@@ -1,0 +1,96 @@
+﻿1.Fm - Acapella;http://www.1.fm;http://sc-acapl.1.fm:8662
+1.Fm - Otto's Baroque Music;http://www.1.fm;http://sc-baroque.1.fm:8045
+1.Fm - Otto's Classical Music;http://www.1.fm;http://sc-classical.1.fm:8047
+1.Fm - Otto's Opera Musick;http://www.1.fm;http://sc-opera.1.fm:9020
+181.Fm - Classic Hits;http://www.181.fm;http://relay.181.fm:8132/
+Abacus Fm - Smooth Jazz;http://www.abacus.fm;http://listen.radionomy.com/ambiente-fm---tenerife,-canary-islands
+Abacus Fm - Vintage Jazz;http://www.abacus.fm;http://listen.radionomy.com/abacusfm-vintage-jazz
+AddictedToRadio - Classic Channel;http://addictedtoradio.com;http://wms-15.streamsrus.com:14510
+Ancient Fm;http://www.ancientfm.com;http://5.152.208.98:8058/
+Apollo Radio;http://www.apolloradio.de/;http://apollo-stream.primacom.net:6300
+Audiophile Baroque;http://stream.psychomed.gr/webstream%20baroque.html;http://50.7.173.162:8010/
+Audiophile Classical;http://stream.psychomed.gr/webstream%20classical.html;http://50.7.173.162:8012/
+Audiophile Live;http://stream.psychomed.gr/webstream%20live.html;http://50.7.173.162:8008/
+AVRO De klassieken;http://www.avro.nl/radio/;http://icecast.omroep.nl/radio4-klassieken-bb-mp3
+AVRO Klassiek Baroque;http://www.avro.nl/radio/;http://icecast.omroep.nl/radio4-baroque-bb-mp3
+Calm Radio - Antonio Dvorak;https://calmradio.com;http://calm11.calmradio.com:10556/stream
+Calm Radio - Bach;https://calmradio.com;http://67.21.244.248:10056/stream
+Calm Radio - Baroque;https://calmradio.com;http://calm2.calmradio.com:10056/stream
+Calm Radio - Beethoven;https://calmradio.com;http://67.21.244.248:10156/stream
+Calm Radio - Brahms;https://calmradio.com;http://67.21.244.248:10356/stream
+Calm Radio - Cantatas;https://calmradio.com;http://calm3.calmradio.com:10728/stream
+Calm Radio - Cello;https://calmradio.com;http://calm3.calmradio.com:9956/stream
+Calm Radio - Celtic;https://calmradio.com;http://calm2.calmradio.com:8056/stream
+Calm Radio - Chamber Music;https://calmradio.com;http://calm3.calmradio.com:10456/stream
+Calm Radio - Chopin;https://calmradio.com;http://calm3.calmradio.com:10556/stream
+Calm Radio - Christian;https://calmradio.com;http://calm11.calmradio.com:8476/stream
+Calm Radio - Classical Chorale;https://calmradio.com;http://calm2.calmradio.com:9956/stream
+Calm Radio - Classical Guitar;https://calmradio.com;http://calm2.calmradio.com:9756/stream
+Calm Radio - Classical Mix;https://calmradio.com;http://calm2.calmradio.com:9856/stream
+Calm Radio - Classical Piano;https://calmradio.com;http://calm11.calmradio.com:8956/stream
+Calm Radio - Concertos;https://calmradio.com;http://67.21.244.246:8056/stream
+Calm Radio - Corelli;https://calmradio.com;http://67.21.244.246:8556/stream
+Calm Radio - Debussy;https://calmradio.com;http://calm11.calmradio.com:8566/stream
+Calm Radio - Delius;https://calmradio.com;http://calm11.calmradio.com:8876/stream
+Calm Radio - Dmitri Shostakovich;https://calmradio.com;http://calm11.calmradio.com:9266/stream
+Calm Radio - Eric Harry;https://calmradio.com;http://calm11.calmradio.com:8456/stream
+Calm Radio - Felix Mendelssohn;https://calmradio.com;http://calm11.calmradio.com:12456/stream
+Calm Radio - Flamenco;https://calmradio.com;http://calm1.calmradio.com:11356/stream
+Calm Radio - Flute;https://calmradio.com;http://calm11.calmradio.com:8076/stream
+Calm Radio - Frescobaldi;https://calmradio.com;http://67.21.244.246:9456/stream
+Calm Radio - Gregorian Chant;https://calmradio.com;http://calm11.calmradio.com:9776/stream
+Calm Radio - Handel;https://calmradio.com;http://calm11.calmradio.com:8486/stream
+Calm Radio - Harp;https://calmradio.com;http://calm11.calmradio.com:9666/stream
+Calm Radio - Harpsichord;https://calmradio.com;http://calm11.calmradio.com:9366/stream
+Calm Radio - Haydn;https://calmradio.com;http://67.21.244.248:10456/stream
+Calm Radio - Healing;https://calmradio.com;http://calm11.calmradio.com:9356/stream
+Calm Radio - Liszt;https://calmradio.com;http://67.21.244.246:8256/stream
+Calm Radio - Lute;https://calmradio.com;http://calm11.calmradio.com:9466/stream
+Calm Radio - Mahler;https://calmradio.com;http://calm7.calmradio.com:8356/stream
+Calm Radio - Mozart;https://calmradio.com;http://67.21.244.248:10556/stream
+Calm Radio - Rachmaninoff;https://calmradio.com;http://67.21.244.246:9256/stream
+Calm Radio - Ravel;https://calmradio.com;http://calm11.calmradio.com:8666/stream
+Calm Radio - Satie;https://calmradio.com;http://calm11.calmradio.com:8966/stream
+Calm Radio - Schubert;https://calmradio.com;http://calm2.calmradio.com:10656/stream
+Calm Radio - Schumann;https://calmradio.com;http://67.21.244.246:11056/stream
+Calm Radio - Solo Guitar;https://calmradio.com;http://calm2.calmradio.com:9656/stream
+Calm Radio - Solo Piano;https://calmradio.com;http://calm3.calmradio.com:9256/stream
+Calm Radio - Solo Piano n Guitar;https://calmradio.com;http://calm3.calmradio.com:8256/stream
+Calm Radio - Strauss II;https://calmradio.com;http://calm2.calmradio.com:10956/stream
+Calm Radio - Tchaikovsky;https://calmradio.com;http://calm2.calmradio.com:10756/stream
+Calm Radio - Telemann;https://calmradio.com;http://67.21.244.246:8856/stream
+Calm Radio - Verdi;https://calmradio.com;http://calm7.calmradio.com:8256/stream
+Calm Radio - Vienna Philharmonica;https://calmradio.com;http://calm1.calmradio.com:9256/stream
+Calm Radio - Violin;https://calmradio.com;http://calm3.calmradio.com:9856/stream
+Calm Radio - Vivaldi;https://calmradio.com;http://calm3.calmradio.com:10656/stream
+Calm Radio - Wagner;https://calmradio.com;http://calm7.calmradio.com:8056/stream
+Calm Radio - YoYoMa;https://calmradio.com;http://67.21.244.242:11256/stream
+Civil Radio.hu;http://www.civilradio.hu/index.php;http://civilradio.hu:8000/
+Classical Radio Greece;http://www.classicalradio.gr/gr/home#;http://46.4.82.243:8080
+Classic Fm;http://www.classicfm.com;http://media-ice.musicradio.com:80/ClassicFMMP3
+Concertzender - Wereldmuziek;http://www.concertzender.nl/;http://streams.greenhost.nl:8080/live
+Concertzender - Xrated;http://www.concertzender.nl/;http://streams.greenhost.nl:8080/concertzenderlive
+Klassik Radio Opera;http://www.klassikradio.de;http://62.27.87.92:8000/klassikradioopera128/livestream.mp3
+Kuar Fm;http://www.publicbroadcasting.net/kuar/ppr/index.shtml;http://pubint.ic.llnwd.net/stream/pubint_kuarfm
+M2 Classic;http://www.m2radio.fr/?m2=classic;http://87.98.163.222:9000
+MDR- Klassik;http://www.mdr.de/mdr-klassik/;http://c22033-l.i.core.cdn.streamfarm.net/22008mdrklassik/live/3087mdrklassik/live_de_128.mp3
+Musiq3 RTBF;http://www.rtbf.be/musiq3;http://musiq3.ice.rtbf.be/musiq3.mp3
+Naxi Radio - Kids;http://www.naxi.rs;http://naxidigital128.kbcnet.rs:8050/
+Oestereich 1;http://oe1.orf.at/#;http://mp3stream3.apasf.apa.at:8000/
+Oestereich 3;http://oe3.orf.at/;http://mp3stream7.apasf.apa.at:8000
+PolskaStacja.pl - Classic;http://www.polskastacja.pl;http://91.121.92.167:8900
+Radio1 Fm88 Classic;http://www.radio1.gr/listenlive;http://111.gr:8016
+Radio Beograd 2;http://www.rts.rs;http://195.252.107.194:8004
+Radio Crazy - Opera;http://www.radiocrazy.ch;http://friends-of-radius.ethz.ch:8000/radiocrazy-opera.mp3
+Radio Riel - Main;http://radioriel.org/;http://moto.slserver.com:8020
+Radio Riel - Reverie;http://radioriel.org/;http://66.135.38.233:10010/
+Sky.fm - Classical Guitar;http://www.sky.fm/guitar/;http://pub2.sky.fm/sky_guitar
+Sky.fm - Mostly Classical;http://www.sky.fm/classical/;http://pub2.sky.fm/sky_classical
+SRo Radio Devin (sk);http://devin.rtvs.sk;http://live.slovakradio.sk:8000/Devin_128.mp3
+SRo Radio Klasika;http://klasika.rtvs.sk;http://live.slovakradio.sk:8000/Klasika_256.mp3
+SWR 2;http://www.swr.de/swr2/-/id=7576/otnbb1/index.html;http://swr-mp3-m-swr2.akacast.akamaistream.net/7/721/137135/v1/gnl.akacast.akamaistream.net/swr-mp3-m-swr2
+VRT Klara;http://radio.klara.be/radio/10_home.php;http://mp3.streampower.be/klaracontinuo-high.mp3
+Whisperings Solo Piano Radio;http://www.solopianoradio.com/;http://pianosolo.streamguys.net:80/live
+WHRV Classic;http://www.whrv.org/home;http://connoisseurclassics.mediaplayer.whro.org/128
+WQXR;http://www.wqxr.org/#;http://wnyc-wqxr-ice.streamguys.com:80/wqxr
+WRJQ Goodtime Radio;http://www.wrjqradio.com;http://70.38.12.44:8144

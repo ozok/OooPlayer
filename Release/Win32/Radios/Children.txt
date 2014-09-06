@@ -1,0 +1,4 @@
+﻿Abiding Radio - Sesonal;http://www.abidingradio.org/format.html;http://streams.abidingradio.org:7842/1
+Antenne Bayern - Kids;http://www.antenne.de/;http://mp3channels.webradio.antenne.de/hits-fuer-kids
+Bright.Fm Kids;http://www.brightfmkids.nl;http://wms.bright.fm:8020/
+SRo Radio Junior (sk);http://junior.rtvs.sk;http://live.slovakradio.sk:8000/Junior_128.mp3

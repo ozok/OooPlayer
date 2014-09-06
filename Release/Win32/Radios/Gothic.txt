@@ -1,0 +1,8 @@
+﻿Abnormally Dead on Air;http://www.internetradio.co.uk/?gk_menu=mega#;http://199.101.51.168:8006
+Asylum Radio;http://www.asylumradio.eu;http://67.159.5.57:9258/
+German Gothic Radio;http://www.german-gothic-radio.de;http://dsl.german-gothic-radio.de:8046/
+Gothville;http://www.gothville.com;http://radio.gothville.com:8000/
+Radio Schwarze Welle;http://www.schwarze-welle.de/;http://85.25.43.132:7500
+Real Industrial Radio;http://realindustrialradio.com/;http://radio.realindustrialradio.com:8000/
+Ultra Dark Radio;http://www.ultradarkradio.com;http://stream1.laut.fm/ultradarkradio
+Vox Noctem;http://www.voxnoctem.de;http://r2d2.voxnoctem.de:8000/voxnoctem.mp3

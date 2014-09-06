@@ -1,0 +1,48 @@
+﻿1.Fm - Americas Ballads;http://www.1.fm;http://sc-abb.1.fm:8680
+AddictedToRadio - Bar Blues;http://addictedtoradio.com;http://208.77.21.33:11710
+AddictedToRadio - Blues Classics;http://addictedtoradio.com;http://208.77.21.33:11610
+ADR 203 Love;http://alldigitalradionetwork.com;http://192.169.70.194:8038
+ADR 204 Idol Rewind;http://alldigitalradionetwork.com;http://192.169.70.194:8110
+AKA Radio;http://community.loudcity.com/stations/akaradio/files/show;http://radio.akaradio.com:8090
+Antenne Bayern - Lovesongs;http://www.antenne.de/;http://mp3channels.webradio.antenne.de/lovesongs
+BellyUp4Blues;http://www.bellyup4blues.com;http://72.13.82.82:5100
+BestNetRadio Love;http://www.bestnetradio.com;http://173.192.32.199:7210
+Big Blue Swing;http://web.bigblueswing.com;http://radio.bigblueswing.com:8002/
+Blues Connection on Air;http://www.internetradio.co.uk/index.php?option=com_k2&view=item&layout=item&id=46&Itemid=198;http://199.101.51.168:8004
+Blues Radio UK;http://www.bluesradio.co.uk;http://206.217.213.16:8430
+Cafe Romantico Radio;http://cafe-romantico-radio.playtheradio.com;http://listen.radionomy.com/cafe-romantico-radio
+Calm Radio - Blues;https://calmradio.com;http://calm11.calmradio.com:9556/stream
+detour Blues;http://www.detourblues.com/;http://arizona.thedetour.us:8081
+Ez Does It Net Radio;http://loudcity.com/stations/ez-does-it/files/show/listennow.html;http://208.85.242.52:8164
+Hard as a rock on Air;http://www.internetradio.co.uk/index.php?option=com_k2&view=item&layout=item&id=101&Itemid=199;http://199.101.51.168:8012
+Heartbeat Radio;http://www.heartbeatofflagler.com/Heartbeatclicktolisten.htm;http://s2.streamorbit.com:8139
+Hearttime Radio;http://www.hearttime-radio.com/news.php;http://hearttime-radio.com:8000/
+Heart Fm Alexandroupolis;https://www.facebook.com/heatradio.gr;http://eu02.egihosting.com:9108/
+Hope Radio Ireland;http://www.hope-radio.com;http://174.127.114.128:8110/stream
+Indie Show on Air;http://www.internetradio.co.uk/index.php?option=com_k2&view=item&layout=item&id=101&Itemid=199;http://199.101.51.168:8008
+I Love You;http://www.iloveradio.de;http://87.230.53.70/iloveradio4.mp3
+Klassik Radio Live;http://www.klassikradio.de;http://62.27.87.92:8000/klassikradiolive128/livestream.mp3
+Kronehit - Love;http://www.kronehit.at;http://onair.krone.at:80/kronehit-love.mp3
+Latido 90.1;http://www.latido.com.mx/index.cfm#;http://gpazos.centrocibernetico.com:42000/
+Latido Fm;http://www.latido.com.mx/index.cfm;http://latido.centrocibernetico.com:42000/
+Life Radio.at - Love;http://www.liferadio.at;http://liferadio.liwest.at:8000/special
+Loveradio.ie;http://www.shoutcast.com/#;http://31.14.40.241:9722
+Love Radio USA;http://loveradiousa.com;http://184.95.47.178:9328
+M2 Love;http://www.m2radio.fr/index.php?m2=love;http://live.m2stream.fr:80/m2love-128.mp3
+Naxi Radio - Love;http://www.naxi.rs;http://naxidigital128.kbcnet.rs:8100/
+ORSRADIO Blues;http://www.shoutcast.com/Internet-Radio/ORSRADIO;http://192.81.248.43:8026
+ORSRADIO Romantica baladas;http://www.shoutcast.com/Internet-Radio/ORSRADIO;http://192.81.248.43:8010
+PolskaStacja.pl - Blues;http://www.polskastacja.pl;http://188.165.20.29:5500
+Radio1 Fm88 Ballads;http://www.radio1.gr/listenlive;http://111.gr:8010
+Rádio Blesk (sk);http://www.radioblesk.net;http://stream.radioblesk.net:7777
+Radio Expres (sk);http://www.expres.sk;http://85.248.7.162:8000/64.mp3
+Radio Logos (sk);http://www.radiologos.sk;http://server1.internetoveradio.sk:8834
+Radio Moonlight;http://www.radio-moonlight.org;http://85.25.246.7:18080
+RFP Radio - Soul Heaven;http://rfpradio.com/tunein;http://108.163.213.202:8192/stream
+Sky.fm - Christian;http://www.sky.fm/christian;http://pub2.sky.fm/sky_christian
+Sky.fm - Love Music;http://www.sky.fm/lovemusic;http://pub2.sky.fm/sky_lovemusic
+Sunshine Fm 104.9;http://www.sunshinefm.com.au/listen-live.html;http://199.71.212.205:7104/
+Swing Fm Limoges;http://www.swingfm.asso.fr/html/index.php;http://swingfm.ice.infomaniak.ch:80/swingfm-128
+Todo exitos - Romatico;http://www.todoexitos.com/index.php/romantico;http://hertz.todoexitos.com:8210
+Vibration - Soft Hits;http://www.vibrationclassic80.ch/spip.php?page=vibrationclassic;http://vibrationsofthits.stream2net.eu:8350
+WGLT Blues Radio;http://wglt.org/streams/blues.shtml;http://wgltradio.ilstu.edu:8000/wgltblues.mp3

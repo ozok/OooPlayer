@@ -1,0 +1,54 @@
+﻿.977 - The Oldies Channel;http://www.977music.com;http://7659.live.streamtheworld.com:80/977_OLDIES_SC
+1.Fm - 70s;http://www.1.fm;http://sc-70s.1.fm:8656
+1.Fm - Disco One;http://www.1.fm;http://sc-disco.1.fm:8100
+1.Fm - Luxuria Music;http://www.1.fm;http://64.62.252.136:3142
+181.Fm - Super 70s;http://www.181.fm;http://relay.181.fm:8066
+20th Century Radio;http://www.20thcenturyradio.com;http://74.53.80.173:6006
+AddictedToRadio - 70s Decade;http://addictedtoradio.com;http://208.77.21.31:9210
+AddictedToRadio - 70s Lite;http://addictedtoradio.com;http://rfe-r1.alldigital.net:8000/lmjc355
+AddictedToRadio - Jammin Oldies;http://addictedtoradio.com;http://wms-13.streamsrus.com:9010
+AddictedToRadio - Oldies Channel;http://addictedtoradio.com;http://wms-13.streamsrus.com:9810
+AddictedToRadio - Quiet Storm;http://addictedtoradio.com;http://wms-13.streamsrus.com:12110
+AddictedToRadio - Studio 54;http://addictedtoradio.com;http://wms-13.streamsrus.com:9810
+ADR 211 70s;http://alldigitalradionetwork.com;http://192.169.70.194:8040
+American Graffiti;http://www.radionomy.com/en/radio/american-graffiti/index;http://listen.radionomy.com/american-graffiti
+Angel Radio;http://www.angelradio.co.uk/#/listen-live/4522509190;http://s6.viastreaming.net:7030/
+Antenne Bayern - Oldies;http://www.antenne.de/;http://mp3channels.webradio.antenne.de/oldies-but-goldies
+BayRadio North;http://www.bayradio.fm/listen-live;http://64.150.191.39:8434
+BayRadio South;http://www.bayradio.fm/listen-live;http://68.168.103.13:8220
+Beatles Radio;http://www.beatlesradio.com/;http://64.40.99.2:8088
+BestNetRadio 70s Pop;http://www.bestnetradio.com;http://173.192.32.199:7020
+Calm Radio - Big Band;https://calmradio.com;http://calm2.calmradio.com:10856/stream
+Compass Fm UK;http://www.compassfm.co.uk;http://icy-e-04.sharp-stream.com:80/lincsfmcompass.mp3
+Crik Fm - Super 70s;http://www.lynxradionetwork.com;http://94.23.62.189:6046
+Fun 45s;http://www.fun45s.com/#;http://173.193.205.96:8076/
+Gapfreeradio - Rock n Roll;http://gapfreeradio.com/listen-to-rock-n-roll-thru-time;http://162.251.160.2:80/gapfreeradiohigh
+Gold fm;http://www.goldfm.de/;http://sc1.netstreamer.net:8060
+Gold Mx Albany;http://www.goldmx.com.au/;http://mega6.radioserver.co.uk:8038/
+Got Radio - Classic 60s;http://www.gotradio.com/;http://173.244.215.163:8370
+Gramox Finland;http://gramox.fi;http://suomiradio.pro:8000/gramox.mp3
+Hitradio Sundaymusic;http://www.hitradio-sundaymusic.repage.de;http://stream.laut.fm/sundaymusic
+HotMixRadio - Funky;http://www.hotmixradio.fr/90s;http://streamingads.hotmixradio.fm/hotmixradio-funky-128.mp3
+Italian Graffiati;http://www.italiangraffiati.com;http://kos.broadstreamer.com:8500
+just70s;http://www.laut.fm/just70s;http://www.laut.fm/just70s
+Legend Fm.gr;http://www.legendfm.gr;http://s6.onweb.gr:8002/
+Nostalgie.fr;http://www.nostalgie.fr;http://mp3.live.tv-radio.com/nostalgie/all/nos_113812.mp3
+Offshore Music Radio;http://www.offshoremusicradio.com;http://bitsmitter.com:8000/
+Oldies104;http://www.oldies104.net;http://ando1.cdn.radiostorm.com/oldies-mp3
+ORSRADIO 80s Metal;http://www.shoutcast.com/Internet-Radio/ORSRADIO;http://192.81.248.43:8018
+PapaJoe´s Bar;http://www.papajoes-bar.com;http://stream2.sxcore.net:9974
+Pear Radio;http://loudcity.com/stations/pear-radio/files/show/listen.htm;http://mega6.radioserver.co.uk:8030
+PolskaStacja.pl - 80s;http://www.polskastacja.pl;http://188.165.23.150:9700
+Radio Bavaria International;http://www.radio-bavaria-international.de/;http://streamplus18.leonex.de:18576
+Radio Bop;http://radiobop.com;http://208.53.158.48:8362/
+Radio Bop 60s;http://radiobop60s.com;http://208.53.158.48:8410/
+Radio F 94.5;http://www.radiof.de/radiof.de/index.php#;http://webradio.radiof.de:8000/
+radio GOLD - real classics;http://www.radiogold.de;http://www.digitalradiostream.de:7000
+Radio One Retro.sk;http://www.radiorock.sk;http://217.75.92.14:8000/retro
+Radio Riel - Dieselpunk;http://radioriel.org/;http://64.34.173.110:8408/
+Radio Riel - New Toulouse;http://radioriel.org/;http://argon.slserver.com:8052/
+Red River Radio;http://www.redriverradio.org/;http://pubint.ic.llnwd.net/stream/pubint_rrr
+Rich Bro Radio;http://www.streamlicensing.com/stations/richbro/index.html;http://sc2.paulmerrell.net:8236/
+Sky.fm - American Songbook;http://www.sky.fm/americansongbook;http://pub1.sky.fm/sky_americansongbook
+Sky.fm - Beatles Tribute;http://www.sky.fm/beatles/;http://pub2.sky.fm/sky_beatles
+Sky.fm - Hit 70s;http://www.sky.fm/hit70s/;http://pub2.sky.fm/sky_hit70s

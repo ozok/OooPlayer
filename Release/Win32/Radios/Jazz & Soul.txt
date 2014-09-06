@@ -1,0 +1,68 @@
+﻿.977 - The Smooth Jazz Channel;http://www.977music.com;http://7609.live.streamtheworld.com:80/977_SMOOJAZZ_SC
+1.Fm - Adore Jazz;http://www.1.fm;http://sc-ajazz.1.fm:5080
+1.Fm - All & Gospel;http://www.1.fm;http://sc-gospel.1.fm:7102
+1.Fm - Bay Smooth Jazz;http://www.1.fm;http://sc-sjazz.1.fm:9010
+121 Webradio - Jazz n Classic;http://jazz.121webradio.com/;http://www.121webradio.com:8020/
+90.9 Jazzy Hungaria;http://www.jazzy.hu/;http://online.jazzy.hu/jazzy.mp3
+ABC - Jazz;http://www.abc.net.au/radio/listenlive.htm#directlinks;http://shoutmedia.abc.net.au:10430/
+AddictedToRadio - Jazz Masters;http://addictedtoradio.com;http://wms-15.streamsrus.com:16810
+ADR 104 Jazz Lab;http://alldigitalradionetwork.com;http://192.169.70.194:8116
+ADR 207 Gospel Station;http://alldigitalradionetwork.com;http://192.169.70.194:8114
+Amazing Smooth and Jazz;http://smoothandjazz.com;http://uk1.amazingradios.com:8090/
+Audiophile Jazz;http://stream.psychomed.gr/webstream%20jazz.html;http://50.7.173.162:8014/
+Bossajazzbrasil;http://www.bossajazzbrasil.com;http://streaming17.brlogic.com:8238/live
+Calm Radio - Be Bop;https://calmradio.com;http://67.21.244.246:8156/stream
+Calm Radio - Bossa Nova;https://calmradio.com;http://67.21.244.246:10056/stream
+Calm Radio - Jazz Guitar;https://calmradio.com;http://calm11.calmradio.com:9566/stream
+Calm Radio - Jazz Piano;https://calmradio.com;http://calm3.calmradio.com:8756/stream
+Calm Radio - Jazz Vocals;https://calmradio.com;http://67.21.244.246:8356/stream
+Calm Radio - Just Jazz;https://calmradio.com;http://calm11.calmradio.com:8856/stream
+Calm Radio - Latin Jazz;https://calmradio.com;http://calm11.calmradio.com:9686/stream
+Calm Radio - Movieola;https://calmradio.com;http://calm2.calmradio.com:8156/stream
+Calm Radio - Smooth Jazz;https://calmradio.com;http://calm3.calmradio.com:10856/stream
+Chroma - Classic Jazz;http://chromaradio.net;http://176.9.22.6:8052
+Chroma - Jazz Smooth;http://chromaradio.net;http://176.9.22.6:8002
+Chroma - Soul;http://chromaradio.net;http://176.9.22.6:8680
+Concertzender - Jazz;http://www.concertzender.nl/;http://streams.greenhost.nl:8080/jazz
+Crooze Fm;http://www.crooze.fm/;http://77.92.64.44:8045/stream
+Gong Radio - Abalone;http://www.gongradio.fr/5/abalone.html;http://listen.radionomy.com/abalone
+Got Radio - Jazz;http://www.gotradio.com/;http://173.244.215.163:8460
+Groove Fm;http://www.groovefm.de/;http://stream.groovefm.de:10028/
+JazzRadio.net;http://www.jazzradio.net/;http://80.237.159.26:8250
+Jazz 88.3;http://www.jazz88.org/listen.php;http://listen.jazz88.org/ksds.mp3
+Jazz Radio - Blues;http://www.jazzradio.fr/radio/webradio/blues;http://jazzblues.ice.infomaniak.ch/jazzblues-high.mp3
+Jazz Radio - Beatles;http://www.jazzradio.fr/radio/webradio/beatles-jazz;http://jazz-wr16.ice.infomaniak.ch/jazz-wr16-128.mp3
+Jazz Radio - Black;http://www.jazzradio.fr/radio/webradio/black-music;http://jazzblackmusic.ice.infomaniak.ch/jazzblackmusic-high.mp3
+Jazz Radio;http://www.jazzradio.fr/;http://jazzradio.ice.infomaniak.ch/jazzradio-high.mp3
+Jazz Radio - Classic;http://www.jazzradio.fr/radio/webradio/jazz-and-classique;http://jazz-wr17.ice.infomaniak.ch/jazz-wr17-128.mp3
+Jazz Radio - Classic Jazz;http://www.jazzradio.fr/radio/webradio/classic-jazz;http://jazz-wr01.ice.infomaniak.ch/jazz-wr01-128.mp3
+Jazz Radio - Contemporary;http://www.jazzradio.fr/radio/webradio/contemporary-jazz;http://jazz-wr05.ice.infomaniak.ch/jazz-wr05-128.mp3
+Jazz Radio - French;http://www.jazzradio.fr/radio/webradio/jazzy-french-radio-by-jazz-radio;http://jazz-wr18.ice.infomaniak.ch/jazz-wr18-128.mp3
+Jazz Radio - Grovv;http://www.jazzradio.fr/radio/webradio/groov-up;http://jazz-wr13.ice.infomaniak.ch/jazz-wr13-128.mp3
+Jazz Radio - Ladies;http://www.jazzradio.fr/radio/webradio/ladies-n-crooners;http://jazzladiescrooners.ice.infomaniak.ch/jazzladiescrooners-high.mp3
+Jazz Radio - Lounge;http://www.jazzradio.fr/radio/webradio/lounge;http://jazzlounge.ice.infomaniak.ch/jazzlounge-high.mp3
+Jazz Radio - Manouche;http://www.jazzradio.fr/radio/webradio/jazz-manouche;http://jazz-wr02.ice.infomaniak.ch/jazz-wr02-128.mp3
+Jazz Radio - New Orleans;http://www.jazzradio.fr/radio/webradio/new-orleans;http://jazz-wr03.ice.infomaniak.ch/jazz-wr03-128.mp3
+Jazz Radio - Reprises;http://www.jazzradio.fr/radio/webradio/reprises;http://reprises.ice.infomaniak.ch/reprises-high.mp3
+Jazz Radio - Rhino;http://www.jazzradio.fr/radio/webradio/rhino-jazz;http://jazz-wr15.ice.infomaniak.ch/jazz-wr15-128.mp3
+Jazz Radio - Soul;http://www.jazzradio.fr/radio/webradio/soul;http://jazz-wr10.ice.infomaniak.ch/jazz-wr10-128.mp3
+M2 Jazz;http://www.m2radio.fr/?m2=jazz;http://live.m2stream.fr:80/m2jazz-128.mp3
+ORSRADIO Hip Hop;http://www.shoutcast.com/Internet-Radio/ORSRADIO;http://192.81.248.43:8032
+Pure Jazz Radio;http://loudcity.com/stations/pure-jazz-radio/tune_in;http://71.125.12.37:8000
+Qfm Tenerife ;http://www.qmusica.com/index_de.php;http://s1.viastreaming.net:7420/
+Radio Crazy - Jazz & Swing;http://www.radiocrazy.ch;http://friends-of-radius.ethz.ch:8000/radiocrazy-jazz.mp3
+Radio Jazz Plus;http://www.radiojazzplus.com;http://70.38.64.240:8000/
+Radio Slow Jamz.br;http://www.slowjamz.com.br;http://slow01.slowjamz.com.br:8028/
+Radio Wax;http://www.radiowax.com/listenlive.html;http://50.7.96.210:8494
+Renessans 94.2;http://www.jazzfm.com.ua/;http://217.20.164.163:8014/
+RFP Radio - Kingston Ska;http://rfpradio.com/tunein;http://108.163.213.202:8210/stream
+RFP Radio - Music for the Soul;http://rfpradio.com/tunein;http://108.163.213.202:8222/stream
+RFP Radio - Neo Soul;http://rfpradio.com/tunein;http://108.163.213.202:8060/stream
+Sky.fm - BeBop Jazz;http://www.sky.fm/sky_bebop/;http://pub2.sky.fm/sky_bebop
+Sky.fm - BossaNova Jazz;http://www.sky.fm/sky_bossanova/;http://pub2.sky.fm/sky_bossanova
+Sky.fm - Smooth Jazz;http://www.sky.fm/smoothjazz/;http://pub5.sky.fm/sky_smoothjazz
+SmoothJazz station;http://smj.delfa.net;http://radioserver1.delfa.net/192.mp3
+Smooth Jazz and More Radio;http://www.myspace.com/thesourcesmoothjazzandmor;http://149.255.33.71:8002
+SomaFM - Sonic Universe;http://somafm.com/sonicuniverse/played;http://uwstream2.somafm.com:8604
+Sublime Fm;http://www.sublimefm.nl/home;http://82.201.47.68/SublimeFM2
+WGLT Jazz Radio;http://wglt.org/streams/jazz.shtml;http://wgltradio.ilstu.edu:8000/wgltjazz.mp3

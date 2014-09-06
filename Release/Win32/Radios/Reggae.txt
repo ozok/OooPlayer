@@ -1,0 +1,22 @@
+﻿AddictedToRadio - Raggaeton;http://addictedtoradio.com;http://wms-13.streamsrus.com:17210
+AddictedToRadio - Raggaeton;http://addictedtoradio.com;http://wms-13.streamsrus.com:17110
+AddictedToRadio - Salsa;http://addictedtoradio.com;http://208.77.21.31:17310
+BigUp Radio - Reggaeton;http://www.bigupradio.com;http://173.224.124.232:9914
+BigUp Radio - Roots;http://www.bigupradio.com;http://radio.bigupradio.com:8005/
+Calm Radio - Native;https://calmradio.com;http://calm11.calmradio.com:10256/stream
+Calm Radio - Persia;https://calmradio.com;http://calm4.calmradio.com:8756/stream
+FunX - Reggae;http://www.funx.nl;http://icecast.omroep.nl/funx-reggae-bb-mp3
+Got Radio - Reggae;http://www.gotradio.com;http://173.244.215.163:8470
+hitRadio.fr - Frenchy;http://www.hitradio.fr;http://listen.radionomy.com/hitradiofr-frenchy
+LA X 103.9 Fm;http://www.laxelectronica.com/lax/home;http://66.240.202.106:8074
+Partyviberadio - Reggae;http://www.partyviberadio.com/player/dancehall-reggae/index.html;http://206.190.152.194:8000/
+PolskaStacja.pl - Bollywood;http://www.polskastacja.pl/radiochannel/Bollywood.htm;http://91.121.92.167:4600
+PolskaStacja.pl - CCM;http://www.polskastacja.pl;http://188.165.20.29:4100
+PolskaStacja.pl - Hip Hop;http://www.polskastacja.pl;http://91.121.116.107:9300
+Pondends;www.pondends.net;http://198.178.123.20:7000
+Radio 6;http://www.radio-6.de/;http://streamplus3.leonex.de:41204
+Sky.fm - Roots Reggae;http://www.sky.fm/rootsreggae/;http://pub2.sky.fm/sky_rootsreggae
+Sky Radio Macedonia;http://www.skyradio.com.mk/;http://89.205.123.70:8002
+Slam101 Fm;http://www.slam101fm.com;http://s2.nexuscast.com:8014/
+Tambareen Radio;http://mixupyaad.com/tambareenradio;http://198.178.123.14:8044
+The Healing Light;http://loudcity.com/stations/the-healing-light/files/show/index.html;http://sc3.mystreamserver.com:8076

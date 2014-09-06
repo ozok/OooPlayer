@@ -1,0 +1,10 @@
+﻿1.Fm - Chinamerica;http://www.1.fm;http://sc7.1.fm:26814
+AnimeAMAZE;http://www.animeamaze.net;http://apple.neostreams.info:10007/
+AnimeRadio.su;http://animeradio.su;http://78.46.91.38:8000
+Anime Thai;http://www.anime-thai.net/radio.php;http://202.162.78.203:9020/
+JPopsuki Radio;http://jpopsuki.eu/media.php;http://213.239.204.252:8000/stream
+Musicradio.in.th;http://www.musicradio.in.th;http://111.223.33.232:8050/
+Radio Rakuen Peru;http://radiorakuen.blogspot.com;http://67.212.165.162:7018
+Radio Tensai;http://www.radiotensai.com.br/site;http://ouvir.radiotensai.in:8007/autodj
+Radio Waizon;http://radio.waizon.com;http://112.121.150.38:8888/
+Sky.fm - Jpop;http://www.sky.fm/jpop;http://pub2.sky.fm/sky_jpop

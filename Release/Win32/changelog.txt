@@ -1,0 +1,26 @@
+--1.3
+-Added: Radio player
+-Added: Visualization
+-Fixed: Keyboard shortcuts for "Save Playlist" and "Stop" were the same
+
+--1.2
+-Added: Dragging items in the playlist
+-Added: Support for internal artwork
+-Added: An option to load external or internal artworks first
+-Added: Support for WAV files
+-Added: An option to delete selected files from the playlist
+-Added: Tray icon and tray menu
+-Added: Some shortcuts
+-Fixed: Program would stop working if user tried to play a non-existing file
+-Updated: MediaInfo to 0.7.69
+
+--1.1
+-Added: Support for speex, TAK and OptimFrog files
+-Added: An option to not to load cover art
+-Added: Smaller package size
+-Fixed: Unable to drag&drop audio files to playlist
+-Updated: FLAC, WacPack and Opus playback libraries
+-Updated: ID3v1 and ID3v2 tag libraries
+
+--1.0
+-First release

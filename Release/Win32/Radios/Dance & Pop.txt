@@ -1,0 +1,78 @@
+﻿1.Fm - Adult Urban Hits;http://www.1.fm;http://sc-ua.1.fm:8023
+1005 Das Hitradio;http://www.dashitradio.de;http://skyserver5.skydisc.net:8000/
+121 Webradio - Pop n Rock;http://jazz.121webradio.com/;http://www.121webradio.com:8010/
+181.Fm - Studio 181;http://www.181.fm/;http://relay.181.fm:8072/
+ABradio Dance;http://www.abradio.cz/radio/59/dance-radio;http://mp3stream4.abradio.cz:8000/dance128.mp3
+AddictedToRadio - BreakBeat;http://addictedtoradio.com;http://208.77.21.31:13010
+AddictedToRadio - Love Bites;http://addictedtoradio.com;http://208.77.21.33:15910
+AddictedToRadio - Old School;http://addictedtoradio.com;http://208.77.21.31:14910
+ADR 206 Pop Nation;http://alldigitalradionetwork.com;http://192.169.70.194:8112
+BestNetRadio Coffee House;http://www.bestnetradio.com;http://173.192.32.199:7160
+Boom Station;http://boomstation.net;http://206.190.150.90:8217
+Cadena Dial;http://www.dialandaluciaeste.com;http://4633.live.streamtheworld.com:80/CADENADIAL_SC
+City Dance Radio Spain;http://www.citypopradio.es/index2.html;http://listen.radionomy.com/City-Dance-Radio
+City Funk Radio Spain;http://www.citypopradio.es/index2.html;http://listen.radionomy.com/CITY-FUNK-RADIO
+City Pop Radio Spain;http://www.citypopradio.es/index2.html;http://listen.radionomy.com/City-Pop-Radio
+Cosmo Radio - Greece;http://www.cosmoradio.gr/;http://shout.cosmoradio.gr:8130/
+c.t. - Das Radio;http://www.radioct.de/;http://live.radioct.de:8008/
+Disco Fm.nl;http://www.discofm.nl;http://174.36.1.92:8508/
+Dobre Radio (sk);http://www.dobreradio.sk;http://stream.dobreradio.sk:8000/Dobre128mp3
+Electro Radio;http://www.electroradio.ch/;http://stream.electroradio.ch:26630
+Energy - Dance;http://www.energy.ch/webradios/musicinfos-detail/channel/energy-dance-internet-radio-techno-trance-house-und-elektro/;http://energydance.ice.infomaniak.ch:80/energydance-high.mp3
+FG Dance;http://www.radiofg.com;http://radiofg.impek.com/fgd
+FG DJ Mix;http://www.radiofg.com;http://radiofg.impek.com/fg6
+FG Radio;http://www.radiofg.com;http://radiofg.impek.com/fg
+FG Underground;http://www.radiofg.com;http://radiofg.impek.com/ufg
+Fitmix.fm;http://www.fitmix.fm;http://198.105.220.12:6443/live
+Fresh Radio;http://www.freshradio.org;http://176.31.113.37:8080
+FunX - Amsterdam;http://www.funx.nl;http://icecast.omroep.nl/funx-amsterdam-bb-mp3
+FunX - Den Haag;http://www.funx.nl;http://icecast.omroep.nl/funx-denhaag-bb-mp3
+FunX - Utrecht;http://www.funx.nl;http://icecast.omroep.nl/funx-utrecht-bb-mp3
+Fun Radio FM (sk);http://www.funradio.sk;http://stream.funradio.sk:8000/fun128.mp3
+Fun Radio Lorraine;http://www.funradiolorraine.fr;http://88.191.152.65:8014
+Fusion Radio Chicago -  Pop;http://popfusion.fusionchicago.com/;http://pop.fusionchicago.com:9006
+Future Radio UK;http://futureradio.co.uk;http://radio.canstream.co.uk:8007/live.mp3
+Gapfreeradio - Flashback;http://gapfreeradio.com/listen-to-flashback-now;http://162.251.160.2:80/gapfreeflashbackhigh
+Got Radio - Dance;http://www.gotradio.com/;http://173.244.215.163:8570
+Got Radio - The Beat;http://www.gotradio.com/;http://173.244.215.162:8130
+hitRadio.fr - Dance;http://www.hitradio.fr;http://listen.radionomy.com/hitradiofr-dance
+hitRadio.fr - Disco;http://www.hitradio.fr;http://listen.radionomy.com/hitradiofr-disco
+hitRadio.fr - Pop;http://www.hitradio.fr;http://listen.radionomy.com/hitradiofr-pop
+Imagine Fm Belgium;http://www.imaginefm.be;http://str43.streamakaci.com:6710
+I Love 2 Dance;http://www.iloveradio.de;http://80.237.156.44:80/iloveradio2.mp3
+Jack Fm - Berlin;http://www.jackfm.de/;http://sc1.netstreamer.net:8050
+Jemne Melodie (sk);http://www.jemnemelodie.sk/titulna-stranka;http://93.184.69.143:8000/;jemnemelodie-high-mp3.mp3
+Kronehit - Dance;http://www.kronehit.at;http://onair.krone.at:80/kronehit-dance.mp3
+LifeGate Sound;http://www.shoutcast.com;http://95.211.113.141:8254
+Lite Fm;http://www.litefmnh.com/lite-fm;http://162.251.160.2:80/bobcountryhigh
+Magic Radio - France;http://www.magic-radio.net;http://mp3.magic-radio.net
+Magic Radio - Switzerland;http://www.magicradio.ch/v2/index.php/ecoutez;http://magicradio.ice.infomaniak.ch/magicradio-high.mp3
+Naxi Radio - Dance;http://www.naxi.rs;http://naxidigital128.kbcnet.rs:8110/
+ORSRADIO Disco;http://www.shoutcast.com/Internet-Radio/ORSRADIO;http://192.81.248.43:8014
+Partyviberadio - Pop;http://www.partyviberadio.com/player/pop/index.html;http://206.190.152.194:8018/
+PlaZma Radio;http://www.plazmaradio.com;http://50.7.70.66:8638
+PolskaStacja.pl - Dance100;http://www.polskastacja.pl;http://91.121.165.51:2200
+PolskaStacja.pl - Dancehall;http://www.polskastacja.pl;http://91.121.92.167:4800
+PolskaStacja.pl - Italia;http://www.polskastacja.pl;http://91.121.157.133:5000
+Puls Fm;http://www.pulsfm.de;http://87.230.82.41:80
+Q Music.be;http://q-music.be;http://146.185.49.37:80/QBE_MP3_HI
+Radio1 Fm88 Dance;http://www.radio1.gr/listenlive;http://111.gr:8004
+Radio DEEA;http://www.shoutcast.com/Internet-Radio/Radio%20DEEA;http://89.46.222.8:9940
+Radio puntonuovo;http://www.radiopuntonuovo.it/;http://s3.mediastreaming.it:7260/
+Radio Rasman (sk);http://www.shoutcast.com;http://server1.internetoveradio.sk:8856
+Radio SAW 2000er;http://www.radiosaw.de;http://stream.saw-musikwelt.de/saw-2000er/
+Radio SAW Deutsch;http://www.radiosaw.de;http://stream.saw-musikwelt.de/saw-deutsch/
+Radio SAW Party;http://www.radiosaw.de;http://stream.saw-musikwelt.de/saw-party/
+Radio Sever (sk);http://www.radiosever.sk;http://stream.sepia.sk:8000/sever128.mp3
+Retropraha.cz;http://retropraha.cz;http://icecast4.play.cz/retromusichallradio128.mp3
+RFP Radio - Dancehall Queen;http://rfpradio.com/tunein;http://108.163.213.202:8072/stream
+RFP Radio - Make it Pop;http://rfpradio.com/tunein;http://108.163.213.202:8120/
+RL Tech Radio;http://rl-tech-radio.playtheradio.com;http://listen.radionomy.com/rl-tech-radio
+San Antonio Dance Radio;http://www.streamlicensing.com/stations/sadanceradio/SanAntonioDanceRadio.html;http://64.150.176.87:8203
+Sky.fm - Russian Dance;http://www.sky.fm/russiandance;http://pub1.sky.fm/sky_russiandance
+Sky.fm - Russian Pop;http://www.sky.fm/russianpop;http://pub2.sky.fm/sky_russianpop
+Smart Fm.gr;http://www.smartfm.gr;http://smartfm.serverroom.us:8030
+SomaFM - PopTron;http://somafm.com/play/poptron;http://ice.somafm.com/poptron
+SunRise Fm (sk);http://www.sunrisefm.sk/kontakt.html;http://server1.internetoveradio.sk:8809
+Two Lochs Radio.uk;http://www.2lr.co.uk;http://icecast.commedia.org.uk:8000/twolochs.mp3
+Zap Fm 1;http://www.zap.fm;http://83.149.112.83:8000/

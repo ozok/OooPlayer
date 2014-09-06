@@ -1,0 +1,2 @@
+﻿AI Radio;http://ai-radio.org;http://mp3.ai-radio.org:8000/radio.mp3
+Radio Paralax;http://www.radio-paralax.de;http://stream.t-n-media.de:8030

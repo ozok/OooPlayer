@@ -1,0 +1,48 @@
+﻿.977 - The Alternative Channel;http://www.977music.com;http://7639.live.streamtheworld.com:80/977_ALTERN_SC
+1.Fm - High Voltage;http://www.1.fm;http://sc-hv.1.fm:8035
+3Fm - Alternative;http://www.3fm.nl;http://icecast.omroep.nl/3fm-alternative-mp3
+3Fm - On Stage;http://www.3fm.nl;http://icecast.omroep.nl/3fm-live-mp3
+4 Ever Floyd;http://4everfloyd.com;http://99.198.112.59:8000
+Acoustic Alternative;http://www.streamlicensing.com/directory/index.cgi?sid=42&start=1&g=&e=0&s=Acoustic;http://162.251.160.2:80/acoustichigh
+amazing radio;http://amazingradio.com;http://109.74.195.10:8000
+Atlantic Sound Factory;http://loudcity.com/stations/atlantic-sound-factory/files/show/default.htm;http://streaming304.radionomy.com:80/atlanticsoundfactory
+BigBeats.ru;http://bigbeats.ru/how-to-listen;http://50.7.158.42:8048/stream
+Birmingham Mountain Radio;http://www.bhammountainradio.com;http://38.96.148.18:4376
+BoxTree Radio;http://boxtreeradio.com/;http://sc.digitaleagles.com:8010
+Break Pirates;http://www.breakpirates.com/tune-in/;http://bpstream.hostco.de:3000/
+CFRE Radio;http://www.cfreradio.com/;http://142.150.7.99:8000/listen
+Dirtybass Fm;http://dirtybass.fm:8111/;http://dirtybass.fm:8000/
+DRS - Virus MetalX;http://www.virus.ch;http://streaming.swisstxt.ch/m/drsvirus/mp3_128
+Eastside Fm;http://eastsidefm.org/listen-online;http://eastsideradio.serverroom.us:6034
+EDA Music Radio;http://eda-music-radio.playtheradio.com;http://streaming.radionomy.com/eda-music-radio
+Fiksz Radio.hu;http://www.fikszradio.hu;http://157.181.47.204:9000/
+Frequence Geek;http://www.frequencegeek.com/;http://94.23.221.212:404
+Frequence Orange;http://www.frequenceorange.com/v4.php?site=static&staticID=2;http://94.23.213.103:8000/
+Gapfreeradio - Mix;http://gapfreeradio.com/listen-to-in-the-mix;http://162.251.160.2:80/gapfreemixhigh
+GD Radio;http://www.gdradio.net;http://216.119.152.213:8019/
+Got Radio - Alternative;http://www.gotradio.com;http://173.244.215.162:8200
+Hazzard Of Darkness;http://www.hazzardofdarkness.net;http://188.138.74.113:7777
+HookedOnRadio - AdultAlt;http://hookedonradio.com;http://174.37.110.72:8510
+HookedOnRadio - Alternative;http://hookedonradio.com;http://174.37.110.72:8530
+Indie Authority;http://www.theindieauthority.com;http://66.85.154.211:8394/stream
+I Love Mashup;http://www.iloveradio.de;http://87.230.53.70/iloveradio5.mp3
+ledjam;http://www.ledjamradio.com;http://ledjamradio.ice.infomaniak.ch/ledjamradio.mp3?group=961
+Linn Radio;http://radio.linnrecords.com/;http://89.16.185.174:8003/stream
+NSM88 Records;http://live.nsm88records.com;http://live.nsm88records.com:8088/
+Radio B92;http://www.b92.net/radio;http://stream.b92.net:7999/radio-b92.mp3
+Radio Canale Zero;http://www.radiocanalezero.com;http://50.7.158.42:8064/
+Radio Pepito;http://www.radiopepito.com/sitioeng/indexeng.htm;http://radiopepito.purestream.net:8010/
+Radio Riel - Steampunk;http://radioriel.org/;http://apollo.slserver.com:8402
+Radio SiTy (sk);http://www.radiosity.sk;http://217.73.17.42:8000/hq.mp3
+Rautemusik FM - 12punks;http://www.rautemusik.fm;http://12punks-high.rautemusik.fm
+Reboot.fm;http://reboot.fm;http://91.213.60.47:8002/stream
+Sky.fm - Ska;http://www.sky.fm/ska;http://pub2.sky.fm/sky_ska
+SomaFM - Iceland Airwaves;http://somafm.com/play/airwaves;http://uwstream2.somafm.com:5400
+Soundportal;http://soundportal.at;http://212.48.110.149:8000
+Star Fm - Alternative;http://www.starfm.de;http://87.230.53.43:7004/
+Todo exitos - Indie;http://www.todoexitos.com;http://hertz.todoexitos.com:8222
+Twen fm - Live;http://twenfm.org/884/2011/03/tv-clubnacht-25-03-2011/;http://ice.rosebud-media.de:8000/88vier
+WGLT Acusticity Radio;http://wglt.org/streams/acousticity.shtml;http://wgltradio.ilstu.edu:8000/wgltfolk.mp3
+WRFA LP NY;http://wrfalp.com/index.php?content=home&page=streaming;http://radioforthearts.serverroom.us:6128/
+WSRF;http://www.wsrf.com/#;http://www.live365.com/play/planet17
+Xtreme Radio;http://xtremeradio.org;http://streams.xtremeradio.org/high.mp3

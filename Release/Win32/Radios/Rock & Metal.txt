@@ -1,0 +1,116 @@
+﻿.977 - The Classic Rock Channel;http://www.977music.com;http://7649.live.streamtheworld.com:80/977_CLASSROCK_SC
+1431 AM;http://radiofono.eng.auth.gr;http://155.207.18.114:8000/1431high
+181.Fm - Mellow Gold;http://www.181.fm;http://relay.181.fm:8060
+181.Fm - Rock 181;http://www.181.fm/;http://69.4.232.112:8168
+181.Fm - The Eagle;http://www.181.fm;http://relay.181.fm:8030
+4U Classic Rock;http://www.4urock.com/;http://217.114.200.100:80
+89 rainbow.gr;http://www.89rainbow.gr;http://stream3.greekradios.gr:8006/
+91rock.br;http://www.91rock.com.br;http://streaming01.brlogic.com:8230/live
+Absolute Radio - Classic Rock;http://www.absoluteradio.co.uk/listen/on-other-devices.html;http://stream.timlradio.co.uk/ABSOLUTECRIRMP3
+AddictedToRadio - Channel One;http://addictedtoradio.com;http://208.77.21.33:9710
+AddictedToRadio - Classic Rock;http://addictedtoradio.com;http://208.77.21.33:13810
+AddictedToRadio - Freestyle Ex;http://addictedtoradio.com;http://wms-13.streamsrus.com:14710
+AddictedToRadio - Hair Voltage;http://addictedtoradio.com;http://208.77.21.33:15710
+AddictedToRadio - Hard Rock;http://addictedtoradio.com;http://208.77.21.15:15510
+AddictedToRadio - Q101 Rock;http://addictedtoradio.com;http://208.77.21.33:16010
+AddictedToRadio - Q97 Rock Alt;http://addictedtoradio.com;http://wms-15.streamsrus.com:16030
+ADR 210 Classic Rock;http://alldigitalradionetwork.com;http://192.169.70.194:8122
+AGF Radio;http://www.deutschrock-nr1.de;http://service.pop-stream.de:4000
+Aligator Classic Rock Radio (sk);http://www.aligator.sk;http://stream.aligator.sk:8000/aligator_192.mp3
+Beat Radio;http://www.radiobeat.cz/cs/;http://icecast2.play.cz:8000/radiobeat128.mp3
+BestNetRadio 80s Metal;http://www.bestnetradio.com;http://173.192.32.199:7060
+BestNetRadio Classic Rock;http://www.bestnetradio.com;http://173.192.32.199:7150
+BestNetRadio Rock Mix;http://www.bestnetradio.com;http://173.192.32.199:7260
+BestNetRadio Rock Rewind;http://www.bestnetradio.com;http://173.192.32.199:7250
+Brasil 2000;http://www.brasil2000.com.br;http://shoutcast.hostlocation.com.br:8450
+CBC Radio3;http://music.cbc.ca/;http://1661.live.streamtheworld.com:80/CBC_R3_WEB_SC
+Chroma - Classic Rock;http://chromaradio.net;http://176.9.22.6:8070
+Chroma - Metal;http://chromaradio.net;http://176.9.22.6:8128
+Chroma - Rock;http://chromaradio.net;http://176.9.22.6:8016
+Classic Rock Party;http://fgproductions.net;http://174.37.16.73:1910/live
+Crik Fm - Classic Rock;http://www.lynxradionetwork.com;http://94.23.62.189:6052
+DangerousDRadio;http://www.dangerousdradio.com;http://s3.voscast.com:8464
+Devil's Night Radio;http://www.devilsnight.com/radio.htm;http://67.212.189.20:80/
+DRS - Virus;http://www.virus.ch;http://stream.srg-ssr.ch/m/drsvirus/mp3_128
+EBM Radio;http://www.ebm-radio.de/;http://www.ebm-radio.org:7000
+epicRockradio.au;www.epicrockradio.com;http://50.7.96.210:8269/stream
+Eska Rock;http://www.eskarock.pl;http://publish.acdn.smcloud.net:8000/t041-1.mp3
+Eska Rock Alternative;http://www.eskarock.pl;http://publish.acdn.smcloud.net:8000/t015-1.mp3
+Eska Rock Polska;http://www.eskarock.pl;http://publish.acdn.smcloud.net:8000/t008-1.mp3
+Faros 906 - Greece;http://www.faros906.gr;http://85.17.122.39:8012
+Friss Radio.hu;http://www.frissradio.hu;http://stream.frissradio.hu:8000/
+Got Radio - 60s;http://www.gotradio.com;http://173.244.215.163:8370
+Got Radio - Rock;http://www.gotradio.com;http://173.244.215.162:8210
+Grufti Radio;http://www.gruftiradio.de/vb/content/?s=d961743060785b7220ae657cfd3df5bd;http://server5.digital-webstream.de:12790/
+Hand of Doom Radio;http://www.handofdoomradio.com;http://50.117.8.242:9585/Live
+Hard House Uk;http://www.hardhouseuk.net;http://hhuk.netmindz.net:8000/
+Hard Rock Heaven;http://www.hrhradio.com/site/index.php;http://67.213.213.143:8048
+Headbangers Fm;http://www.headbangersfm.com;http://78.129.196.32:80/
+Heavy Handed Radio;http://www.heavyhandedradio.com;http://174.37.16.73:3280/live
+HookedOnRadio - Active Rock;http://hookedonradio.com;http://174.37.110.72:8560
+HotMixRadio - Rock;http://www.hotmixradio.fr/90s;http://streamingads.hotmixradio.fm/hotmixradio-rock-128.mp3
+Infernal Rock Radio;http://infernalrockradio.com/LoudCity%20Launch%20Page/IRRLaunch.html;http://50.7.129.122:8409
+KNAC - Pure Rock;http://www.knac.com/;http://s5.voscast.com:7346
+Krueger FM - Extreme Metal;http://www.kruegerfm.net/eng;http://stream.kruegerfm.net:666/mp3
+Lonely Oak Radio;http://www.lonely-oak.com;http://72.167.42.69:8082/rock_mp3_128/
+M2 Caliente;http://www.m2radio.fr/index.php?m2=discovery;http://87.98.163.222:9050
+Margaritaville;http://www.margaritaville.com/radio_listen.html;http://radmarg.ic.llnwd.net/stream/radmarg_razorback
+MegarockRadio.Net;http://megarockradio.net;http://50.7.77.114:8240/
+Metal Arena;http://metalarena.wix.com/metal-arena;http://listen.radionomy.com/metal-arena
+Metal Assault Radio;http://www.metalassaultradio.com;http://108.166.161.202:8080
+MusicBase - RockSection;http://www.radiohoeren.at/index.php?sectionname=rocksection;http://stream.rocksection.fm:92
+Music Victim 1;http://musicvictim.com/radio.php?idioma=de;http://radio.musicvictim.com:8012/
+Nashe.ru;http://www.nashe.ru;http://94.25.53.131:80/nashe-128.mp3
+Nashville Rock Europe;http://nashvillerock.worlditsme.com;http://ice.stream101.com:6025
+Netrock101;http://netrock101.com/web/modules/main;http://76.73.47.10:8418
+ORSRADIO Soft Rock;http://www.shoutcast.com/Internet-Radio/ORSRADIO;http://192.81.248.43:8046
+Partyviberadio - Rock;http://www.partyviberadio.com/player/rock/index.html;http://206.190.152.194:8016/
+PolskaStacja.pl - Gothic;http://www.polskastacja.pl;http://91.121.165.51:2300
+PolskaStacja.pl - Hardstyle;http://www.polskastacja.pl;http://91.121.236.243:80
+PolskaStacja.pl - Rock;http://www.polskastacja.pl;http://91.121.103.183:6200
+Power Prog Radio;http://www.powerprogradio.net/the_prog_channel.html;http://streamplus3.leonex.de:38042
+Power Prog Radio - Main;http://www.powerprogradio.net/the_main_channel.html;http://streamplus7.leonex.de:28174
+Power Prog Radio - Power;http://www.powerprogradio.net/the_power_channel.html;http://streamplus8.leonex.de:23832
+Power Prog Radio - Rock;http://www.powerprogradio.net/the_rock_channel.html;http://streamplus36.leonex.de:23330
+Radio1 Fm88 Rock;http://www.radio1.gr/listenlive;http://111.gr:8012
+Radioactive Scotland;http://www.radioactivescotland.com/listen-now;http://178.32.5.21:8042
+Radio LOL;http://www.radiolol.it;http://s6.mediastreaming.it:9066/
+Radio Nova;http://www.nova.ie/;http://radionova128.media.vistatec.ie:80/
+Radio Nova Dublin;http://www.nova.ie;http://radionova128.media.vistatec.ie:80/
+Radio One Rock.sk;http://www.radiorock.sk;http://217.75.92.14:8000/rrock
+Radio Regenbogen - Rock;http://www.regenbogen.de;http://217.151.151.91/live6
+Radio Rock (sk);http://www.radiorock.sk;http://217.75.92.14:8000/rrock
+Radio Salue;http://www.salue.de;http://edge.live.mp3.mdn.newmedia.nacamar.net/ps-radiosalue128/livestream.mp3
+Radio Skyweb;http://www.radioskyweb.com/;http://nr11.newradio.it:9210/
+Rautemusik FM - Rock ;http://www.rautemusik.fm;http://rock-high.rautemusik.fm
+Real Rebel Radio;http://www.real-rebel-radio.net;http://66.55.88.65:8030/
+Revoradio 104.1 Fm;http://www.revoradio1041fm.net/;http://50.7.77.114:8206/
+Riff Radio Metal;http://www.hardrocksociety.com;http://96.3.248.202:8000/
+Righteous Rock Radio;http://www.3r-radio.com;http://107.181.227.250:8178/
+RockDivision (sk);http://www.rockdivision.sk;http://93.184.70.54:8000/mid-rockdivision.mp3
+Rockfile Radio Fire;http://rockfileradio.com/listen.php;http://64.72.118.14:8122
+Rockfile Radio Ice;http://rockfileradio.com/listen.php;http://64.72.118.14:8120
+RockGenesis.gr;http://rockgenesis.gr;http://192.184.9.81:8444
+Rockin Bad Boys Radio;http://www.rockinbadboysradio.com;http://69.10.36.226:8108/
+Rockin Doc Radio;http://www.rockindocradio.net;http://108.61.26.26:8600/rdr192
+Rockland Fm;http://www.rockland-digital.de;http://stream.rockland-digital.de
+Rockova Republika (sk);http://www.rockovarepublika.sk;http://217.67.31.66:8000/republika128.mp3
+Rocky Fm;http://www.rockyfm.de;http://tuner.rockyfm.com:80
+Rock 104 Ohio;http://www.realrock104.com;http://5913.live.streamtheworld.com:3690/WWIZFM_SC
+Rock Radio 1;http://www.rockradio1.com;http://87.98.146.216:8000/
+Rock Radio Russia;http://www.rockradiofm.ru;http://radiook.nlink.ru:8000/Rock128.mp3
+ShoutedFM - Alternative;http://www.shouted.fm/index.php?area=alternative;http://alternative.mthn.net:8700
+Sky.fm - Hard Rock;http://www.sky.fm/hardrock/;http://pub2.sky.fm/sky_hardrock
+Sky.fm - Indie Rock;http://www.sky.fm/indierock/;http://pub4.sky.fm/sky_indierock
+Sky.fm - Metal;http://www.sky.fm/metal/;http://pub2.sky.fm/sky_metal
+Sky.fm - Modern Rock;http://www.sky.fm/modernrock/;http://pub2.sky.fm/sky_modernrock
+Sky.fm - Soft Rock;http://www.sky.fm/classicrock;http://pub2.sky.fm/sky_softrock
+Soft Rock Radio;http://www.softrockradio.net;http://173.236.21.250:8032/
+Spoon Radio;http://www.spoonradio.com;http://spoonradio.ice.infomaniak.ch:80/spoonradio-hd
+TeamRock Radio;www.teamrockradio.com;http://teamrock.planetwideradio.com:8000/teamrockhigh
+The Arrow;http://www.thearrow.co.uk;http://ice-sov.musicradio.com:80/ArrowMP3
+The Healing Rock;http://healingstreammedia.com;http://sc3.mystreamserver.com:8094
+Thunder Radio Canada;http://thunderradiocanada.com;http://192.99.20.78:8101/stream
+Todo exitos - Metal;http://www.todoexitos.com/;http://hertz.todoexitos.com:8206
+Tutt Radio;http://loudcity.com/stations/tutt-radio;http://199.58.162.74:8004
+WWOR;http://loudcity.com/stations/wwor;http://redmanstreams.com:8757

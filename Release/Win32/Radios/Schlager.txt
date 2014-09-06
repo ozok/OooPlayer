@@ -1,0 +1,26 @@
+﻿1000 Schlager;http://www.1000schlager.de;http://www.laut.fm/1000schlager
+All4Fun Radio - Deutschstream;http://www.all4funradio.eu;http://46.163.108.110:30730
+Antenne 50plus;http://zentrum50plus.de/index.php?page=44;http://85.214.65.158:8500
+Antenne Bayern - Schlagersahne;http://www.antenne.de/;http://mp3channels.webradio.antenne.de/das-schlager-karussell
+DanceFox Radio;http://www.dancefox-radio.de;http://dfr-radio.de:80/
+Deutsch.fm;http://deutschfmradio.de;http://streamplus7.leonex.de:35466
+Elmar Radio.ee;http://www.elmar.ee;http://217.146.71.24:80/elmar.mp3
+fox4you;http://fox4you.de;http://80.237.158.41:8100/
+Kronehit - Vollgas;http://www.kronehit.at;http://onair.krone.at:80/kronehit-vollgas.mp3
+Memory Radio 1;http://www.memoryradio.de/;http://www.memoryradio.de:4000/
+Ole Fm - Kult;http://www.ole-radio.com;http://kult.ole.fm:8000
+Ole Fm - Schlager;http://www.ole-radio.com;http://schlager.ole.fm:8000
+Palmenstrandradio;http://www.palmenstrandradio.com/#;http://listen.palmenstrandradio.com:8000/
+Radio2000 Suedtirol;http://www.radio2000.it;http://server2.digital-webstream.de:9840/
+Radio 700 - Schlager und Oldies;http://www.radio700.de;http://streamserver.funkhaus.info:80
+Radio Arabella;http://www.arabellamusic.de;http://stream01.arabella-at.vss.kapper.net:8000
+Radio Chantre 1;http://radiochantre.com/news.php;http://188.138.91.134:9000/
+Radio Chantre 2;http://radiochantre.com/news.php;http://188.138.91.134:8002/
+Radio Jodlerwirt;http://www.radio-jodlerwirt.de;http://stream.laut.fm/radio-jodlerwirt
+Radio MN NL;http://www.radiomn.nl;http://server-09.stream-server.nl:8628
+Radio Seefunk;http://www.radio-seefunk.de;http://webradio.radio-seefunk.de:8000/
+Rautemusik FM - Schlager;http://www.rautemusik.fm;http://schlager-high.rautemusik.fm
+Slager Radio (sk);http://www.slagerradio.sk;http://209.105.232.220:8585/slager
+SWR 4 BW;http://www.swr.de/swr4/bw/-/id=233374/mqfgxh/index.html;http://swr-mp3-m-swr4bw.akacast.akamaistream.net/7/426/137137/v1/gnl.akacast.akamaistream.net/swr-mp3-m-swr4bw
+SWR 4 RP;http://www.swr.de/swr4/rp/-/id=233378/oihljy/index.html;http://swr-mp3-m-swr4rp.akacast.akamaistream.net/7/906/137138/v1/gnl.akacast.akamaistream.net/swr-mp3-m-swr4rp
+THMR;http://thmr.eu;http://thmrhosting.de:9110

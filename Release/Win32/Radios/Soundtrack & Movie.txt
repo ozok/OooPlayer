@@ -1,0 +1,4 @@
+﻿Energy - Soundtracks;http://www.energy.ch/webradios/musicinfos-detail/channel/energy-soundtrack-filmmusik-und-titelsongs-im-internet-hoeren/;http://energysoundtrack.ice.infomaniak.ch:80/energysoundtrack-high.mp3
+Klassik Radio Movie;http://www.klassikradio.de;http://62.27.87.92:8000/klassikradiomovie128/livestream.mp3
+ORSRADIO New Age;http://www.shoutcast.com/Internet-Radio/ORSRADIO;http://192.81.248.43:8016
+Radio FxTrailer;http://www.streamlicensing.com/stations/fxtrailer/livestream.html;http://stream-ch01-mp3-128.fxtrailer.com:9000/

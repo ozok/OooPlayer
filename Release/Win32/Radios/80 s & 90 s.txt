@@ -1,0 +1,57 @@
+﻿.977 - The 80s Channel;http://www.977music.com;http://7649.live.streamtheworld.com:80/977_80_SC
+.977 - The 90s Channel;http://www.977music.com;http://7599.live.streamtheworld.com:80/977_90_SC
+1.Fm - 80s;http://www.1.fm;http://sc-80s.1.fm:8097
+1.Fm - 90s;http://www.1.fm;http://sc-90s.1.fm:8065
+1.Fm - Back 80s US;http://www.1.fm;http://sc-b280s.1.fm:6900
+181.Fm - Awesome 80s;http://www.181.fm ;http://relay.181.fm:8000/
+181.Fm - Lite 80s;http://www.181.fm;http://relay.181.fm:8040/
+80s Mixed;http://www.80smixed.com;http://184.154.202.243:8108/
+AddictedToRadio - 80s Decade;http://addictedtoradio.com;http://wms-13.streamsrus.com:9310
+AddictedToRadio - 80s Lite;http://addictedtoradio.com;http://wms-13.streamsrus.com:9410
+AddictedToRadio - 90s;http://addictedtoradio.com;http://wms-13.streamsrus.com:14010
+AddictedToRadio - 90s and RnB;http://addictedtoradio.com;http://wms-13.streamsrus.com:14310
+AddictedToRadio - 90s Dance;http://addictedtoradio.com;http://wms-13.streamsrus.com:13910
+AddictedToRadio - At Work;http://addictedtoradio.com;http://208.77.21.33:11510
+All4Fun Radio - Mainstream;http://www.all4funradio.eu;http://46.163.108.110:30716
+All 80s Dublin;http://www.all80s.ie/listen/;http://5.63.151.52:8101
+Anarchy n Angels on Air;http://www.internetradio.co.uk/index.php?option=com_k2&view=item&layout=item&id=78&Itemid=202;http://199.101.51.168:8022
+Antenna 1 - Roma;http://www.antenna1.fm/#;http://s3.mediastreaming.it:7568/
+Antenne Bayern - 80er;http://www.antenne.de/;http://mp3channels.webradio.antenne.de/80er-kulthits
+BestNetRadio 90s;http://www.bestnetradio.com;http://173.192.32.199:7080
+Central Fm;http://www.centralfm.com;http://85.17.177.8:8040
+Classic 21 - 80s;http://www.rtbf.be/classic21;http://broadcast.infomaniak.net:80/wr-classic21-80-128.mp3
+Crik Fm - Classic Hits;http://www.lynxradionetwork.com;http://94.23.62.189:6044
+Crik Fm - Retro 80s;http://www.lynxradionetwork.com;http://94.23.62.189:6048
+Generation Disco Funk;http://www.generationdiscofunk.com/v4/index.php;http://streaming304.radionomy.com:80/GENERATIONSOULDISCOFUNK-MP3
+Got Radio - Rockin 80s;http://www.gotradio.com/;http://173.244.215.163:8420
+gr8tunes - 80s;http://www.gr8tunes.com;http://184.107.202.178:8138/
+gr8tunes - 90s;http://www.gr8tunes.com;http://184.107.202.178:8132/
+HookedOnRadio - 90s;http://hookedonradio.com;http://174.37.110.72:8540
+HotMixRadio - 80s;http://www.hotmixradio.fr/80s;http://streamingads.hotmixradio.fm/hotmixradio-80-128.mp3
+HotMixRadio - 90s;http://www.hotmixradio.fr/90s;http://streamingads.hotmixradio.fm/hotmixradio-90-128.mp3
+Inolvidable Fm Espana;http://www.inolvidablefm.es;http://s7.voscast.com:7608
+just80s;http://www.laut.fm/just80s;http://www.laut.fm/just80s
+just90s;http://www.laut.fm/just90s;http://www.laut.fm/just90s
+Kool Mix Radio;http://www.koolmixradio.com;http://s7.voscast.com:8004
+K-Lite Online;http://www.kliteonline.com;http://50.7.77.114:9042/
+Loo-Radio.nl;http://www.loo-tv.nl;http://icecast.streamone.nl/t2Dns9sQwv
+M2 Analog 80s;http://www.m2radio.fr/index.php?m2=analog;http://live.m2stream.fr:80/m280-128.mp3
+M2 Digital 90s;http://www.m2radio.fr/index.php?m2=digital;http://neo.m2stream.fr:80/m290-128.mp3
+Naxi Radio - Cafe;http://www.naxi.rs;http://naxidigital-128.kbcnet.rs:8020/
+ORSRADIO 90s Rock;http://www.shoutcast.com/Internet-Radio/ORSRADIO;http://192.81.248.43:8020
+PowerRadio Greece;http://powerradio.blogspot.de;http://195.97.106.232:8002
+Radio1 Fm88 Gold;http://www.radio1.gr/listenlive;http://111.gr:8008
+Radio Crazy - 80s;http://www.radiocrazy.ch;http://stream2183.init7.net:80
+Radio Freewoodbury;http://radiofreewoodbury.org/2322.html;http://69.4.232.119:80/
+Radio GO DeeJay (sk);http://www.djgo.sk;http://195.168.11.25:8000/live64
+Radio Live SK (sk);http://www.radiolive.sk/o-radiu.html;http://server1.internetoveradio.sk:8840
+Radio Regenbogen - 80er;http://www.regenbogen.de;http://217.151.151.91/live4
+Rautemusik FM - Goldies;http://www.rautemusik.fm/;http://goldies-high.rautemusik.fm
+Retro Fm SPB;http://spb.retrofm.ru;http://onair.eltel.net/retrofm-128k
+Sky.fm - Best of the 60s;http://www.sky.fm/hit60s/;http://pub4.sky.fm/sky_hit60s
+Sky.fm - Best of the 80s;http://www.sky.fm/the80s/;http://pub1.sky.fm/sky_the80s
+Sky.fm - New Age;http://www.sky.fm/newage/;http://pub1.sky.fm/sky_newage
+SomaFM - Underground80s;http://somafm.com/play/u80s;http://sfstream1.somafm.com:8884
+Surf Radio 80;http://www.radionomy.com/en/radio/surf-radio-80/index;http://listen.radionomy.com/surf-radio-80
+The Cube;http://www.caps.wegetitserved.com/rrr/wordpress;http://50.7.77.114:8002/
+Vibration - Classic Hits;http://www.vibrationclassic80.ch/spip.php?page=vibrationclassic;http://vibrationclassic80.stream2net.eu:8060/
