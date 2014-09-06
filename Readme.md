@@ -1,7 +1,9 @@
 OooPlayer
 =========
 
-####OooPlayer is a lightweight music player for Windows. It's written in Delphi and uses Bass library and it's plugins from http://www.un4seen.com/.
+####OooPlayer is a lightweight music player for Windows. It's written in Delphi and uses Bass library and it's plugins from http://www.un4seen.com/
+
+You can download it from http://sourceforge.net/projects/oooplayer/
 
 Supported formats
 --
@@ -40,7 +42,7 @@ Version and download location
 ---
 >Latest version of OooPlayer is 1.2
 
->You can download OooPlayer from  http://sourceforge.net/projects/oooplayer/
+>You can download OooPlayer from http://sourceforge.net/projects/oooplayer/
 
 Licence
 ---
