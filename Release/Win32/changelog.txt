@@ -1,6 +1,7 @@
 --1.3
 -Added: Radio player
 -Added: Visualization
+-Added: A few interface changes
 -Fixed: Keyboard shortcuts for "Save Playlist" and "Stop" were the same
 
 --1.2

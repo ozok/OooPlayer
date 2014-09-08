@@ -39,7 +39,8 @@ uses
   bassflac in 'BassUnits\bassflac.pas',
   bassopus in 'BassUnits\bassopus.pas',
   basswma in 'BassUnits\basswma.pas',
-  basswv in 'BassUnits\basswv.pas';
+  basswv in 'BassUnits\basswv.pas',
+  bassmix in 'BassUnits\bassmix.pas';
 
 {$R *.res}
 

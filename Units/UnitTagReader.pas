@@ -290,7 +290,7 @@ begin
   begin
     if FWAVTag.Loaded then
     begin
-      // todo: load artwork from wav
+      // todo: check artwork for wav
     end;
   end;
 end;

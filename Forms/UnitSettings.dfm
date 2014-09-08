@@ -31,6 +31,10 @@ object SettingsForm: TSettingsForm
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'General'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object CheckUpdateBtn: TCheckBox
         Left = 16
         Top = 16
@@ -43,6 +47,10 @@ object SettingsForm: TSettingsForm
     object TabSheet2: TTabSheet
       Caption = 'Playback'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object PlayCursorBtn: TCheckBox
         Left = 16
         Top = 16
@@ -63,6 +71,10 @@ object SettingsForm: TSettingsForm
     object TabSheet3: TTabSheet
       Caption = 'Cover'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object LoadArtBtn: TCheckBox
         Left = 16
         Top = 16
@@ -91,6 +103,10 @@ object SettingsForm: TSettingsForm
     object TabSheet4: TTabSheet
       Caption = 'Visualization'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label1: TLabel
         Left = 16
         Top = 42
@@ -114,7 +130,7 @@ object SettingsForm: TSettingsForm
         Top = 39
         Width = 75
         Height = 21
-        CheckOptions = [coCheckOnChange, coCropBeyondLimit]
+        CheckOptions = [coCheckOnExit, coCropBeyondLimit]
         Alignment = taCenter
         ButtonKind = bkClassic
         MaxValue = 2000.000000000000000000

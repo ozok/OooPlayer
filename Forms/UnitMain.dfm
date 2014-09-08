@@ -31,7 +31,6 @@ object MainForm: TMainForm
     BevelOuter = bvNone
     TabOrder = 0
     OnMouseEnter = TopBarPnlMouseEnter
-    ExplicitTop = -6
     DesignSize = (
       674
       127)
@@ -184,7 +183,6 @@ object MainForm: TMainForm
       Max = 100
       Orientation = trVertical
       Position = 50
-      ShowSelRange = False
       TabOrder = 0
       TickMarks = tmBoth
       TickStyle = tsNone
@@ -216,10 +214,11 @@ object MainForm: TMainForm
       Height = 23
       Hint = 'Position'
       Align = alBottom
+      LineSize = 10
+      PageSize = 4
       TabOrder = 2
       TickMarks = tmBoth
       TickStyle = tsNone
-      ShowRange = False
       OnChanged = PositionBarChanged
       OnMouseDown = PositionBarMouseDown
     end
@@ -476,8 +475,6 @@ object MainForm: TMainForm
         OnDblClick = RadioListDblClick
         OnMouseEnter = RadioListMouseEnter
         OnMouseLeave = RadioListMouseLeave
-        ExplicitLeft = -1
-        ExplicitTop = 22
       end
     end
   end
@@ -5793,7 +5790,7 @@ object MainForm: TMainForm
   end
   object PositionTimer: TTimer
     Enabled = False
-    Interval = 200
+    Interval = 5
     OnTimer = PositionTimerTimer
     Left = 32
     Top = 176

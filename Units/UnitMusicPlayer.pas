@@ -89,7 +89,7 @@ const
 
 implementation
 
-{ TPlayer }
+{ TMusicPlayer }
 
 constructor TMusicPlayer.Create(const WinHandle: Cardinal);
 begin
@@ -395,3 +395,4 @@ begin
 end;
 
 end.
+

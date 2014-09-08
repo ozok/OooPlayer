@@ -312,7 +312,7 @@ var
   FRadioHandle: HSTREAM;
 
 const
-  BuildInt = 781;
+  BuildInt = 1043;
   Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
@@ -2839,3 +2839,4 @@ begin
 end;
 
 end.
+
