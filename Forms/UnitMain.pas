@@ -33,7 +33,7 @@ uses
   JvExStdCtrls, JvListBox, IniFiles, Vcl.Buttons, JvFormPlacement, JvAppStorage,
   JvAppIniStorage, StrUtils, ShellAPI, JvComputerInfoEx, UnitTagTypes, UnitTagReader, PNGImage, JvDragDrop,
   JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon, Jpeg, UnitMusicPlayer, Bass,
-  IdBaseComponent, IdThreadComponent, Vcl.Samples.Gauges;
+  IdBaseComponent, IdThreadComponent, Vcl.Samples.Gauges, UnitLyricDownloader;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -157,6 +157,9 @@ type
     Gauge2: TGauge;
     Gauge3: TGauge;
     Gauge4: TGauge;
+    TabSheet3: TTabSheet;
+    LyricList: TJvListBox;
+    LyricStatusLabel: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -229,6 +232,8 @@ type
     procedure FuncPagesChange(Sender: TObject);
     procedure RadioThreadRun(Sender: TIdThreadComponent);
     procedure VisTimerTimer(Sender: TObject);
+    procedure TrayIconClick(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure LyricListMouseEnter(Sender: TObject);
   private
     { Private declarations }
     FStoppedByUser: Boolean;
@@ -240,12 +245,10 @@ type
     FDraggingCurrentFile: Boolean;
     FJpeg: TJPEGImage;
     FPng: TPngImage;
-    FRadioStations: TRadioList;
-    FCurrentRadioIndex: integer;
-    FPlaybackType: TPlaybackType;
     FRadioURL: Ansistring;
     FRadioLogItem: string;
     FFFTData: TFFTData;
+    FLyricDownloader: TLyricDownloader;
 
     procedure AddFile(const FileName: string);
     procedure ReScanFile(const FileIndex: integer);
@@ -272,6 +275,25 @@ type
     procedure SavePPFPlaylist(const FileName: string);
 
     function GetVisData(const Stream: HSTREAM): TVisData;
+  public
+    { Public declarations }
+    FPlayListItems: TList<TPlayListItem>;
+    FRadioStations: TRadioList;
+    FCurrentItemInfo: TCurrentItemInfo;
+    FPlayer: TMusicPlayer;
+    FTagReader: TTagReader;
+    FAppDataFolder: string;
+    FPlaybackType: TPlaybackType;
+    FCurrentRadioIndex: integer;
+
+    procedure ScrollToItem(const ItemIndex: integer);
+
+    procedure PlayItem(const ItemIndex: integer);
+
+    function RemoveInvalidChars(const Title: string): string;
+
+    // handles msgessent from radio thread
+    procedure WndProc(var Msg: TMessage); override;
 
     // Radio player funcs
     function IsRadioPlayerPaused: Boolean;
@@ -288,22 +310,8 @@ type
 
     procedure RadioResetUI;
     // Radio player funcs
-  public
-    { Public declarations }
-    FPlayListItems: TList<TPlayListItem>;
-    FCurrentItemInfo: TCurrentItemInfo;
-    FPlayer: TMusicPlayer;
-    FTagReader: TTagReader;
-    FAppDataFolder: string;
 
-    procedure ScrollToItem(const ItemIndex: integer);
-
-    procedure PlayItem(const ItemIndex: integer);
-
-    function RemoveInvalidChars(const Title: string): string;
-
-    // handles msgessent from radio thread
-    procedure WndProc(var Msg: TMessage); override;
+    function CreateLyricFileName(const Title, Artist, Album: string): string;
   end;
 
 var
@@ -573,7 +581,7 @@ end;
 
 procedure TMainForm.BotBarPnlMouseEnter(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
@@ -593,6 +601,12 @@ end;
 procedure TMainForm.C2Click(Sender: TObject);
 begin
   ShellExecute(Handle, 'open', PWideChar(ExtractFileDir(Application.ExeName) + '\changelog.txt'), nil, nil, SW_SHOWNORMAL);
+end;
+
+function TMainForm.CreateLyricFileName(const Title, Artist, Album: string): string;
+begin
+  // todo: check valid
+  Result := Title + '_' + Artist + '_' + Album + '.txt';
 end;
 
 procedure TMainForm.D1Click(Sender: TObject);
@@ -798,6 +812,7 @@ begin
       Application.Terminate;
     end;
   end;
+  ForceDirectories(FAppDataFolder + '\lyric\');
 
   FPlayListItems := TList<TPlayListItem>.Create;
   FCurrentItemInfo.ItemIndex := -1;
@@ -811,6 +826,7 @@ begin
   FJpeg := TJPEGImage.Create;
   FRadioStations := TRadioList.Create;
   PositionBar.Max := MaxInt;
+  FLyricDownloader := TLyricDownloader.Create(FAppDataFolder + '\lyric\');
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -823,6 +839,7 @@ begin
   FPng.Free;
   FRadioStations.Free;
   BASS_Free;
+  FLyricDownloader.Free;
 end;
 
 procedure TMainForm.FormResize(Sender: TObject);
@@ -854,6 +871,7 @@ begin
   begin
     UpdateThread.Execute(nil)
   end;
+  PlayList.Columns[0].Width := PlayList.ClientWidth - PlayList.Columns[1].Width;
 end;
 
 procedure TMainForm.G1Click(Sender: TObject);
@@ -1240,9 +1258,15 @@ begin
   end;
 end;
 
+procedure TMainForm.LyricListMouseEnter(Sender: TObject);
+begin
+  if Self.Enabled and Self.Visible then
+    Self.FocusControl(LyricList);
+end;
+
 procedure TMainForm.LyricListMouseLeave(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
@@ -1350,13 +1374,13 @@ begin
         end;
     end;
   end;
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
 procedure TMainForm.NextBtnMouseEnter(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
@@ -1379,13 +1403,13 @@ end;
 
 procedure TMainForm.FuncPagesChange(Sender: TObject);
 begin
-  Self.Width := Self.Width + 1;
-  Self.Width := Self.Width - 1;
+  // Self.Width := Self.Width + 1;
+  // Self.Width := Self.Width - 1;
 end;
 
 procedure TMainForm.FuncPagesMouseLeave(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
@@ -1428,13 +1452,13 @@ begin
       end;
     end;
   end;
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
 procedure TMainForm.PauseBtnMouseEnter(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
@@ -1579,7 +1603,7 @@ begin
                 end;
             end;
           end;
-          if Self.Enabled then
+          if Self.Enabled and Self.Visible then
             Self.FocusControl(VolumeBar);
         end;
 {$ENDREGION}
@@ -1640,7 +1664,7 @@ end;
 
 procedure TMainForm.PlayBtnMouseEnter(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
@@ -1721,6 +1745,26 @@ begin
         begin
           CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
           FLastCoverPath := LImageFile;
+        end;
+      end;
+      // lyric
+      LyricList.Items.Clear;
+      LyricStatusLabel.Caption := '';
+      if SettingsForm.LyricBtn.Checked then
+      begin
+        if FileExists(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlayListItems[FCurrentItemInfo.ItemIndex].Title, FPlayListItems[FCurrentItemInfo.ItemIndex].Artist, FPlayListItems[FCurrentItemInfo.ItemIndex].Album)) then
+        begin
+          LyricList.Items.Clear;
+          LyricList.Items.LoadFromFile(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlayListItems[FCurrentItemInfo.ItemIndex].Title, FPlayListItems[FCurrentItemInfo.ItemIndex].Artist, FPlayListItems[FCurrentItemInfo.ItemIndex].Album));
+          LyricStatusLabel.Caption := 'Loaded local lyric file';
+        end
+        else
+        begin
+          FLyricDownloader.Stop;
+          FLyricDownloader.SongTitle := FPlayListItems[FCurrentItemInfo.ItemIndex].Title;
+          FLyricDownloader.Artist := FPlayListItems[FCurrentItemInfo.ItemIndex].Artist;
+          FLyricDownloader.Album := FPlayListItems[FCurrentItemInfo.ItemIndex].Album;
+          FLyricDownloader.Start;
         end;
       end;
     end
@@ -1810,13 +1854,13 @@ end;
 
 procedure TMainForm.PlayListMouseEnter(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(PlayList);
 end;
 
 procedure TMainForm.PlayListMouseLeave(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
@@ -1890,7 +1934,7 @@ begin
         VisTimer.Enabled := True;
     end;
   end;
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
@@ -1924,13 +1968,13 @@ begin
     end;
   end;
 
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
 procedure TMainForm.PositionBarMouseEnter(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
@@ -1949,7 +1993,6 @@ begin
       SetProgressValue(Handle, LPosition, MaxInt);
       PositionLabel.Caption := FPlayer.PositionStr + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt - FPlayer.PositionAsSec) + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt);
     end;
-    SetProgressValue(Handle, PositionBar.Position, PositionBar.Max);
   end
   else
   begin
@@ -2024,7 +2067,7 @@ begin
               AlbumLabel.Caption := '';
               PlaybackInfoLabel.Caption := '';
               SetProgressValue(Handle, 0, MaxInt);
-              if Self.Enabled then
+              if Self.Enabled and Self.Visible then
                 Self.FocusControl(VolumeBar);
             end;
           end;
@@ -2142,13 +2185,13 @@ begin
         end;
     end;
   end;
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
 procedure TMainForm.PrevBtnMouseEnter(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
@@ -2236,13 +2279,13 @@ end;
 
 procedure TMainForm.RadioListMouseEnter(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(RadioList);
 end;
 
 procedure TMainForm.RadioListMouseLeave(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
@@ -2458,6 +2501,12 @@ end;
 procedure TMainForm.S2Click(Sender: TObject);
 begin
   Self.Enabled := False;
+  case FuncPages.ActivePageIndex of
+    0:
+      SearchForm.SearchType := stmusic;
+    1:
+      SearchForm.SearchType := stradio;
+  end;
   SearchForm.ActiveControl := SearchForm.QueryEdit;
   SearchForm.Show;
 end;
@@ -2643,13 +2692,13 @@ begin
   SetProgressValue(Handle, 0, MaxInt);
   PlayList.Invalidate;
   RadioList.Invalidate;
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
 procedure TMainForm.StopBtnMouseEnter(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
@@ -2663,8 +2712,20 @@ end;
 
 procedure TMainForm.TopBarPnlMouseEnter(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
+end;
+
+procedure TMainForm.TrayIconClick(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if self.Visible then
+  begin
+    Self.Hide;
+  end
+  else
+  begin
+    Self.Show;
+  end;
 end;
 
 procedure TMainForm.UpdateCheckerDoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string);
@@ -2780,7 +2841,7 @@ end;
 
 procedure TMainForm.VolumeBarMouseEnter(Sender: TObject);
 begin
-  if Self.Enabled then
+  if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;
 
@@ -2798,7 +2859,7 @@ begin
           ArtistLabel.Caption := '';
           AlbumLabel.Caption := '';
           PlaybackInfoLabel.Caption := '';
-          Self.Caption := 'RAdio [OooPlayer]';
+          Self.Caption := 'Radio [OooPlayer]';
         end;
       SHOW_ERROR:
         begin
@@ -2839,4 +2900,3 @@ begin
 end;
 
 end.
-

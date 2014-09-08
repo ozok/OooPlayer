@@ -43,7 +43,6 @@ type
     function GetBassStreamStatus: TPlayerStatus;
     function GetTotalLength(): int64;
     function GetPosition(): int64;
-    function GetLevels: Cardinal;
     function GetPositionStr: string;
     function GetSecondDuration: Integer;
 
@@ -58,7 +57,6 @@ type
     property FileName: string read FFileName write FFileName;
     property TotalLength: int64 read GetTotalLength;
     property Position: int64 read GetPosition;
-    property Levels: Cardinal read GetLevels;
     property PositionStr: string read GetPositionStr;
     property DurationAsSec: integer read GetSecondDuration;
     property PositionAsSec: integer read FPositionAsSec;
@@ -143,11 +141,6 @@ end;
 function TMusicPlayer.GetLeftLevel: Integer;
 begin
   Result := Loword(BASS_ChannelGetLevel(FBassHandle))
-end;
-
-function TMusicPlayer.GetLevels: Cardinal;
-begin
-  Result := BASS_ChannelGetLevel(FBassHandle);
 end;
 
 function TMusicPlayer.GetPosition: int64;
@@ -395,4 +388,3 @@ begin
 end;
 
 end.
-

@@ -44,6 +44,8 @@ type
     VisEnableBtn: TCheckBox;
     VisIntervalEdit: TJvSpinEdit;
     Label1: TLabel;
+    TabSheet5: TTabSheet;
+    LyricBtn: TCheckBox;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -102,6 +104,7 @@ begin
       CoverArtList.ItemIndex := SettingsFile.ReadInteger('settings', 'cover', 0);
       VisEnableBtn.Checked := SettingsFile.ReadBool('settings', 'vis', True);
       VisIntervalEdit.Text := SettingsFile.ReadString('settings', 'visint', '100');
+      LyricBtn.Checked := SettingsFile.ReadBool('settings', 'lyric', True);
     end;
   finally
     SettingsFile.Free;
@@ -126,6 +129,7 @@ begin
       SettingsFile.WriteInteger('settings', 'cover', CoverArtList.ItemIndex);
       SettingsFile.WriteBool('settings', 'vis', VisEnableBtn.Checked);
       SettingsFile.WriteString('settings', 'visint', VisIntervalEdit.Text);
+      SettingsFile.WriteBool('settings', 'lyric', LyricBtn.Checked);
     end;
   finally
     SettingsFile.Free;

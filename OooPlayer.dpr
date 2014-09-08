@@ -40,7 +40,8 @@ uses
   bassopus in 'BassUnits\bassopus.pas',
   basswma in 'BassUnits\basswma.pas',
   basswv in 'BassUnits\basswv.pas',
-  bassmix in 'BassUnits\bassmix.pas';
+  bassmix in 'BassUnits\bassmix.pas',
+  UnitLyricDownloader in 'Units\UnitLyricDownloader.pas';
 
 {$R *.res}
 

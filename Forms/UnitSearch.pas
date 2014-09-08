@@ -29,6 +29,9 @@ uses
   Vcl.ExtCtrls, Generics.Collections, StrUtils;
 
 type
+  TSearchType = (stmusic = 0, stradio = 1);
+
+type
   TSearchForm = class(TForm)
     QueryEdit: TLabeledEdit;
     SearchBtn: TButton;
@@ -49,6 +52,7 @@ type
     FResultsList: TList<Integer>;
   public
     { Public declarations }
+    SearchType: TSearchType;
   end;
 
 var
@@ -121,16 +125,26 @@ var
 begin
   if ResultsList.ItemIndex > -1 then
   begin
-    LItemIndex := FResultsList[ResultsList.ItemIndex];
-    with MainForm do
-    begin
-      PositionTimer.Enabled := False;
-      if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < FPlayListItems.Count) then
-      begin
-        PlayList.Items[FCurrentItemInfo.ItemIndex].StateIndex := -1;
-      end;
-      FPlayer.Stop;
-      PlayItem(LItemIndex);
+    case SearchType of
+      stmusic:
+        begin
+          LItemIndex := FResultsList[ResultsList.ItemIndex];
+          with MainForm do
+          begin
+            PositionTimer.Enabled := False;
+            FPlayer.Stop;
+            PlayItem(LItemIndex);
+          end;
+        end;
+      stradio:
+        begin
+          LItemIndex := FResultsList[ResultsList.ItemIndex];
+          with MainForm do
+          begin
+            StopRadio;
+            PlayRadio(FRadioStations[LItemIndex].URL);
+          end;
+        end;
     end;
   end;
 end;
@@ -149,18 +163,38 @@ begin
     ResultsLbl.Caption := '';
     ResultsList.Items.BeginUpdate;
     try
-      for I := 0 to MainForm.FPlayListItems.Count - 1 do
-      begin
-        Application.ProcessMessages;
-        if ContainsText(MainForm.FPlayListItems[i].Title, LQuery) or ContainsText(MainForm.FPlayListItems[i].Artist, LQuery) or ContainsText(MainForm.FPlayListItems[i].Album, LQuery) or
-          ContainsText(MainForm.FPlayListItems[i].FullFileName, LQuery) then
-        begin
-          FResultsList.Add(i);
+      case SearchType of
+        stmusic:
+          begin
+            for I := 0 to MainForm.FPlayListItems.Count - 1 do
+            begin
+              Application.ProcessMessages;
+              if ContainsText(MainForm.FPlayListItems[i].Title, LQuery) or ContainsText(MainForm.FPlayListItems[i].Artist, LQuery) or ContainsText(MainForm.FPlayListItems[i].Album, LQuery) or
+                ContainsText(MainForm.FPlayListItems[i].FullFileName, LQuery) then
+              begin
+                FResultsList.Add(i);
 
-          LListItem := ResultsList.Items.Add;
-          LListItem.Caption := MainForm.FPlayListItems[i].Artist + ' - ' + MainForm.FPlayListItems[i].Album + ' - ' + MainForm.FPlayListItems[i].Title;
-          LListItem.SubItems.Add(MainForm.FPlayListItems[i].DurationStr);
-        end;
+                LListItem := ResultsList.Items.Add;
+                LListItem.Caption := MainForm.FPlayListItems[i].Artist + ' - ' + MainForm.FPlayListItems[i].Album + ' - ' + MainForm.FPlayListItems[i].Title;
+                LListItem.SubItems.Add(MainForm.FPlayListItems[i].DurationStr);
+              end;
+            end;
+          end;
+        stradio:
+          begin
+            for I := 0 to MainForm.FRadioStations.Count - 1 do
+            begin
+              Application.ProcessMessages;
+              if ContainsText(MainForm.FRadioStations[i].Name, LQuery) or ContainsText(MainForm.FRadioStations[i].URL, LQuery) then
+              begin
+                FResultsList.Add(i);
+
+                LListItem := ResultsList.Items.Add;
+                LListItem.Caption := MainForm.FRadioStations[i].Name + ' - ' + MainForm.FRadioStations[i].URL;
+                LListItem.SubItems.Add('00:00:00.000');
+              end;
+            end;
+          end;
       end;
     finally
       ResultsList.Items.EndUpdate;
@@ -170,4 +204,3 @@ begin
 end;
 
 end.
-

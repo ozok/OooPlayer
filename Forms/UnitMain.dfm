@@ -355,7 +355,7 @@ object MainForm: TMainForm
     Top = 127
     Width = 674
     Height = 389
-    ActivePage = TabSheet1
+    ActivePage = TabSheet3
     Align = alClient
     TabOrder = 3
     OnChange = FuncPagesChange
@@ -475,6 +475,41 @@ object MainForm: TMainForm
         OnDblClick = RadioListDblClick
         OnMouseEnter = RadioListMouseEnter
         OnMouseLeave = RadioListMouseLeave
+      end
+    end
+    object TabSheet3: TTabSheet
+      Caption = 'Lyric'
+      ImageIndex = 2
+      object LyricStatusLabel: TLabel
+        Left = 0
+        Top = 348
+        Width = 666
+        Height = 13
+        Align = alBottom
+        ExplicitWidth = 3
+      end
+      object LyricList: TJvListBox
+        Left = 0
+        Top = 0
+        Width = 666
+        Height = 348
+        Align = alClient
+        BorderStyle = bsNone
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ItemHeight = 17
+        Background.FillMode = bfmTile
+        Background.Visible = False
+        ParentFont = False
+        Style = lbOwnerDrawFixed
+        TabOrder = 0
+        Alignment = taCenter
+        OnMouseEnter = LyricListMouseEnter
+        OnMouseLeave = LyricListMouseLeave
+        ExplicitHeight = 361
       end
     end
   end
@@ -5760,7 +5795,8 @@ object MainForm: TMainForm
       002600000026000000260000002600000026000000260000002600}
     IconIndex = 0
     PopupMenu = TrayMenu
-    Visibility = [tvVisibleTaskBar, tvVisibleTaskList, tvRestoreClick, tvMinimizeClick]
+    Visibility = [tvVisibleTaskBar, tvRestoreClick]
+    OnClick = TrayIconClick
     Left = 576
     Top = 360
   end
