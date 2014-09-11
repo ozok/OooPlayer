@@ -16,24 +16,23 @@ Features
 * Several playback modes: Normal, Random, Repeat Track, Shuffle
 * Cover art support: OooPlayer can read both embedded and external cover art and display it
 * Fast search: Oooplayer has a very fast search mechanism
+* Gapless playback: Supports gapless playback
 * Radio player: Online radio player that has more than 1500 radio stations
+* Lyric downloader: OooPlayer can download lyrics automatically
 * Clear interface: OooPlayer has a very simple interface that offers sufficient functionality to users
-* Visualization: OooPlayer shows a small visualization. It uses very little CPU and can be disabled 
 
 To-Do
 ---
 ####While OooPlayer is very much functional in it's current state, development continues. Things planned for it:
 * CD player
 * Tag editor
-* Gapless playback
 * ReplayGain support
 * Online cover art downloader
 * Multiple playlist support
-* Lyric downloader
 
 Version and download location
 ---
-* Latest version of OooPlayer is 1.3
+* Latest version of OooPlayer is 1.4
 * You can download OooPlayer from http://sourceforge.net/projects/oooplayer/
 
 Licence

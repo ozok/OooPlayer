@@ -315,7 +315,7 @@ var
   FPlayer: TMusicPlayer;
 
 const
-  BuildInt = 1043;
+  BuildInt = 1355;
   Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
@@ -604,7 +604,6 @@ const
 var
   I: Integer;
 begin
-  // todo: check valid
   Result := Title + '_' + Artist + '_' + Album + '.txt';
   for I := Low(InvalidChars) to High(InvalidChars) do
   begin
@@ -662,6 +661,7 @@ begin
       end;
       PlayList.Items[PlayList.ItemIndex].Delete;
       FPlayListItems.Delete(PlayList.ItemIndex);
+      PlayList.Items.Count := PlayList.Items.Count - 1;
       PlayList.Repaint;
       if PlayList.ItemIndex < FCurrentItemInfo.ItemIndex then
       begin

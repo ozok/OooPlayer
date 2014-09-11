@@ -3,6 +3,7 @@
 -Added: Lyric downloader
 -Added: Search function for radio station list
 -Added: Radio station info window (thx to Midas)
+-Improved: Lowered CPU usage significantly in some cases
 -Removed: Visualization
 
 --1.3
