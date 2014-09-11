@@ -9,6 +9,11 @@ type
   TLyricDownloaderStatus = (lsDownloading = 0, lsDone = 1, lsError = 2, lsIdle = 3);
 
 type
+  TItemInfo = class
+    Title, Artist, Album: string;
+  end;
+
+type
   TLyricDownloader = class
   private
     FThread: TIdThreadComponent;
@@ -21,6 +26,8 @@ type
     FLyricFolder: string;
     FLyricStatusMsg: string;
     FLogLine: string;
+    FItemInfo: TItemInfo;
+    FDef: TJvCustomUrlGrabberDefaultProperties;
 
     // thread events
     procedure ThreadRun(Sender: TIdThreadComponent);
@@ -35,18 +42,20 @@ type
     procedure UpdateMainUI;
     procedure UpdateLyricStatus;
     procedure AddToLog;
+    procedure EnableUIControls;
   public
     property SongTitle: string read FSongName write FSongName;
     property Artist: string read FArtist write FArtist;
     property Album: string read FAlbum write FAlbum;
     property Status: TLyricDownloaderStatus read FStatus;
     property Lyrics: TStringList read FLyricFile;
+    property ItemInfo: TItemInfo read FItemInfo write FItemInfo;
 
     procedure Start;
     procedure Stop;
 
     constructor Create(const LyricFolder: string);
-    destructor Destroy;
+    destructor Destroy; override;
   end;
 
 implementation
@@ -61,8 +70,6 @@ begin
 end;
 
 constructor TLyricDownloader.Create(const LyricFolder: string);
-var
-  Def: TJvCustomUrlGrabberDefaultProperties;
 begin
   FStatus := lsIdle;
 
@@ -73,8 +80,8 @@ begin
   FThread.OnStopped := ThreadStopped;
   FThread.OnTerminate := ThreadTerminate;
 
-  Def := TJvCustomUrlGrabberDefaultProperties.Create(nil);
-  FPageDownloader := TJvHttpUrlGrabber.Create(nil, '', Def);
+  FDef := TJvCustomUrlGrabberDefaultProperties.Create(nil);
+  FPageDownloader := TJvHttpUrlGrabber.Create(nil, '', FDef);
   with FPageDownloader do
   begin
     OnDoneStream := DoneStream;
@@ -85,6 +92,7 @@ begin
 
   FLyricFolder := LyricFolder;
   FLyricFile := TStringList.Create;
+  FItemInfo := TItemInfo.Create;
 end;
 
 destructor TLyricDownloader.Destroy;
@@ -92,6 +100,8 @@ begin
   FThread.Free;
   FPageDownloader.Free;
   FLyricFile.Free;
+  FItemInfo.Free;
+  FDef.Free;
 end;
 
 procedure TLyricDownloader.DoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string);
@@ -105,8 +115,10 @@ var
 begin
   if Stream.Size = 0 then
   begin
-    FLyricFile.Add('Stream is zero');
-    FThread.Synchronize(UpdateMainUI);
+    FLyricStatusMsg := 'Downloaded file is empty';
+    FThread.Synchronize(UpdateLyricStatus);
+    FLogLine := 'Failed to download lyric from ' + 'http://www.azlyrics.com/lyrics/' + FixStrings(FArtist) + '/' + FixStrings(FSongName) + '.html';
+    FThread.Synchronize(AddToLog);
     FStatus := lsError;
   end
   else
@@ -127,7 +139,7 @@ begin
         end;
         if LAddToLyricFile then
         begin
-          FLyricFile.Add(FixLine(LLine));
+          FLyricFile.Add(Trim(FixLine(LLine)));
         end;
       end;
     finally
@@ -137,7 +149,10 @@ begin
     FThread.Synchronize(UpdateMainUI);
     if FLyricFile.Count > 1 then
     begin
-      FLyricFile.SaveToFile(FLyricFolder + MainForm.CreateLyricFileName(FSongName, FArtist, FAlbum), TEncoding.UTF8);
+      with FItemInfo do
+      begin
+        FLyricFile.SaveToFile(FLyricFolder + MainForm.CreateLyricFileName(Title, Artist, Album), TEncoding.UTF8);
+      end;
     end
     else
     begin
@@ -146,13 +161,29 @@ begin
       FLogLine := 'Failed to download lyric from ' + 'http://www.azlyrics.com/lyrics/' + FixStrings(FArtist) + '/' + FixStrings(FSongName) + '.html';
       FThread.Synchronize(AddToLog);
     end;
+    FThread.Synchronize(EnableUIControls);
     FStatus := lsDone;
+  end;
+end;
+
+procedure TLyricDownloader.EnableUIControls;
+begin
+  with MainForm do
+  begin
+    LyricTitleEdit.Text := FSongName;
+    LyricArtistEdit.Text := FArtist;
+    FLyricAlbumStr := FAlbum;
+    LyricSearchBtn.Enabled := True;
+    LyricArtistEdit.Enabled := True;
+    LyricTitleEdit.Enabled := True;
   end;
 end;
 
 procedure TLyricDownloader.Error(Sender: TObject; ErrorMsg: string);
 begin
   FStatus := lsError;
+  FLyricStatusMsg := 'Lyric downloader error msg: ' + ErrorMsg;
+  FThread.Synchronize(UpdateLyricStatus);
 end;
 
 function TLyricDownloader.FixLine(const Str: string): string;
@@ -161,17 +192,34 @@ begin
   Result := Trim(StringReplace(Result, '<i>', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '</i>', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<!-- start of lyrics -->', '', [rfReplaceAll]));
+
+  Result := Trim(Result)
 end;
 
 function TLyricDownloader.FixStrings(const Str: string): string;
 begin
   Result := LowerCase(StringReplace(Str, ' ', '', [rfReplaceAll]));
   Result := LowerCase(StringReplace(Result, '&', '', [rfReplaceAll]));
+  Result := LowerCase(StringReplace(Result, 'Ö', 'o', [rfReplaceAll]));
+  Result := LowerCase(StringReplace(Result, 'ö', 'o', [rfReplaceAll]));
+  Result := LowerCase(StringReplace(Result, '''', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, ',', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '!', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '?', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '(', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, ')', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '[', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, ']', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '-', '', [rfReplaceAll]));
 end;
 
 procedure TLyricDownloader.Start;
 begin
   FStatus := lsDownloading;
+  if 'the ' = LowerCase(Copy(FArtist, 1, 4)) then
+  begin
+    FArtist := Trim(Copy(FArtist, 4, Maxint))
+  end;
   FLyricFile.Clear;
   FThread.Start;
 end;

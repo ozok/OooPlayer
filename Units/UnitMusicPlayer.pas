@@ -17,14 +17,13 @@
   * along with OooPlayer.  If not, see <http://www.gnu.org/licenses/>.
   *
   * }
-
 unit UnitMusicPlayer;
 
 interface
 
 uses System.Classes, BASS, BASS_AAC, BASSFLAC, BassWMA, BASSWV, BASS_AC3,
   BASS_ALAC, BASS_APE, BASS_MPC, BASS_OFR, BASS_SPX, BASS_TTA, BassOPUS,
-  Windows, SysUtils, StrUtils, Generics.Collections, MediaInfoDll;
+  Windows, SysUtils, StrUtils, Generics.Collections, MediaInfoDll, Bassmix, dialogs;
 
 type
   TPlayerStatus = (psPlaying = 0, psPaused = 1, psStopped = 2, psStalled = 3, psUnkown = 4);
@@ -39,6 +38,8 @@ type
     FVolumeLevel: integer;
     FPositionAsSec: integer;
     FTAKPluginHandle: Cardinal;
+    FMixHandle: HSTREAM;
+    FPosition: int64;
 
     function GetBassStreamStatus: TPlayerStatus;
     function GetTotalLength(): int64;
@@ -47,12 +48,12 @@ type
     function GetSecondDuration: Integer;
 
     function IsM4AALAC: Boolean;
-    function GetLeftLevel: Integer;
-    function GetRightLevel: Integer;
     function GetBassErrorCode: Integer;
+    function GetMixerPlayStatus: TPlayerStatus;
   public
     property PlayerStatus: TPlayerStatus read FPlayerStatus;
     property PlayerStatus2: TPlayerStatus read GetBassStreamStatus;
+    property MixerPlayStatus: TPlayerStatus read GetMixerPlayStatus;
     property ErrorMsg: Integer read FErrorMsg;
     property FileName: string read FFileName write FFileName;
     property TotalLength: int64 read GetTotalLength;
@@ -61,10 +62,8 @@ type
     property DurationAsSec: integer read GetSecondDuration;
     property PositionAsSec: integer read FPositionAsSec;
     property Channel: Cardinal read FBassHandle;
-    property LeftLevel: Integer read GetLeftLevel;
-    property RightLevel: Integer read GetRightLevel;
     property BassErrorCode: Integer read GetBassErrorCode;
-    property BassHandleValue: Cardinal read FBassHandle;
+    property MixHandle: HSTREAM read FMixHandle;
 
     constructor Create(const WinHandle: Cardinal);
     destructor Destroy; override;
@@ -89,13 +88,120 @@ implementation
 
 { TMusicPlayer }
 
+uses UnitMain, UnitSettings, UnitLog;
+
+// procedure SyncProc(hSync: Thandle; hChan: THandle; NotUsed: DWord; MyObject: DWord); stdcall;
+procedure SyncProc(hSync: Thandle; hChan: HSTREAM; NotUsed: DWord; MyObject: DWord); stdcall;
+var
+  LRndIndex: integer;
+begin
+  with MainForm do
+  begin
+    case PlaybackOrderList.ItemIndex of
+      0: // normal
+        begin
+          PositionTimer.Enabled := False;
+          // if playlist is not empty
+          if PlayList.Items.Count > 0 then
+          begin
+            // playback follows selection
+            if SettingsForm.PlayCursorBtn.Checked then
+            begin
+              // try selected file
+              if PlayList.ItemIndex > -1 then
+              begin
+                // if not last played item selected
+                if PlayList.ItemIndex <> FCurrentItemInfo.ItemIndex then
+                begin
+                  PlayItem(PlayList.ItemIndex);
+                end
+                else
+                begin
+                  // if last played item selected then try next item
+                  if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
+                  begin
+                    PlayItem(FCurrentItemInfo.ItemIndex + 1);
+                  end;
+                end;
+              end
+              else
+              begin
+                // play next item
+                if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
+                begin
+                  PlayItem(FCurrentItemInfo.ItemIndex + 1);
+                end;
+              end;
+            end
+            else
+            begin
+              // ignore selection and try next song
+              if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
+              begin
+                PlayItem(FCurrentItemInfo.ItemIndex + 1);
+              end;
+            end;
+          end
+          else
+          begin
+            // empty playlist
+            FPlayer.Stop;
+            PositionBar.Position := 0;
+            MainForm.Caption := 'OooPlayer';
+            CoverImage.Picture.LoadFromFile('logo.png');
+            TitleLabel.Caption := '';
+            ArtistLabel.Caption := '';
+            AlbumLabel.Caption := '';
+            PlaybackInfoLabel.Caption := '';
+            if MainForm.Enabled and MainForm.Visible then
+              MainForm.FocusControl(VolumeBar);
+          end;
+        end;
+      1: // random
+        begin
+          Randomize;
+          LRndIndex := Random(FPlayListItems.Count);
+          PositionTimer.Enabled := False;
+          PlayItem(LRndIndex);
+        end;
+      2: // repear track
+        begin
+          PositionTimer.Enabled := False;
+          try
+            if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
+            begin
+              PlayItem(FCurrentItemInfo.ItemIndex);
+            end;
+          finally
+            PositionTimer.Enabled := True;
+          end;
+        end;
+      3: // shuffle
+        begin
+          PositionTimer.Enabled := False;
+          try
+            if FShuffleIndex + 1 < FShuffleIndexes.Count then
+            begin
+              FShuffleIndex := 1 + FShuffleIndex;
+              if FShuffleIndexes[FShuffleIndex] < FPlayListItems.Count then
+              begin
+                PlayItem(FShuffleIndexes[FShuffleIndex]);
+              end;
+            end;
+          finally
+            PositionTimer.Enabled := True;
+          end;
+        end;
+    end;
+    BASS_ChannelSetPosition(FPlayer.MixHandle, 0, BASS_POS_BYTE);
+  end;
+end;
+
 constructor TMusicPlayer.Create(const WinHandle: Cardinal);
 begin
   FPlayerStatus := psStopped;
   FErrorMsg := MY_ERROR_OK;
-  BASS_SetConfig(BASS_CONFIG_FLOATDSP, 1);
-
-  if not BASS_Init(-1, 44100, 0, WinHandle, nil) then
+  if not BASS_Init(1, 44100, 0, WinHandle, nil) then
   begin
     FErrorMsg := MY_ERROR_BASS_NOT_LOADED;
   end;
@@ -104,6 +210,12 @@ begin
   begin
     FErrorMsg := MY_ERROR_BASS_NOT_LOADED;
   end;
+  // BASS_SetConfig(BASS_CONFIG_ASYNCFILE_BUFFER, 131072);
+  // BASS_SetConfig(BASS_CONFIG_BUFFER, 2000);
+
+  FMixHandle := BASS_Mixer_StreamCreate(44100, 2, BASS_MIXER_END or BASS_MIXER_BUFFER);
+  BASS_ChannelSetSync(FMixHandle, BASS_SYNC_END or BASS_SYNC_MIXTIME, 0, @SyncProc, nil);
+  // BASS_Mixer_ChannelFlags(FMixHandle, BASS_CONFIG_MIXER_BUFFER, 4);
 end;
 
 destructor TMusicPlayer.Destroy;
@@ -138,9 +250,20 @@ begin
   end;
 end;
 
-function TMusicPlayer.GetLeftLevel: Integer;
+function TMusicPlayer.GetMixerPlayStatus: TPlayerStatus;
 begin
-  Result := Loword(BASS_ChannelGetLevel(FBassHandle))
+  case BASS_ChannelIsActive(FMixHandle) of
+    BASS_ACTIVE_STOPPED:
+      Result := psStopped;
+    BASS_ACTIVE_PLAYING:
+      Result := psPlaying;
+    BASS_ACTIVE_STALLED:
+      Result := psStalled;
+    BASS_ACTIVE_PAUSED:
+      Result := psPaused;
+  else
+    Result := psUnkown;
+  end;
 end;
 
 function TMusicPlayer.GetPosition: int64;
@@ -149,6 +272,7 @@ begin
   if FBassHandle > 0 then
   begin
     Result := BASS_ChannelGetPosition(FBassHandle, BASS_POS_BYTE);
+    FPosition := Result;
   end;
 end;
 
@@ -159,11 +283,6 @@ begin
     FPositionAsSec := Round(BASS_ChannelBytes2Seconds(FBassHandle, BASS_ChannelGetPosition(FBassHandle, BASS_POS_BYTE)));
     Result := IntToTime(FPositionAsSec);
   end;
-end;
-
-function TMusicPlayer.GetRightLevel: Integer;
-begin
-  Result := HiWord(BASS_ChannelGetLevel(FBassHandle));
 end;
 
 function TMusicPlayer.GetSecondDuration: Integer;
@@ -263,9 +382,9 @@ end;
 
 procedure TMusicPlayer.Pause;
 begin
-  if GetBassStreamStatus = psPlaying then
+  if GetMixerPlayStatus = psPlaying then
   begin
-    if BASS_ChannelPause(FBassHandle) then
+    if BASS_ChannelPause(FMixHandle) then
       FPlayerStatus := psPaused;
   end;
 end;
@@ -287,59 +406,62 @@ begin
   LExt := LowerCase(ExtractFileExt(FFileName));
   if (LExt = '.aac') or (LExt = '.m4b') then
   begin
-    FBassHandle := BASS_MP4_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT);
+    FBassHandle := BASS_MP4_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE);
   end
   else if (LExt = '.m4a') then
   begin
     if IsM4AALAC then
     begin
-      FBassHandle := BASS_ALAC_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT)
+      FBassHandle := BASS_ALAC_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN)
     end
     else
     begin
-      FBassHandle := BASS_MP4_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT);
+      FBassHandle := BASS_MP4_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
     end;
   end
   else if (LExt = '.flac') then
   begin
-    FBassHandle := BASS_FLAC_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT);
+    FBassHandle := BASS_FLAC_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
   end
   else if (LExt = '.ape') then
   begin
-    FBassHandle := BASS_APE_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT);
+    FBassHandle := BASS_APE_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
   end
   else if (LExt = '.ac3') then
   begin
-    FBassHandle := BASS_AC3_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT);
+    FBassHandle := BASS_AC3_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
   end
   else if (LExt = '.wv') then
   begin
-    FBassHandle := BASS_WV_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT);
+    FBassHandle := BASS_WV_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
   end
   else if (LExt = '.ofr') then
   begin
-    FBassHandle := BASS_OFR_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT);
+    FBassHandle := BASS_OFR_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
   end
   else if (LExt = '.spx') then
   begin
-    FBassHandle := BASS_SPX_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT);
+    FBassHandle := BASS_SPX_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
   end
   else if (LExt = '.tta') then
   begin
-    FBassHandle := BASS_TTA_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT);
+    FBassHandle := BASS_TTA_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
   end
   else if (LExt = '.opus') then
   begin
-    FBassHandle := BASS_OPUS_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT);
+    FBassHandle := BASS_OPUS_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
   end
   else
   begin
-    FBassHandle := Bass_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT);
+    FBassHandle := Bass_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE);
   end;
 
   if FBassHandle > 0 then
   begin
-    if BASS_ChannelPlay(FBassHandle, False) then
+    BASS_ChannelSetAttribute(FBassHandle, BASS_ATTRIB_VOL, (100 - MainForm.VolumeBar.Position) / 100.0);
+    BASS_Mixer_StreamAddChannel(FMixHandle, FBassHandle, BASS_STREAM_AUTOFREE or BASS_MIXER_NORAMPIN or BASS_MIXER_BUFFER);
+    BASS_ChannelSetPosition(FMixHandle, 0, BASS_POS_BYTE);
+    if BASS_ChannelPlay(FMixHandle, False) then
     begin
       FErrorMsg := MY_ERROR_OK;
       FPlayerStatus := psPlaying;
@@ -358,9 +480,9 @@ end;
 
 procedure TMusicPlayer.Resume;
 begin
-  if GetBassStreamStatus = psPaused then
+  if GetMixerPlayStatus = psPaused then
   begin
-    if BASS_ChannelPlay(FBassHandle, False) then
+    if Bass_ChannelPlay(FMixHandle, False) then
       FPlayerStatus := psPlaying;
   end;
 end;
@@ -382,7 +504,7 @@ procedure TMusicPlayer.Stop;
 begin
   if GetBassStreamStatus <> psStopped then
   begin
-    if BASS_ChannelStop(FBassHandle) then
+    if BASS_ChannelStop(FBassHandle) and BASS_ChannelStop(FMixHandle) then
       FPlayerStatus := psStopped;
   end;
 end;

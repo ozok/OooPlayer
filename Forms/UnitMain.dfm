@@ -11,6 +11,7 @@ object MainForm: TMainForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   Menu = MainMenu1
   OldCreateOrder = False
   Position = poScreenCenter
@@ -52,70 +53,6 @@ object MainForm: TMainForm
       Center = True
       Proportional = True
       Stretch = True
-    end
-    object Gauge1: TGauge
-      Left = 349
-      Top = 0
-      Width = 10
-      Height = 45
-      Anchors = [akTop, akRight]
-      BackColor = clBtnFace
-      BorderStyle = bsNone
-      ForeColor = clActiveCaption
-      Kind = gkVerticalBar
-      MaxValue = 300
-      ParentShowHint = False
-      Progress = 0
-      ShowHint = False
-      ShowText = False
-    end
-    object Gauge2: TGauge
-      Left = 357
-      Top = 0
-      Width = 10
-      Height = 45
-      Anchors = [akTop, akRight]
-      BackColor = clBtnFace
-      BorderStyle = bsNone
-      ForeColor = clActiveCaption
-      Kind = gkVerticalBar
-      MaxValue = 300
-      ParentShowHint = False
-      Progress = 0
-      ShowHint = False
-      ShowText = False
-    end
-    object Gauge3: TGauge
-      Left = 365
-      Top = 0
-      Width = 10
-      Height = 45
-      Anchors = [akTop, akRight]
-      BackColor = clBtnFace
-      BorderStyle = bsNone
-      ForeColor = clActiveCaption
-      Kind = gkVerticalBar
-      MaxValue = 300
-      ParentShowHint = False
-      Progress = 0
-      ShowHint = False
-      ShowText = False
-    end
-    object Gauge4: TGauge
-      Left = 373
-      Top = 0
-      Width = 10
-      Height = 45
-      Anchors = [akTop, akRight]
-      BackColor = clBtnFace
-      BorderStyle = bsNone
-      ForeColor = clActiveCaption
-      Kind = gkVerticalBar
-      MaxValue = 300
-      ParentShowHint = False
-      Progress = 0
-      ShowHint = False
-      ShowText = False
     end
     object PauseBtn: TButton
       Left = 60
@@ -355,8 +292,14 @@ object MainForm: TMainForm
     Top = 127
     Width = 674
     Height = 389
-    ActivePage = TabSheet3
+    ActivePage = TabSheet1
     Align = alClient
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
     TabOrder = 3
     OnChange = FuncPagesChange
     OnMouseLeave = FuncPagesMouseLeave
@@ -462,10 +405,17 @@ object MainForm: TMainForm
           item
           end>
         ColumnClick = False
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
         HideSelection = False
         OwnerData = True
         ReadOnly = True
         RowSelect = True
+        ParentFont = False
+        PopupMenu = RadioListMenu
         ShowColumnHeaders = False
         StateImages = PlayBackImgs
         TabOrder = 1
@@ -490,9 +440,9 @@ object MainForm: TMainForm
       end
       object LyricList: TJvListBox
         Left = 0
-        Top = 0
+        Top = 41
         Width = 666
-        Height = 348
+        Height = 307
         Align = alClient
         BorderStyle = bsNone
         Font.Charset = DEFAULT_CHARSET
@@ -509,7 +459,54 @@ object MainForm: TMainForm
         Alignment = taCenter
         OnMouseEnter = LyricListMouseEnter
         OnMouseLeave = LyricListMouseLeave
-        ExplicitHeight = 361
+      end
+      object Panel1: TPanel
+        Left = 0
+        Top = 0
+        Width = 666
+        Height = 41
+        Align = alTop
+        TabOrder = 1
+        DesignSize = (
+          666
+          41)
+        object LyricTitleEdit: TLabeledEdit
+          Left = 12
+          Top = 14
+          Width = 310
+          Height = 21
+          Anchors = [akLeft, akTop, akRight]
+          EditLabel.Width = 24
+          EditLabel.Height = 13
+          EditLabel.Caption = 'Title:'
+          Enabled = False
+          TabOrder = 0
+          OnKeyDown = LyricTitleEditKeyDown
+        end
+        object LyricArtistEdit: TLabeledEdit
+          Left = 328
+          Top = 14
+          Width = 250
+          Height = 21
+          Anchors = [akTop, akRight]
+          EditLabel.Width = 30
+          EditLabel.Height = 13
+          EditLabel.Caption = 'Artist:'
+          Enabled = False
+          TabOrder = 1
+          OnKeyDown = LyricTitleEditKeyDown
+        end
+        object LyricSearchBtn: TButton
+          Left = 584
+          Top = 0
+          Width = 75
+          Height = 35
+          Anchors = [akTop, akRight]
+          Caption = 'Search'
+          Enabled = False
+          TabOrder = 2
+          OnClick = LyricSearchBtnClick
+        end
       end
     end
   end
@@ -706,8 +703,8 @@ object MainForm: TMainForm
   object PlayBackImgs: TImageList
     Height = 20
     Width = 1
-    Left = 584
-    Top = 160
+    Left = 560
+    Top = 424
   end
   object AppIniFileStorage: TJvAppIniFileStorage
     StorageOptions.BooleanStringTrueValues = 'TRUE, YES, Y'
@@ -5795,8 +5792,7 @@ object MainForm: TMainForm
       002600000026000000260000002600000026000000260000002600}
     IconIndex = 0
     PopupMenu = TrayMenu
-    Visibility = [tvVisibleTaskBar, tvRestoreClick]
-    OnClick = TrayIconClick
+    Visibility = [tvVisibleTaskBar, tvRestoreClick, tvMinimizeClick]
     Left = 576
     Top = 360
   end
@@ -5826,10 +5822,10 @@ object MainForm: TMainForm
   end
   object PositionTimer: TTimer
     Enabled = False
-    Interval = 5
+    Interval = 50
     OnTimer = PositionTimerTimer
     Left = 32
-    Top = 176
+    Top = 168
   end
   object RadioThread: TIdThreadComponent
     Active = False
@@ -5840,11 +5836,12 @@ object MainForm: TMainForm
     Left = 40
     Top = 440
   end
-  object VisTimer: TTimer
-    Enabled = False
-    Interval = 100
-    OnTimer = VisTimerTimer
-    Left = 104
-    Top = 176
+  object RadioListMenu: TPopupMenu
+    Left = 264
+    Top = 376
+    object S6: TMenuItem
+      Caption = 'Station info'
+      OnClick = S6Click
+    end
   end
 end

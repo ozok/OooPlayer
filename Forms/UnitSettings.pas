@@ -40,18 +40,12 @@ type
     TabSheet3: TTabSheet;
     LoadArtBtn: TCheckBox;
     CoverArtList: TComboBox;
-    TabSheet4: TTabSheet;
-    VisEnableBtn: TCheckBox;
-    VisIntervalEdit: TJvSpinEdit;
-    Label1: TLabel;
     TabSheet5: TTabSheet;
     LyricBtn: TCheckBox;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LoadArtBtnClick(Sender: TObject);
-    procedure VisEnableBtnClick(Sender: TObject);
-    procedure VisIntervalEditChange(Sender: TObject);
   private
     { Private declarations }
     procedure LoadSettings;
@@ -102,15 +96,11 @@ begin
       CheckUpdateBtn.Checked := SettingsFile.ReadBool('settings', 'update', True);
       LoadArtBtn.Checked := SettingsFile.ReadBool('settings', 'loadcover', True);
       CoverArtList.ItemIndex := SettingsFile.ReadInteger('settings', 'cover', 0);
-      VisEnableBtn.Checked := SettingsFile.ReadBool('settings', 'vis', True);
-      VisIntervalEdit.Text := SettingsFile.ReadString('settings', 'visint', '100');
       LyricBtn.Checked := SettingsFile.ReadBool('settings', 'lyric', True);
     end;
   finally
     SettingsFile.Free;
     LoadArtBtnClick(Self);
-    VisEnableBtnClick(Self);
-    VisIntervalEditChange(Self);
   end;
 end;
 
@@ -127,33 +117,10 @@ begin
       SettingsFile.WriteBool('settings', 'update', CheckUpdateBtn.Checked);
       SettingsFile.WriteBool('settings', 'loadcover', LoadArtBtn.Checked);
       SettingsFile.WriteInteger('settings', 'cover', CoverArtList.ItemIndex);
-      SettingsFile.WriteBool('settings', 'vis', VisEnableBtn.Checked);
-      SettingsFile.WriteString('settings', 'visint', VisIntervalEdit.Text);
       SettingsFile.WriteBool('settings', 'lyric', LyricBtn.Checked);
     end;
   finally
     SettingsFile.Free;
-  end;
-end;
-
-procedure TSettingsForm.VisEnableBtnClick(Sender: TObject);
-begin
-  VisIntervalEdit.Enabled := VisEnableBtn.Checked;
-  MainForm.VisTimer.Enabled := VisEnableBtn.Checked;
-  if not VisEnableBtn.Checked then
-  begin
-    MainForm.Gauge1.Progress := 0;
-    MainForm.Gauge2.Progress := 0;
-    MainForm.Gauge3.Progress := 0;
-    MainForm.Gauge4.Progress := 0;
-  end;
-end;
-
-procedure TSettingsForm.VisIntervalEditChange(Sender: TObject);
-begin
-  if VisIntervalEdit.Value > 0 then
-  begin
-    MainForm.VisTimer.Interval := Abs(Round(VisIntervalEdit.Value));
   end;
 end;
 

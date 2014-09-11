@@ -1,5 +1,9 @@
 --1.4
--Added: Search for radio player
+-Added: Gapless playback
+-Added: Lyric downloader
+-Added: Search function for radio station list
+-Added: Radio station info window (thx to Midas)
+-Removed: Visualization
 
 --1.3
 -Added: Radio player
