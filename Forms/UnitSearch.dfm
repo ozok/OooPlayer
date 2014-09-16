@@ -75,10 +75,19 @@ object SearchForm: TSearchForm
       end>
     ReadOnly = True
     RowSelect = True
+    PopupMenu = ListMenu
     ShowColumnHeaders = False
     TabOrder = 2
     ViewStyle = vsReport
     OnClick = ResultsListClick
     OnDblClick = ResultsListDblClick
+  end
+  object ListMenu: TPopupMenu
+    Left = 312
+    Top = 152
+    object A1: TMenuItem
+      Caption = 'Add to queue'
+      OnClick = A1Click
+    end
   end
 end

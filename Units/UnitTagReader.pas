@@ -93,8 +93,7 @@ begin
   FOPUSTag.Free;
   FWAVTag.Free;
   TMemoryStream(FPicStream).Clear;
-//  TMemoryStream(FPicStream).
-  FPicStream.Free;
+  TMemoryStream(FPicStream).Clear;
 end;
 
 procedure TTagReader.ReadArtwork(const FileName: string);
@@ -121,7 +120,7 @@ begin
     // end
     // else
     // begin
-//    FPicStream := TMemoryStream.Create;
+    // FPicStream := TMemoryStream.Create;
     // end;
     FPicType := none;
 

@@ -305,11 +305,21 @@ object MainForm: TMainForm
     OnMouseLeave = FuncPagesMouseLeave
     object TabSheet1: TTabSheet
       Caption = 'Music'
+      object Splitter1: TSplitter
+        Left = 0
+        Top = 237
+        Width = 666
+        Height = 3
+        Cursor = crVSplit
+        Align = alBottom
+        ExplicitTop = 0
+        ExplicitWidth = 240
+      end
       object PlayList: TListView
         Left = 0
         Top = 0
         Width = 666
-        Height = 361
+        Height = 237
         Hint = 'Playlist'
         Margins.Left = 0
         Margins.Top = 0
@@ -324,6 +334,9 @@ object MainForm: TMainForm
           item
             Caption = 'Title'
             Width = 500
+          end
+          item
+            Caption = 'Queue'
           end
           item
             Alignment = taCenter
@@ -349,6 +362,31 @@ object MainForm: TMainForm
         OnMouseEnter = PlayListMouseEnter
         OnMouseLeave = PlayListMouseLeave
         OnStartDrag = PlayListStartDrag
+        ExplicitHeight = 361
+      end
+      object QueueList: TListView
+        Left = 0
+        Top = 240
+        Width = 666
+        Height = 121
+        Align = alBottom
+        Columns = <
+          item
+            Caption = 'Title'
+          end
+          item
+            Caption = 'Duration'
+            Width = 100
+          end>
+        HideSelection = False
+        MultiSelect = True
+        ReadOnly = True
+        RowSelect = True
+        ShowColumnHeaders = False
+        StateImages = PlayBackImgs
+        TabOrder = 1
+        ViewStyle = vsReport
+        OnDblClick = QueueListDblClick
       end
     end
     object TabSheet2: TTabSheet
@@ -683,6 +721,11 @@ object MainForm: TMainForm
   object PlayListMenu: TPopupMenu
     Left = 32
     Top = 376
+    object A2: TMenuItem
+      Caption = 'Add to queue'
+      ShortCut = 16465
+      OnClick = A2Click
+    end
     object o1: TMenuItem
       Caption = 'Open Folder'
       OnClick = o1Click
@@ -5822,7 +5865,7 @@ object MainForm: TMainForm
   end
   object PositionTimer: TTimer
     Enabled = False
-    Interval = 50
+    Interval = 100
     OnTimer = PositionTimerTimer
     Left = 32
     Top = 168

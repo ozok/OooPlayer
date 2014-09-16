@@ -1,3 +1,7 @@
+--1.5
+--Fixed: couldn't download lyric if title or artist contained "."
+--Fixed: Possible fix for access vialotion errors when closing the program
+
 --1.4
 -Added: Gapless playback
 -Added: Lyric downloader

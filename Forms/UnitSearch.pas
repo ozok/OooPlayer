@@ -26,7 +26,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.StdCtrls,
-  Vcl.ExtCtrls, Generics.Collections, StrUtils;
+  Vcl.ExtCtrls, Generics.Collections, StrUtils, Vcl.Menus;
 
 type
   TSearchType = (stmusic = 0, stradio = 1);
@@ -37,6 +37,8 @@ type
     SearchBtn: TButton;
     ResultsList: TListView;
     ResultsLbl: TLabel;
+    ListMenu: TPopupMenu;
+    A1: TMenuItem;
     procedure FormResize(Sender: TObject);
     procedure SearchBtnClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -47,6 +49,7 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure QueryEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
+    procedure A1Click(Sender: TObject);
   private
     { Private declarations }
     FResultsList: TList<Integer>;
@@ -63,6 +66,34 @@ implementation
 {$R *.dfm}
 
 uses UnitMain;
+
+procedure TSearchForm.A1Click(Sender: TObject);
+var
+  LItem: TListItem;
+  LItemIndex: integer;
+begin
+  if SearchType = stmusic then
+  begin
+    if ResultsList.ItemIndex > -1 then
+    begin
+      LItemIndex := FResultsList[ResultsList.ItemIndex];
+      with MainForm do
+      begin
+        // add if not already in the queue
+        if not FQueuedItems.Contains(LItemIndex) then
+        begin
+          // add to queue list
+          FQueuedItems.Add(LItemIndex);
+          PlayList.Invalidate;
+          // add to queue list
+          LItem := QueueList.Items.Add;
+          LItem.Caption := FPlayListItems[LItemIndex].Artist + ' - ' + FPlayListItems[LItemIndex].Album + ' - ' + FPlayListItems[LItemIndex].Title;
+          LItem.SubItems.Add(FPlayListItems[LItemIndex].DurationStr);
+        end;
+      end;
+    end;
+  end;
+end;
 
 procedure TSearchForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
@@ -138,7 +169,6 @@ begin
         end;
       stradio:
         begin
-          LItemIndex := FResultsList[ResultsList.ItemIndex];
           with MainForm do
           begin
             StopRadio;

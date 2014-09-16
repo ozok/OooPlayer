@@ -211,6 +211,7 @@ begin
   Result := Trim(StringReplace(Result, '[', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, ']', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '-', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '.', '', [rfReplaceAll]));
 end;
 
 procedure TLyricDownloader.Start;
@@ -260,9 +261,14 @@ begin
 end;
 
 procedure TLyricDownloader.UpdateMainUI;
+var
+  I: Integer;
 begin
   MainForm.LyricList.Items.Clear;
-  MainForm.LyricList.Items.AddStrings(FLyricFile);
+  for I := 0 to FLyricFile.Count - 1 do
+  begin
+    MainForm.LyricList.Items.Add(Trim(FLyricFile[i]));
+  end;
   if FLyricFile.Count > 1 then
   begin
     MainForm.LyricStatusLabel.Caption := 'Loaded downloaded lyric';

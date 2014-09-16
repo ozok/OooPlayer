@@ -156,6 +156,9 @@ type
     LyricSearchBtn: TButton;
     RadioListMenu: TPopupMenu;
     S6: TMenuItem;
+    QueueList: TListView;
+    Splitter1: TSplitter;
+    A2: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -231,6 +234,8 @@ type
     procedure LyricSearchBtnClick(Sender: TObject);
     procedure LyricTitleEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure S6Click(Sender: TObject);
+    procedure A2Click(Sender: TObject);
+    procedure QueueListDblClick(Sender: TObject);
   private
     { Private declarations }
     FStoppedByUser: Boolean;
@@ -279,6 +284,7 @@ type
     FLyricAlbumStr: string;
     FShuffleIndexes: TList<Integer>;
     FShuffleIndex: Integer;
+    FQueuedItems: TList<Integer>;
 
     procedure ScrollToItem(const ItemIndex: integer);
 
@@ -366,6 +372,26 @@ procedure TMainForm.A1Click(Sender: TObject);
 begin
   Self.Enabled := False;
   AboutForm.Show;
+end;
+
+procedure TMainForm.A2Click(Sender: TObject);
+var
+  LItem: TListItem;
+begin
+  if PlayList.ItemIndex > -1 then
+  begin
+    // add if not already in the queue
+    if not FQueuedItems.Contains(PlayList.ItemIndex) then
+    begin
+      // add to queue list
+      FQueuedItems.Add(PlayList.ItemIndex);
+      PlayList.Invalidate;
+      // add to queue list
+      LItem := QueueList.Items.Add;
+      LItem.Caption := FPlayListItems[PlayList.ItemIndex].Artist + ' - ' + FPlayListItems[PlayList.ItemIndex].Album + ' - ' + FPlayListItems[PlayList.ItemIndex].Title;
+      LItem.SubItems.Add(FPlayListItems[PlayList.ItemIndex].DurationStr);
+    end;
+  end;
 end;
 
 procedure TMainForm.A3Click(Sender: TObject);
@@ -830,6 +856,7 @@ begin
   FRadioStations := TRadioList.Create;
   PositionBar.Max := MaxInt;
   FLyricDownloader := TLyricDownloader.Create(FAppDataFolder + '\lyric\');
+  FQueuedItems := TList<Integer>.Create;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -843,11 +870,13 @@ begin
   FRadioStations.Free;
   BASS_Free;
   FLyricDownloader.Free;
+  FQueuedItems.Free;
 end;
 
 procedure TMainForm.FormResize(Sender: TObject);
 begin
-  PlayList.Columns[0].Width := PlayList.ClientWidth - PlayList.Columns[1].Width;
+  PlayList.Columns[0].Width := PlayList.ClientWidth - PlayList.Columns[1].Width - PlayList.Columns[2].Width;
+  QueueList.Columns[0].Width := QueueList.ClientWidth - QueueList.Columns[1].Width;
   StatusBar1.Panels[0].Width := StatusBar1.ClientWidth - StatusBar1.Panels[1].Width;
   RadioList.Columns[0].Width := RadioList.ClientWidth - 20;
 end;
@@ -1245,6 +1274,7 @@ begin
       RadioCatList.ItemIndex := ReadInteger('radio', 'cat', 0);
       FuncPages.ActivePageIndex := ReadInteger('general', 'func', 0);
       FCurrentRadioIndex := ReadInteger('radio', 'curr', -1);
+      QueueList.Height := ReadInteger('ui', 'queueh', 120);
     end;
   finally
     SettingsFile.Free;
@@ -1319,18 +1349,39 @@ begin
       0: // normal
         begin
           PositionTimer.Enabled := False;
-          // playback follows selection
-          if SettingsForm.PlayCursorBtn.Checked then
+          // first try queue
+          if FQueuedItems.Count > 0 then
           begin
-            // try selected file
-            if PlayList.ItemIndex > -1 then
+            // play first item in the queue list
+            PlayItem(FQueuedItems[0]);
+            // remove item from queue
+            FQueuedItems.Delete(0);
+            QueueList.Items.Delete(0);
+            PlayList.Invalidate;
+          end
+          else
+          begin
+            // playback follows selection
+            if SettingsForm.PlayCursorBtn.Checked then
             begin
-              if PlayList.ItemIndex <> FCurrentItemInfo.ItemIndex then
+              // try selected file
+              if PlayList.ItemIndex > -1 then
               begin
-                PlayItem(PlayList.ItemIndex);
+                if PlayList.ItemIndex <> FCurrentItemInfo.ItemIndex then
+                begin
+                  PlayItem(PlayList.ItemIndex);
+                end
+                else
+                begin
+                  if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
+                  begin
+                    PlayItem(FCurrentItemInfo.ItemIndex + 1);
+                  end;
+                end;
               end
               else
               begin
+                // play next item
                 if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
                 begin
                   PlayItem(FCurrentItemInfo.ItemIndex + 1);
@@ -1339,19 +1390,11 @@ begin
             end
             else
             begin
-              // play next item
+              // ignore selection and try next song
               if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
               begin
                 PlayItem(FCurrentItemInfo.ItemIndex + 1);
               end;
-            end;
-          end
-          else
-          begin
-            // ignore selection and try next song
-            if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
-            begin
-              PlayItem(FCurrentItemInfo.ItemIndex + 1);
             end;
           end;
         end;
@@ -1828,6 +1871,14 @@ begin
   if Item.Index < FPlayListItems.Count then
   begin
     Item.Caption := FPlayListItems[Item.Index].Artist + ' - ' + FPlayListItems[Item.Index].Album + ' - ' + FPlayListItems[Item.Index].Title;
+    if FQueuedItems.Contains(Item.Index) then
+    begin
+      Item.SubItems.Add('Q')
+    end
+    else
+    begin
+      Item.SubItems.Add('')
+    end;
     Item.SubItems.Add(FPlayListItems[Item.Index].DurationStr);
   end;
 end;
@@ -2067,6 +2118,19 @@ procedure TMainForm.PrevBtnMouseEnter(Sender: TObject);
 begin
   if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
+end;
+
+procedure TMainForm.QueueListDblClick(Sender: TObject);
+begin
+  if QueueList.ItemIndex > -1 then
+  begin
+    // play selected item
+    PlayItem(FQueuedItems[QueueList.ItemIndex]);
+    // delete it from lists
+    FQueuedItems.Delete(QueueList.ItemIndex);
+    QueueList.Items.Delete(QueueList.ItemIndex);
+    PlayList.Invalidate;
+  end;
 end;
 
 procedure TMainForm.R1Click(Sender: TObject);
@@ -2512,6 +2576,7 @@ begin
       WriteInteger('radio', 'cat', RadioCatList.ItemIndex);
       WriteInteger('general', 'func', FuncPages.ActivePageIndex);
       WriteInteger('radio', 'curr', FCurrentRadioIndex);
+      WriteInteger('ui', 'queueh', QueueList.Height);
     end;
   finally
     SettingsFile.Free;
@@ -2579,6 +2644,9 @@ begin
   SetProgressValue(Handle, 0, MaxInt);
   PlayList.Invalidate;
   RadioList.Invalidate;
+  LyricList.Items.Clear;
+  LyricTitleEdit.Clear;
+  LyricArtistEdit.Clear;
   if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
 end;

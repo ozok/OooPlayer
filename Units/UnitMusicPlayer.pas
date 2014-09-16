@@ -104,20 +104,41 @@ begin
           // if playlist is not empty
           if PlayList.Items.Count > 0 then
           begin
-            // playback follows selection
-            if SettingsForm.PlayCursorBtn.Checked then
+            // first try queue
+            if FQueuedItems.Count > 0 then
             begin
-              // try selected file
-              if PlayList.ItemIndex > -1 then
+              // play first queue item
+              PlayItem(FQueuedItems[0]);
+              // delete it from lists
+              FQueuedItems.Delete(0);
+              QueueList.Items.Delete(0);
+              PlayList.Invalidate;
+            end
+            else
+            begin
+              // playback follows selection
+              if SettingsForm.PlayCursorBtn.Checked then
               begin
-                // if not last played item selected
-                if PlayList.ItemIndex <> FCurrentItemInfo.ItemIndex then
+                // try selected file
+                if PlayList.ItemIndex > -1 then
                 begin
-                  PlayItem(PlayList.ItemIndex);
+                  // if not last played item selected
+                  if PlayList.ItemIndex <> FCurrentItemInfo.ItemIndex then
+                  begin
+                    PlayItem(PlayList.ItemIndex);
+                  end
+                  else
+                  begin
+                    // if last played item selected then try next item
+                    if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
+                    begin
+                      PlayItem(FCurrentItemInfo.ItemIndex + 1);
+                    end;
+                  end;
                 end
                 else
                 begin
-                  // if last played item selected then try next item
+                  // play next item
                   if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
                   begin
                     PlayItem(FCurrentItemInfo.ItemIndex + 1);
@@ -126,19 +147,11 @@ begin
               end
               else
               begin
-                // play next item
+                // ignore selection and try next song
                 if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
                 begin
                   PlayItem(FCurrentItemInfo.ItemIndex + 1);
                 end;
-              end;
-            end
-            else
-            begin
-              // ignore selection and try next song
-              if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
-              begin
-                PlayItem(FCurrentItemInfo.ItemIndex + 1);
               end;
             end;
           end
