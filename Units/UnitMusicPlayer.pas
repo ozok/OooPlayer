@@ -133,6 +133,10 @@ begin
                     if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
                     begin
                       PlayItem(FCurrentItemInfo.ItemIndex + 1);
+                    end
+                    else
+                    begin
+                      PlayItem(0);
                     end;
                   end;
                 end
@@ -177,7 +181,7 @@ begin
           PositionTimer.Enabled := False;
           PlayItem(LRndIndex);
         end;
-      2: // repear track
+      2: // repeat track
         begin
           PositionTimer.Enabled := False;
           try
@@ -419,7 +423,7 @@ begin
   LExt := LowerCase(ExtractFileExt(FFileName));
   if (LExt = '.aac') or (LExt = '.m4b') then
   begin
-    FBassHandle := BASS_MP4_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE);
+    FBassHandle := BASS_MP4_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
   end
   else if (LExt = '.m4a') then
   begin
@@ -518,7 +522,9 @@ begin
   if GetBassStreamStatus <> psStopped then
   begin
     if BASS_ChannelStop(FBassHandle) and BASS_ChannelStop(FMixHandle) then
+    begin
       FPlayerStatus := psStopped;
+    end;
   end;
 end;
 

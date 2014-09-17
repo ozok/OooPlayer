@@ -43,17 +43,6 @@ object MainForm: TMainForm
       Anchors = [akTop, akRight]
       Caption = '00:00:00/00:00:00/00:00:00'
     end
-    object CoverImage: TImage
-      Left = 535
-      Top = 3
-      Width = 100
-      Height = 100
-      Hint = 'Cover art'
-      Anchors = [akRight, akBottom]
-      Center = True
-      Proportional = True
-      Stretch = True
-    end
     object PauseBtn: TButton
       Left = 60
       Top = 0
@@ -124,6 +113,7 @@ object MainForm: TMainForm
       TickMarks = tmBoth
       TickStyle = tsNone
       OnChange = VolumeBarChange
+      ShowRange = False
       OnMouseEnter = VolumeBarMouseEnter
     end
     object PlaybackOrderList: TComboBox
@@ -156,6 +146,7 @@ object MainForm: TMainForm
       TabOrder = 2
       TickMarks = tmBoth
       TickStyle = tsNone
+      ShowRange = False
       OnChanged = PositionBarChanged
       OnMouseDown = PositionBarMouseDown
     end
@@ -237,6 +228,29 @@ object MainForm: TMainForm
         ExplicitWidth = 541
       end
     end
+    object Panel2: TPanel
+      Left = 535
+      Top = 3
+      Width = 100
+      Height = 100
+      Anchors = [akRight, akBottom]
+      TabOrder = 9
+      object CoverImage: TImage
+        Left = 1
+        Top = 1
+        Width = 98
+        Height = 98
+        Hint = 'Cover art'
+        Align = alClient
+        Center = True
+        Proportional = True
+        Stretch = True
+        ExplicitLeft = 535
+        ExplicitTop = 3
+        ExplicitWidth = 100
+        ExplicitHeight = 100
+      end
+    end
   end
   object StatusBar1: TStatusBar
     Left = 0
@@ -253,6 +267,7 @@ object MainForm: TMainForm
         Text = '100%'
         Width = 100
       end>
+    ExplicitTop = 558
   end
   object ProgressPanel: TPanel
     Left = 0
@@ -329,7 +344,6 @@ object MainForm: TMainForm
         BevelInner = bvNone
         BevelOuter = bvNone
         BorderStyle = bsNone
-        Color = clWhite
         Columns = <
           item
             Caption = 'Title'
@@ -362,7 +376,6 @@ object MainForm: TMainForm
         OnMouseEnter = PlayListMouseEnter
         OnMouseLeave = PlayListMouseLeave
         OnStartDrag = PlayListStartDrag
-        ExplicitHeight = 361
       end
       object QueueList: TListView
         Left = 0
@@ -387,6 +400,7 @@ object MainForm: TMainForm
         TabOrder = 1
         ViewStyle = vsReport
         OnDblClick = QueueListDblClick
+        ExplicitTop = 239
       end
     end
     object TabSheet2: TTabSheet
@@ -482,7 +496,6 @@ object MainForm: TMainForm
         Width = 666
         Height = 307
         Align = alClient
-        BorderStyle = bsNone
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12

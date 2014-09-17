@@ -159,6 +159,7 @@ type
     QueueList: TListView;
     Splitter1: TSplitter;
     A2: TMenuItem;
+    Panel2: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -312,6 +313,8 @@ type
     // Radio player funcs
 
     function CreateLyricFileName(const Title, Artist, Album: string): string;
+
+    function BassErrorCodeToString(const ErrorCode: integer): string;
   end;
 
 var
@@ -600,6 +603,82 @@ begin
   end;
 end;
 
+function TMainForm.BassErrorCodeToString(const ErrorCode: integer): string;
+begin
+  case ErrorCode of
+    -1:
+      Result := 'Unkown error';
+     1:
+      Result := 'Not enough memory';
+     2:
+      Result := 'Unable to open file';
+     3:
+      Result := 'BASS_ERROR_DRIVER';
+     4:
+      Result := 'BASS_ERROR_BUFLOST';
+     5:
+      Result := 'BASS_ERROR_HANDLE ';
+     6:
+      Result := 'BASS_ERROR_FORMAT';
+     7:
+      Result := 'BASS_ERROR_POSITION ';
+     8:
+      Result := 'BASS_ERROR_INIT';
+     9:
+      Result := 'BASS_ERROR_START ';
+     14:
+      Result := 'BASS_ERROR_ALREADY ';
+     18:
+      Result := 'BASS_ERROR_NOCHAN ';
+     19:
+      Result := 'BASS_ERROR_ILLTYPE ';
+     20:
+      Result := 'BASS_ERROR_ILLPARAM ';
+     21:
+      Result := 'BASS_ERROR_NO3D';
+     22:
+      Result := 'BASS_ERROR_NOEAX ';
+     23:
+      Result := 'BASS_ERROR_DEVICE ';
+     24:
+      Result := 'BASS_ERROR_NOPLAY';
+     25:
+      Result := 'BASS_ERROR_FREQ ';
+     27:
+      Result := 'BASS_ERROR_NOTFILE ';
+     28:
+      Result := 'BASS_ERROR_NOHW ';
+     29:
+      Result := 'BASS_ERROR_EMPTY ';
+     31:
+      Result := 'BASS_ERROR_NONET';
+     32:
+      Result := 'BASS_ERROR_CREATE ';
+     33:
+      Result := 'BASS_ERROR_NOFX ';
+     34:
+      Result := 'BASS_ERROR_NOTAVAIL';
+     37:
+      Result := 'BASS_ERROR_DECODE';
+     39:
+      Result := 'BASS_ERROR_DX ';
+     40:
+      Result := 'BASS_ERROR_TIMEOUT';
+     41:
+      Result := 'BASS_ERROR_FILEFORM';
+     42:
+      Result := 'BASS_ERROR_SPEAKER ';
+     43:
+      Result := 'BASS_ERROR_VERSION ';
+     44:
+      Result := 'BASS_ERROR_CODEC ';
+     45:
+      Result := 'BASS_ERROR_ENDED';
+     46:
+      Result := 'BASS_ERROR_BUSY';
+  end;
+end;
+
 procedure TMainForm.BotBarPnlMouseEnter(Sender: TObject);
 begin
   if Self.Enabled and Self.Visible then
@@ -790,10 +869,12 @@ end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  FPlayer.Stop;
   SavePlayList;
   SaveSettings;
   TrayIcon.Active := False;
   Sleep(100);
+  FLyricDownloader.Stop;
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
@@ -1842,6 +1923,11 @@ begin
   end
   else
   begin
+    LogForm.LogList.Lines.Add('[' + DateTimeToStr(Now) + '] Error:' + FloatToStr(FPlayer.ErrorMsg));
+      if not LogForm.Visible then
+      begin
+        LogForm.Show;
+      end;
     FPlayer.Stop;
     FStoppedByUser := False;
   end;
@@ -2255,7 +2341,7 @@ begin
   begin
     FRadioLogItem := 'Unable to play: ' + FRadioURL;
     RadioThread.Synchronize(AddToRadioLog);
-    FRadioLogItem := 'Bass radio code: ' + FloatToStr(BASS_ErrorGetCode);
+    FRadioLogItem := 'Bass radio error: ' + BassErrorCodeToString(BASS_ErrorGetCode());
     RadioThread.Synchronize(AddToRadioLog);
     RadioThread.Synchronize(RadioResetUI);
   end
@@ -2710,26 +2796,6 @@ begin
 
   UpdateThread.CancelExecute;
 end;
-
-// function TMainForm.TPlayerErrorToStr(const ErrorMsg: Integer): string;
-// begin
-// case ErrorMsg of
-// 0:
-// Result := 'OK.';
-// 1:
-// Result := 'Bass not loaded.';
-// 2:
-// Result := 'Could not stop previous stream.';
-// 3:
-// Result := 'Stream is zero.';
-// 4:
-// Result := 'OK';
-// 5:
-// Result := 'OK';
-// 6:
-// Result := 'OK';
-// end;
-// end;
 
 procedure TMainForm.V1Click(Sender: TObject);
 begin
