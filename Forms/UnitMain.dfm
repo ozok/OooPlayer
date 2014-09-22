@@ -838,8 +838,8 @@ object MainForm: TMainForm
     ProxyAddresses = 'proxyserver'
     ProxyIgnoreList = '<local>'
     OnDoneStream = UpdateCheckerDoneStream
-    Left = 480
-    Top = 216
+    Left = 504
+    Top = 224
   end
   object UpdateThread: TJvThread
     Exclusive = True

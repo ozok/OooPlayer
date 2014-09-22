@@ -3,7 +3,7 @@ OooPlayer
 
 ####OooPlayer is a lightweight music player for Windows. It's written in Delphi and uses Bass library and it's plugins from http://www.un4seen.com/
 
-You can download it from http://sourceforge.net/projects/oooplayer/
+You can download it from http://www.fosshub.com/OooPlayer.html
 
 Supported formats
 --
@@ -17,6 +17,7 @@ Features
 * Cover art support: OooPlayer can read both embedded and external cover art and display it
 * Fast search: Oooplayer has a very fast search mechanism
 * Gapless playback: Supports gapless playback
+* Queue support: Add songs in queue
 * Radio player: Online radio player that has more than 1500 radio stations
 * Lyric downloader: OooPlayer can download lyrics automatically
 * Clear interface: OooPlayer has a very simple interface that offers sufficient functionality to users
@@ -32,8 +33,8 @@ To-Do
 
 Version and download location
 ---
-* Latest version of OooPlayer is 1.4
-* You can download OooPlayer from http://sourceforge.net/projects/oooplayer/
+* Latest version of OooPlayer is 1.5
+* You can download OooPlayer from http://www.fosshub.com/OooPlayer.html
 
 Licence
 ---

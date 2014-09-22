@@ -331,7 +331,6 @@ type
     // Radio player funcs
 
     function CreateLyricFileName(const Title, Artist, Album: string): string;
-
     function BassErrorCodeToString(const ErrorCode: integer): string;
   end;
 
@@ -342,7 +341,7 @@ var
   FPlayer: TMusicPlayer;
 
 const
-  BuildInt = 1355;
+  BuildInt = 1432;
   Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
@@ -494,15 +493,31 @@ var
 begin
   if RadioCatList.Text <> 'User Favourites' then
   begin
-    LStreamWriter := TStreamWriter.Create(FAppDataFolder + '\User Favourites.txt', True);
-    LReader := TStringList.Create;
-    try
-      LReader.LoadFromFile(ExtractFileDir(Application.ExeName) + '\Radios\' + RadioCatList.Text + '.txt');
-      LStreamWriter.WriteLine(LReader[RadioList.ItemIndex]);
-    finally
-      LStreamWriter.Close;
-      LStreamWriter.Free;
-      LReader.Free;
+    if not Portable then
+    begin
+      LStreamWriter := TStreamWriter.Create(FAppDataFolder + '\User Favourites.txt', True);
+      LReader := TStringList.Create;
+      try
+        LReader.LoadFromFile(FAppDataFolder + '\' + RadioCatList.Text + '.txt');
+        LStreamWriter.WriteLine(LReader[RadioList.ItemIndex]);
+      finally
+        LStreamWriter.Close;
+        LStreamWriter.Free;
+        LReader.Free;
+      end;
+    end
+    else
+    begin
+      LStreamWriter := TStreamWriter.Create(ExtractFileDir(Application.ExeName) + '\Radios\User Favourites.txt', True);
+      LReader := TStringList.Create;
+      try
+        LReader.LoadFromFile(ExtractFileDir(Application.ExeName) + '\Radios\' + RadioCatList.Text + '.txt');
+        LStreamWriter.WriteLine(LReader[RadioList.ItemIndex]);
+      finally
+        LStreamWriter.Close;
+        LStreamWriter.Free;
+        LReader.Free;
+      end;
     end;
   end;
 end;
@@ -513,6 +528,7 @@ begin
   begin
     Self.Enabled := False;
     NewRadioForm.RadioCategory := RadioCatList.Text;
+    NewRadioForm.Portable := Portable;
     NewRadioForm.Show;
   end;
 end;
@@ -2423,9 +2439,18 @@ begin
       begin
         Dec(FCurrentRadioIndex);
       end;
-      LRadioFile.LoadFromFile(FAppDataFolder + '\' + RadioCatList.Text + '.txt');
-      LRadioFile.Delete(RadioList.ItemIndex);
-      LRadioFile.SaveToFile(FAppDataFolder + '\' + RadioCatList.Text + '.txt', TEncoding.UTF8);
+      if not Portable then
+      begin
+        LRadioFile.LoadFromFile(FAppDataFolder + '\' + RadioCatList.Text + '.txt');
+        LRadioFile.Delete(RadioList.ItemIndex);
+        LRadioFile.SaveToFile(FAppDataFolder + '\' + RadioCatList.Text + '.txt', TEncoding.UTF8);
+      end
+      else
+      begin
+        LRadioFile.LoadFromFile(ExtractFileDir(Application.ExeName) + '\Radios\' + RadioCatList.Text + '.txt');
+        LRadioFile.Delete(RadioList.ItemIndex);
+        LRadioFile.SaveToFile(ExtractFileDir(Application.ExeName) + '\Radios\' + RadioCatList.Text + '.txt', TEncoding.UTF8);
+      end;
       FRadioStations.Delete(RadioList.ItemIndex);
       RadioList.Items.Count := FRadioStations.Count;
 
@@ -3018,7 +3043,7 @@ begin
           begin
             if ID_YES = Application.MessageBox('There is a new version. Would you like to go homepage and download it?', 'New Version', MB_ICONQUESTION or MB_YESNO) then
             begin
-              ShellExecute(Handle, 'open', 'https://sourceforge.net/projects/oooplayer/', nil, nil, SW_NORMAL);
+              ShellExecute(Handle, 'open', 'http://www.fosshub.com/OooPlayer.html', nil, nil, SW_NORMAL);
             end;
           end;
         end;

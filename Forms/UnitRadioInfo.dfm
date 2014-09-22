@@ -94,7 +94,5 @@ object RadioInfoForm: TRadioInfoForm
     ParentFont = False
     TabOrder = 0
     OnClick = Button1Click
-    ExplicitLeft = 562
-    ExplicitTop = 281
   end
 end
