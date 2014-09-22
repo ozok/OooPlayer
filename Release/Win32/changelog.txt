@@ -1,9 +1,12 @@
 --1.5
---Added: Queue function
---Added: Start from the beginning when it reaches the end instead of getting stuck
---Fixed: couldn't download lyric if title or artist contained "."
---Fixed: Possible fix for access vialotion errors when closing the program
---Fixed: Playlist color problem under dark classic Windows themes
+-Added: Queue in music playlist
+-Added: Radio favourites
+-Added: Add/remove radio stations
+-Added: Song number to playlist
+-Fixed: Player getting stuck when it reaches the end of the playlist
+-Fixed: Couldn't download lyric if title or artist contained "."
+-Fixed: Possible fix for access vialotion errors when closing the program
+-Fixed: Playlist color problem under dark classic Windows themes
 
 --1.4
 -Added: Gapless playback

@@ -122,7 +122,6 @@ type
     AbortBtn: TButton;
     ProgressLabel: TLabel;
     R2: TMenuItem;
-    D2: TMenuItem;
     DragDrop: TJvDragDrop;
     H1: TMenuItem;
     C2: TMenuItem;
@@ -160,6 +159,16 @@ type
     Splitter1: TSplitter;
     A2: TMenuItem;
     Panel2: TPanel;
+    Bevel1: TBevel;
+    Bevel2: TBevel;
+    Bevel3: TBevel;
+    V5: TMenuItem;
+    M1: TMenuItem;
+    R3: TMenuItem;
+    L3: TMenuItem;
+    A5: TMenuItem;
+    A6: TMenuItem;
+    R4: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -237,6 +246,12 @@ type
     procedure S6Click(Sender: TObject);
     procedure A2Click(Sender: TObject);
     procedure QueueListDblClick(Sender: TObject);
+    procedure M1Click(Sender: TObject);
+    procedure R3Click(Sender: TObject);
+    procedure L3Click(Sender: TObject);
+    procedure A5Click(Sender: TObject);
+    procedure A6Click(Sender: TObject);
+    procedure R4Click(Sender: TObject);
   private
     { Private declarations }
     FStoppedByUser: Boolean;
@@ -244,6 +259,7 @@ type
     FLastDir: string;
     FStopAddFiles: Boolean;
     FDraggingCurrentFile: Boolean;
+    FDraggedQueueItemIndex: integer;
     FJpeg: TJPEGImage;
     FPng: TPngImage;
     FRadioURL: Ansistring;
@@ -273,6 +289,9 @@ type
     procedure LoadPPFPlaylist(const PlaylistPath: string);
     procedure SaveM3UPlayList(const FileName: string; const UTF8: Boolean);
     procedure SavePPFPlaylist(const FileName: string);
+
+    procedure CreateUserRadioLists;
+    procedure MoveRadioStations;
   public
     { Public declarations }
     FPlayListItems: TList<TPlayListItem>;
@@ -301,14 +320,13 @@ type
     function IsRadioPlayerStopped: Boolean;
 
     procedure LoadRadioStations;
+    procedure ReloadRadioCategory;
     procedure PlayRadio(const URL: Ansistring);
     procedure PauseRadio;
     procedure ResumeRadio;
     procedure StopRadio;
     procedure SetRadioVolume(const Volume: integer);
-
     procedure AddToRadioLog;
-
     procedure RadioResetUI;
     // Radio player funcs
 
@@ -340,7 +358,8 @@ implementation
 
 {$R *.dfm}
 
-uses UnitSearch, UnitSettings, UnitFileInfo, UnitLog, UnitAbout, UnitRadioInfo;
+uses UnitSearch, UnitSettings, UnitFileInfo, UnitLog, UnitAbout, UnitRadioInfo,
+  UnitNewRadio;
 
 // radio sync func
 procedure StatusProc(buffer: Pointer; len: DWORD; user: Pointer); stdcall;
@@ -380,19 +399,23 @@ end;
 procedure TMainForm.A2Click(Sender: TObject);
 var
   LItem: TListItem;
+  i: integer;
 begin
-  if PlayList.ItemIndex > -1 then
+  for I := 0 to PlayList.Items.Count - 1 do
   begin
-    // add if not already in the queue
-    if not FQueuedItems.Contains(PlayList.ItemIndex) then
+    if PlayList.Items[i].Selected then
     begin
-      // add to queue list
-      FQueuedItems.Add(PlayList.ItemIndex);
-      PlayList.Invalidate;
-      // add to queue list
-      LItem := QueueList.Items.Add;
-      LItem.Caption := FPlayListItems[PlayList.ItemIndex].Artist + ' - ' + FPlayListItems[PlayList.ItemIndex].Album + ' - ' + FPlayListItems[PlayList.ItemIndex].Title;
-      LItem.SubItems.Add(FPlayListItems[PlayList.ItemIndex].DurationStr);
+      // add if not already in the queue
+      if not FQueuedItems.Contains(i) then
+      begin
+        // add to queue list
+        FQueuedItems.Add(i);
+        PlayList.Invalidate;
+        // add to queue list
+        LItem := QueueList.Items.Add;
+        LItem.Caption := FPlayListItems[i].Artist + ' - ' + FPlayListItems[i].Album + ' - ' + FPlayListItems[i].Title;
+        LItem.SubItems.Add(FPlayListItems[i].DurationStr);
+      end;
     end;
   end;
 end;
@@ -461,6 +484,36 @@ begin
       GenerateShuffleList;
       StatusBar1.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
     end;
+  end;
+end;
+
+procedure TMainForm.A5Click(Sender: TObject);
+var
+  LStreamWriter: TStreamWriter;
+  LReader: TStringList;
+begin
+  if RadioCatList.Text <> 'User Favourites' then
+  begin
+    LStreamWriter := TStreamWriter.Create(FAppDataFolder + '\User Favourites.txt', True);
+    LReader := TStringList.Create;
+    try
+      LReader.LoadFromFile(ExtractFileDir(Application.ExeName) + '\Radios\' + RadioCatList.Text + '.txt');
+      LStreamWriter.WriteLine(LReader[RadioList.ItemIndex]);
+    finally
+      LStreamWriter.Close;
+      LStreamWriter.Free;
+      LReader.Free;
+    end;
+  end;
+end;
+
+procedure TMainForm.A6Click(Sender: TObject);
+begin
+  if RadioCatList.Text <> 'User Favourites' then
+  begin
+    Self.Enabled := False;
+    NewRadioForm.RadioCategory := RadioCatList.Text;
+    NewRadioForm.Show;
   end;
 end;
 
@@ -606,75 +659,75 @@ end;
 function TMainForm.BassErrorCodeToString(const ErrorCode: integer): string;
 begin
   case ErrorCode of
-    -1:
+    - 1:
       Result := 'Unkown error';
-     1:
+    1:
       Result := 'Not enough memory';
-     2:
+    2:
       Result := 'Unable to open file';
-     3:
+    3:
       Result := 'BASS_ERROR_DRIVER';
-     4:
+    4:
       Result := 'BASS_ERROR_BUFLOST';
-     5:
+    5:
       Result := 'BASS_ERROR_HANDLE ';
-     6:
+    6:
       Result := 'BASS_ERROR_FORMAT';
-     7:
+    7:
       Result := 'BASS_ERROR_POSITION ';
-     8:
+    8:
       Result := 'BASS_ERROR_INIT';
-     9:
+    9:
       Result := 'BASS_ERROR_START ';
-     14:
+    14:
       Result := 'BASS_ERROR_ALREADY ';
-     18:
+    18:
       Result := 'BASS_ERROR_NOCHAN ';
-     19:
+    19:
       Result := 'BASS_ERROR_ILLTYPE ';
-     20:
+    20:
       Result := 'BASS_ERROR_ILLPARAM ';
-     21:
+    21:
       Result := 'BASS_ERROR_NO3D';
-     22:
+    22:
       Result := 'BASS_ERROR_NOEAX ';
-     23:
+    23:
       Result := 'BASS_ERROR_DEVICE ';
-     24:
+    24:
       Result := 'BASS_ERROR_NOPLAY';
-     25:
+    25:
       Result := 'BASS_ERROR_FREQ ';
-     27:
+    27:
       Result := 'BASS_ERROR_NOTFILE ';
-     28:
+    28:
       Result := 'BASS_ERROR_NOHW ';
-     29:
+    29:
       Result := 'BASS_ERROR_EMPTY ';
-     31:
+    31:
       Result := 'BASS_ERROR_NONET';
-     32:
+    32:
       Result := 'BASS_ERROR_CREATE ';
-     33:
+    33:
       Result := 'BASS_ERROR_NOFX ';
-     34:
+    34:
       Result := 'BASS_ERROR_NOTAVAIL';
-     37:
+    37:
       Result := 'BASS_ERROR_DECODE';
-     39:
+    39:
       Result := 'BASS_ERROR_DX ';
-     40:
+    40:
       Result := 'BASS_ERROR_TIMEOUT';
-     41:
+    41:
       Result := 'BASS_ERROR_FILEFORM';
-     42:
+    42:
       Result := 'BASS_ERROR_SPEAKER ';
-     43:
+    43:
       Result := 'BASS_ERROR_VERSION ';
-     44:
+    44:
       Result := 'BASS_ERROR_CODEC ';
-     45:
+    45:
       Result := 'BASS_ERROR_ENDED';
-     46:
+    46:
       Result := 'BASS_ERROR_BUSY';
   end;
 end;
@@ -713,6 +766,31 @@ begin
   for I := Low(InvalidChars) to High(InvalidChars) do
   begin
     Result := StringReplace(Result, InvalidChars[i], '', [rfReplaceAll]);
+  end;
+end;
+
+procedure TMainForm.CreateUserRadioLists;
+var
+  LDummyFile: TStringList;
+begin
+  LDummyFile := TStringList.Create;
+  try
+    if not Portable then
+    begin
+      if not FileExists(FAppDataFolder + '\User Favourites.txt') then
+      begin
+        LDummyFile.SaveToFile(FAppDataFolder + '\User Favourites.txt', TEncoding.UTF8);
+      end;
+    end
+    else
+    begin
+      if not FileExists(ExtractFileDir(Application.ExeName) + '\Radios\User Favourites.txt') then
+      begin
+        LDummyFile.SaveToFile(ExtractFileDir(Application.ExeName) + '\Radios\User Favourites.txt', TEncoding.UTF8);
+      end;
+    end;
+  finally
+    LDummyFile.Free;
   end;
 end;
 
@@ -966,6 +1044,8 @@ procedure TMainForm.FormShow(Sender: TObject);
 begin
   LoadPlayList;
   LoadSettings;
+  MoveRadioStations;
+  CreateUserRadioLists;
   LoadRadioStations;
   GenerateShuffleList;
   StatusBar1.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
@@ -1095,6 +1175,11 @@ end;
 procedure TMainForm.L2Click(Sender: TObject);
 begin
   LogForm.Show;
+end;
+
+procedure TMainForm.L3Click(Sender: TObject);
+begin
+  FuncPages.ActivePageIndex := 2;
 end;
 
 procedure TMainForm.LoadCoverArt(const FileName: string);
@@ -1311,7 +1396,14 @@ begin
   FRadioStations.Clear;
   RadioList.Items.Count := 0;
   RadioList.Invalidate;
-  LStreamReader := TStreamReader.Create(ExtractFileDir(Application.ExeName) + '\Radios\' + RadioCatList.Text + '.txt');
+  if not Portable then
+  begin
+    LStreamReader := TStreamReader.Create(FAppDataFolder + '\' + RadioCatList.Text + '.txt');
+  end
+  else
+  begin
+    LStreamReader := TStreamReader.Create(ExtractFileDir(Application.ExeName) + '\Radios\' + RadioCatList.Text + '.txt');
+  end;
   LSplitList := TStringList.Create;
   try
     LSplitList.StrictDelimiter := True;
@@ -1406,6 +1498,27 @@ begin
   if Key = VK_RETURN then
   begin
     LyricSearchBtnClick(Self);
+  end;
+end;
+
+procedure TMainForm.M1Click(Sender: TObject);
+begin
+  FuncPages.ActivePageIndex := 0;
+end;
+
+procedure TMainForm.MoveRadioStations;
+var
+  I: Integer;
+begin
+  for I := 0 to RadioCatList.Items.Count - 1 do
+  begin
+    if not Portable then
+    begin
+      if not FileExists(FAppDataFolder + '\' + RadioCatList.Items[i] + '.txt') then
+      begin
+        CopyFile(PWideChar(ExtractFileDir(Application.ExeName) + '\Radios\' + RadioCatList.Items[i] + '.txt'), PWideChar(FAppDataFolder + '\' + RadioCatList.Items[i] + '.txt'), True);
+      end;
+    end;
   end;
 end;
 
@@ -1924,10 +2037,10 @@ begin
   else
   begin
     LogForm.LogList.Lines.Add('[' + DateTimeToStr(Now) + '] Error:' + FloatToStr(FPlayer.ErrorMsg));
-      if not LogForm.Visible then
-      begin
-        LogForm.Show;
-      end;
+    if not LogForm.Visible then
+    begin
+      LogForm.Show;
+    end;
     FPlayer.Stop;
     FStoppedByUser := False;
   end;
@@ -1956,7 +2069,7 @@ procedure TMainForm.PlayListData(Sender: TObject; Item: TListItem);
 begin
   if Item.Index < FPlayListItems.Count then
   begin
-    Item.Caption := FPlayListItems[Item.Index].Artist + ' - ' + FPlayListItems[Item.Index].Album + ' - ' + FPlayListItems[Item.Index].Title;
+    Item.Caption := FloatToStr(Item.Index + 1) + '. ' + FPlayListItems[Item.Index].Artist + ' - ' + FPlayListItems[Item.Index].Album + ' - ' + FPlayListItems[Item.Index].Title;
     if FQueuedItems.Contains(Item.Index) then
     begin
       Item.SubItems.Add('Q')
@@ -1981,6 +2094,7 @@ end;
 procedure TMainForm.PlayListDragDrop(Sender, Source: TObject; X, Y: Integer);
 var
   Item: TListItem;
+  I: Integer;
 begin
   Item := PlayList.GetItemAt(X, Y);
   if Item <> nil then
@@ -1989,6 +2103,10 @@ begin
     if FDraggingCurrentFile then
     begin
       FCurrentItemInfo.ItemIndex := Item.Index;
+    end;
+    if FDraggedQueueItemIndex > -1 then
+    begin
+      FQueuedItems[FDraggedQueueItemIndex] := Item.Index;
     end;
     PlayList.Items[TMyDragObject(Source).ItemIndex].Selected := True;
     PlayList.Items[Item.Index].Selected := False;
@@ -2016,6 +2134,7 @@ end;
 procedure TMainForm.PlayListStartDrag(Sender: TObject; var DragObject: TDragObject);
 var
   Item: TListItem;
+  I: Integer;
 begin
   Item := PlayList.Selected;
   if Item <> nil then
@@ -2023,6 +2142,15 @@ begin
     DragObject := TMyDragObject.Create;
     TMyDragObject(DragObject).ItemIndex := Item.Index;
     FDraggingCurrentFile := Item.Index = FCurrentItemInfo.ItemIndex;
+    FDraggedQueueItemIndex := -1;
+    for I := 0 to FQueuedItems.Count - 1 do
+    begin
+      if FQueuedItems[i] = Item.Index then
+      begin
+        FDraggedQueueItemIndex := I;
+        Break;
+      end;
+    end;
   end;
 end;
 
@@ -2236,14 +2364,82 @@ begin
 end;
 
 procedure TMainForm.R2Click(Sender: TObject);
+var
+  I: Integer;
+  FDeletedQueueIndex: integer;
 begin
   if PlayList.ItemIndex > -1 then
   begin
+    FDeletedQueueIndex := -1;
+    // if a queued item is selected to be deleted, store its index to delete it later
+    for I := 0 to FQueuedItems.Count - 1 do
+    begin
+      if FQueuedItems[i] = PlayList.ItemIndex then
+      begin
+        FDeletedQueueIndex := i;
+        Break;
+      end;
+    end;
+    // adjust queue items
+    for I := 0 to FQueuedItems.Count - 1 do
+    begin
+      // if queued item is below the deleted item then decrease it's index by 1
+      if FQueuedItems[i] > PlayList.ItemIndex then
+      begin
+        FQueuedItems[i] := FQueuedItems[i] - 1;
+      end;
+    end;
+    if FDeletedQueueIndex > -1 then
+    begin
+      FQueuedItems.Delete(FDeletedQueueIndex);
+      QueueList.Items.Delete(FDeletedQueueIndex);
+    end;
     PlayList.Items[PlayList.ItemIndex].Delete;
     FPlayListItems.Delete(PlayList.ItemIndex);
     PlayList.Items.Count := PlayList.Items.Count - 1;
     PlayList.Repaint;
     StatusBar1.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+  end;
+end;
+
+procedure TMainForm.R3Click(Sender: TObject);
+begin
+  FuncPages.ActivePageIndex := 1;
+end;
+
+procedure TMainForm.R4Click(Sender: TObject);
+var
+  LRadioFile: TStringList;
+begin
+  if RadioList.ItemIndex > -1 then
+  begin
+    LRadioFile := TStringList.Create;
+    try
+      if FCurrentRadioIndex = RadioList.ItemIndex then
+      begin
+        FCurrentRadioIndex := -1;
+      end;
+      if FCurrentRadioIndex > RadioList.ItemIndex then
+      begin
+        Dec(FCurrentRadioIndex);
+      end;
+      LRadioFile.LoadFromFile(FAppDataFolder + '\' + RadioCatList.Text + '.txt');
+      LRadioFile.Delete(RadioList.ItemIndex);
+      LRadioFile.SaveToFile(FAppDataFolder + '\' + RadioCatList.Text + '.txt', TEncoding.UTF8);
+      FRadioStations.Delete(RadioList.ItemIndex);
+      RadioList.Items.Count := FRadioStations.Count;
+
+      ReloadRadioCategory;
+      if RadioList.Items.Count > 0 then
+      begin
+        if (FCurrentRadioIndex < radioList.Items.Count) and (FCurrentRadioIndex > -1) then
+        begin
+          RadioList.Items[FCurrentRadioIndex].MakeVisible(False);
+        end;
+      end;
+    finally
+      LRadioFile.Free;
+    end;
   end;
 end;
 
@@ -2385,6 +2581,53 @@ begin
     SendMessage(WinHandle, WM_INFO_UPDATE, REPAINT_RADIO_LIST, 0);
   end;
   RadioThread.Terminate;
+end;
+
+procedure TMainForm.ReloadRadioCategory;
+var
+  LStreamReader: TStreamReader;
+  LLine: string;
+  LRadioStation: TRadioStation;
+  LSplitList: TStringList;
+begin
+  // remove all radio stations
+  FRadioStations.Clear;
+  RadioList.Items.Count := 0;
+  RadioList.Invalidate;
+  if not Portable then
+  begin
+    LStreamReader := TStreamReader.Create(FAppDataFolder + '\' + RadioCatList.Text + '.txt');
+  end
+  else
+  begin
+    LStreamReader := TStreamReader.Create(ExtractFileDir(Application.ExeName) + '\Radios\' + RadioCatList.Text + '.txt');
+  end;
+  LSplitList := TStringList.Create;
+  try
+    LSplitList.StrictDelimiter := True;
+    LSplitList.Delimiter := ';';
+    while not LStreamReader.EndOfStream do
+    begin
+      LLine := Trim(LStreamReader.ReadLine);
+      if Length(LLine) > 0 then
+      begin
+        LSplitList.DelimitedText := LLine;
+        if LSplitList.Count = 3 then
+        begin
+          LRadioStation.Name := LSplitList[0];
+          LRadioStation.Web := LSplitList[1];
+          LRadioStation.URL := LSplitList[2];
+
+          RadioList.Items.Count := RadioList.Items.Count + 1;
+          FRadioStations.Add(LRadioStation);
+        end;
+      end;
+    end;
+  finally
+    LStreamReader.Close;
+    LStreamReader.Free;
+    LSplitList.Free;
+  end;
 end;
 
 function TMainForm.RemoveInvalidChars(const Title: string): string;

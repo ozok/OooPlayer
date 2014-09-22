@@ -6,6 +6,7 @@
 181.Fm - Awesome 80s;http://www.181.fm ;http://relay.181.fm:8000/
 181.Fm - Lite 80s;http://www.181.fm;http://relay.181.fm:8040/
 80s Mixed;http://www.80smixed.com;http://184.154.202.243:8108/
+4U 80's;http://www.radionomy.com/en/radio/4u-80s/index#;http://streaming.radionomy.com/4u-80s
 AddictedToRadio - 80s Decade;http://addictedtoradio.com;http://wms-13.streamsrus.com:9310
 AddictedToRadio - 80s Lite;http://addictedtoradio.com;http://wms-13.streamsrus.com:9410
 AddictedToRadio - 90s;http://addictedtoradio.com;http://wms-13.streamsrus.com:14010

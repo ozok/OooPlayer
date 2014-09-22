@@ -267,7 +267,6 @@ object MainForm: TMainForm
         Text = '100%'
         Width = 100
       end>
-    ExplicitTop = 558
   end
   object ProgressPanel: TPanel
     Left = 0
@@ -330,11 +329,20 @@ object MainForm: TMainForm
         ExplicitTop = 0
         ExplicitWidth = 240
       end
+      object Bevel1: TBevel
+        Left = 0
+        Top = 234
+        Width = 666
+        Height = 3
+        Align = alBottom
+        Shape = bsTopLine
+        ExplicitTop = 187
+      end
       object PlayList: TListView
         Left = 0
         Top = 0
         Width = 666
-        Height = 237
+        Height = 234
         Hint = 'Playlist'
         Margins.Left = 0
         Margins.Top = 0
@@ -383,6 +391,7 @@ object MainForm: TMainForm
         Width = 666
         Height = 121
         Align = alBottom
+        BorderStyle = bsNone
         Columns = <
           item
             Caption = 'Title'
@@ -400,7 +409,6 @@ object MainForm: TMainForm
         TabOrder = 1
         ViewStyle = vsReport
         OnDblClick = QueueListDblClick
-        ExplicitTop = 239
       end
     end
     object TabSheet2: TTabSheet
@@ -444,7 +452,8 @@ object MainForm: TMainForm
           'Talk'
           'Schlager'
           'Soundtrack & Movie'
-          'Season')
+          'Season'
+          'User Favourites')
       end
       object RadioList: TListView
         Left = 0
@@ -490,12 +499,30 @@ object MainForm: TMainForm
         Align = alBottom
         ExplicitWidth = 3
       end
-      object LyricList: TJvListBox
+      object Bevel2: TBevel
+        Left = 0
+        Top = 345
+        Width = 666
+        Height = 3
+        Align = alBottom
+        Shape = bsTopLine
+        ExplicitTop = 298
+      end
+      object Bevel3: TBevel
         Left = 0
         Top = 41
         Width = 666
-        Height = 307
+        Height = 3
+        Align = alTop
+        Shape = bsTopLine
+      end
+      object LyricList: TJvListBox
+        Left = 0
+        Top = 44
+        Width = 666
+        Height = 301
         Align = alClient
+        BorderStyle = bsNone
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
@@ -517,6 +544,7 @@ object MainForm: TMainForm
         Width = 666
         Height = 41
         Align = alTop
+        BevelOuter = bvNone
         TabOrder = 1
         DesignSize = (
           666
@@ -642,6 +670,24 @@ object MainForm: TMainForm
         OnClick = L2Click
       end
     end
+    object V5: TMenuItem
+      Caption = 'View'
+      object M1: TMenuItem
+        Caption = 'Music'
+        ShortCut = 16433
+        OnClick = M1Click
+      end
+      object R3: TMenuItem
+        Caption = 'Radio'
+        ShortCut = 16434
+        OnClick = R3Click
+      end
+      object L3: TMenuItem
+        Caption = 'Lyric'
+        ShortCut = 16435
+        OnClick = L3Click
+      end
+    end
     object P1: TMenuItem
       Caption = 'Playback'
       object P2: TMenuItem
@@ -746,10 +792,6 @@ object MainForm: TMainForm
     object R2: TMenuItem
       Caption = 'Remove from the list'
       OnClick = R2Click
-    end
-    object D2: TMenuItem
-      Caption = 'Delete file from disk and list'
-      OnClick = D2Click
     end
     object F2: TMenuItem
       Caption = 'File Information'
@@ -5898,6 +5940,18 @@ object MainForm: TMainForm
     object S6: TMenuItem
       Caption = 'Station info'
       OnClick = S6Click
+    end
+    object A5: TMenuItem
+      Caption = 'Add to favourites'
+      OnClick = A5Click
+    end
+    object A6: TMenuItem
+      Caption = 'Add a radio'
+      OnClick = A6Click
+    end
+    object R4: TMenuItem
+      Caption = 'Remove selected'
+      OnClick = R4Click
     end
   end
 end

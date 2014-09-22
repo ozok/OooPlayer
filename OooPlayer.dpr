@@ -42,7 +42,8 @@ uses
   basswv in 'BassUnits\basswv.pas',
   UnitLyricDownloader in 'Units\UnitLyricDownloader.pas',
   bassmix in 'BassUnits\bassmix.pas',
-  UnitRadioInfo in 'Forms\UnitRadioInfo.pas' {RadioInfoForm};
+  UnitRadioInfo in 'Forms\UnitRadioInfo.pas' {RadioInfoForm},
+  UnitNewRadio in 'Forms\UnitNewRadio.pas' {NewRadioForm};
 
 {$R *.res}
 
@@ -55,6 +56,7 @@ begin
   Application.CreateForm(TSettingsForm, SettingsForm);
   Application.CreateForm(TLogForm, LogForm);
   Application.CreateForm(TAboutForm, AboutForm);
+  Application.CreateForm(TNewRadioForm, NewRadioForm);
   Application.Run;
 
 end.
