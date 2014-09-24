@@ -1,3 +1,7 @@
+--1.5.1
+-Fixed: Double clicking a radio search result caused "Argument out of reach" error (thx to Midas)
+-Fixed: Selecting a radio search result didn't scroll to that station in radio list
+
 --1.5
 -Added: Queue in music playlist
 -Added: Radio favourites

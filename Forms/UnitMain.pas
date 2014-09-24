@@ -341,7 +341,7 @@ var
   FPlayer: TMusicPlayer;
 
 const
-  BuildInt = 1432;
+  BuildInt = 1457;
   Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
@@ -655,7 +655,6 @@ begin
         LPlayListItem.Codec := LCodec;
         LPlayListItem.SampleRate := LSampleRate;
         FPlayListItems.Add(LPlayListItem);
-
       finally
         MediaInfo_Close(MediaInfoHandle);
       end;
@@ -732,7 +731,7 @@ begin
     39:
       Result := 'BASS_ERROR_DX ';
     40:
-      Result := 'BASS_ERROR_TIMEOUT';
+      Result := 'Connection timed out. Please try later.';
     41:
       Result := 'BASS_ERROR_FILEFORM';
     42:
@@ -981,6 +980,8 @@ begin
         Application.Terminate;
       end;
   end;
+  BASS_PluginLoad('bass_aac.dll', 0);
+  BASS_PluginLoad('basswma.dll', 0);
   if not MediaInfoDLL_Load(ExtractFileDir(Application.ExeName) + '\mediainfo.dll') then
   begin
     Application.MessageBox('Couldn''t load mediainfo.dll library.', 'Fatal Error', MB_ICONERROR);

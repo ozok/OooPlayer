@@ -93,6 +93,7 @@ begin
   FOPUSTag.Free;
   FWAVTag.Free;
   TMemoryStream(FPicStream).Clear;
+  FPicStream.Free;
 end;
 
 procedure TTagReader.ReadArtwork(const FileName: string);
@@ -113,14 +114,14 @@ begin
   FIsBusy := True;
   try
     // clear the image from last time
-    if Assigned(FPicStream) then
-    begin
-      TMemoryStream(FPicStream).Clear;
-    end
-    else
-    begin
-      FPicStream := TMemoryStream.Create;
-    end;
+    // if Assigned(FPicStream) then
+    // begin
+    // TMemoryStream(FPicStream).Clear;
+    // end
+    // else
+    // begin
+    // FPicStream := TMemoryStream.Create;
+    // end;
     FPicType := none;
 
     if FID3v2Tag.LoadFromFile(FileName) = 0 then

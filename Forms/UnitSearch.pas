@@ -144,9 +144,21 @@ end;
 
 procedure TSearchForm.ResultsListClick(Sender: TObject);
 begin
-  if ResultsList.ItemIndex > -1 then
-  begin
-    MainForm.ScrollToItem(FResultsList[ResultsList.ItemIndex]);
+  case SearchType of
+    stmusic:
+      if ResultsList.ItemIndex > -1 then
+      begin
+        MainForm.ScrollToItem(FResultsList[ResultsList.ItemIndex]);
+      end;
+    stradio:
+      begin
+        if (ResultsList.ItemIndex < MainForm.FRadioStations.Count) and (ResultsList.ItemIndex > -1) then
+        begin
+          MainForm.RadioList.Items[FResultsList[ResultsList.ItemIndex]].MakeVisible(False);
+          MainForm.RadioList.ItemIndex := -1;
+          MainForm.RadioList.ItemIndex := FResultsList[ResultsList.ItemIndex];
+        end;
+      end;
   end;
 end;
 
@@ -169,9 +181,11 @@ begin
         end;
       stradio:
         begin
+          LItemIndex := FResultsList[ResultsList.ItemIndex];
           with MainForm do
           begin
             StopRadio;
+            MainForm.FCurrentRadioIndex := LItemIndex;
             PlayRadio(FRadioStations[LItemIndex].URL);
           end;
         end;
