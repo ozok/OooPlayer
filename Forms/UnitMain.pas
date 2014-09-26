@@ -265,6 +265,7 @@ type
     FRadioURL: Ansistring;
     FRadioLogItem: string;
     FLyricDownloader: TLyricDownloader;
+    FPageHasntChangedYet: Boolean;
 
     procedure AddFile(const FileName: string);
     procedure ReScanFile(const FileIndex: integer);
@@ -1033,6 +1034,7 @@ begin
   PositionBar.Max := MaxInt;
   FLyricDownloader := TLyricDownloader.Create(FAppDataFolder + '\lyric\');
   FQueuedItems := TList<Integer>.Create;
+  FPageHasntChangedYet := True;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -1507,6 +1509,29 @@ begin
         end;
       end;
     end;
+  end
+  else if FPlaybackType = radio then
+  begin
+    if not IsRadioPlayerStopped then
+    begin
+      if (Length(LyricTitleEdit.Text) > 0) and (Length(LyricArtistEdit.Text) > 0) then
+      begin
+        LyricSearchBtn.Enabled := False;
+        LyricArtistEdit.Enabled := False;
+        LyricTitleEdit.Enabled := False;
+        if SettingsForm.LyricBtn.Checked then
+        begin
+          FLyricDownloader.Stop;
+          FLyricDownloader.SongTitle := LyricTitleEdit.Text;
+          FLyricDownloader.Artist := LyricArtistEdit.Text;
+          FLyricDownloader.Album := 'Radio';
+          FLyricDownloader.ItemInfo.Title := LyricTitleEdit.Text;
+          FLyricDownloader.ItemInfo.Artist := LyricArtistEdit.Text;
+          FLyricDownloader.ItemInfo.Album := 'Radio';
+          FLyricDownloader.Start;
+        end;
+      end;
+    end;
   end;
 end;
 
@@ -1675,8 +1700,15 @@ end;
 
 procedure TMainForm.FuncPagesChange(Sender: TObject);
 begin
-  // Self.Width := Self.Width + 1;
-  // Self.Width := Self.Width - 1;
+  if FPageHasntChangedYet then
+  begin
+    if FuncPages.ActivePageIndex = 0 then
+    begin
+      Self.Width := Self.Width + 1;
+      Self.Width := Self.Width - 1;
+      FPageHasntChangedYet := False;
+    end;
+  end;
 end;
 
 procedure TMainForm.FuncPagesMouseLeave(Sender: TObject);
@@ -2031,6 +2063,12 @@ begin
           FLyricDownloader.ItemInfo.Album := FPlayListItems[FCurrentItemInfo.ItemIndex].Album;
           FLyricDownloader.Start;
         end;
+      end
+      else
+      begin
+        LyricSearchBtn.Enabled := True;
+        LyricArtistEdit.Enabled := True;
+        LyricTitleEdit.Enabled := True;
       end;
       Self.Enabled := False;
       Sleep(100);
@@ -2180,7 +2218,7 @@ begin
   PositionBar.Position := 0;
   Self.Caption := 'OooPlayer';
   CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
-  TitleLabel.Caption := '';
+  TitleLabel.Caption := 'Trying to connect to the radio station...';
   ArtistLabel.Caption := '';
   AlbumLabel.Caption := '';
   PlaybackInfoLabel.Caption := '';
@@ -3111,6 +3149,8 @@ begin
 end;
 
 procedure TMainForm.WndProc(var Msg: TMessage);
+var
+  LSplitList: TStringList;
 begin
   inherited;
   if Msg.Msg = WM_INFO_UPDATE then
@@ -3146,7 +3186,45 @@ begin
       // 6:
       // Label3.Caption := String(PAnsiChar(msg.LParam));
       UPDATE_META:
-        ArtistLabel.Caption := String(PAnsiChar(msg.LParam));
+        begin
+          ArtistLabel.Caption := String(PAnsiChar(msg.LParam));
+          // lyric
+          LyricList.Items.Clear;
+          LyricStatusLabel.Caption := '';
+          LyricTitleEdit.Text := '';
+          LyricArtistEdit.Text := '';
+          LSplitList := TStringList.Create;
+          try
+            // try to get tags
+            // artist - title is assumed
+            LSplitList.StrictDelimiter := True;
+            LSplitList.Delimiter := '-';
+            LSplitList.DelimitedText := ArtistLabel.Caption;
+            if LSplitList.Count = 2 then
+            begin
+              // sometimes there are no tags so we must check for them
+              if (Length(Trim(LSplitList[1])) > 0) and (Length(Trim(LSplitList[0])) > 0) then
+              begin
+                LyricTitleEdit.Text := Trim(LSplitList[1]);
+                LyricArtistEdit.Text := Trim(LSplitList[0]);
+                FLyricAlbumStr := 'Radio';
+                LyricSearchBtn.Enabled := False;
+                LyricArtistEdit.Enabled := False;
+                LyricTitleEdit.Enabled := False;
+                FLyricDownloader.Stop;
+                FLyricDownloader.SongTitle := Trim(LSplitList[1]);
+                FLyricDownloader.Artist := Trim(LSplitList[0]);
+                FLyricDownloader.Album := 'Radio';
+                FLyricDownloader.ItemInfo.Title := Trim(LSplitList[1]);
+                FLyricDownloader.ItemInfo.Artist := Trim(LSplitList[0]);
+                FLyricDownloader.ItemInfo.Album := 'Radio';
+                FLyricDownloader.Start;
+              end;
+            end;
+          finally
+            LSplitList.Free;
+          end;
+        end;
       STATUS_UPDATE:
         begin
           if (String(PAnsiChar(msg.LParam)) = 'ICY 200 OK') or (String(PAnsiChar(msg.LParam)) = 'HTTP/1.0 200 OK') then

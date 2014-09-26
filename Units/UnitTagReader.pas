@@ -92,8 +92,8 @@ begin
   FMP4Tag.Free;
   FOPUSTag.Free;
   FWAVTag.Free;
-  TMemoryStream(FPicStream).Clear;
-  FPicStream.Free;
+  // TMemoryStream(FPicStream).Clear;
+  // FPicStream.Free;
 end;
 
 procedure TTagReader.ReadArtwork(const FileName: string);

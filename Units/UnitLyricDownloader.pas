@@ -62,7 +62,7 @@ implementation
 
 { TLyricDownloader }
 
-uses UnitMain, UnitLog;
+uses UnitMain, UnitLog, UnitSettings;
 
 procedure TLyricDownloader.AddToLog;
 begin
@@ -117,8 +117,11 @@ begin
   begin
     FLyricStatusMsg := 'Downloaded file is empty';
     FThread.Synchronize(UpdateLyricStatus);
-    FLogLine := 'Failed to download lyric from ' + 'http://www.azlyrics.com/lyrics/' + FixStrings(FArtist) + '/' + FixStrings(FSongName) + '.html';
-    FThread.Synchronize(AddToLog);
+    if SettingsForm.LogLyricFailBtn.Checked then
+    begin
+      FLogLine := 'Failed to download lyric from ' + 'http://www.azlyrics.com/lyrics/' + FixStrings(FArtist) + '/' + FixStrings(FSongName) + '.html';
+      FThread.Synchronize(AddToLog);
+    end;
     FStatus := lsError;
   end
   else
@@ -158,8 +161,11 @@ begin
     begin
       FLyricStatusMsg := 'Could not found any lyrics';
       FThread.Synchronize(UpdateLyricStatus);
-      FLogLine := 'Failed to download lyric from ' + 'http://www.azlyrics.com/lyrics/' + FixStrings(FArtist) + '/' + FixStrings(FSongName) + '.html';
-      FThread.Synchronize(AddToLog);
+      if SettingsForm.LogLyricFailBtn.Checked then
+      begin
+        FLogLine := 'Failed to download lyric from ' + 'http://www.azlyrics.com/lyrics/' + FixStrings(FArtist) + '/' + FixStrings(FSongName) + '.html';
+        FThread.Synchronize(AddToLog);
+      end;
     end;
     FThread.Synchronize(EnableUIControls);
     FStatus := lsDone;

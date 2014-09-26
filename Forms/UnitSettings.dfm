@@ -26,7 +26,7 @@ object SettingsForm: TSettingsForm
     Top = 8
     Width = 272
     Height = 139
-    ActivePage = TabSheet1
+    ActivePage = TabSheet5
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     object TabSheet1: TTabSheet
@@ -128,6 +128,14 @@ object SettingsForm: TSettingsForm
         ParentFont = False
         State = cbChecked
         TabOrder = 0
+      end
+      object LogLyricFailBtn: TCheckBox
+        Left = 16
+        Top = 39
+        Width = 169
+        Height = 17
+        Caption = 'Log if lyric downloader fails'
+        TabOrder = 1
       end
     end
   end
