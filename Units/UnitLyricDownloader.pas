@@ -190,6 +190,7 @@ begin
   FStatus := lsError;
   FLyricStatusMsg := 'Lyric downloader error msg: ' + ErrorMsg;
   FThread.Synchronize(UpdateLyricStatus);
+  FThread.Synchronize(EnableUIControls);
 end;
 
 function TLyricDownloader.FixLine(const Str: string): string;

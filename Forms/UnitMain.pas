@@ -32,8 +32,8 @@ uses
   windows7taskbar,
   JvExStdCtrls, JvListBox, IniFiles, Vcl.Buttons, JvFormPlacement, JvAppStorage,
   JvAppIniStorage, StrUtils, ShellAPI, JvComputerInfoEx, UnitTagTypes, UnitTagReader, PNGImage, JvDragDrop,
-  JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon, Jpeg, UnitMusicPlayer, Bass,
-  IdBaseComponent, IdThreadComponent, UnitLyricDownloader;
+  JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon, Jpeg, UnitMusicPlayer, Bass, BASSenc,
+  IdBaseComponent, IdThreadComponent, UnitLyricDownloader, sButton;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -61,6 +61,13 @@ type
   TMyDragObject = class(TDragObject)
   public
     ItemIndex: Integer;
+  end;
+
+type
+  TRadioRecordInfo = record
+    FileName: string;
+    Title: string;
+    Artist: string;
   end;
 
 type
@@ -169,6 +176,14 @@ type
     A5: TMenuItem;
     A6: TMenuItem;
     R4: TMenuItem;
+    RadioRecordPanel: TPanel;
+    RecordRadioBtn: TsButton;
+    StopRadioRecordBtn: TButton;
+    RadioRecordFormatList: TComboBox;
+    Label1: TLabel;
+    RadioRecordingOptionsBtn: TButton;
+    RadioRecordModeList: TComboBox;
+    Label2: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -252,6 +267,9 @@ type
     procedure A5Click(Sender: TObject);
     procedure A6Click(Sender: TObject);
     procedure R4Click(Sender: TObject);
+    procedure RecordRadioBtnClick(Sender: TObject);
+    procedure RadioRecordingOptionsBtnClick(Sender: TObject);
+    procedure StopRadioRecordBtnClick(Sender: TObject);
   private
     { Private declarations }
     FStoppedByUser: Boolean;
@@ -295,6 +313,10 @@ type
     procedure MoveRadioStations;
   public
     { Public declarations }
+    // encoder paths
+    FLamePath, FOggEncPath, FOpusEncPath, FFDKPath: string;
+    // encoder paths
+
     FPlayListItems: TList<TPlayListItem>;
     FRadioStations: TRadioList;
     FCurrentItemInfo: TCurrentItemInfo;
@@ -306,6 +328,8 @@ type
     FShuffleIndexes: TList<Integer>;
     FShuffleIndex: Integer;
     FQueuedItems: TList<Integer>;
+    PortableMode: Boolean;
+    FRecordingRadio: Boolean;
 
     procedure ScrollToItem(const ItemIndex: integer);
 
@@ -329,6 +353,11 @@ type
     procedure SetRadioVolume(const Volume: integer);
     procedure AddToRadioLog;
     procedure RadioResetUI;
+    procedure StartRadioRecording;
+    procedure StopRadioRecording;
+    procedure RecordingDisableUI;
+    procedure RecordingEnableUI;
+    function CreateRadioRecordFileName: TRadioRecordInfo;
     // Radio player funcs
 
     function CreateLyricFileName(const Title, Artist, Album: string): string;
@@ -339,6 +368,7 @@ var
   MainForm: TMainForm;
   WinHandle: HWND;
   FRadioHandle: HSTREAM;
+  FRadioRecordProcessID: Cardinal;
   FPlayer: TMusicPlayer;
 
 const
@@ -359,7 +389,7 @@ implementation
 {$R *.dfm}
 
 uses UnitSearch, UnitSettings, UnitFileInfo, UnitLog, UnitAbout, UnitRadioInfo,
-  UnitNewRadio;
+  UnitNewRadio, UnitRadioRecordOptions;
 
 // radio sync func
 procedure StatusProc(buffer: Pointer; len: DWORD; user: Pointer); stdcall;
@@ -754,6 +784,12 @@ begin
     Self.FocusControl(VolumeBar);
 end;
 
+procedure TMainForm.RadioRecordingOptionsBtnClick(Sender: TObject);
+begin
+  Self.Enabled := False;
+  RadioRecordOptionsForm.Show;
+end;
+
 procedure TMainForm.C1Click(Sender: TObject);
 begin
   PlayList.Items.Clear;
@@ -783,6 +819,81 @@ begin
   begin
     Result := StringReplace(Result, InvalidChars[i], '', [rfReplaceAll]);
   end;
+end;
+
+function TMainForm.CreateRadioRecordFileName: TRadioRecordInfo;
+var
+  LOutputFile: string;
+  LSplitLst: TStringList;
+begin
+  case RadioRecordModeList.ItemIndex of
+    0: // seperate file for each file
+      begin
+        // make sure we have tags
+        if Length(ArtistLabel.Caption) > 0 then
+        begin
+          LSplitLst := TStringList.Create;
+          try
+            LSplitLst.StrictDelimiter := True;
+            LSplitLst.Delimiter := '-';
+            LSplitLst.DelimitedText := ArtistLabel.Caption;
+            if LSplitLst.Count = 2 then
+            begin
+              LOutputFile := FRadioStations[FCurrentRadioIndex].Name + ' - ' + Trim(LSplitLst[1]) + ' - ' + Trim(LSplitLst[0]);
+              Result.Title := '"' + Trim(LSplitLst[1]) + '" ';
+              Result.Artist := '"' + Trim(LSplitLst[0]) + '" ';
+            end
+            else
+            begin
+              // use date time
+              LOutputFile := FRadioStations[FCurrentRadioIndex].Name + ' - ' + DateTimeToStr(Now);
+            end;
+          finally
+            LSplitLst.Free;
+          end;
+        end
+        else
+        begin
+          // if tags aren't present use date and date
+          LOutputFile := FRadioStations[FCurrentRadioIndex].Name + ' - ' + DateTimeToStr(Now);
+        end;
+      end;
+    1: // single long file
+      begin
+        LOutputFile := FRadioStations[FCurrentRadioIndex].Name + ' - ' + DateTimeToStr(Now)
+      end;
+  end;
+  if Length(Result.FileName) >= 251 then
+  begin
+    Result.FileName := Copy(Result.FileName, 1, 250);
+  end;
+  // extension
+  case RadioRecordFormatList.ItemIndex of
+    0:
+      LOutputFile := LOutputFile + '.mp3';
+    1:
+      LOutputFile := LOutputFile + '.ogg';
+    2:
+      LOutputFile := LOutputFile + '.opus';
+    3:
+      LOutputFile := LOutputFile + '.aac';
+    4:
+      LOutputFile := LOutputFile + '.wav';
+  end;
+
+  LOutputFile := StringReplace(LOutputFile, '/', '_', [rfReplaceAll]);
+  LOutputFile := StringReplace(LOutputFile, '\', '_', [rfReplaceAll]);
+  Result.FileName := LOutputFile;
+  // remove chars that are not allowed
+  Result.FileName := StringReplace(Result.FileName, '<', '_', [rfReplaceAll]);
+  Result.FileName := StringReplace(Result.FileName, '>', '_', [rfReplaceAll]);
+  Result.FileName := StringReplace(Result.FileName, ':', '_', [rfReplaceAll]);
+  Result.FileName := StringReplace(Result.FileName, '"', '_', [rfReplaceAll]);
+  Result.FileName := StringReplace(Result.FileName, '|', '_', [rfReplaceAll]);
+  Result.FileName := StringReplace(Result.FileName, '?', '_', [rfReplaceAll]);
+  Result.FileName := StringReplace(Result.FileName, '|', '_', [rfReplaceAll]);
+  Result.FileName := StringReplace(Result.FileName, '*', '_', [rfReplaceAll]);
+  Result.FileName := '"' + RadioRecordOptionsForm.RecordSaveEdit.Text + '\' + Result.FileName + '"';
 end;
 
 procedure TMainForm.CreateUserRadioLists;
@@ -996,6 +1107,31 @@ begin
       Application.MessageBox('You seem to have Windows 7 but OooPlayer can''t start taskbar progressbar!', 'Error', MB_ICONERROR);
     end;
   end;
+  // encoder paths
+  FLamePath := ExtractFileDir(Application.ExeName) + '\Encoders\lame.exe';
+  FOggEncPath := ExtractFileDir(Application.ExeName) + '\Encoders\oggenc2.exe';
+  FOpusEncPath := ExtractFileDir(Application.ExeName) + '\Encoders\opusenc.exe';
+  FFDKPath := ExtractFileDir(Application.ExeName) + '\Encoders\fdkaac.exe';
+  if not FileExists(FLamePath) then
+  begin
+    Application.MessageBox('Unable to find lame.exe!', 'Fatal Error', MB_ICONERROR);
+    Application.Terminate;
+  end;
+  if not FileExists(FOggEncPath) then
+  begin
+    Application.MessageBox('Unable to find oggenc2.exe!', 'Fatal Error', MB_ICONERROR);
+    Application.Terminate;
+  end;
+  if not FileExists(FOpusEncPath) then
+  begin
+    Application.MessageBox('Unable to find opusenc.exe!', 'Fatal Error', MB_ICONERROR);
+    Application.Terminate;
+  end;
+  if not FileExists(FFDKPath) then
+  begin
+    Application.MessageBox('Unable to find fdkaac.exe!', 'Fatal Error', MB_ICONERROR);
+    Application.Terminate;
+  end;
 
   // radio playe config
   BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1);
@@ -1035,6 +1171,7 @@ begin
   FLyricDownloader := TLyricDownloader.Create(FAppDataFolder + '\lyric\');
   FQueuedItems := TList<Integer>.Create;
   FPageHasntChangedYet := True;
+  PortableMode := Portable;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -1530,6 +1667,12 @@ begin
           FLyricDownloader.ItemInfo.Album := 'Radio';
           FLyricDownloader.Start;
         end;
+      end
+      else
+      begin
+        LyricSearchBtn.Enabled := True;
+        LyricArtistEdit.Enabled := True;
+        LyricTitleEdit.Enabled := True;
       end;
     end;
   end;
@@ -2215,6 +2358,7 @@ begin
   FStoppedByUser := True;
 
   FPlayer.Stop;
+  StopRadioRecording;
   PositionBar.Position := 0;
   Self.Caption := 'OooPlayer';
   CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
@@ -2647,6 +2791,29 @@ begin
   RadioThread.Terminate;
 end;
 
+procedure TMainForm.RecordingDisableUI;
+begin
+  RecordRadioBtn.Enabled := False;
+  StopRadioRecordBtn.Enabled := True;
+  RadioRecordFormatList.Enabled := False;
+  RadioRecordModeList.Enabled := false;
+  RadioRecordingOptionsBtn.Enabled := False;
+end;
+
+procedure TMainForm.RecordingEnableUI;
+begin
+  RecordRadioBtn.Enabled := True;
+  StopRadioRecordBtn.Enabled := False;
+  RadioRecordFormatList.Enabled := True;
+  RadioRecordModeList.Enabled := True;
+  RadioRecordingOptionsBtn.Enabled := True;
+end;
+
+procedure TMainForm.RecordRadioBtnClick(Sender: TObject);
+begin
+  StartRadioRecording;
+end;
+
 procedure TMainForm.ReloadRadioCategory;
 var
   LStreamReader: TStreamReader;
@@ -3011,6 +3178,59 @@ begin
   PlayList.Columns[0].Width := PlayList.ClientWidth - PlayList.Columns[1].Width;
 end;
 
+procedure TMainForm.StartRadioRecording;
+var
+  LEncodeCMD: PWideChar;
+  LChanInfo: BASS_CHANNELINFO;
+  LRadioInfo: TRadioRecordInfo;
+begin
+  if FPlaybackType = radio then
+  begin
+    if not IsRadioPlayerStopped then
+    begin
+      if not IsRadioPlayerPaused then
+      begin
+        // get channel frequency
+        BASS_ChannelGetInfo(FRadioHandle, LChanInfo);
+        LRadioInfo := CreateRadioRecordFileName;
+        case RadioRecordFormatList.ItemIndex of
+          0: // mp3
+            LEncodeCMD := PWideChar('"' + FLamePath + '" -r -s ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' --tt ' + LRadioInfo.Title + ' --ta ' + LRadioInfo.Artist + ' - -o ' + LRadioInfo.FileName);
+          // LEncodeCMD := PWideChar('"' + FLamePath + '" -r -s ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' - -o ' + LRadioInfo.FileName);
+          1: // ogg
+            LEncodeCMD := PWideChar('"' + FOggEncPath + '" --ignorelength -r -R ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' -t ' + LRadioInfo.Title + ' -l ' + LRadioInfo.Artist + ' - -o ' +
+              LRadioInfo.FileName);
+          2: // opus
+            LEncodeCMD := PWideChar('"' + FOpusEncPath + '" --hard-cbr --bitrate ' + RadioRecordOptionsForm.BitrateList.Text + ' --title ' + LRadioInfo.Title + ' --artist ' + LRadioInfo.Artist + ' --raw --raw-rate ' +
+              FloatToStr(LChanInfo.freq) + ' - ' + LRadioInfo.FileName);
+          3: // aac
+            LEncodeCMD := PWideChar('"' + FFDKPath + '" -m 0 -b ' + RadioRecordOptionsForm.BitrateList.Text + ' --title ' + LRadioInfo.Title + ' --artist ' + LRadioInfo.Artist + ' --moov-before-mdat --ignorelength -R --raw-rate ' +
+              FloatToStr(LChanInfo.freq) + ' - -o ' + LRadioInfo.FileName);
+          4: // wav
+            LEncodeCMD := PWideChar(LRadioInfo.FileName);
+        end;
+        FRadioRecordProcessID := BASS_Encode_Start(FRadioHandle, LEncodeCMD, BASS_UNICODE, nil, nil);
+        if FRadioRecordProcessID > 0 then
+        begin
+          // todo: started recording etc
+          RecordingDisableUI;
+          FRecordingRadio := True;
+        end
+        else
+        begin
+          FRecordingRadio := False;
+          // show error
+          LogForm.LogList.Lines.Add('Radio recording bass error: ' + FloatToStr(BASS_ErrorGetCode));
+          if not LogForm.Visible then
+          begin
+            LogForm.Show;
+          end;
+        end;
+      end;
+    end;
+  end;
+end;
+
 procedure TMainForm.StopBtnClick(Sender: TObject);
 begin
   if FPlaybackType = music then
@@ -3025,6 +3245,7 @@ begin
     if not IsRadioPlayerStopped then
     begin
       StopRadio;
+      StopRadioRecording;
     end;
   end;
   PositionBar.Position := 0;
@@ -3055,6 +3276,21 @@ begin
   if BASS_ChannelIsActive(FRadioHandle) <> BASS_ACTIVE_STOPPED then
   begin
     BASS_ChannelStop(FRadioHandle)
+  end;
+end;
+
+procedure TMainForm.StopRadioRecordBtnClick(Sender: TObject);
+begin
+  StopRadioRecording;
+end;
+
+procedure TMainForm.StopRadioRecording;
+begin
+  if FPlaybackType = radio then
+  begin
+    BASS_Encode_Stop(FRadioHandle);
+    RecordingEnableUI;
+    FRecordingRadio := False;
   end;
 end;
 
@@ -3188,6 +3424,20 @@ begin
       UPDATE_META:
         begin
           ArtistLabel.Caption := String(PAnsiChar(msg.LParam));
+          // radio recording
+          // seperate file for each song
+          if FRecordingRadio then
+          begin
+            if RadioRecordModeList.ItemIndex = 0 then
+            begin
+              StopRadioRecording;
+              StartRadioRecording;
+            end
+            else
+            begin
+              // single file so do nothing
+            end;
+          end;
           // lyric
           LyricList.Items.Clear;
           LyricStatusLabel.Caption := '';
@@ -3219,7 +3469,19 @@ begin
                 FLyricDownloader.ItemInfo.Artist := Trim(LSplitList[0]);
                 FLyricDownloader.ItemInfo.Album := 'Radio';
                 FLyricDownloader.Start;
+              end
+              else
+              begin
+                LyricSearchBtn.Enabled := True;
+                LyricArtistEdit.Enabled := True;
+                LyricTitleEdit.Enabled := True;
               end;
+            end
+            else
+            begin
+              LyricSearchBtn.Enabled := True;
+              LyricArtistEdit.Enabled := True;
+              LyricTitleEdit.Enabled := True;
             end;
           finally
             LSplitList.Free;

@@ -306,7 +306,7 @@ object MainForm: TMainForm
     Top = 127
     Width = 674
     Height = 389
-    ActivePage = TabSheet3
+    ActivePage = TabSheet2
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -457,9 +457,9 @@ object MainForm: TMainForm
       end
       object RadioList: TListView
         Left = 0
-        Top = 21
+        Top = 73
         Width = 666
-        Height = 340
+        Height = 288
         Align = alClient
         BorderStyle = bsNone
         Columns = <
@@ -486,6 +486,98 @@ object MainForm: TMainForm
         OnDblClick = RadioListDblClick
         OnMouseEnter = RadioListMouseEnter
         OnMouseLeave = RadioListMouseLeave
+        ExplicitTop = 19
+        ExplicitHeight = 340
+      end
+      object RadioRecordPanel: TPanel
+        Left = 0
+        Top = 21
+        Width = 666
+        Height = 52
+        Align = alTop
+        TabOrder = 2
+        ExplicitLeft = 56
+        ExplicitTop = 27
+        DesignSize = (
+          666
+          52)
+        object Label1: TLabel
+          Left = 176
+          Top = 6
+          Width = 77
+          Height = 13
+          Anchors = [akTop, akRight]
+          Caption = 'Format to save:'
+        end
+        object Label2: TLabel
+          Left = 298
+          Top = 6
+          Width = 67
+          Height = 13
+          Anchors = [akTop, akRight]
+          Caption = 'Save method:'
+        end
+        object RecordRadioBtn: TsButton
+          Left = 6
+          Top = 6
+          Width = 50
+          Height = 40
+          Caption = 'Record'
+          TabOrder = 0
+          OnClick = RecordRadioBtnClick
+          SkinData.SkinSection = 'BUTTON'
+        end
+        object StopRadioRecordBtn: TButton
+          Left = 62
+          Top = 6
+          Width = 50
+          Height = 40
+          Caption = 'Stop'
+          Enabled = False
+          TabOrder = 1
+          OnClick = StopRadioRecordBtnClick
+        end
+        object RadioRecordFormatList: TComboBox
+          Left = 176
+          Top = 25
+          Width = 114
+          Height = 21
+          Style = csDropDownList
+          Anchors = [akTop, akRight]
+          ItemIndex = 0
+          TabOrder = 2
+          Text = 'Mp3'
+          Items.Strings = (
+            'Mp3'
+            'Ogg Vorbis'
+            'Opus'
+            'AAC'
+            'WAV')
+        end
+        object RadioRecordingOptionsBtn: TButton
+          Left = 505
+          Top = 6
+          Width = 152
+          Height = 40
+          Anchors = [akTop, akRight]
+          Caption = 'Recording Options'
+          TabOrder = 3
+          OnClick = RadioRecordingOptionsBtnClick
+        end
+        object RadioRecordModeList: TComboBox
+          Left = 296
+          Top = 25
+          Width = 203
+          Height = 21
+          Style = csDropDownList
+          Anchors = [akTop, akRight]
+          ItemIndex = 0
+          TabOrder = 4
+          Text = 'Try to save each song seperately'
+          Items.Strings = (
+            'Try to save each song seperately'
+            'Save recording as a single long file')
+        end
       end
     end
     object TabSheet3: TTabSheet
@@ -5922,8 +6014,8 @@ object MainForm: TMainForm
     Enabled = False
     Interval = 100
     OnTimer = PositionTimerTimer
-    Left = 32
-    Top = 168
+    Left = 400
+    Top = 280
   end
   object RadioThread: TIdThreadComponent
     Active = False
