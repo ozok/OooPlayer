@@ -33,7 +33,7 @@ uses
   JvExStdCtrls, JvListBox, IniFiles, Vcl.Buttons, JvFormPlacement, JvAppStorage,
   JvAppIniStorage, StrUtils, ShellAPI, JvComputerInfoEx, UnitTagTypes, UnitTagReader, PNGImage, JvDragDrop,
   JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon, Jpeg, UnitMusicPlayer, Bass, BASSenc,
-  IdBaseComponent, IdThreadComponent, UnitLyricDownloader, sButton;
+  IdBaseComponent, IdThreadComponent, UnitLyricDownloader;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -177,13 +177,14 @@ type
     A6: TMenuItem;
     R4: TMenuItem;
     RadioRecordPanel: TPanel;
-    RecordRadioBtn: TsButton;
+    RecordRadioBtn: TButton;
     StopRadioRecordBtn: TButton;
     RadioRecordFormatList: TComboBox;
     Label1: TLabel;
     RadioRecordingOptionsBtn: TButton;
     RadioRecordModeList: TComboBox;
     Label2: TLabel;
+    RadioRecordOutputFolderBtn: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -270,6 +271,7 @@ type
     procedure RecordRadioBtnClick(Sender: TObject);
     procedure RadioRecordingOptionsBtnClick(Sender: TObject);
     procedure StopRadioRecordBtnClick(Sender: TObject);
+    procedure RadioRecordOutputFolderBtnClick(Sender: TObject);
   private
     { Private declarations }
     FStoppedByUser: Boolean;
@@ -362,6 +364,7 @@ type
 
     function CreateLyricFileName(const Title, Artist, Album: string): string;
     function BassErrorCodeToString(const ErrorCode: integer): string;
+    procedure SetPlayerBuffer(const Buffer: DWORD);
   end;
 
 var
@@ -675,6 +678,7 @@ begin
         // increase playlist item count
         PlayList.Items.Count := PlayList.Items.Count + 1;
 
+        LPlayListItem := TPlayListItem.Create;
         LPlayListItem.FullFileName := FileName;
         LPlayListItem.DurationStr := LDuration;
         LPlayListItem.Title := LTitle;
@@ -790,6 +794,14 @@ begin
   RadioRecordOptionsForm.Show;
 end;
 
+procedure TMainForm.RadioRecordOutputFolderBtnClick(Sender: TObject);
+begin
+  if DirectoryExists(RadioRecordOptionsForm.RecordSaveEdit.Text) then
+  begin
+    ShellExecute(Handle, 'open', 'explorer', PChar(RadioRecordOptionsForm.RecordSaveEdit.Text), nil, SW_SHOWNORMAL);
+  end;
+end;
+
 procedure TMainForm.C1Click(Sender: TObject);
 begin
   PlayList.Items.Clear;
@@ -876,9 +888,7 @@ begin
     2:
       LOutputFile := LOutputFile + '.opus';
     3:
-      LOutputFile := LOutputFile + '.aac';
-    4:
-      LOutputFile := LOutputFile + '.wav';
+      LOutputFile := LOutputFile + '.m4a';
   end;
 
   LOutputFile := StringReplace(LOutputFile, '/', '_', [rfReplaceAll]);
@@ -1221,6 +1231,7 @@ begin
     UpdateThread.Execute(nil)
   end;
   PlayList.Columns[0].Width := PlayList.ClientWidth - PlayList.Columns[1].Width;
+  FPlayer.SetBuffer(Round(SettingsForm.BufferEdit.Value));
 end;
 
 procedure TMainForm.G1Click(Sender: TObject);
@@ -1462,6 +1473,7 @@ var
   LPlayListItem: TPlayListItem;
   LLine: string;
   LSpltLst: TStringList;
+  LInt: integer;
 begin
   if FileExists(FAppDataFolder + '\playlist.dat') then
   begin
@@ -1478,6 +1490,7 @@ begin
         LSpltLst.DelimitedText := LLine;
         if LSpltLst.Count >= 9 then
         begin
+          LPlayListItem := TPlayListItem.Create;
           LPlayListItem.FullFileName := LSpltLst[0];
           LPlayListItem.Artist := LSpltLst[1];
           LPlayListItem.Album := LSpltLst[2];
@@ -1487,6 +1500,22 @@ begin
           LPlayListItem.Channels := LSpltLst[6];
           LPlayListItem.Codec := LSpltLst[7];
           LPlayListItem.SampleRate := LSpltLst[8];
+          LPlayListItem.PlayCount := 0;
+          LPlayListItem.Stars := 0;
+          // play count and star.
+          // this values are added later so in onder to keep compability with
+          // older versions we must check the size.
+          if LSpltLst.Count >= 11 then
+          begin
+            if TryStrToInt(LSpltLst[9], LInt) then
+            begin
+              LPlayListItem.PlayCount := LInt;
+            end;
+            if TryStrToInt(LSpltLst[10], LInt) then
+            begin
+              LPlayListItem.Stars := LInt;
+            end;
+          end;
           FPlayListItems.Add(LPlayListItem);
         end;
       end;
@@ -1505,6 +1534,7 @@ var
   LPlayListItem: TPlayListItem;
   LLine: string;
   LSpltLst: TStringList;
+  LInt: integer;
 begin
   if FileExists(PlaylistPath) then
   begin
@@ -1521,6 +1551,7 @@ begin
         LSpltLst.DelimitedText := LLine;
         if LSpltLst.Count >= 9 then
         begin
+          LPlayListItem := TPlayListItem.Create;
           LPlayListItem.FullFileName := LSpltLst[0];
           LPlayListItem.Artist := LSpltLst[1];
           LPlayListItem.Album := LSpltLst[2];
@@ -1530,7 +1561,22 @@ begin
           LPlayListItem.Channels := LSpltLst[6];
           LPlayListItem.Codec := LSpltLst[7];
           LPlayListItem.SampleRate := LSpltLst[8];
-          FPlayListItems.Add(LPlayListItem);
+          LPlayListItem.PlayCount := 0;
+          LPlayListItem.Stars := 0;
+          // play count and star.
+          // this values are added later so in onder to keep compability with
+          // older versions we must check the size.
+          if LSpltLst.Count >= 11 then
+          begin
+            if TryStrToInt(LSpltLst[9], LInt) then
+            begin
+              LPlayListItem.PlayCount := LInt;
+            end;
+            if TryStrToInt(LSpltLst[10], LInt) then
+            begin
+              LPlayListItem.Stars := LInt;
+            end;
+          end;
         end;
       end;
     finally
@@ -1604,6 +1650,8 @@ begin
       FuncPages.ActivePageIndex := ReadInteger('general', 'func', 0);
       FCurrentRadioIndex := ReadInteger('radio', 'curr', -1);
       QueueList.Height := ReadInteger('ui', 'queueh', 120);
+      RadioRecordFormatList.ItemIndex := ReadInteger('radio', 'recformat', 0);
+      RadioRecordModeList.ItemIndex := ReadInteger('radio', 'recmethod', 0);
     end;
   finally
     SettingsFile.Free;
@@ -2101,6 +2149,7 @@ procedure TMainForm.PlayItem(const ItemIndex: integer);
 var
   LImageFile: string;
   LPlayIndex: integer;
+  LPlayCountStr: string;
 begin
   FPlaybackType := music;
   PositionTimer.Enabled := False;
@@ -2136,8 +2185,16 @@ begin
       FPlayer.Play;
       FCurrentItemInfo.DurationBass := FPlayer.TotalLength;
       FCurrentItemInfo.DurationAsSecInt := FPlayer.DurationAsSec;
+      if FPlayListItems[FCurrentItemInfo.ItemIndex].PlayCount = 1 then
+      begin
+        LPlayCountStr := '1 time'
+      end
+      else
+      begin
+        LPlayCountStr := FloatToStr(FPlayListItems[FCurrentItemInfo.ItemIndex].PlayCount) + ' times'
+      end;
       FCurrentItemInfo.StatusInfoText := FPlayListItems[FCurrentItemInfo.ItemIndex].Bitrate + ' | ' + FPlayListItems[FCurrentItemInfo.ItemIndex].Channels + ' | ' + FPlayListItems[FCurrentItemInfo.ItemIndex].Codec + ' | ' +
-        FPlayListItems[FCurrentItemInfo.ItemIndex].SampleRate + ' Hz';
+        FPlayListItems[FCurrentItemInfo.ItemIndex].SampleRate + ' Hz | ' + LPlayCountStr;
       PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
       PositionBar.Position := 0;
       FPlayer.SetVolume(100 - VolumeBar.Position);
@@ -2152,10 +2209,10 @@ begin
       with FPlayListItems[FCurrentItemInfo.ItemIndex] do
       begin
         Self.Caption := Title + ' - ' + Album + ' - ' + Artist + ' - [OooPlayer]';
-        TitleLabel.Caption := Title;
+        TitleLabel.Caption :=  Title;
         AlbumLabel.Caption := Album;
         ArtistLabel.Caption := Artist;
-        // PositionLabel.Caption := '00:00:00/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt) + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt);
+        PlayCount := PlayCount + 1;
       end;
       // jump to current song
       if SettingsForm.PlayJumpBtn.Checked then
@@ -2797,7 +2854,6 @@ begin
   StopRadioRecordBtn.Enabled := True;
   RadioRecordFormatList.Enabled := False;
   RadioRecordModeList.Enabled := false;
-  RadioRecordingOptionsBtn.Enabled := False;
 end;
 
 procedure TMainForm.RecordingEnableUI;
@@ -2806,7 +2862,6 @@ begin
   StopRadioRecordBtn.Enabled := False;
   RadioRecordFormatList.Enabled := True;
   RadioRecordModeList.Enabled := True;
-  RadioRecordingOptionsBtn.Enabled := True;
 end;
 
 procedure TMainForm.RecordRadioBtnClick(Sender: TObject);
@@ -3091,7 +3146,7 @@ begin
     begin
       with FPlayListItems[i] do
       begin
-        LStreamWriter.WriteLine(FullFileName + '|' + Artist + '|' + Album + '|' + Title + '|' + DurationStr + '|' + Bitrate + '|' + Channels + '|' + Codec + '|' + SampleRate);
+        LStreamWriter.WriteLine(FullFileName + '|' + Artist + '|' + Album + '|' + Title + '|' + DurationStr + '|' + Bitrate + '|' + Channels + '|' + Codec + '|' + SampleRate + '|' + FloatToStr(PlayCount) + '|' + FloatToStr(Stars));
       end;
     end;
   finally
@@ -3137,6 +3192,8 @@ begin
       WriteInteger('general', 'func', FuncPages.ActivePageIndex);
       WriteInteger('radio', 'curr', FCurrentRadioIndex);
       WriteInteger('ui', 'queueh', QueueList.Height);
+      WriteInteger('radio', 'recformat', RadioRecordFormatList.ItemIndex);
+      WriteInteger('radio', 'recmethod', RadioRecordModeList.ItemIndex);
     end;
   finally
     SettingsFile.Free;
@@ -3166,6 +3223,11 @@ begin
     PlayList.ItemIndex := -1;
     PlayList.ItemIndex := ItemIndex;
   end;
+end;
+
+procedure TMainForm.SetPlayerBuffer(const Buffer: DWORD);
+begin
+  FPlayer.SetBuffer(Buffer);
 end;
 
 procedure TMainForm.SetRadioVolume(const Volume: integer);
@@ -3198,7 +3260,7 @@ begin
             LEncodeCMD := PWideChar('"' + FLamePath + '" -r -s ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' --tt ' + LRadioInfo.Title + ' --ta ' + LRadioInfo.Artist + ' - -o ' + LRadioInfo.FileName);
           // LEncodeCMD := PWideChar('"' + FLamePath + '" -r -s ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' - -o ' + LRadioInfo.FileName);
           1: // ogg
-            LEncodeCMD := PWideChar('"' + FOggEncPath + '" --ignorelength -r -R ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' -t ' + LRadioInfo.Title + ' -l ' + LRadioInfo.Artist + ' - -o ' +
+            LEncodeCMD := PWideChar('"' + FOggEncPath + '" --ignorelength -r -R ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' -t ' + LRadioInfo.Title + ' -a ' + LRadioInfo.Artist + ' - -o ' +
               LRadioInfo.FileName);
           2: // opus
             LEncodeCMD := PWideChar('"' + FOpusEncPath + '" --hard-cbr --bitrate ' + RadioRecordOptionsForm.BitrateList.Text + ' --title ' + LRadioInfo.Title + ' --artist ' + LRadioInfo.Artist + ' --raw --raw-rate ' +
@@ -3206,13 +3268,10 @@ begin
           3: // aac
             LEncodeCMD := PWideChar('"' + FFDKPath + '" -m 0 -b ' + RadioRecordOptionsForm.BitrateList.Text + ' --title ' + LRadioInfo.Title + ' --artist ' + LRadioInfo.Artist + ' --moov-before-mdat --ignorelength -R --raw-rate ' +
               FloatToStr(LChanInfo.freq) + ' - -o ' + LRadioInfo.FileName);
-          4: // wav
-            LEncodeCMD := PWideChar(LRadioInfo.FileName);
         end;
         FRadioRecordProcessID := BASS_Encode_Start(FRadioHandle, LEncodeCMD, BASS_UNICODE, nil, nil);
         if FRadioRecordProcessID > 0 then
         begin
-          // todo: started recording etc
           RecordingDisableUI;
           FRecordingRadio := True;
         end

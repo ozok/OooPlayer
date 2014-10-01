@@ -154,7 +154,14 @@ begin
     begin
       with FItemInfo do
       begin
-        FLyricFile.SaveToFile(FLyricFolder + MainForm.CreateLyricFileName(Title, Artist, Album), TEncoding.UTF8);
+        try
+          FLyricFile.SaveToFile(FLyricFolder + MainForm.CreateLyricFileName(Title, Artist, Album), TEncoding.UTF8);
+        except on E: EFCreateError do
+          begin
+            FLyricStatusMsg := 'Loaded downloaded lyric but cannot save to file ' + MainForm.CreateLyricFileName(Title, Artist, Album) + '.txt';
+            FThread.Synchronize(UpdateLyricStatus);
+          end;
+        end;
       end;
     end
     else

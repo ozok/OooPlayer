@@ -43,10 +43,13 @@ type
     TabSheet5: TTabSheet;
     LyricBtn: TCheckBox;
     LogLyricFailBtn: TCheckBox;
+    BufferEdit: TJvSpinEdit;
+    Label1: TLabel;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LoadArtBtnClick(Sender: TObject);
+    procedure BufferEditChange(Sender: TObject);
   private
     { Private declarations }
     procedure LoadSettings;
@@ -63,6 +66,11 @@ implementation
 {$R *.dfm}
 
 uses UnitMain;
+
+procedure TSettingsForm.BufferEditChange(Sender: TObject);
+begin
+  MainForm.SetPlayerBuffer(Round(BufferEdit.Value));
+end;
 
 procedure TSettingsForm.Button1Click(Sender: TObject);
 begin
@@ -99,6 +107,7 @@ begin
       CoverArtList.ItemIndex := SettingsFile.ReadInteger('settings', 'cover', 0);
       LyricBtn.Checked := SettingsFile.ReadBool('settings', 'lyric', True);
       LogLyricFailBtn.Checked := SettingsFile.ReadBool('settings', 'loglyric', False);
+      BufferEdit.Text := SettingsFile.ReadString('settings', 'buffer', '500');
     end;
   finally
     SettingsFile.Free;
@@ -121,6 +130,7 @@ begin
       SettingsFile.WriteInteger('settings', 'cover', CoverArtList.ItemIndex);
       SettingsFile.WriteBool('settings', 'lyric', LyricBtn.Checked);
       SettingsFile.WriteBool('settings', 'loglyric', LogLyricFailBtn.Checked);
+      SettingsFile.WriteString('settings', 'buffer', BufferEdit.Text);
     end;
   finally
     SettingsFile.Free;

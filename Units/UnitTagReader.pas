@@ -313,6 +313,7 @@ end;
 function TTagReader.ReadTags(const FileName: string): TPlayListItem;
 begin
   FIsBusy := True;
+  Result := TPlayListItem.Create;
   try
     if FID3v2Tag.LoadFromFile(FileName) = 0 then
     begin

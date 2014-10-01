@@ -25,7 +25,7 @@ interface
 uses Classes;
 
 type
-  TPlayListItem = packed record
+  TPlayListItem = class
     FullFileName: string;
     DurationStr: string;
     Bitrate: string;
@@ -35,8 +35,24 @@ type
     Title: string;
     Artist: string;
     Album: string;
+    PlayCount: integer;
+    Stars: integer;
+    constructor Create;
+    destructor Destroy;
   end;
 
 implementation
+
+{ TPlayListItem }
+
+constructor TPlayListItem.Create;
+begin
+
+end;
+
+destructor TPlayListItem.Destroy;
+begin
+
+end;
 
 end.

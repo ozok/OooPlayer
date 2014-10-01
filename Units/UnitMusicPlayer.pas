@@ -75,6 +75,7 @@ type
     procedure SetVolume(const Volume: integer);
     function SetPosition(const Position: int64): Boolean;
     function IntToTime(IntTime: Integer): string;
+    procedure SetBuffer(const Buffer: DWORD);
   end;
 
 const
@@ -502,6 +503,11 @@ begin
     if Bass_ChannelPlay(FMixHandle, False) then
       FPlayerStatus := psPlaying;
   end;
+end;
+
+procedure TMusicPlayer.SetBuffer(const Buffer: DWORD);
+begin
+  BASS_SetConfig(BASS_CONFIG_BUFFER, Buffer);
 end;
 
 function TMusicPlayer.SetPosition(const Position: int64): Boolean;

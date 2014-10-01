@@ -26,15 +26,11 @@ object SettingsForm: TSettingsForm
     Top = 8
     Width = 272
     Height = 139
-    ActivePage = TabSheet5
+    ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'General'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object CheckUpdateBtn: TCheckBox
         Left = 16
         Top = 16
@@ -47,10 +43,13 @@ object SettingsForm: TSettingsForm
     object TabSheet2: TTabSheet
       Caption = 'Playback'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      object Label1: TLabel
+        Left = 16
+        Top = 65
+        Width = 102
+        Height = 13
+        Caption = 'Buffer length (in ms):'
+      end
       object PlayCursorBtn: TCheckBox
         Left = 16
         Top = 16
@@ -67,14 +66,24 @@ object SettingsForm: TSettingsForm
         Caption = 'Jump to played file'
         TabOrder = 1
       end
+      object BufferEdit: TJvSpinEdit
+        Left = 124
+        Top = 62
+        Width = 75
+        Height = 21
+        CheckOptions = [coCheckOnExit, coCropBeyondLimit]
+        Alignment = taCenter
+        ButtonKind = bkClassic
+        MaxValue = 5000.000000000000000000
+        MinValue = 500.000000000000000000
+        Value = 500.000000000000000000
+        TabOrder = 2
+        OnChange = BufferEditChange
+      end
     end
     object TabSheet3: TTabSheet
       Caption = 'Cover'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LoadArtBtn: TCheckBox
         Left = 16
         Top = 16
@@ -109,10 +118,6 @@ object SettingsForm: TSettingsForm
       Font.Style = []
       ImageIndex = 4
       ParentFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LyricBtn: TCheckBox
         Left = 16
         Top = 16

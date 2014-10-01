@@ -197,7 +197,7 @@ object MainForm: TMainForm
         Top = 44
         Width = 513
         Height = 15
-        Hint = 'Info'
+        Hint = 'Status, Bitrate, Channels, Codec, Sample Rate, Play Count'
         Align = alBottom
         AutoSize = False
         Font.Charset = DEFAULT_CHARSET
@@ -319,6 +319,10 @@ object MainForm: TMainForm
     OnMouseLeave = FuncPagesMouseLeave
     object TabSheet1: TTabSheet
       Caption = 'Music'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Splitter1: TSplitter
         Left = 0
         Top = 237
@@ -453,7 +457,8 @@ object MainForm: TMainForm
           'Schlager'
           'Soundtrack & Movie'
           'Season'
-          'User Favourites')
+          'User Favourites'
+          'Imported')
       end
       object RadioList: TListView
         Left = 0
@@ -486,8 +491,6 @@ object MainForm: TMainForm
         OnDblClick = RadioListDblClick
         OnMouseEnter = RadioListMouseEnter
         OnMouseLeave = RadioListMouseLeave
-        ExplicitTop = 19
-        ExplicitHeight = 340
       end
       object RadioRecordPanel: TPanel
         Left = 0
@@ -496,8 +499,6 @@ object MainForm: TMainForm
         Height = 52
         Align = alTop
         TabOrder = 2
-        ExplicitLeft = 56
-        ExplicitTop = 27
         DesignSize = (
           666
           52)
@@ -517,21 +518,22 @@ object MainForm: TMainForm
           Anchors = [akTop, akRight]
           Caption = 'Save method:'
         end
-        object RecordRadioBtn: TsButton
+        object RecordRadioBtn: TButton
           Left = 6
           Top = 6
           Width = 50
           Height = 40
+          Hint = 'Start recording the radio you are listening'
           Caption = 'Record'
           TabOrder = 0
           OnClick = RecordRadioBtnClick
-          SkinData.SkinSection = 'BUTTON'
         end
         object StopRadioRecordBtn: TButton
           Left = 62
           Top = 6
           Width = 50
           Height = 40
+          Hint = 'Stop radio recording'
           Caption = 'Stop'
           Enabled = False
           TabOrder = 1
@@ -542,6 +544,7 @@ object MainForm: TMainForm
           Top = 25
           Width = 114
           Height = 21
+          Hint = 'Radio recording format'
           Style = csDropDownList
           Anchors = [akTop, akRight]
           ItemIndex = 0
@@ -551,14 +554,14 @@ object MainForm: TMainForm
             'Mp3'
             'Ogg Vorbis'
             'Opus'
-            'AAC'
-            'WAV')
+            'AAC')
         end
         object RadioRecordingOptionsBtn: TButton
-          Left = 505
+          Left = 492
           Top = 6
-          Width = 152
+          Width = 104
           Height = 40
+          Hint = 'Recording options like bitrate and output location'
           Anchors = [akTop, akRight]
           Caption = 'Recording Options'
           TabOrder = 3
@@ -567,8 +570,9 @@ object MainForm: TMainForm
         object RadioRecordModeList: TComboBox
           Left = 296
           Top = 25
-          Width = 203
+          Width = 190
           Height = 21
+          Hint = 'File creation method'
           Style = csDropDownList
           Anchors = [akTop, akRight]
           ItemIndex = 0
@@ -577,6 +581,17 @@ object MainForm: TMainForm
           Items.Strings = (
             'Try to save each song seperately'
             'Save recording as a single long file')
+        end
+        object RadioRecordOutputFolderBtn: TButton
+          Left = 602
+          Top = 6
+          Width = 55
+          Height = 40
+          Hint = 'Open recording save location'
+          Anchors = [akTop, akRight]
+          Caption = 'Folder'
+          TabOrder = 5
+          OnClick = RadioRecordOutputFolderBtnClick
         end
       end
     end
@@ -902,14 +917,14 @@ object MainForm: TMainForm
     Location = flCustom
     DefaultSection = 'General'
     SubStorages = <>
-    Left = 24
-    Top = 240
+    Left = 32
+    Top = 232
   end
   object FormStorage: TJvFormStorage
     AppStorage = AppIniFileStorage
     AppStoragePath = '%FORM_NAME%\'
     StoredValues = <>
-    Left = 136
+    Left = 128
     Top = 232
   end
   object SysInfo: TJvComputerInfoEx

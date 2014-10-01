@@ -1,7 +1,10 @@
 --1.6
+-Added: Radio recording to mp3, ogg vorbis, aac
 -Added: Lyric downloader now works for radio player too
+-Added: An option to specify playback buffer in ms
+-Added: Play count information is now stored in playlist and shown in the interface
 -Added: An option to enable/disable lyric download failure logging
--Fixed: A playlist bug where there would be an unnecessary horizontal scrollbar
+-Fixed: A playlist bug where there'd be an unnecessary horizontal scrollbar
 
 --1.5.1
 -Fixed: Double clicking a radio search result caused "Argument out of reach" error (thx to Midas)
