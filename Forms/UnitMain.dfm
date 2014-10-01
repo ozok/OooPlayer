@@ -306,7 +306,7 @@ object MainForm: TMainForm
     Top = 127
     Width = 674
     Height = 389
-    ActivePage = TabSheet3
+    ActivePage = TabSheet1
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -414,6 +414,10 @@ object MainForm: TMainForm
     object TabSheet2: TTabSheet
       Caption = 'Radio'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object RadioCatList: TComboBox
         Left = 0
         Top = 0
@@ -594,6 +598,10 @@ object MainForm: TMainForm
     object TabSheet3: TTabSheet
       Caption = 'Lyric'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object LyricStatusLabel: TLabel
         Left = 0
         Top = 348
@@ -641,8 +649,6 @@ object MainForm: TMainForm
         Alignment = taCenter
         OnMouseEnter = LyricListMouseEnter
         OnMouseLeave = LyricListMouseLeave
-        ExplicitTop = 44
-        ExplicitHeight = 301
       end
       object Panel1: TPanel
         Left = 0
@@ -667,7 +673,6 @@ object MainForm: TMainForm
           Enabled = False
           TabOrder = 0
           OnKeyDown = LyricTitleEditKeyDown
-          ExplicitTop = 14
         end
         object LyricArtistEdit: TLabeledEdit
           Left = 328
@@ -681,7 +686,6 @@ object MainForm: TMainForm
           Enabled = False
           TabOrder = 1
           OnKeyDown = LyricTitleEditKeyDown
-          ExplicitTop = 14
         end
         object LyricSearchBtn: TButton
           Left = 584
@@ -693,7 +697,6 @@ object MainForm: TMainForm
           Enabled = False
           TabOrder = 2
           OnClick = LyricSearchBtnClick
-          ExplicitTop = 0
         end
         object LyricSourceList: TComboBox
           Left = 0
@@ -887,6 +890,10 @@ object MainForm: TMainForm
     end
     object H1: TMenuItem
       Caption = 'Help'
+      object D2: TMenuItem
+        Caption = 'Donate'
+        OnClick = D2Click
+      end
       object C2: TMenuItem
         Caption = 'Change log'
         OnClick = C2Click

@@ -259,8 +259,9 @@ begin
   Result := Str;
 
   Result := Trim(StringReplace(Result, '<div id="lyrics-body-text">', '', [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, '</p><p class=''verse''>', #13#10, [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, '<p class=''verse''>', #13#10, [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '</p><p class=''verse''>', sLineBreak, [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '<p class=''verse''>', sLineBreak, [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '<p class=''''verse''''> ', sLineBreak, [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '</p>	</div>', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<br />', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<i>', '', [rfReplaceAll]));
@@ -268,7 +269,6 @@ begin
   Result := Trim(StringReplace(Result, '<!-- start of lyrics -->', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<pre id="from_pre">', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '</pre>', '', [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, '<p class=''''verse''''> ', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<br/>', '', [rfReplaceAll]));
 
   Result := Trim(Result)

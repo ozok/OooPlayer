@@ -19,7 +19,8 @@ Features
 * Gapless playback: Supports gapless playback
 * Queue support: Add songs in queue
 * Radio player: Online radio player that has more than 1500 radio stations
-* Lyric downloader: OooPlayer can download lyrics automatically
+* Radio recorder: You can record radios to mp3, ogg vorbis, aac and opus
+* Lyric downloader: OooPlayer can download lyrics automatically from many sources
 * Clear interface: OooPlayer has a very simple interface that offers sufficient functionality to users
 
 To-Do
@@ -33,7 +34,7 @@ To-Do
 
 Version and download location
 ---
-* Latest version of OooPlayer is 1.5
+* Latest version of OooPlayer is 1.6
 * You can download OooPlayer from http://www.fosshub.com/OooPlayer.html
 
 Licence

@@ -186,6 +186,7 @@ type
     Label2: TLabel;
     RadioRecordOutputFolderBtn: TButton;
     LyricSourceList: TComboBox;
+    D2: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -376,7 +377,7 @@ var
   FPlayer: TMusicPlayer;
 
 const
-  BuildInt = 1457;
+  BuildInt = 1570;
   Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
@@ -968,29 +969,7 @@ end;
 
 procedure TMainForm.D2Click(Sender: TObject);
 begin
-  if (PlayList.ItemIndex > -1) then
-  begin
-    if ID_YES = Application.MessageBox('Do you want to delete this file from disc permanently?', 'Confirm', MB_YESNO or MB_ICONQUESTION) then
-    begin
-      if FileExists(FPlayListItems[PlayList.ItemIndex].FullFileName) then
-      begin
-        DeleteFile(FPlayListItems[PlayList.ItemIndex].FullFileName)
-      end
-      else
-      begin
-        LogForm.LogList.Lines.Add('Unable to find ' + FPlayListItems[PlayList.ItemIndex].FullFileName)
-      end;
-      PlayList.Items[PlayList.ItemIndex].Delete;
-      FPlayListItems.Delete(PlayList.ItemIndex);
-      PlayList.Items.Count := PlayList.Items.Count - 1;
-      PlayList.Repaint;
-      if PlayList.ItemIndex < FCurrentItemInfo.ItemIndex then
-      begin
-        FCurrentItemInfo.ItemIndex := FCurrentItemInfo.ItemIndex - 1;
-      end;
-      StatusBar1.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
-    end;
-  end;
+  ShellExecute(0, 'open', 'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SQXZVLR553H64', nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TMainForm.DragDropDrop(Sender: TObject; Pos: TPoint; Value: TStrings);
@@ -1186,8 +1165,14 @@ begin
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
+var
+  I: Integer;
 begin
   FPlayer.Free;
+  for I := 0 to FPlayListItems.Count-1 do
+  begin
+    FPlayListItems[i].Free;
+  end;
   FPlayListItems.Free;
   FShuffleIndexes.Free;
   FTagReader.Free;
@@ -1454,13 +1439,23 @@ begin
   end
   else if PicType = TCoverArtType.jpeg then
   begin
-    FJpeg.LoadFromStream(Stream);
-    CoverImage.Picture.Assign(FJpeg);
+    try
+      FJpeg.LoadFromStream(Stream);
+      CoverImage.Picture.Assign(FJpeg);
+    except
+      on E: Exception do
+        CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
+    end;
   end
   else if PicType = png then
   begin
-    FPng.LoadFromStream(Stream);
-    CoverImage.Picture.Assign(FPng);
+    try
+      FPng.LoadFromStream(Stream);
+      CoverImage.Picture.Assign(FPng);
+    except
+      on E: Exception do
+        CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
+    end;
   end
   else if PicType = bmp then
   begin
