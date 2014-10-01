@@ -306,7 +306,7 @@ object MainForm: TMainForm
     Top = 127
     Width = 674
     Height = 389
-    ActivePage = TabSheet2
+    ActivePage = TabSheet3
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -319,10 +319,6 @@ object MainForm: TMainForm
     OnMouseLeave = FuncPagesMouseLeave
     object TabSheet1: TTabSheet
       Caption = 'Music'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Splitter1: TSplitter
         Left = 0
         Top = 237
@@ -617,17 +613,18 @@ object MainForm: TMainForm
       end
       object Bevel3: TBevel
         Left = 0
-        Top = 41
+        Top = 73
         Width = 666
         Height = 3
         Align = alTop
         Shape = bsTopLine
+        ExplicitTop = 41
       end
       object LyricList: TJvListBox
         Left = 0
-        Top = 44
+        Top = 76
         Width = 666
-        Height = 301
+        Height = 269
         Align = alClient
         BorderStyle = bsNone
         Font.Charset = DEFAULT_CHARSET
@@ -644,54 +641,74 @@ object MainForm: TMainForm
         Alignment = taCenter
         OnMouseEnter = LyricListMouseEnter
         OnMouseLeave = LyricListMouseLeave
+        ExplicitTop = 44
+        ExplicitHeight = 301
       end
       object Panel1: TPanel
         Left = 0
         Top = 0
         Width = 666
-        Height = 41
+        Height = 73
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 1
         DesignSize = (
           666
-          41)
+          73)
         object LyricTitleEdit: TLabeledEdit
           Left = 12
-          Top = 14
+          Top = 46
           Width = 310
           Height = 21
-          Anchors = [akLeft, akTop, akRight]
+          Anchors = [akLeft, akRight, akBottom]
           EditLabel.Width = 24
           EditLabel.Height = 13
           EditLabel.Caption = 'Title:'
           Enabled = False
           TabOrder = 0
           OnKeyDown = LyricTitleEditKeyDown
+          ExplicitTop = 14
         end
         object LyricArtistEdit: TLabeledEdit
           Left = 328
-          Top = 14
+          Top = 46
           Width = 250
           Height = 21
-          Anchors = [akTop, akRight]
+          Anchors = [akRight, akBottom]
           EditLabel.Width = 30
           EditLabel.Height = 13
           EditLabel.Caption = 'Artist:'
           Enabled = False
           TabOrder = 1
           OnKeyDown = LyricTitleEditKeyDown
+          ExplicitTop = 14
         end
         object LyricSearchBtn: TButton
           Left = 584
-          Top = 0
+          Top = 32
           Width = 75
           Height = 35
-          Anchors = [akTop, akRight]
+          Anchors = [akRight, akBottom]
           Caption = 'Search'
           Enabled = False
           TabOrder = 2
           OnClick = LyricSearchBtnClick
+          ExplicitTop = 0
+        end
+        object LyricSourceList: TComboBox
+          Left = 0
+          Top = 0
+          Width = 666
+          Height = 21
+          Align = alTop
+          Style = csDropDownList
+          ItemIndex = 0
+          TabOrder = 3
+          Text = 'azlyrics.com'
+          Items.Strings = (
+            'azlyrics.com'
+            'batlyrics.net'
+            'metrolyrics.com')
         end
       end
     end

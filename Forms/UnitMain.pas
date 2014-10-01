@@ -185,6 +185,7 @@ type
     RadioRecordModeList: TComboBox;
     Label2: TLabel;
     RadioRecordOutputFolderBtn: TButton;
+    LyricSourceList: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -1652,6 +1653,7 @@ begin
       QueueList.Height := ReadInteger('ui', 'queueh', 120);
       RadioRecordFormatList.ItemIndex := ReadInteger('radio', 'recformat', 0);
       RadioRecordModeList.ItemIndex := ReadInteger('radio', 'recmethod', 0);
+      LyricSourceList.ItemIndex := ReadInteger('lyric', 'source', 0);
     end;
   finally
     SettingsFile.Free;
@@ -2209,7 +2211,7 @@ begin
       with FPlayListItems[FCurrentItemInfo.ItemIndex] do
       begin
         Self.Caption := Title + ' - ' + Album + ' - ' + Artist + ' - [OooPlayer]';
-        TitleLabel.Caption :=  Title;
+        TitleLabel.Caption := Title;
         AlbumLabel.Caption := Album;
         ArtistLabel.Caption := Artist;
         PlayCount := PlayCount + 1;
@@ -3194,6 +3196,7 @@ begin
       WriteInteger('ui', 'queueh', QueueList.Height);
       WriteInteger('radio', 'recformat', RadioRecordFormatList.ItemIndex);
       WriteInteger('radio', 'recmethod', RadioRecordModeList.ItemIndex);
+      WriteInteger('lyric', 'source', LyricSourceList.ItemIndex);
     end;
   finally
     SettingsFile.Free;

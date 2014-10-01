@@ -1,5 +1,7 @@
 --1.6
 -Added: Radio recording to mp3, ogg vorbis, aac
+-Added: New lyric sources batlyrics.net and metrolyrics.com
+-Added: Option to select between lyric sources
 -Added: Lyric downloader now works for radio player too
 -Added: An option to specify playback buffer in ms
 -Added: Play count information is now stored in playlist and shown in the interface

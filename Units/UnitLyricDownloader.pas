@@ -3,7 +3,7 @@ unit UnitLyricDownloader;
 interface
 
 uses System.Classes, IdBaseComponent, IdThreadComponent, StrUtils, SysUtils, IdThread, JvComponentBase,
-  JvUrlListGrabber, JvUrlGrabbers, JvTypes;
+  JvUrlListGrabber, JvUrlGrabbers, JvTypes, dialogs;
 
 type
   TLyricDownloaderStatus = (lsDownloading = 0, lsDone = 1, lsError = 2, lsIdle = 3);
@@ -28,6 +28,8 @@ type
     FLogLine: string;
     FItemInfo: TItemInfo;
     FDef: TJvCustomUrlGrabberDefaultProperties;
+    FLyricSourceIndex: integer;
+    FLyricPageLink: string;
 
     // thread events
     procedure ThreadRun(Sender: TIdThreadComponent);
@@ -108,6 +110,11 @@ procedure TLyricDownloader.DoneStream(Sender: TObject; Stream: TStream; StreamSi
 const
   START_STR = '<!-- start of lyrics -->';
   END_STR = '<!-- end of lyrics -->';
+  START_STR_BAT = '<pre id="from_pre">';
+  END_STR_BAT = '<pre id="to_pre" style="display';
+  BAT_SPAN = '<span style="font-size';
+  METRO_START = '<div id="lyrics-body-text">';
+  METRO_END = '<div id="selected-song-meaning-open" unselectable="on" style="display:none;">';
 var
   LSR: TStreamReader;
   LLine: string;
@@ -119,7 +126,7 @@ begin
     FThread.Synchronize(UpdateLyricStatus);
     if SettingsForm.LogLyricFailBtn.Checked then
     begin
-      FLogLine := 'Failed to download lyric from ' + 'http://www.azlyrics.com/lyrics/' + FixStrings(FArtist) + '/' + FixStrings(FSongName) + '.html';
+      FLogLine := 'Failed to download lyric from ' + FPageDownloader.Url;
       FThread.Synchronize(AddToLog);
     end;
     FStatus := lsError;
@@ -129,21 +136,67 @@ begin
     LAddToLyricFile := False;
     LSR := TStreamReader.Create(Stream);
     try
-      while not LSR.EndOfStream do
-      begin
-        LLine := Trim(LSR.ReadLine);
-        if LLine = START_STR then
-        begin
-          LAddToLyricFile := True;
-        end
-        else if LLine = END_STR then
-        begin
-          Break;
-        end;
-        if LAddToLyricFile then
-        begin
-          FLyricFile.Add(Trim(FixLine(LLine)));
-        end;
+      case FLyricSourceIndex of
+        0: // az
+          begin
+            while not LSR.EndOfStream do
+            begin
+              LLine := Trim(LSR.ReadLine);
+              if LLine = START_STR then
+              begin
+                LAddToLyricFile := True;
+              end
+              else if LLine = END_STR then
+              begin
+                Break;
+              end;
+              if LAddToLyricFile then
+              begin
+                FLyricFile.Add(Trim(FixLine(LLine)));
+              end;
+            end;
+          end;
+        1: // bat
+          begin
+            while not LSR.EndOfStream do
+            begin
+              LLine := Trim(LSR.ReadLine);
+              if Copy(LLine, 1, Length(START_STR_BAT)) = START_STR_BAT then
+              begin
+                LAddToLyricFile := True;
+              end
+              else if Copy(LLine, 1, Length(END_STR_BAT)) = END_STR_BAT then
+              begin
+                Break;
+              end;
+              if LAddToLyricFile then
+              begin
+                if Copy(LLine, 1, Length(BAT_SPAN)) <> BAT_SPAN then
+                begin
+                  FLyricFile.Add(Trim(FixLine(LLine)));
+                end;
+              end;
+            end;
+          end;
+        2: // metro
+          begin
+            while not LSR.EndOfStream do
+            begin
+              LLine := Trim(LSR.ReadLine);
+              if LLine = METRO_START then
+              begin
+                LAddToLyricFile := True;
+              end
+              else if LLine = METRO_END then
+              begin
+                Break;
+              end;
+              if LAddToLyricFile then
+              begin
+                FLyricFile.Add(Trim(FixLine(LLine)));
+              end;
+            end;
+          end;
       end;
     finally
       LSR.Close;
@@ -156,7 +209,8 @@ begin
       begin
         try
           FLyricFile.SaveToFile(FLyricFolder + MainForm.CreateLyricFileName(Title, Artist, Album), TEncoding.UTF8);
-        except on E: EFCreateError do
+        except
+          on E: EFCreateError do
           begin
             FLyricStatusMsg := 'Loaded downloaded lyric but cannot save to file ' + MainForm.CreateLyricFileName(Title, Artist, Album) + '.txt';
             FThread.Synchronize(UpdateLyricStatus);
@@ -170,7 +224,7 @@ begin
       FThread.Synchronize(UpdateLyricStatus);
       if SettingsForm.LogLyricFailBtn.Checked then
       begin
-        FLogLine := 'Failed to download lyric from ' + 'http://www.azlyrics.com/lyrics/' + FixStrings(FArtist) + '/' + FixStrings(FSongName) + '.html';
+        FLogLine := 'Failed to download lyric from ' + FPageDownloader.Url;
         FThread.Synchronize(AddToLog);
       end;
     end;
@@ -202,30 +256,74 @@ end;
 
 function TLyricDownloader.FixLine(const Str: string): string;
 begin
-  Result := Trim(StringReplace(Str, '<br />', '', [rfReplaceAll]));
+  Result := Str;
+
+  Result := Trim(StringReplace(Result, '<div id="lyrics-body-text">', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '</p><p class=''verse''>', #13#10, [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '<p class=''verse''>', #13#10, [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '</p>	</div>', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '<br />', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<i>', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '</i>', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<!-- start of lyrics -->', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '<pre id="from_pre">', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '</pre>', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '<p class=''''verse''''> ', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '<br/>', '', [rfReplaceAll]));
 
   Result := Trim(Result)
 end;
 
 function TLyricDownloader.FixStrings(const Str: string): string;
 begin
-  Result := LowerCase(StringReplace(Str, ' ', '', [rfReplaceAll]));
-  Result := LowerCase(StringReplace(Result, '&', '', [rfReplaceAll]));
-  Result := LowerCase(StringReplace(Result, 'Ö', 'o', [rfReplaceAll]));
-  Result := LowerCase(StringReplace(Result, 'ö', 'o', [rfReplaceAll]));
-  Result := LowerCase(StringReplace(Result, '''', '', [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, ',', '', [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, '!', '', [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, '?', '', [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, '(', '', [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, ')', '', [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, '[', '', [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, ']', '', [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, '-', '', [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, '.', '', [rfReplaceAll]));
+  case FLyricSourceIndex of
+    0: // azlyrics
+      begin
+        Result := LowerCase(StringReplace(Str, ' ', '', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, '&', '', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, 'Ö', 'o', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, 'ö', 'o', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, '''', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, ',', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '!', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '?', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '(', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, ')', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '[', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, ']', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '-', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '.', '', [rfReplaceAll]));
+      end;
+    1: // batlyrics
+      begin
+        Result := LowerCase(StringReplace(Str, ' & ', 'and', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, ' ', '_', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, 'Ö', 'o', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, 'ö', 'o', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, ',', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '!', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '?', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '[', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, ']', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '.', '', [rfReplaceAll]));
+      end;
+    2: // metrolyrics
+      begin
+        Result := LowerCase(StringReplace(Str, ' & ', '-', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, ' ', '-', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, 'Ö', 'o', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, 'ö', 'o', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, '''', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, ',', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '!', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '?', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '(', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, ')', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '[', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, ']', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '.', '', [rfReplaceAll]));
+      end;
+  end;
 end;
 
 procedure TLyricDownloader.Start;
@@ -250,7 +348,15 @@ end;
 
 procedure TLyricDownloader.ThreadRun(Sender: TIdThreadComponent);
 begin
-  FPageDownloader.Url := 'http://www.azlyrics.com/lyrics/' + FixStrings(FArtist) + '/' + FixStrings(FSongName) + '.html';
+  FLyricSourceIndex := MainForm.LyricSourceList.ItemIndex;
+  case FLyricSourceIndex of
+    0:
+      FPageDownloader.Url := 'http://www.azlyrics.com/lyrics/' + FixStrings(FArtist) + '/' + FixStrings(FSongName) + '.html';
+    1:
+      FPageDownloader.Url := 'http://batlyrics.net/' + FixStrings(FSongName) + '-lyrics-' + FixStrings(FArtist) + '.html';
+    2:
+      FPageDownloader.Url := 'http://www.metrolyrics.com/' + FixStrings(FSongName) + '-lyrics-' + FixStrings(FArtist) + '.html';
+  end;
   FPageDownloader.Start;
   while FPageDownloader.Status <> gsStopped do
   begin

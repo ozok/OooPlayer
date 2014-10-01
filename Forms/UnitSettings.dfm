@@ -31,6 +31,10 @@ object SettingsForm: TSettingsForm
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'General'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object CheckUpdateBtn: TCheckBox
         Left = 16
         Top = 16
@@ -43,6 +47,10 @@ object SettingsForm: TSettingsForm
     object TabSheet2: TTabSheet
       Caption = 'Playback'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label1: TLabel
         Left = 16
         Top = 65
@@ -84,6 +92,10 @@ object SettingsForm: TSettingsForm
     object TabSheet3: TTabSheet
       Caption = 'Cover'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object LoadArtBtn: TCheckBox
         Left = 16
         Top = 16
@@ -118,6 +130,10 @@ object SettingsForm: TSettingsForm
       Font.Style = []
       ImageIndex = 4
       ParentFont = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object LyricBtn: TCheckBox
         Left = 16
         Top = 16
