@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, JvExMask,
-  JvToolEdit, Vcl.ComCtrls, IniFiles, JvComponentBase, JvComputerInfoEx;
+  JvToolEdit, Vcl.ComCtrls, IniFiles, JvComponentBase, JvComputerInfoEx, ShellAPI;
 
 type
   TRadioRecordOptionsForm = class(TForm)
@@ -20,6 +20,7 @@ type
     procedure Button2Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
 
@@ -37,6 +38,14 @@ implementation
 {$R *.dfm}
 
 uses UnitMain;
+
+procedure TRadioRecordOptionsForm.Button1Click(Sender: TObject);
+begin
+  if DirectoryExists(RecordSaveEdit.Text) then
+  begin
+    ShellExecute(Handle, 'open', 'explorer', PChar(RecordSaveEdit.Text), nil, SW_SHOWNORMAL);
+  end;
+end;
 
 procedure TRadioRecordOptionsForm.Button2Click(Sender: TObject);
 begin

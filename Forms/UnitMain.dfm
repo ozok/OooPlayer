@@ -3,7 +3,7 @@ object MainForm: TMainForm
   Top = 0
   Caption = 'OooPlayer'
   ClientHeight = 576
-  ClientWidth = 674
+  ClientWidth = 862
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -23,25 +23,45 @@ object MainForm: TMainForm
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
+  object Splitter2: TSplitter
+    Left = 609
+    Top = 127
+    Height = 389
+    Align = alRight
+    OnMoved = Splitter2Moved
+    ExplicitLeft = 440
+    ExplicitTop = 264
+    ExplicitHeight = 100
+  end
+  object Bevel3: TBevel
+    Left = 606
+    Top = 127
+    Width = 3
+    Height = 389
+    Align = alRight
+    Shape = bsRightLine
+    ExplicitLeft = 559
+  end
   object TopBarPnl: TPanel
     Left = 0
     Top = 0
-    Width = 674
+    Width = 862
     Height = 127
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
     OnMouseEnter = TopBarPnlMouseEnter
     DesignSize = (
-      674
+      862
       127)
     object PositionLabel: TLabel
-      Left = 389
+      Left = 577
       Top = 24
       Width = 140
       Height = 13
       Anchors = [akTop, akRight]
       Caption = '00:00:00/00:00:00/00:00:00'
+      ExplicitLeft = 389
     end
     object PauseBtn: TButton
       Left = 60
@@ -100,7 +120,7 @@ object MainForm: TMainForm
       OnClick = PlayBtnClick
     end
     object VolumeBar: TJvTrackBar
-      Left = 651
+      Left = 839
       Top = 0
       Width = 23
       Height = 104
@@ -117,7 +137,7 @@ object MainForm: TMainForm
       OnMouseEnter = VolumeBarMouseEnter
     end
     object PlaybackOrderList: TComboBox
-      Left = 389
+      Left = 577
       Top = 0
       Width = 140
       Height = 21
@@ -137,7 +157,7 @@ object MainForm: TMainForm
     object PositionBar: TJvTrackBar
       Left = 0
       Top = 104
-      Width = 674
+      Width = 862
       Height = 23
       Hint = 'Position'
       Align = alBottom
@@ -153,7 +173,7 @@ object MainForm: TMainForm
     object InfoPanel: TPanel
       Left = 16
       Top = 44
-      Width = 513
+      Width = 701
       Height = 59
       Anchors = [akLeft, akRight, akBottom]
       BevelOuter = bvNone
@@ -161,7 +181,7 @@ object MainForm: TMainForm
       object AlbumLabel: TLabel
         Left = 0
         Top = 29
-        Width = 513
+        Width = 701
         Height = 15
         Hint = 'Album'
         Align = alBottom
@@ -174,11 +194,12 @@ object MainForm: TMainForm
         ParentFont = False
         ShowAccelChar = False
         ExplicitTop = 23
+        ExplicitWidth = 513
       end
       object ArtistLabel: TLabel
         Left = 0
         Top = 14
-        Width = 513
+        Width = 701
         Height = 15
         Align = alBottom
         AutoSize = False
@@ -195,7 +216,7 @@ object MainForm: TMainForm
       object PlaybackInfoLabel: TLabel
         Left = 0
         Top = 44
-        Width = 513
+        Width = 701
         Height = 15
         Hint = 'Status, Bitrate, Channels, Codec, Sample Rate, Play Count'
         Align = alBottom
@@ -212,7 +233,7 @@ object MainForm: TMainForm
       object TitleLabel: TLabel
         Left = 0
         Top = -1
-        Width = 513
+        Width = 701
         Height = 15
         Hint = 'Title'
         Align = alBottom
@@ -229,7 +250,7 @@ object MainForm: TMainForm
       end
     end
     object Panel2: TPanel
-      Left = 535
+      Left = 723
       Top = 3
       Width = 100
       Height = 100
@@ -255,7 +276,7 @@ object MainForm: TMainForm
   object StatusBar1: TStatusBar
     Left = 0
     Top = 557
-    Width = 674
+    Width = 862
     Height = 19
     Panels = <
       item
@@ -271,7 +292,7 @@ object MainForm: TMainForm
   object ProgressPanel: TPanel
     Left = 0
     Top = 516
-    Width = 674
+    Width = 862
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
@@ -281,7 +302,7 @@ object MainForm: TMainForm
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 587
+      Width = 775
       Height = 35
       Align = alClient
       Caption = 'Progress info'
@@ -291,7 +312,7 @@ object MainForm: TMainForm
     end
     object AbortBtn: TButton
       AlignWithMargins = True
-      Left = 596
+      Left = 784
       Top = 3
       Width = 75
       Height = 35
@@ -304,7 +325,7 @@ object MainForm: TMainForm
   object FuncPages: TPageControl
     Left = 0
     Top = 127
-    Width = 674
+    Width = 606
     Height = 389
     ActivePage = TabSheet1
     Align = alClient
@@ -319,30 +340,43 @@ object MainForm: TMainForm
     OnMouseLeave = FuncPagesMouseLeave
     object TabSheet1: TTabSheet
       Caption = 'Music'
-      object Splitter1: TSplitter
-        Left = 0
-        Top = 237
-        Width = 666
-        Height = 3
-        Cursor = crVSplit
-        Align = alBottom
-        ExplicitTop = 0
-        ExplicitWidth = 240
-      end
       object Bevel1: TBevel
         Left = 0
-        Top = 234
-        Width = 666
+        Top = 358
+        Width = 598
         Height = 3
         Align = alBottom
         Shape = bsTopLine
         ExplicitTop = 187
+        ExplicitWidth = 666
+      end
+      object Splitter1: TSplitter
+        Left = 0
+        Top = 234
+        Width = 598
+        Height = 3
+        Cursor = crVSplit
+        Align = alBottom
+        MinSize = 1
+        ResizeStyle = rsUpdate
+        ExplicitTop = 0
+        ExplicitWidth = 526
+      end
+      object Bevel2: TBevel
+        Left = 0
+        Top = 231
+        Width = 598
+        Height = 3
+        Align = alBottom
+        Shape = bsBottomLine
+        ExplicitTop = 184
+        ExplicitWidth = 526
       end
       object PlayList: TListView
         Left = 0
         Top = 0
-        Width = 666
-        Height = 234
+        Width = 598
+        Height = 231
         Hint = 'Playlist'
         Margins.Left = 0
         Margins.Top = 0
@@ -354,15 +388,12 @@ object MainForm: TMainForm
         BorderStyle = bsNone
         Columns = <
           item
-            Caption = 'Title'
-            Width = 500
-          end
-          item
-            Caption = 'Queue'
           end
           item
             Alignment = taCenter
-            Caption = 'Duration'
+            Width = 30
+          end
+          item
             Width = 100
           end>
         DragMode = dmAutomatic
@@ -383,21 +414,20 @@ object MainForm: TMainForm
         OnDragOver = PlayListDragOver
         OnMouseEnter = PlayListMouseEnter
         OnMouseLeave = PlayListMouseLeave
+        OnResize = PlayListResize
         OnStartDrag = PlayListStartDrag
       end
       object QueueList: TListView
         Left = 0
-        Top = 240
-        Width = 666
+        Top = 237
+        Width = 598
         Height = 121
         Align = alBottom
         BorderStyle = bsNone
         Columns = <
           item
-            Caption = 'Title'
           end
           item
-            Caption = 'Duration'
             Width = 100
           end>
         HideSelection = False
@@ -414,14 +444,10 @@ object MainForm: TMainForm
     object TabSheet2: TTabSheet
       Caption = 'Radio'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object RadioCatList: TComboBox
         Left = 0
         Top = 0
-        Width = 666
+        Width = 598
         Height = 21
         Hint = 'Radio station categories'
         Align = alTop
@@ -463,7 +489,7 @@ object MainForm: TMainForm
       object RadioList: TListView
         Left = 0
         Top = 73
-        Width = 666
+        Width = 598
         Height = 288
         Align = alClient
         BorderStyle = bsNone
@@ -495,28 +521,30 @@ object MainForm: TMainForm
       object RadioRecordPanel: TPanel
         Left = 0
         Top = 21
-        Width = 666
+        Width = 598
         Height = 52
         Align = alTop
         TabOrder = 2
         DesignSize = (
-          666
+          598
           52)
         object Label1: TLabel
-          Left = 176
+          Left = 108
           Top = 6
           Width = 77
           Height = 13
           Anchors = [akTop, akRight]
           Caption = 'Format to save:'
+          ExplicitLeft = 176
         end
         object Label2: TLabel
-          Left = 298
+          Left = 230
           Top = 6
           Width = 67
           Height = 13
           Anchors = [akTop, akRight]
           Caption = 'Save method:'
+          ExplicitLeft = 298
         end
         object RecordRadioBtn: TButton
           Left = 6
@@ -540,24 +568,25 @@ object MainForm: TMainForm
           OnClick = StopRadioRecordBtnClick
         end
         object RadioRecordFormatList: TComboBox
-          Left = 176
+          Left = 108
           Top = 25
           Width = 114
           Height = 21
           Hint = 'Radio recording format'
           Style = csDropDownList
           Anchors = [akTop, akRight]
-          ItemIndex = 0
+          ItemIndex = 4
           TabOrder = 2
-          Text = 'Mp3'
+          Text = 'Original'
           Items.Strings = (
             'Mp3'
             'Ogg Vorbis'
             'Opus'
-            'AAC')
+            'AAC'
+            'Original')
         end
         object RadioRecordingOptionsBtn: TButton
-          Left = 492
+          Left = 424
           Top = 6
           Width = 104
           Height = 40
@@ -568,7 +597,7 @@ object MainForm: TMainForm
           OnClick = RadioRecordingOptionsBtnClick
         end
         object RadioRecordModeList: TComboBox
-          Left = 296
+          Left = 228
           Top = 25
           Width = 190
           Height = 21
@@ -583,7 +612,7 @@ object MainForm: TMainForm
             'Save recording as a single long file')
         end
         object RadioRecordOutputFolderBtn: TButton
-          Left = 602
+          Left = 534
           Top = 6
           Width = 55
           Height = 40
@@ -595,124 +624,128 @@ object MainForm: TMainForm
         end
       end
     end
-    object TabSheet3: TTabSheet
-      Caption = 'Lyric'
-      ImageIndex = 2
+  end
+  object LyricPanel: TPanel
+    Left = 612
+    Top = 127
+    Width = 250
+    Height = 389
+    Align = alRight
+    TabOrder = 4
+    object LyricStatusLabel: TLabel
+      Left = 1
+      Top = 375
+      Width = 248
+      Height = 13
+      Align = alBottom
+      ExplicitWidth = 3
+    end
+    object bvl1: TBevel
+      Left = 1
+      Top = 372
+      Width = 248
+      Height = 3
+      Align = alBottom
+      Shape = bsTopLine
       ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object LyricStatusLabel: TLabel
-        Left = 0
-        Top = 348
-        Width = 666
-        Height = 13
-        Align = alBottom
-        ExplicitWidth = 3
-      end
-      object Bevel2: TBevel
-        Left = 0
-        Top = 345
-        Width = 666
-        Height = 3
-        Align = alBottom
-        Shape = bsTopLine
-        ExplicitTop = 298
-      end
-      object Bevel3: TBevel
-        Left = 0
-        Top = 73
-        Width = 666
-        Height = 3
-        Align = alTop
-        Shape = bsTopLine
-        ExplicitTop = 41
-      end
-      object LyricList: TJvListBox
-        Left = 0
-        Top = 76
-        Width = 666
-        Height = 269
-        Align = alClient
-        BorderStyle = bsNone
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ItemHeight = 17
-        Background.FillMode = bfmTile
-        Background.Visible = False
-        ParentFont = False
-        Style = lbOwnerDrawFixed
+      ExplicitTop = 298
+      ExplicitWidth = 666
+    end
+    object bvl2: TBevel
+      Left = 1
+      Top = 105
+      Width = 248
+      Height = 3
+      Align = alTop
+      Shape = bsTopLine
+      ExplicitLeft = 2
+      ExplicitTop = 9
+      ExplicitWidth = 200
+    end
+    object LyricList: TJvListBox
+      Left = 1
+      Top = 108
+      Width = 248
+      Height = 264
+      Align = alClient
+      BorderStyle = bsNone
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ItemHeight = 17
+      Background.FillMode = bfmTile
+      Background.Visible = False
+      ParentFont = False
+      Style = lbOwnerDrawFixed
+      TabOrder = 0
+      Alignment = taCenter
+      OnMouseEnter = LyricListMouseEnter
+      OnMouseLeave = LyricListMouseLeave
+    end
+    object pnl3: TPanel
+      Left = 1
+      Top = 1
+      Width = 248
+      Height = 104
+      Align = alTop
+      BevelOuter = bvNone
+      TabOrder = 1
+      DesignSize = (
+        248
+        104)
+      object LyricTitleEdit: TLabeledEdit
+        Left = 5
+        Top = 37
+        Width = 236
+        Height = 21
+        Anchors = [akLeft, akTop, akRight]
+        EditLabel.Width = 24
+        EditLabel.Height = 13
+        EditLabel.Caption = 'Title:'
+        Enabled = False
         TabOrder = 0
-        Alignment = taCenter
-        OnMouseEnter = LyricListMouseEnter
-        OnMouseLeave = LyricListMouseLeave
+        OnKeyDown = LyricTitleEditKeyDown
       end
-      object Panel1: TPanel
+      object LyricArtistEdit: TLabeledEdit
+        Left = 5
+        Top = 77
+        Width = 181
+        Height = 21
+        Anchors = [akLeft, akTop, akRight]
+        EditLabel.Width = 30
+        EditLabel.Height = 13
+        EditLabel.Caption = 'Artist:'
+        Enabled = False
+        TabOrder = 1
+        OnKeyDown = LyricTitleEditKeyDown
+      end
+      object LyricSearchBtn: TButton
+        Left = 192
+        Top = 64
+        Width = 50
+        Height = 34
+        Anchors = [akRight, akBottom]
+        Caption = 'Search'
+        Enabled = False
+        TabOrder = 2
+        OnClick = LyricSearchBtnClick
+      end
+      object LyricSourceList: TComboBox
         Left = 0
         Top = 0
-        Width = 666
-        Height = 73
+        Width = 248
+        Height = 21
         Align = alTop
-        BevelOuter = bvNone
-        TabOrder = 1
-        DesignSize = (
-          666
-          73)
-        object LyricTitleEdit: TLabeledEdit
-          Left = 12
-          Top = 46
-          Width = 310
-          Height = 21
-          Anchors = [akLeft, akRight, akBottom]
-          EditLabel.Width = 24
-          EditLabel.Height = 13
-          EditLabel.Caption = 'Title:'
-          Enabled = False
-          TabOrder = 0
-          OnKeyDown = LyricTitleEditKeyDown
-        end
-        object LyricArtistEdit: TLabeledEdit
-          Left = 328
-          Top = 46
-          Width = 250
-          Height = 21
-          Anchors = [akRight, akBottom]
-          EditLabel.Width = 30
-          EditLabel.Height = 13
-          EditLabel.Caption = 'Artist:'
-          Enabled = False
-          TabOrder = 1
-          OnKeyDown = LyricTitleEditKeyDown
-        end
-        object LyricSearchBtn: TButton
-          Left = 584
-          Top = 32
-          Width = 75
-          Height = 35
-          Anchors = [akRight, akBottom]
-          Caption = 'Search'
-          Enabled = False
-          TabOrder = 2
-          OnClick = LyricSearchBtnClick
-        end
-        object LyricSourceList: TComboBox
-          Left = 0
-          Top = 0
-          Width = 666
-          Height = 21
-          Align = alTop
-          Style = csDropDownList
-          ItemIndex = 0
-          TabOrder = 3
-          Text = 'azlyrics.com'
-          Items.Strings = (
-            'azlyrics.com'
-            'batlyrics.net'
-            'metrolyrics.com')
-        end
+        Style = csDropDownList
+        ItemIndex = 0
+        TabOrder = 3
+        Text = 'azlyrics.com'
+        Items.Strings = (
+          'azlyrics.com'
+          'batlyrics.net'
+          'metrolyrics.com')
       end
     end
   end
@@ -808,11 +841,6 @@ object MainForm: TMainForm
         Caption = 'Radio'
         ShortCut = 16434
         OnClick = R3Click
-      end
-      object L3: TMenuItem
-        Caption = 'Lyric'
-        ShortCut = 16435
-        OnClick = L3Click
       end
     end
     object P1: TMenuItem
@@ -928,6 +956,12 @@ object MainForm: TMainForm
       Caption = 'File Information'
       OnClick = F2Click
     end
+    object S7: TMenuItem
+      Caption = 'Search song in YouTube'
+    end
+    object S8: TMenuItem
+      Caption = 'Search song in Google'
+    end
   end
   object PlayBackImgs: TImageList
     Height = 20
@@ -978,8 +1012,8 @@ object MainForm: TMainForm
     RunOnCreate = True
     FreeOnTerminate = True
     OnExecute = UpdateThreadExecute
-    Left = 584
-    Top = 224
+    Left = 704
+    Top = 376
   end
   object OpenDialog: TOpenDialog
     Filter = 

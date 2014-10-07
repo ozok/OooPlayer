@@ -26,9 +26,6 @@ uses Classes, Windows, SysUtils, Messages, StrUtils, UnitTagTypes, WMATagLibrary
   FlacTagLibrary, ID3v2Library, ID3v1Library, OggVorbisAndOpusTagLibrary, WAVTagLibrary;
 
 type
-  TCoverArtType = (none = 0, jpeg = 1, png = 2, bmp = 3, gif = 4);
-
-type
   TTagReader = class(TObject)
   private
     FWMATag: TWMATag;
@@ -92,7 +89,11 @@ begin
   FMP4Tag.Free;
   FOPUSTag.Free;
   FWAVTag.Free;
-  // TMemoryStream(FPicStream).Clear;
+  try
+    FPicStream.Free;
+  except
+
+  end;
   // FPicStream.Free;
 end;
 
@@ -113,15 +114,6 @@ var
 begin
   FIsBusy := True;
   try
-    // clear the image from last time
-    // if Assigned(FPicStream) then
-    // begin
-    // TMemoryStream(FPicStream).Clear;
-    // end
-    // else
-    // begin
-    // FPicStream := TMemoryStream.Create;
-    // end;
     FPicType := none;
 
     if FID3v2Tag.LoadFromFile(FileName) = 0 then

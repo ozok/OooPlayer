@@ -23,7 +23,7 @@ interface
 
 uses System.Classes, BASS, BASS_AAC, BASSFLAC, BassWMA, BASSWV, BASS_AC3,
   BASS_ALAC, BASS_APE, BASS_MPC, BASS_OFR, BASS_SPX, BASS_TTA, BassOPUS,
-  Windows, SysUtils, StrUtils, Generics.Collections, MediaInfoDll, Bassmix, dialogs;
+  Windows, SysUtils, StrUtils, Generics.Collections, MediaInfoDll, Bassmix;
 
 type
   TPlayerStatus = (psPlaying = 0, psPaused = 1, psStopped = 2, psStalled = 3, psUnkown = 4);

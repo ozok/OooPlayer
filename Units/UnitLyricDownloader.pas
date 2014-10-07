@@ -29,7 +29,6 @@ type
     FItemInfo: TItemInfo;
     FDef: TJvCustomUrlGrabberDefaultProperties;
     FLyricSourceIndex: integer;
-    FLyricPageLink: string;
 
     // thread events
     procedure ThreadRun(Sender: TIdThreadComponent);
@@ -99,7 +98,11 @@ end;
 
 destructor TLyricDownloader.Destroy;
 begin
-  FThread.Free;
+  try
+    FThread.Free;
+  except
+
+  end;
   FPageDownloader.Free;
   FLyricFile.Free;
   FItemInfo.Free;
@@ -123,11 +126,19 @@ begin
   if Stream.Size = 0 then
   begin
     FLyricStatusMsg := 'Downloaded file is empty';
-    FThread.Synchronize(UpdateLyricStatus);
+    try
+      FThread.Synchronize(UpdateLyricStatus);
+    except
+
+    end;
     if SettingsForm.LogLyricFailBtn.Checked then
     begin
       FLogLine := 'Failed to download lyric from ' + FPageDownloader.Url;
-      FThread.Synchronize(AddToLog);
+      try
+        FThread.Synchronize(AddToLog);
+      except
+
+      end;
     end;
     FStatus := lsError;
   end
@@ -202,7 +213,11 @@ begin
       LSR.Close;
       LSR.Free;
     end;
-    FThread.Synchronize(UpdateMainUI);
+    try
+      FThread.Synchronize(UpdateMainUI);
+    except
+
+    end;
     if FLyricFile.Count > 1 then
     begin
       with FItemInfo do
@@ -213,7 +228,11 @@ begin
           on E: EFCreateError do
           begin
             FLyricStatusMsg := 'Loaded downloaded lyric but cannot save to file ' + MainForm.CreateLyricFileName(Title, Artist, Album) + '.txt';
-            FThread.Synchronize(UpdateLyricStatus);
+            try
+              FThread.Synchronize(UpdateLyricStatus);
+            except
+
+            end;
           end;
         end;
       end;
@@ -221,14 +240,26 @@ begin
     else
     begin
       FLyricStatusMsg := 'Could not found any lyrics';
-      FThread.Synchronize(UpdateLyricStatus);
+      try
+        FThread.Synchronize(UpdateLyricStatus);
+      except
+
+      end;
       if SettingsForm.LogLyricFailBtn.Checked then
       begin
         FLogLine := 'Failed to download lyric from ' + FPageDownloader.Url;
-        FThread.Synchronize(AddToLog);
+        try
+          FThread.Synchronize(AddToLog);
+        except
+
+        end;
       end;
     end;
-    FThread.Synchronize(EnableUIControls);
+    try
+      FThread.Synchronize(EnableUIControls);
+    except
+
+    end;
     FStatus := lsDone;
   end;
 end;
@@ -243,6 +274,7 @@ begin
     LyricSearchBtn.Enabled := True;
     LyricArtistEdit.Enabled := True;
     LyricTitleEdit.Enabled := True;
+    LyricSourceList.Enabled := True;
   end;
 end;
 
@@ -250,8 +282,16 @@ procedure TLyricDownloader.Error(Sender: TObject; ErrorMsg: string);
 begin
   FStatus := lsError;
   FLyricStatusMsg := 'Lyric downloader error msg: ' + ErrorMsg;
-  FThread.Synchronize(UpdateLyricStatus);
-  FThread.Synchronize(EnableUIControls);
+  try
+    FThread.Synchronize(UpdateLyricStatus);
+  except
+
+  end;
+  try
+    FThread.Synchronize(EnableUIControls);
+  except
+
+  end;
 end;
 
 function TLyricDownloader.FixLine(const Str: string): string;
@@ -334,14 +374,25 @@ begin
     FArtist := Trim(Copy(FArtist, 4, Maxint))
   end;
   FLyricFile.Clear;
-  FThread.Start;
+  try
+    FThread.Start;
+  except
+    on e: Exception do
+    begin
+      FStatus := lsDone;
+    end;
+  end;
 end;
 
 procedure TLyricDownloader.Stop;
 begin
   if not FThread.Stopped then
   begin
-    FThread.Terminate;
+    try
+      FThread.Terminate;
+    except
+
+    end;
     FStatus := lsDone;
   end;
 end;
@@ -362,7 +413,11 @@ begin
   begin
     Sleep(100);
   end;
-  FThread.Terminate;
+  try
+    FThread.Terminate;
+  except
+
+  end;
 end;
 
 procedure TLyricDownloader.ThreadStopped(Sender: TIdThreadComponent);

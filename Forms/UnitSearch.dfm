@@ -62,7 +62,7 @@ object SearchForm: TSearchForm
     Left = 8
     Top = 39
     Width = 619
-    Height = 246
+    Height = 223
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <
       item
@@ -81,6 +81,16 @@ object SearchForm: TSearchForm
     ViewStyle = vsReport
     OnClick = ResultsListClick
     OnDblClick = ResultsListDblClick
+  end
+  object chkCloseOnPlayBtn: TCheckBox
+    Left = 8
+    Top = 268
+    Width = 273
+    Height = 17
+    Caption = 'Close this window if a result is selected to play'
+    Checked = True
+    State = cbChecked
+    TabOrder = 3
   end
   object ListMenu: TPopupMenu
     Left = 312

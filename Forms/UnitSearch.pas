@@ -39,6 +39,7 @@ type
     ResultsLbl: TLabel;
     ListMenu: TPopupMenu;
     A1: TMenuItem;
+    chkCloseOnPlayBtn: TCheckBox;
     procedure FormResize(Sender: TObject);
     procedure SearchBtnClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -177,6 +178,10 @@ begin
             PositionTimer.Enabled := False;
             FPlayer.Stop;
             PlayItem(LItemIndex);
+            if chkCloseOnPlayBtn.Checked then
+            begin
+              Self.Close;
+            end;
           end;
         end;
       stradio:
@@ -187,6 +192,10 @@ begin
             StopRadio;
             MainForm.FCurrentRadioIndex := LItemIndex;
             PlayRadio(FRadioStations[LItemIndex].URL);
+            if chkCloseOnPlayBtn.Checked then
+            begin
+              Self.Close;
+            end;
           end;
         end;
     end;

@@ -60,6 +60,7 @@ object RadioRecordOptionsForm: TRadioRecordOptionsForm
     Anchors = [akTop, akRight]
     Caption = 'Open'
     TabOrder = 1
+    OnClick = Button1Click
   end
   object Button2: TButton
     Left = 562

@@ -1,6 +1,6 @@
 {
   BASSenc 2.4 Delphi unit
-  Copyright (c) 2003-2013 Un4seen Developments Ltd.
+  Copyright (c) 2003-2014 Un4seen Developments Ltd.
 
   See the BASSENC.CHM file for more detailed documentation
 }
@@ -86,7 +86,7 @@ const
 type
   HENCODE = DWORD; // encoder handle
 
-  ENCODEPROC = procedure(handle: DWORD; channel: DWORD; buffer: Pointer; length: DWORD; user: Pointer); {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+  ENCODEPROC = procedure(handle: HENCODE; channel: DWORD; buffer: Pointer; length: DWORD; user: Pointer); {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 {
   Encoding callback function.
   handle : The encoder
@@ -94,6 +94,31 @@ type
   buffer : Buffer containing the encoded data
   length : Number of bytes
   user   : The 'user' parameter value given when calling BASS_EncodeStart
+}
+
+ENCODEPROCEX =
+procedure(handle: HENCODE; channel: DWORD; buffer: Pointer; length: DWORD; offset: QWORD; user: Pointer); {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+{
+  Encoding callback function with offset info.
+  handle : The encoder
+  channel: The channel handle
+  buffer : Buffer containing the encoded data
+  length : Number of bytes
+  offset : File offset of the data
+  user   : The 'user' parameter value given when calling BASS_Encode_StartCA
+}
+
+ENCODERPROC =
+function(handle: HENCODE; channel: DWORD; buffer: Pointer; length: DWORD; maxout: DWORD; user: Pointer): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+{
+  Encoder callback function.
+  handle : The encoder
+  channel: The channel handle
+  buffer : Buffer containing the PCM data (input) and receiving the encoded data (output)
+  length : Number of bytes in (-1=closing)
+  maxout : Maximum number of bytes out
+  user   : The 'user' parameter value given when calling BASS_Encode_StartUser
+  RETURN : The amount of encoded data (-1=stop)
 }
 
 ENCODECLIENTPROC =
@@ -134,6 +159,8 @@ function BASS_Encode_Start(handle: DWORD; cmdline: PChar; flags: DWORD; proc: EN
 external bassencdll;
 function BASS_Encode_StartLimit(handle: DWORD; cmdline: PChar; flags: DWORD; proc: ENCODEPROC; user: Pointer; limit: DWORD): HENCODE; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
+function BASS_Encode_StartUser(handle: DWORD; filename: PChar; flags: DWORD; proc: ENCODERPROC; user: Pointer): HENCODE; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+external bassencdll;
 function BASS_Encode_AddChunk(handle: HENCODE; id: PAnsiChar; buffer: Pointer; length: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
 function BASS_Encode_IsActive(handle: DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
@@ -153,13 +180,20 @@ external bassencdll;
 function BASS_Encode_GetChannel(handle: HENCODE): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
 
+{$IFDEF MSWINDOWS}
 function BASS_Encode_GetACMFormat(handle: DWORD; form: Pointer; formlen: DWORD; title: PChar; flags: DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
 function BASS_Encode_StartACM(handle: DWORD; form: Pointer; flags: DWORD; proc: ENCODEPROC; user: Pointer): HENCODE; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
 function BASS_Encode_StartACMFile(handle: DWORD; form: Pointer; flags: DWORD; filename: PChar): HENCODE; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
-
+{$ENDIF}
+{$IFDEF MACOS}
+function BASS_Encode_StartCA(handle, ftype, atype, flags, bitrate: DWORD; proc: ENCODEPROCEX; user: Pointer): HENCODE; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+external bassencdll;
+function BASS_Encode_StartCAFile(handle, ftype, atype, flags, bitrate: DWORD; filename: PChar): HENCODE; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+external bassencdll;
+{$ENDIF}
 function BASS_Encode_CastInit(handle: HENCODE; server, pass, content, name, url, genre, desc, headers: PAnsiChar; bitrate: DWORD; pub: BOOL): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
 function BASS_Encode_CastSetTitle(handle: HENCODE; title, url: PAnsiChar): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};

@@ -25,6 +25,25 @@ interface
 uses Classes;
 
 type
+  TCoverArtType = (none = 0, jpeg = 1, png = 2, bmp = 3, gif = 4);
+
+type
+  PTag = ^TTag;
+
+  TTag = packed record
+    Title: string;
+    Artist: string;
+    Album: string;
+    Comment: string;
+    Genre: string;
+    Track: string;
+    TrackTotal: string;
+    Disc: string;
+    DiscTotal: string;
+    Year: string;
+  end;
+
+type
   TPlayListItem = class
     FullFileName: string;
     DurationStr: string;
@@ -38,7 +57,7 @@ type
     PlayCount: integer;
     Stars: integer;
     constructor Create;
-    destructor Destroy;
+    destructor Destroy; override;
   end;
 
 implementation

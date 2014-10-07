@@ -37,11 +37,12 @@ uses
   basswma in 'BassUnits\basswma.pas',
   basswv in 'BassUnits\basswv.pas',
   UnitLyricDownloader in 'Units\UnitLyricDownloader.pas',
-  bassmix in 'BassUnits\bassmix.pas',
   UnitRadioInfo in 'Forms\UnitRadioInfo.pas' {RadioInfoForm} ,
   UnitNewRadio in 'Forms\UnitNewRadio.pas' {NewRadioForm} ,
   bassenc in 'BassUnits\bassenc.pas',
-  UnitRadioRecordOptions in 'Forms\UnitRadioRecordOptions.pas' {RadioRecordOptionsForm};
+  UnitRadioRecordOptions in 'Forms\UnitRadioRecordOptions.pas' {RadioRecordOptionsForm} ,
+  bassmix in 'BassUnits\bassmix.pas',
+  UnitTagWriter in 'Units\UnitTagWriter.pas';
 
 {$R *.res}
 
