@@ -1,6 +1,6 @@
 // ********************************************************************************************************************************
 // *                                                                                                                              *
-// *     Ogg Vorbis and Opus Tag Library 1.0.14.21 © 3delite 2012-2014                                                            *
+// *     Ogg Vorbis and Opus Tag Library 1.0.15.22 © 3delite 2012-2014                                                            *
 // *     See Ogg Vorbis and Opus Tag Library Readme.txt for details                                                               *
 // *                                                                                                                              *
 // * Two licenses are available for commercial usage of this component:                                                           *
@@ -67,7 +67,7 @@ Uses
   Classes;
 
 Const
-  OPUSTAGLIBRARY_VERSION = $01001421;
+  OPUSTAGLIBRARY_VERSION = $01001522;
 
 Const
   OPUSTAGLIBRARY_SUCCESS = 0;
@@ -481,30 +481,30 @@ end;
 
 procedure EncodePacket(const Packet: TPacket; NumChars: Integer; OutBuf: PByte);
 begin
-  OutBuf[0] := EncodeTable[Packet.a[0] shr 2];
-  OutBuf[1] := EncodeTable[((Packet.a[0] shl 4) or (Packet.a[1] shr 4)) and $0000003F];
+  OutBuf[0] := EnCodeTable[Packet.a[0] shr 2];
+  OutBuf[1] := EnCodeTable[((Packet.a[0] shl 4) or (Packet.a[1] shr 4)) and $0000003F];
   if NumChars < 2 then
     OutBuf[2] := Ord('=')
   else
-    OutBuf[2] := EncodeTable[((Packet.a[1] shl 2) or (Packet.a[2] shr 6)) and $0000003F];
+    OutBuf[2] := EnCodeTable[((Packet.a[1] shl 2) or (Packet.a[2] shr 6)) and $0000003F];
   if NumChars < 3 then
     OutBuf[3] := Ord('=')
   else
-    OutBuf[3] := EncodeTable[Packet.a[2] and $0000003F];
+    OutBuf[3] := EnCodeTable[Packet.a[2] and $0000003F];
 end;
 
 function DecodePacket(InBuf: PByte; var nChars: Integer): TPacket;
 begin
   Result.a[0] := (DecodeTable[InBuf[0]] shl 2) or (DecodeTable[InBuf[1]] shr 4);
-  nChars := 1;
+  NChars := 1;
   if InBuf[2] <> Ord('=') then
   begin
-    Inc(nChars);
+    Inc(NChars);
     Result.a[1] := Byte((DecodeTable[InBuf[1]] shl 4) or (DecodeTable[InBuf[2]] shr 2));
   end;
   if InBuf[3] <> Ord('=') then
   begin
-    Inc(nChars);
+    Inc(NChars);
     Result.a[2] := Byte((DecodeTable[InBuf[2]] shl 6) or DecodeTable[InBuf[3]]);
   end;
 end;
@@ -541,7 +541,7 @@ begin
       Inc(BufPtr, 4);
       // Inc(K, 4);
     end;
-    Output.Write(OutBuf, BufPtr - PChar(@OutBuf));
+    Output.Write(Outbuf, BufPtr - PChar(@OutBuf));
   until BytesRead = 0;
 end;
 
@@ -555,16 +555,16 @@ var
 
   procedure SkipWhite;
   var
-    c: Char;
+    C: Char;
     NumRead: Integer;
   begin
     while True do
     begin
-      FillChar(c, SizeOf(c), 0);
-      NumRead := Input.Read(c, 1);
+      FillChar(C, SizeOf(C), 0);
+      NumRead := Input.Read(C, 1);
       if NumRead = 1 then
       begin
-        if c in ['0' .. '9', 'A' .. 'Z', 'a' .. 'z', '+', '/', '='] then
+        if C in ['0' .. '9', 'A' .. 'Z', 'a' .. 'z', '+', '/', '='] then
         begin
           Input.Position := Input.Position - 1;
           Break;
@@ -1612,7 +1612,7 @@ end;
 function TOpusTag.DeleteFrame(FrameIndex: Integer): Boolean;
 var
   i: Integer;
-  J: Integer;
+  j: Integer;
 begin
   Result := False;
   if (FrameIndex >= Length(Frames)) OR (FrameIndex < 0) then
@@ -1621,18 +1621,18 @@ begin
   end;
   FreeAndNil(Frames[FrameIndex]);
   i := 0;
-  J := 0;
+  j := 0;
   while i <= Length(Frames) - 1 do
   begin
     if Frames[i] <> nil then
     begin
-      Frames[J] := Frames[i];
-      Frames[J].Index := i;
-      Inc(J);
+      Frames[j] := Frames[i];
+      Frames[j].Index := i;
+      Inc(j);
     end;
     Inc(i);
   end;
-  SetLength(Frames, J);
+  SetLength(Frames, j);
   Result := True;
 end;
 
@@ -2196,7 +2196,7 @@ function TOpusTag.DeleteFrameByName(Name: String): Boolean;
 var
   i: Integer;
   l: Integer;
-  J: Integer;
+  j: Integer;
 begin
   l := Length(Frames);
   i := 0;
@@ -2211,17 +2211,17 @@ begin
   end;
   FreeAndNil(Frames[i]);
   i := 0;
-  J := 0;
+  j := 0;
   while i <= l - 1 do
   begin
     if Frames[i] <> nil then
     begin
-      Frames[J] := Frames[i];
-      Inc(J);
+      Frames[j] := Frames[i];
+      Inc(j);
     end;
     Inc(i);
   end;
-  SetLength(Frames, J);
+  SetLength(Frames, j);
   Result := True;
 end;
 
@@ -2419,70 +2419,72 @@ begin
   Info.FileSize := SourceFile.Size;
   SourceFile.Seek(Info.ID3v2Size, soFromBeginning);
   OGGStream := TOGGStream.Create(SourceFile);
-  if
-{$IFDEF OVAOTL_MOBILE}
-    (OGGStream.FirstOGGHeader.ID[1] <> Ord(OGG_PAGE_ID[0])) OR (OGGStream.FirstOGGHeader.ID[2] <> Ord(OGG_PAGE_ID[1])) OR (OGGStream.FirstOGGHeader.ID[3] <> Ord(OGG_PAGE_ID[2])) OR (OGGStream.FirstOGGHeader.ID[4] <> Ord(OGG_PAGE_ID[3]))
-{$ELSE}
-  (OGGStream.FirstOGGHeader.ID[1] <> Ord(OGG_PAGE_ID[1])) OR (OGGStream.FirstOGGHeader.ID[2] <> Ord(OGG_PAGE_ID[2])) OR (OGGStream.FirstOGGHeader.ID[3] <> Ord(OGG_PAGE_ID[3])) OR (OGGStream.FirstOGGHeader.ID[4] <> Ord(OGG_PAGE_ID[4]))
-{$ENDIF}
-  then
-  begin
-    FreeAndNil(OGGStream);
-    Exit;
-  end;
-  FirstOGGPage.Clear;
-  OGGStream.GetNextPageData(FirstOGGPage);
-  Info.SPagePos := OGGStream.FStream.Position;
-  // * This will be re-set after all the tags are parsed
-  Info.TagEndPos := OGGStream.FStream.Position;
-  Data := TMemoryStream.Create;
   try
-    OGGStream.GetNextPageData(Data);
-    Data.Seek(0, soBeginning);
-    // * Check if Opus
-    Data.Read(OpusTags.ID, SizeOf(OpusTags.ID));
     if
 {$IFDEF OVAOTL_MOBILE}
-      (OpusTags.ID[1] = Ord(OPUS_TAG_ID[0])) AND (OpusTags.ID[2] = Ord(OPUS_TAG_ID[1])) AND (OpusTags.ID[3] = Ord(OPUS_TAG_ID[2])) AND (OpusTags.ID[4] = Ord(OPUS_TAG_ID[3])) AND (OpusTags.ID[5] = Ord(OPUS_TAG_ID[4])) AND
-      (OpusTags.ID[6] = Ord(OPUS_TAG_ID[5])) AND (OpusTags.ID[7] = Ord(OPUS_TAG_ID[6])) AND (OpusTags.ID[8] = Ord(OPUS_TAG_ID[7]))
+      (OGGStream.FirstOGGHeader.ID[1] <> Ord(OGG_PAGE_ID[0])) OR (OGGStream.FirstOGGHeader.ID[2] <> Ord(OGG_PAGE_ID[1])) OR (OGGStream.FirstOGGHeader.ID[3] <> Ord(OGG_PAGE_ID[2])) OR (OGGStream.FirstOGGHeader.ID[4] <> Ord(OGG_PAGE_ID[3]))
 {$ELSE}
-    (OpusTags.ID[1] = Ord(OPUS_TAG_ID[1])) AND (OpusTags.ID[2] = Ord(OPUS_TAG_ID[2])) AND (OpusTags.ID[3] = Ord(OPUS_TAG_ID[3])) AND (OpusTags.ID[4] = Ord(OPUS_TAG_ID[4])) AND (OpusTags.ID[5] = Ord(OPUS_TAG_ID[5])) AND
-      (OpusTags.ID[6] = Ord(OPUS_TAG_ID[6])) AND (OpusTags.ID[7] = Ord(OPUS_TAG_ID[7])) AND (OpusTags.ID[8] = Ord(OPUS_TAG_ID[8]))
+    (OGGStream.FirstOGGHeader.ID[1] <> Ord(OGG_PAGE_ID[1])) OR (OGGStream.FirstOGGHeader.ID[2] <> Ord(OGG_PAGE_ID[2])) OR (OGGStream.FirstOGGHeader.ID[3] <> Ord(OGG_PAGE_ID[3])) OR (OGGStream.FirstOGGHeader.ID[4] <> Ord(OGG_PAGE_ID[4]))
 {$ENDIF}
     then
     begin
-      Format := ofOpus;
-      ReadOpusAudioAttributes(SourceFile);
-      ReadTag(Data, OGGStream);
-      Result := True;
+      Exit;
     end;
-    Data.Seek(0, soBeginning);
-    // * Check if Vorbis
-    Data.Read(VorbisHeader.ID, SizeOf(VorbisHeader.ID));
-    if
+    FirstOGGPage.Clear;
+    OGGStream.GetNextPageData(FirstOGGPage);
+    Info.SPagePos := OGGStream.FStream.Position;
+    // * This will be re-set after all the tags are parsed
+    Info.TagEndPos := OGGStream.FStream.Position;
+    Data := TMemoryStream.Create;
+    try
+      OGGStream.GetNextPageData(Data);
+      Data.Seek(0, soBeginning);
+      // * Check if Opus
+      Data.Read(OpusTags.ID, SizeOf(OpusTags.ID));
+      if
 {$IFDEF OVAOTL_MOBILE}
-      (VorbisHeader.ID[1] = Ord(VORBIS_TAG_ID[0])) AND (VorbisHeader.ID[2] = Ord(VORBIS_TAG_ID[1])) AND (VorbisHeader.ID[3] = Ord(VORBIS_TAG_ID[2])) AND (VorbisHeader.ID[4] = Ord(VORBIS_TAG_ID[3])) AND
-      (VorbisHeader.ID[5] = Ord(VORBIS_TAG_ID[4])) AND (VorbisHeader.ID[6] = Ord(VORBIS_TAG_ID[5])) AND (VorbisHeader.ID[7] = Ord(VORBIS_TAG_ID[6]))
+        (OpusTags.ID[1] = Ord(OPUS_TAG_ID[0])) AND (OpusTags.ID[2] = Ord(OPUS_TAG_ID[1])) AND (OpusTags.ID[3] = Ord(OPUS_TAG_ID[2])) AND (OpusTags.ID[4] = Ord(OPUS_TAG_ID[3])) AND (OpusTags.ID[5] = Ord(OPUS_TAG_ID[4])) AND
+        (OpusTags.ID[6] = Ord(OPUS_TAG_ID[5])) AND (OpusTags.ID[7] = Ord(OPUS_TAG_ID[6])) AND (OpusTags.ID[8] = Ord(OPUS_TAG_ID[7]))
 {$ELSE}
-    (VorbisHeader.ID[1] = Ord(VORBIS_TAG_ID[1])) AND (VorbisHeader.ID[2] = Ord(VORBIS_TAG_ID[2])) AND (VorbisHeader.ID[3] = Ord(VORBIS_TAG_ID[3])) AND (VorbisHeader.ID[4] = Ord(VORBIS_TAG_ID[4])) AND
-      (VorbisHeader.ID[5] = Ord(VORBIS_TAG_ID[5])) AND (VorbisHeader.ID[6] = Ord(VORBIS_TAG_ID[6])) AND (VorbisHeader.ID[7] = Ord(VORBIS_TAG_ID[7]))
+      (OpusTags.ID[1] = Ord(OPUS_TAG_ID[1])) AND (OpusTags.ID[2] = Ord(OPUS_TAG_ID[2])) AND (OpusTags.ID[3] = Ord(OPUS_TAG_ID[3])) AND (OpusTags.ID[4] = Ord(OPUS_TAG_ID[4])) AND (OpusTags.ID[5] = Ord(OPUS_TAG_ID[5])) AND
+        (OpusTags.ID[6] = Ord(OPUS_TAG_ID[6])) AND (OpusTags.ID[7] = Ord(OPUS_TAG_ID[7])) AND (OpusTags.ID[8] = Ord(OPUS_TAG_ID[8]))
 {$ENDIF}
-    then
-    begin
-      Format := ofVorbis;
-      ReadVorbisAudioAttributes(SourceFile);
-      ReadTag(Data, OGGStream);
-      Result := True;
-    end;
-    Info.HeaderOggPageCount := OGGStream.LastPageQueried;
-    if ParsePlayTime then
-    begin
-      Info.SampleCount := GetSamples(SourceFile);
-      Info.PlayTime := GetPlayTime;
-      Info.BitRate := Trunc((Info.FileSize - CalculateTagSize(True)) / Info.PlayTime / 125);
+      then
+      begin
+        Format := ofOpus;
+        ReadOpusAudioAttributes(SourceFile);
+        ReadTag(Data, OGGStream);
+        Result := True;
+      end;
+      Data.Seek(0, soBeginning);
+      // * Check if Vorbis
+      Data.Read(VorbisHeader.ID, SizeOf(VorbisHeader.ID));
+      if
+{$IFDEF OVAOTL_MOBILE}
+        (VorbisHeader.ID[1] = Ord(VORBIS_TAG_ID[0])) AND (VorbisHeader.ID[2] = Ord(VORBIS_TAG_ID[1])) AND (VorbisHeader.ID[3] = Ord(VORBIS_TAG_ID[2])) AND (VorbisHeader.ID[4] = Ord(VORBIS_TAG_ID[3])) AND
+        (VorbisHeader.ID[5] = Ord(VORBIS_TAG_ID[4])) AND (VorbisHeader.ID[6] = Ord(VORBIS_TAG_ID[5])) AND (VorbisHeader.ID[7] = Ord(VORBIS_TAG_ID[6]))
+{$ELSE}
+      (VorbisHeader.ID[1] = Ord(VORBIS_TAG_ID[1])) AND (VorbisHeader.ID[2] = Ord(VORBIS_TAG_ID[2])) AND (VorbisHeader.ID[3] = Ord(VORBIS_TAG_ID[3])) AND (VorbisHeader.ID[4] = Ord(VORBIS_TAG_ID[4])) AND
+        (VorbisHeader.ID[5] = Ord(VORBIS_TAG_ID[5])) AND (VorbisHeader.ID[6] = Ord(VORBIS_TAG_ID[6])) AND (VorbisHeader.ID[7] = Ord(VORBIS_TAG_ID[7]))
+{$ENDIF}
+      then
+      begin
+        Format := ofVorbis;
+        ReadVorbisAudioAttributes(SourceFile);
+        ReadTag(Data, OGGStream);
+        Result := True;
+      end;
+      Info.HeaderOggPageCount := OGGStream.LastPageQueried;
+      if ParsePlayTime then
+      begin
+        Info.SampleCount := GetSamples(SourceFile);
+        Info.PlayTime := GetPlayTime;
+        Info.BitRate := Trunc((Info.FileSize - CalculateTagSize(True)) / Info.PlayTime / 125);
+      end;
+    finally
+      FreeAndNil(Data);
     end;
   finally
-    FreeAndNil(Data);
     FreeAndNil(OGGStream);
   end;
 end;
@@ -3003,7 +3005,7 @@ begin
       Source.Seek(-4, soCurrent);
       Source.Read(Header, SizeOf(TOggHeader));
       Result := Header.AbsolutePosition;
-      Exit;
+      exit;
     end;
   end;
 end;

@@ -62,7 +62,6 @@ object MainForm: TMainForm
     BevelOuter = bvNone
     TabOrder = 0
     OnMouseEnter = TopBarPnlMouseEnter
-    ExplicitWidth = 862
     DesignSize = (
       869
       127)
@@ -89,7 +88,6 @@ object MainForm: TMainForm
       Animate = True
       AutoSize = False
       Center = True
-      FrameIndex = 2
       Image.Data = {
         270A00004749463839611F001F00D50000FFFFFF000000E8E8E8D2D2D2BCBCBC
         AEAEAEA2A2A2DCDCDCB8B8B89A9A9AE4E4E4D8D8D8AAAAAAA0A0A0B0B0B0CCCC
@@ -277,7 +275,6 @@ object MainForm: TMainForm
       OnMouseEnter = PositionBarMouseEnter
       OnChanged = PositionBarChanged
       OnMouseDown = PositionBarMouseDown
-      ExplicitWidth = 862
     end
     object InfoPanel: TPanel
       Left = 16
@@ -287,7 +284,6 @@ object MainForm: TMainForm
       Anchors = [akLeft, akRight, akBottom]
       BevelOuter = bvNone
       TabOrder = 7
-      ExplicitWidth = 701
       object AlbumLabel: TLabel
         Left = 0
         Top = 29
@@ -393,7 +389,6 @@ object MainForm: TMainForm
       TickStyle = tsNone
       OnChange = VolumeBarChange
       OnMouseEnter = VolumeBarMouseEnter
-      ExplicitLeft = 0
     end
   end
   object StatusBar1: TStatusBar
@@ -411,7 +406,6 @@ object MainForm: TMainForm
         Text = '100%'
         Width = 100
       end>
-    ExplicitWidth = 862
   end
   object ProgressPanel: TPanel
     Left = 0
@@ -423,7 +417,6 @@ object MainForm: TMainForm
     TabOrder = 2
     Visible = False
     OnMouseEnter = ProgressPanelMouseEnter
-    ExplicitWidth = 862
     object ProgressLabel: TLabel
       AlignWithMargins = True
       Left = 3
@@ -447,7 +440,6 @@ object MainForm: TMainForm
       Caption = 'Abort'
       TabOrder = 0
       OnClick = AbortBtnClick
-      ExplicitLeft = 784
     end
   end
   object FuncPages: TPageControl
@@ -466,11 +458,8 @@ object MainForm: TMainForm
     TabOrder = 3
     OnChange = FuncPagesChange
     OnMouseLeave = FuncPagesMouseLeave
-    ExplicitLeft = 1
-    ExplicitTop = 127
     object TabSheet1: TTabSheet
       Caption = 'Music'
-      ExplicitWidth = 598
       object Splitter1: TSplitter
         Left = 0
         Top = 234
@@ -527,7 +516,6 @@ object MainForm: TMainForm
         OnMouseEnter = PlayListMouseEnter
         OnMouseLeave = PlayListMouseLeave
         OnStartDrag = PlayListStartDrag
-        ExplicitLeft = 1
       end
       object QueueList: TListView
         Left = 0
@@ -552,14 +540,15 @@ object MainForm: TMainForm
         OnDblClick = QueueListDblClick
         OnMouseEnter = QueueListMouseEnter
         OnMouseLeave = QueueListMouseLeave
-        ExplicitTop = 234
-        ExplicitWidth = 598
       end
     end
     object TabSheet2: TTabSheet
       Caption = 'Radio'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 598
+      ExplicitHeight = 0
       object RadioCatList: TComboBox
         Left = 0
         Top = 0
@@ -601,7 +590,6 @@ object MainForm: TMainForm
           'Season'
           'User Favourites'
           'Imported')
-        ExplicitWidth = 598
       end
       object RadioList: TListView
         Left = 0
@@ -703,7 +691,6 @@ object MainForm: TMainForm
             'Opus'
             'AAC'
             'Original')
-          ExplicitLeft = 108
         end
         object RadioRecordingOptionsBtn: TButton
           Left = 431
@@ -731,7 +718,6 @@ object MainForm: TMainForm
           Items.Strings = (
             'Try to save each song seperately'
             'Save recording as a single long file')
-          ExplicitLeft = 228
         end
         object RadioRecordOutputFolderBtn: TButton
           Left = 541
@@ -761,7 +747,6 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 4
-    ExplicitLeft = 612
     object LyricStatusLabel: TLabel
       Left = 1
       Top = 372

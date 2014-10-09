@@ -1,6 +1,6 @@
 // ********************************************************************************************************************************
 // *                                                                                                                              *
-// *     WMA Tag Library 1.0.6.9 © 3delite 2013-2014                                                                              *
+// *     WMA Tag Library 1.0.7.10 © 3delite 2013-2014                                                                             *
 // *     See WMA Tag Library ReadMe.txt for details                                                                               *
 // *                                                                                                                              *
 // * Two licenses are available for commercial usage of this component:                                                           *
@@ -78,8 +78,7 @@ uses
   SysUtils,
   Windows,
   // Dialogs,
-  Classes,
-  Activex;
+  Classes;
 
 Const
   WMATAGLIBRARY_SUCCESS = 0;
@@ -474,11 +473,14 @@ type
 
   PCardinal = ^Cardinal;
 
-function DurationToStr(Duration: int64; ShowMs: Boolean): string;
+function DurationToStr(Duration: int64; ShowMs: boolean): string;
 
 function WMATagErrorCode2String(ErrorCode: Integer): String;
 
 implementation
+
+Uses
+  ActiveX;
 
 var
   DllHandleWMVCORE: THandle;
@@ -908,7 +910,7 @@ function TWMATag.GetCoverArtFromFrame(Index: Integer; var PictureStream: TStream
 var
   PictureDataLength: DWord;
   Data: Byte;
-  DataWord: Word;
+  DataWord: WORD;
 begin
   Result := False;
   MIMEType := '';
@@ -959,7 +961,7 @@ function TWMATag.GetCoverArtInfo(Index: Integer; var MIMEType: String; var Pictu
 var
   PictureDataLength: DWord;
   Data: Byte;
-  DataWord: Word;
+  DataWord: WORD;
 begin
   Result := False;
   MIMEType := '';
@@ -1213,19 +1215,19 @@ end;
 function TWMATag.GetAttribIndex(Attrib: string): Integer;
 var
   AttribName: PWideChar;
-  P, Lang: PWORD;
+  P, Lang: PWord;
   AttribLen: Word;
 begin
   Result := -1;
   AttribName := StringToOleStr(Attrib);
-  Lang := PWORD(0);
+  Lang := PWord(0);
   ppHeaderInfo3.GetAttributeIndices($FFFF, AttribName, Lang, nil, AttribLen);
   if AttribLen <> 0 then
   begin
     P := AllocMem(AttribLen);
     try
       ppHeaderInfo3.GetAttributeIndices($FFFF, AttribName, Lang, P, AttribLen);
-      Result := PWORD(P)^;
+      Result := PWord(P)^;
     finally
       FreeMem(P);
     end;
@@ -1246,14 +1248,14 @@ function TWMATag.LoadTags(FileName: String): Integer;
 var
   AttributeCount: Word;
   pType: TWMTAttrDataType;
-  pValue: PBYTE;
+  pValue: PByte;
   I: Integer;
   HR: HRESULT;
   wIndex: Word;
   pwszName: PWideChar;
   pwNameLen: Word;
   pwLangIndex: Word;
-  pdwDataLength: DWord;
+  pdwDataLength: DWORD;
 begin
   if DllHandleWMVCORE = 0 then
   begin
@@ -1304,17 +1306,17 @@ begin
       pdwDataLength := 0;
       ppHeaderInfo3.GetAttributeByIndexEx(65535, wIndex, nil, pwNameLen, pType, pwLangIndex, nil, pdwDataLength);
       pwszName := AllocMem(pwNameLen * 2);
-      pValue := AllocMem(pdwDataLength);
+      PValue := AllocMem(pdwDataLength);
       ppHeaderInfo3.GetAttributeByIndexEx(65535, wIndex, pwszName, pwNameLen, pType, pwLangIndex, pValue, pdwDataLength);
       // * 3delite
-      if pValue = nil then
+      if PValue = nil then
       begin
         Continue;
       end;
       with AddFrame(pwszName) do
       begin
         Format := pType;
-        Stream.Write(Pointer(pValue)^, pdwDataLength);
+        Stream.Write(Pointer(PValue)^, pdwDataLength);
         Stream.Seek(0, soBeginning);
         {
           if pwszName = 'WM/Picture' then begin
@@ -1323,7 +1325,7 @@ begin
         }
       end;
       FreeMem(pwszName);
-      FreeMem(pValue);
+      FreeMem(PValue);
     end;
     Result := WMATAGLIBRARY_SUCCESS;
     ppHeaderInfo3 := nil;
@@ -1439,9 +1441,9 @@ begin
               end;
               end else begin
             }
-            if nLength <> 0 then
+            if nlength <> 0 then
             begin
-              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_DWORD, 0, PBYTE(pValue), nLength);
+              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_DWORD, 0, PByte(pValue), nLength);
             end;
             // end;
           end;
@@ -1458,9 +1460,9 @@ begin
               end;
               end else begin
             }
-            if nLength <> 0 then
+            if nlength <> 0 then
             begin
-              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_STRING, 0, PBYTE(pValue), nLength);
+              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_STRING, 0, PByte(pValue), nLength);
             end;
             // end;
           end;
@@ -1477,9 +1479,9 @@ begin
               end;
               end else begin
             }
-            if nLength <> 0 then
+            if nlength <> 0 then
             begin
-              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_BINARY, 0, PBYTE(pValue), nLength);
+              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_BINARY, 0, PByte(pValue), nLength);
             end;
             // end;
           end;
@@ -1496,9 +1498,9 @@ begin
               end;
               end else begin
             }
-            if nLength <> 0 then
+            if nlength <> 0 then
             begin
-              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_BOOL, 0, PBYTE(pValue), nLength);
+              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_BOOL, 0, PByte(pValue), nLength);
             end;
             // end;
           end;
@@ -1515,9 +1517,9 @@ begin
               end;
               end else begin
             }
-            if nLength <> 0 then
+            if nlength <> 0 then
             begin
-              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_QWORD, 0, PBYTE(pValue), nLength);
+              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_QWORD, 0, PByte(pValue), nLength);
             end;
             // end;
           end;
@@ -1534,9 +1536,9 @@ begin
               end;
               end else begin
             }
-            if nLength <> 0 then
+            if nlength <> 0 then
             begin
-              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_WORD, 0, PBYTE(pValue), nLength);
+              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_WORD, 0, PByte(pValue), nLength);
             end;
             // end;
           end;
@@ -1553,9 +1555,9 @@ begin
               end;
               end else begin
             }
-            if nLength <> 0 then
+            if nlength <> 0 then
             begin
-              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_GUID, 0, PBYTE(pValue), nLength);
+              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_GUID, 0, PByte(pValue), nLength);
             end;
             // end;
           end;
@@ -1579,7 +1581,7 @@ begin
       begin
         if (pValue <> '') AND (nLength > 0) then
         begin
-          ppHeaderInfo3.ModifyAttribute(0, nIndex, WMT_TYPE_BINARY, 0, PBYTE(pValue), nLength)
+          ppHeaderInfo3.ModifyAttribute(0, nIndex, WMT_TYPE_BINARY, 0, PByte(pValue), nLength)
         end
         else
         begin
@@ -1588,9 +1590,9 @@ begin
       end
       else
       begin
-        if nLength <> 0 then
+        if nlength <> 0 then
         begin
-          ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_BINARY, 0, PBYTE(pValue), nLength);
+          ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_BINARY, 0, PByte(pValue), nLength);
         end;
       end;
     end;
@@ -1786,9 +1788,9 @@ begin
   end;
 end;
 
-function DurationToStr(Duration: int64; ShowMs: Boolean): String;
+function DurationToStr(Duration: int64; ShowMs: boolean): String;
 begin
-  if ShowMs then
+  if ShowMS then
   begin
     if Duration >= 3600000 then
       Result := Format('%d:%2.2d:%2.2d.%3.3d', [Duration div 3600000, (Duration mod 3600000) div 60000, (Duration mod 60000) div 1000, Duration mod 1000])
