@@ -2,6 +2,10 @@
 -Added: An option to record radios without encoding
 -Added: A new interface layout moving lyric out of tabs
 -Added: An option close search window when a result is selected to play (thx to Midas)
+-Added: Options to search songs in YouTube and Google
+-Added: Default lyric source is now batlyrics.net
+-Added: An animation to show that player is connecting to a radio
+-Fixed: Memory leaks
 -Fixed: Button to open radio recordings folder didn't function
 -Updated: BassEnc to 2.4.12
 

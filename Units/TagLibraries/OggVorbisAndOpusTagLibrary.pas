@@ -2427,6 +2427,7 @@ begin
 {$ENDIF}
   then
   begin
+    FreeAndNil(OGGStream);
     Exit;
   end;
   FirstOGGPage.Clear;
@@ -2482,6 +2483,7 @@ begin
     end;
   finally
     FreeAndNil(Data);
+    FreeAndNil(OGGStream);
   end;
 end;
 

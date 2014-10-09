@@ -42,7 +42,9 @@ uses
   bassenc in 'BassUnits\bassenc.pas',
   UnitRadioRecordOptions in 'Forms\UnitRadioRecordOptions.pas' {RadioRecordOptionsForm} ,
   bassmix in 'BassUnits\bassmix.pas',
-  UnitTagWriter in 'Units\UnitTagWriter.pas';
+  UnitTagWriter in 'Units\UnitTagWriter.pas',
+  Vcl.Themes,
+  Vcl.Styles;
 
 {$R *.res}
 

@@ -78,7 +78,8 @@ uses
   SysUtils,
   Windows,
   // Dialogs,
-  Classes;
+  Classes,
+  Activex;
 
 Const
   WMATAGLIBRARY_SUCCESS = 0;
@@ -1779,6 +1780,7 @@ begin
     end;
     fFileName := StringToOleStr(FileName);
     Result := LoadTags(fFileName);
+    SysFreeString(fFileName);
   except
     Result := WMATAGLIBRARY_ERROR;
   end;

@@ -171,8 +171,6 @@ begin
             ArtistLabel.Caption := '';
             AlbumLabel.Caption := '';
             PlaybackInfoLabel.Caption := '';
-            if MainForm.Enabled and MainForm.Visible then
-              MainForm.FocusControl(VolumeBar);
           end;
         end;
       1: // random

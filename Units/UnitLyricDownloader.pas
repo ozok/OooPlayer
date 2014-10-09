@@ -399,6 +399,12 @@ end;
 
 procedure TLyricDownloader.ThreadRun(Sender: TIdThreadComponent);
 begin
+  FLyricStatusMsg := 'Searching...';
+  try
+    FThread.Synchronize(UpdateLyricStatus);
+  except
+
+  end;
   FLyricSourceIndex := MainForm.LyricSourceList.ItemIndex;
   case FLyricSourceIndex of
     0:
@@ -439,10 +445,15 @@ procedure TLyricDownloader.UpdateMainUI;
 var
   I: Integer;
 begin
-  MainForm.LyricList.Items.Clear;
-  for I := 0 to FLyricFile.Count - 1 do
-  begin
-    MainForm.LyricList.Items.Add(Trim(FLyricFile[i]));
+  MainForm.LyricList.Lines.Clear;
+  MainForm.LyricList.Lines.BeginUpdate;
+  try
+    for I := 0 to FLyricFile.Count - 1 do
+    begin
+      MainForm.LyricList.Lines.Add(Trim(FLyricFile[i]));
+    end;
+  finally
+    MainForm.LyricList.Lines.EndUpdate;
   end;
   if FLyricFile.Count > 1 then
   begin

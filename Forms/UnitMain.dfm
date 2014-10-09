@@ -3,7 +3,7 @@ object MainForm: TMainForm
   Top = 0
   Caption = 'OooPlayer'
   ClientHeight = 576
-  ClientWidth = 862
+  ClientWidth = 869
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -24,9 +24,9 @@ object MainForm: TMainForm
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter2: TSplitter
-    Left = 609
-    Top = 127
-    Height = 389
+    Left = 616
+    Top = 130
+    Height = 386
     Align = alRight
     OnMoved = Splitter2Moved
     ExplicitLeft = 440
@@ -34,34 +34,147 @@ object MainForm: TMainForm
     ExplicitHeight = 100
   end
   object Bevel3: TBevel
-    Left = 606
-    Top = 127
+    Left = 613
+    Top = 130
     Width = 3
-    Height = 389
+    Height = 386
     Align = alRight
     Shape = bsRightLine
     ExplicitLeft = 559
+    ExplicitTop = 127
+    ExplicitHeight = 389
+  end
+  object Bevel4: TBevel
+    Left = 0
+    Top = 127
+    Width = 869
+    Height = 3
+    Align = alTop
+    Shape = bsTopLine
+    ExplicitWidth = 862
   end
   object TopBarPnl: TPanel
     Left = 0
     Top = 0
-    Width = 862
+    Width = 869
     Height = 127
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
     OnMouseEnter = TopBarPnlMouseEnter
+    ExplicitWidth = 862
     DesignSize = (
-      862
+      869
       127)
     object PositionLabel: TLabel
-      Left = 577
-      Top = 24
-      Width = 140
+      Left = 483
+      Top = 11
+      Width = 156
       Height = 13
       Anchors = [akTop, akRight]
       Caption = '00:00:00/00:00:00/00:00:00'
-      ExplicitLeft = 389
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object RadioConnectionImg: TJvGIFAnimator
+      Left = 440
+      Top = 0
+      Width = 37
+      Height = 37
+      AsyncDrawing = True
+      Animate = True
+      AutoSize = False
+      Center = True
+      FrameIndex = 2
+      Image.Data = {
+        270A00004749463839611F001F00D50000FFFFFF000000E8E8E8D2D2D2BCBCBC
+        AEAEAEA2A2A2DCDCDCB8B8B89A9A9AE4E4E4D8D8D8AAAAAAA0A0A0B0B0B0CCCC
+        CCF6F6F6A8A8A8D4D4D4E6E6E6363636262626505050C4C4C470707092929256
+        5656FAFAFA686868464646C6C6C6F8F8F8484848323232000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        000000000000000000000000000000000021FF0B4E45545343415045322E3003
+        0100000021FE1A43726561746564207769746820616A61786C6F61642E696E66
+        6F0021F904090A0000002C000000001F001F000006FF40807048140C08050380
+        62C1241EC4A874784024AE574065BBE5383E53A982802D6BB95C8C273C5C30CA
+        66341AC460031AF0B89C1B0A2F1A007958677B15770B510A6F0981580E0F0A10
+        000217191A688D0C0A446483091112611B061D8665045479009B766B79074256
+        6511137643131170089379A1B643127946700EBF510E70477050C6430F704870
+        ACCDAB70497092D40010704ADACD06D8DFDC650605D2DF0AD69D58CCD4CFA703
+        C4DFC8650302BDD4C1700200B258B48CE1D225E480AA696136BD1AC28ED1275F
+        5324E46A7405D5104559CA3C8AB44DC1837A1913688AF287A22A41591A209A82
+        07A5493880D8B8718992C14A366304BDAC88D04E150F382F11C0FA6604891273
+        04EED909020021F904090A0000002C000000001F001F000006FF40807048140C
+        080503C050200C04C4A874784024AE5700F68A384CA70AC216AB1D27088AEF70
+        C13067DD09C6420D68C0136577E3BBD8DFF36600210C510A6D785B0E0F0A1000
+        100A0F0E5B001515201E4462640911126A1211789595181F420781697469A3A3
+        0E42565B111374431E1DAD151C0002669EB54306B9150F0363AFC0431B1AB967
+        630FC94419B9180563AAD10017B91606638DD9BCB914E1D9DE5BE0D910634CD7
+        E50A634DCFE50F634EC7E5925B4FBED9126650626199956C42A82D084EA5AA95
+        C68C17219ADE74FA140A10012286DE6051C4C811247D1A196013D207D0189393
+        1ACC9962070E4A2C7BD4B07109470EC38893DCA08956E5E4980C2EE5781D49B2
+        A4C9133A41000021F904090A0000002C000000001F001F000006FF4080704814
+        0C080503C050200C04C4A874784024AE5700F68A384CA70AC216AB1D27088AEF
+        70C13067DD09C6420D68C0136577E3BBD8DFF3667573440A6D785B0E0F0A1000
+        100A0F0E5B650C694362640911126A12118758045481956A69665E00565B1113
+        7443139E5B080002669BAE43126646630EB851915B47630FBF440F634863A4C6
+        0A6349638CC64210634AD3D306D1D8B415DEDE1405CBDC17DFDE169758C5D819
+        E6151803BDD81B1AEE09B563B7BF06EE15C5AA5858FDF2D0C11D07210746B94A
+        D3CF979074873471F204C01C860F430ABDC1926851A347C1B27803E1214A1F40
+        63504A0AC1E08B1D382AB1EC51C306261C390B21623283C658950E9463BA70A3
+        7524C992264FE804010021F904090A0000002C000000001F001F000006FF4080
+        7048140C080503C050200C04C4A874784024AE5700F68A384CA70AC216AB1D27
+        088AEF70C13067DD09C6420D68C0136577E3BBD8DFF3667573440A6D785B0E0F
+        0A1000100A0F0E5B650C694362640911126A12118758045481956A69665E0056
+        5B11137443139E5B080002669BAE43126646630EB851915B47630FBF440F6348
+        63A4C60A6349638CC64210634AD3D306D1D88DD605CBDCCE5B4DC4DCC85B4EBD
+        DCC1584FB6D3BA6350AA58ACBFB063B30007A3AE1E80575001B8F446D3970D06
+        3A5400146A48A13758122DA2752183860A18175EA114A50F404919436214F4C5
+        0E1C00224386A0C3E6644A8C2018B80AE306654A0CFF7E5519633323070F071F
+        B81941A28482050C098AA909020021F904090A0000002C000000001F001F0000
+        06FF40807048140C080503C050200C04C4A874784024AE5700F68A384CA70AC2
+        16AB1D27088AEF70C13067DD09C6420D68C0136577E3BBD8DFF3667573440A6D
+        785B0E0F0A1000100A0F0E5B650C694362640911126A12118758045481956A69
+        665E00565B11137443139E5B080002669BAE43126646630EB851915B47630FBF
+        440F634863A4C60A6349638CC64210634AD3D306D1D88DD605CBDCCE5B4DC4DC
+        C85B4EBDDCC1584FB6D3BA6350AA58ACBFB063B30007811EAEA6635001B894A5
+        4207031BBE74FA7425D49042052B48D490E102144790245DA114A50F00892043
+        021A23E84B889028476ED9A38601089420556E1CA4C60306981564A2F9F5C101
+        870F94F9044E4386C10285254D9ED009020021F904090A0000002C000000001F
+        001F000006FF40807048140C080503C050200C04C4A874784024AE5700F68A38
+        4CA70AC216AB1D27088AEF70C13067DD09C6420D68C0136577E3BBD8DFF36675
+        73440A6D785B0E0F0A1000100A0F0E5B650C694362640911126A121187580454
+        81956A69665E00565B11137443139E5B080002669BAE43126646630EB851915B
+        47630FBF440F634863A4C60A6349638CC64210634AD3D31415DBDB50D8D55B06
+        16DCDB17D800CE5B0518E41519E7C85B62ED1A1BD8C158030FED15D7BFBA63A0
+        7068D7C1C32F5863660170C00F9D2B5363507D60C74D8B264E9E00851AE201C4
+        36408916357A84EF13A5280C42001AB35252834152ECC06989658F1A3633E1C8
+        797889A51B1134C6AAF894850A9B11244A9838F1F625080021F904090A000000
+        2C000000001F001F000006FF40807048140C080503C050200C04C4A874784024
+        AE5700F68A384CA70AC216AB1D27088AEF70C13067DD09C6420D68C0136577E3
+        CB08E5CD7F637573441E2015157F0E0F0A1000100A0F0E5B650C69421F188888
+        5A11126A1211785B04430E9B9B00976A69665E001CA8151D1E744313A25B0800
+        0FB2154AB64312660209B21A1BC144935B039AA819CA440F630416B217D2430A
+        630514B250DA8F63C0E2CA06638EE210E40563ABD2DC5B4D630FE6D4A403630E
+        E6CC584F663E491B36068A952D112628C3356617800380E0810994E015003164
+        12780225EA4FA96D6D466159D4E851247F222D4559B0E70E45320D0849B103E7
+        E5953D6AD8D48423C7561813372FD148AB22A8A1456D46902861E224DC972000
+        21F904090A0000002C000000001F001F000006FF408070487C2430160AC05020
+        0C04C4A854F871702A582C20C1E5220ED3A907932D6FBB5D82223C6480CA6634
+        9AB1600342F0B8BCDB082FFA7959677B09000D75440A0C5C00651A191750100A
+        0F0E68670C6B430497151D061B61121185680443077B001E76006B7B60000872
+        1113AD4213A4680800027B12B743127B0203720EC1449668039C680FC94346A6
+        05729AD10A7205067210D142107206DFD1DC68DEDFE1684CD6E4D9684D72D0DF
+        D369C668C8DFCB5D4FBFD1C372A0CC42532B582E39BC00A492E3AAD52B39B100
+        38639420023051A4062538354411C52E0E1E28F036A9D2252E99A2FCD1C89010
+        A343611AB82CE5B20F9B058B08B1EC42C7E1C415937BD4243B30B00BCB2FE47A
+        35DBB6A4C9133B4100003B}
+      Anchors = [akTop, akRight]
+      Visible = False
     end
     object PauseBtn: TButton
       Left = 60
@@ -70,8 +183,9 @@ object MainForm: TMainForm
       Height = 37
       Hint = 'Pause'
       Caption = '||'
-      TabOrder = 4
+      TabOrder = 3
       OnClick = PauseBtnClick
+      OnMouseEnter = PauseBtnMouseEnter
     end
     object StopBtn: TButton
       Left = 110
@@ -80,8 +194,9 @@ object MainForm: TMainForm
       Height = 37
       Hint = 'Stop'
       Caption = '[]'
-      TabOrder = 5
+      TabOrder = 4
       OnClick = StopBtnClick
+      OnMouseEnter = StopBtnMouseEnter
     end
     object PrevBtn: TButton
       Left = 160
@@ -90,8 +205,9 @@ object MainForm: TMainForm
       Height = 37
       Hint = 'Previous'
       Caption = '|<<'
-      TabOrder = 6
+      TabOrder = 5
       OnClick = PrevBtnClick
+      OnMouseEnter = PrevBtnMouseEnter
     end
     object NextBtn: TButton
       Left = 210
@@ -100,8 +216,15 @@ object MainForm: TMainForm
       Height = 37
       Hint = 'Next'
       Caption = '>>|'
-      TabOrder = 7
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 6
       OnClick = NextBtnClick
+      OnMouseEnter = NextBtnMouseEnter
     end
     object PlayBtn: TButton
       Left = 10
@@ -116,36 +239,20 @@ object MainForm: TMainForm
       Font.Name = 'Tahoma'
       Font.Style = []
       ParentFont = False
-      TabOrder = 3
+      TabOrder = 2
       OnClick = PlayBtnClick
-    end
-    object VolumeBar: TJvTrackBar
-      Left = 839
-      Top = 0
-      Width = 23
-      Height = 104
-      Hint = 'Volume level'
-      Align = alRight
-      Max = 100
-      Orientation = trVertical
-      Position = 50
-      TabOrder = 0
-      TickMarks = tmBoth
-      TickStyle = tsNone
-      OnChange = VolumeBarChange
-      ShowRange = False
-      OnMouseEnter = VolumeBarMouseEnter
+      OnMouseEnter = PlayBtnMouseEnter
     end
     object PlaybackOrderList: TComboBox
-      Left = 577
-      Top = 0
-      Width = 140
+      Left = 645
+      Top = 8
+      Width = 89
       Height = 21
       Hint = 'Playback order'
       Style = csDropDownList
       Anchors = [akTop, akRight]
       ItemIndex = 2
-      TabOrder = 1
+      TabOrder = 0
       Text = 'Repeat Track'
       OnChange = PlaybackOrderListChange
       Items.Strings = (
@@ -157,31 +264,34 @@ object MainForm: TMainForm
     object PositionBar: TJvTrackBar
       Left = 0
       Top = 104
-      Width = 862
+      Width = 869
       Height = 23
       Hint = 'Position'
       Align = alBottom
       LineSize = 10
       PageSize = 4
-      TabOrder = 2
+      TabOrder = 1
       TickMarks = tmBoth
       TickStyle = tsNone
       ShowRange = False
+      OnMouseEnter = PositionBarMouseEnter
       OnChanged = PositionBarChanged
       OnMouseDown = PositionBarMouseDown
+      ExplicitWidth = 862
     end
     object InfoPanel: TPanel
       Left = 16
       Top = 44
-      Width = 701
+      Width = 708
       Height = 59
       Anchors = [akLeft, akRight, akBottom]
       BevelOuter = bvNone
-      TabOrder = 8
+      TabOrder = 7
+      ExplicitWidth = 701
       object AlbumLabel: TLabel
         Left = 0
         Top = 29
-        Width = 701
+        Width = 708
         Height = 15
         Hint = 'Album'
         Align = alBottom
@@ -199,7 +309,7 @@ object MainForm: TMainForm
       object ArtistLabel: TLabel
         Left = 0
         Top = 14
-        Width = 701
+        Width = 708
         Height = 15
         Align = alBottom
         AutoSize = False
@@ -216,7 +326,7 @@ object MainForm: TMainForm
       object PlaybackInfoLabel: TLabel
         Left = 0
         Top = 44
-        Width = 701
+        Width = 708
         Height = 15
         Hint = 'Status, Bitrate, Channels, Codec, Sample Rate, Play Count'
         Align = alBottom
@@ -233,7 +343,7 @@ object MainForm: TMainForm
       object TitleLabel: TLabel
         Left = 0
         Top = -1
-        Width = 701
+        Width = 708
         Height = 15
         Hint = 'Title'
         Align = alBottom
@@ -245,17 +355,16 @@ object MainForm: TMainForm
         Font.Style = [fsBold]
         ParentFont = False
         ShowAccelChar = False
-        ExplicitTop = 15
-        ExplicitWidth = 541
+        ExplicitLeft = 112
       end
     end
     object Panel2: TPanel
-      Left = 723
+      Left = 740
       Top = 3
       Width = 100
       Height = 100
       Anchors = [akRight, akBottom]
-      TabOrder = 9
+      TabOrder = 8
       object CoverImage: TImage
         Left = 1
         Top = 1
@@ -266,17 +375,31 @@ object MainForm: TMainForm
         Center = True
         Proportional = True
         Stretch = True
-        ExplicitLeft = 535
-        ExplicitTop = 3
-        ExplicitWidth = 100
-        ExplicitHeight = 100
+        ExplicitLeft = 16
+        ExplicitTop = 41
       end
+    end
+    object VolumeBar: TJvTrackBar
+      Left = 846
+      Top = 0
+      Width = 23
+      Height = 104
+      Align = alRight
+      Max = 100
+      Orientation = trVertical
+      ShowSelRange = False
+      TabOrder = 9
+      TickMarks = tmBoth
+      TickStyle = tsNone
+      OnChange = VolumeBarChange
+      OnMouseEnter = VolumeBarMouseEnter
+      ExplicitLeft = 0
     end
   end
   object StatusBar1: TStatusBar
     Left = 0
     Top = 557
-    Width = 862
+    Width = 869
     Height = 19
     Panels = <
       item
@@ -288,31 +411,35 @@ object MainForm: TMainForm
         Text = '100%'
         Width = 100
       end>
+    ExplicitWidth = 862
   end
   object ProgressPanel: TPanel
     Left = 0
     Top = 516
-    Width = 862
+    Width = 869
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
     Visible = False
+    OnMouseEnter = ProgressPanelMouseEnter
+    ExplicitWidth = 862
     object ProgressLabel: TLabel
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 775
+      Width = 782
       Height = 35
       Align = alClient
       Caption = 'Progress info'
       Layout = tlCenter
+      OnMouseEnter = ProgressLabelMouseEnter
       ExplicitWidth = 63
       ExplicitHeight = 13
     end
     object AbortBtn: TButton
       AlignWithMargins = True
-      Left = 784
+      Left = 791
       Top = 3
       Width = 75
       Height = 35
@@ -320,13 +447,14 @@ object MainForm: TMainForm
       Caption = 'Abort'
       TabOrder = 0
       OnClick = AbortBtnClick
+      ExplicitLeft = 784
     end
   end
   object FuncPages: TPageControl
     Left = 0
-    Top = 127
-    Width = 606
-    Height = 389
+    Top = 130
+    Width = 613
+    Height = 386
     ActivePage = TabSheet1
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
@@ -338,45 +466,29 @@ object MainForm: TMainForm
     TabOrder = 3
     OnChange = FuncPagesChange
     OnMouseLeave = FuncPagesMouseLeave
+    ExplicitLeft = 1
+    ExplicitTop = 127
     object TabSheet1: TTabSheet
       Caption = 'Music'
-      object Bevel1: TBevel
-        Left = 0
-        Top = 358
-        Width = 598
-        Height = 3
-        Align = alBottom
-        Shape = bsTopLine
-        ExplicitTop = 187
-        ExplicitWidth = 666
-      end
+      ExplicitWidth = 598
       object Splitter1: TSplitter
         Left = 0
         Top = 234
-        Width = 598
+        Width = 605
         Height = 3
         Cursor = crVSplit
         Align = alBottom
         MinSize = 1
         ResizeStyle = rsUpdate
-        ExplicitTop = 0
-        ExplicitWidth = 526
-      end
-      object Bevel2: TBevel
-        Left = 0
-        Top = 231
-        Width = 598
-        Height = 3
-        Align = alBottom
-        Shape = bsBottomLine
-        ExplicitTop = 184
-        ExplicitWidth = 526
+        ExplicitLeft = 1
+        ExplicitTop = 225
+        ExplicitWidth = 598
       end
       object PlayList: TListView
         Left = 0
         Top = 0
-        Width = 598
-        Height = 231
+        Width = 605
+        Height = 234
         Hint = 'Playlist'
         Margins.Left = 0
         Margins.Top = 0
@@ -414,16 +526,15 @@ object MainForm: TMainForm
         OnDragOver = PlayListDragOver
         OnMouseEnter = PlayListMouseEnter
         OnMouseLeave = PlayListMouseLeave
-        OnResize = PlayListResize
         OnStartDrag = PlayListStartDrag
+        ExplicitLeft = 1
       end
       object QueueList: TListView
         Left = 0
         Top = 237
-        Width = 598
+        Width = 605
         Height = 121
         Align = alBottom
-        BorderStyle = bsNone
         Columns = <
           item
           end
@@ -439,15 +550,20 @@ object MainForm: TMainForm
         TabOrder = 1
         ViewStyle = vsReport
         OnDblClick = QueueListDblClick
+        OnMouseEnter = QueueListMouseEnter
+        OnMouseLeave = QueueListMouseLeave
+        ExplicitTop = 234
+        ExplicitWidth = 598
       end
     end
     object TabSheet2: TTabSheet
       Caption = 'Radio'
       ImageIndex = 1
+      ExplicitWidth = 598
       object RadioCatList: TComboBox
         Left = 0
         Top = 0
-        Width = 598
+        Width = 605
         Height = 21
         Hint = 'Radio station categories'
         Align = alTop
@@ -485,12 +601,13 @@ object MainForm: TMainForm
           'Season'
           'User Favourites'
           'Imported')
+        ExplicitWidth = 598
       end
       object RadioList: TListView
         Left = 0
         Top = 73
-        Width = 598
-        Height = 288
+        Width = 605
+        Height = 285
         Align = alClient
         BorderStyle = bsNone
         Columns = <
@@ -517,19 +634,21 @@ object MainForm: TMainForm
         OnDblClick = RadioListDblClick
         OnMouseEnter = RadioListMouseEnter
         OnMouseLeave = RadioListMouseLeave
+        ExplicitWidth = 598
       end
       object RadioRecordPanel: TPanel
         Left = 0
         Top = 21
-        Width = 598
+        Width = 605
         Height = 52
         Align = alTop
         TabOrder = 2
+        ExplicitWidth = 598
         DesignSize = (
-          598
+          605
           52)
         object Label1: TLabel
-          Left = 108
+          Left = 115
           Top = 6
           Width = 77
           Height = 13
@@ -538,7 +657,7 @@ object MainForm: TMainForm
           ExplicitLeft = 176
         end
         object Label2: TLabel
-          Left = 230
+          Left = 237
           Top = 6
           Width = 67
           Height = 13
@@ -568,7 +687,7 @@ object MainForm: TMainForm
           OnClick = StopRadioRecordBtnClick
         end
         object RadioRecordFormatList: TComboBox
-          Left = 108
+          Left = 115
           Top = 25
           Width = 114
           Height = 21
@@ -584,9 +703,10 @@ object MainForm: TMainForm
             'Opus'
             'AAC'
             'Original')
+          ExplicitLeft = 108
         end
         object RadioRecordingOptionsBtn: TButton
-          Left = 424
+          Left = 431
           Top = 6
           Width = 104
           Height = 40
@@ -595,9 +715,10 @@ object MainForm: TMainForm
           Caption = 'Recording Options'
           TabOrder = 3
           OnClick = RadioRecordingOptionsBtnClick
+          ExplicitLeft = 424
         end
         object RadioRecordModeList: TComboBox
-          Left = 228
+          Left = 235
           Top = 25
           Width = 190
           Height = 21
@@ -610,9 +731,10 @@ object MainForm: TMainForm
           Items.Strings = (
             'Try to save each song seperately'
             'Save recording as a single long file')
+          ExplicitLeft = 228
         end
         object RadioRecordOutputFolderBtn: TButton
-          Left = 534
+          Left = 541
           Top = 6
           Width = 55
           Height = 40
@@ -621,20 +743,28 @@ object MainForm: TMainForm
           Caption = 'Folder'
           TabOrder = 5
           OnClick = RadioRecordOutputFolderBtnClick
+          ExplicitLeft = 534
         end
       end
     end
   end
   object LyricPanel: TPanel
-    Left = 612
-    Top = 127
+    Left = 619
+    Top = 130
     Width = 250
-    Height = 389
+    Height = 386
     Align = alRight
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
     TabOrder = 4
+    ExplicitLeft = 612
     object LyricStatusLabel: TLabel
       Left = 1
-      Top = 375
+      Top = 372
       Width = 248
       Height = 13
       Align = alBottom
@@ -642,7 +772,7 @@ object MainForm: TMainForm
     end
     object bvl1: TBevel
       Left = 1
-      Top = 372
+      Top = 369
       Width = 248
       Height = 3
       Align = alBottom
@@ -662,28 +792,6 @@ object MainForm: TMainForm
       ExplicitTop = 9
       ExplicitWidth = 200
     end
-    object LyricList: TJvListBox
-      Left = 1
-      Top = 108
-      Width = 248
-      Height = 264
-      Align = alClient
-      BorderStyle = bsNone
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ItemHeight = 17
-      Background.FillMode = bfmTile
-      Background.Visible = False
-      ParentFont = False
-      Style = lbOwnerDrawFixed
-      TabOrder = 0
-      Alignment = taCenter
-      OnMouseEnter = LyricListMouseEnter
-      OnMouseLeave = LyricListMouseLeave
-    end
     object pnl3: TPanel
       Left = 1
       Top = 1
@@ -691,7 +799,7 @@ object MainForm: TMainForm
       Height = 104
       Align = alTop
       BevelOuter = bvNone
-      TabOrder = 1
+      TabOrder = 0
       DesignSize = (
         248
         104)
@@ -705,6 +813,12 @@ object MainForm: TMainForm
         EditLabel.Height = 13
         EditLabel.Caption = 'Title:'
         Enabled = False
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 0
         OnKeyDown = LyricTitleEditKeyDown
       end
@@ -747,6 +861,26 @@ object MainForm: TMainForm
           'batlyrics.net'
           'metrolyrics.com')
       end
+    end
+    object LyricList: TMemo
+      Left = 1
+      Top = 108
+      Width = 248
+      Height = 261
+      Align = alClient
+      BorderStyle = bsNone
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      HideSelection = False
+      ParentFont = False
+      ReadOnly = True
+      ScrollBars = ssBoth
+      TabOrder = 1
+      OnMouseEnter = LyricListMouseEnter
+      OnMouseLeave = LyricListMouseLeave
     end
   end
   object OpenFolder: TJvBrowseForFolderDialog
@@ -892,7 +1026,7 @@ object MainForm: TMainForm
         OnClick = J1Click
       end
       object S2: TMenuItem
-        Caption = 'Search in the playlist'
+        Caption = 'Search'
         ShortCut = 114
         OnClick = S2Click
       end
@@ -952,15 +1086,17 @@ object MainForm: TMainForm
       Caption = 'Remove from the list'
       OnClick = R2Click
     end
-    object F2: TMenuItem
-      Caption = 'File Information'
-      OnClick = F2Click
-    end
     object S7: TMenuItem
       Caption = 'Search song in YouTube'
+      OnClick = S7Click
     end
     object S8: TMenuItem
       Caption = 'Search song in Google'
+      OnClick = S8Click
+    end
+    object F2: TMenuItem
+      Caption = 'File Information'
+      OnClick = F2Click
     end
   end
   object PlayBackImgs: TImageList

@@ -30,6 +30,7 @@ uses
 type
   TLogForm = class(TForm)
     LogList: TMemo;
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
   public
@@ -42,5 +43,11 @@ var
 implementation
 
 {$R *.dfm}
+
+procedure TLogForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then
+    Self.Close;
+end;
 
 end.
