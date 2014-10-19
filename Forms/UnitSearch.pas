@@ -51,6 +51,8 @@ type
     procedure QueryEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure A1Click(Sender: TObject);
+    procedure ResultsListMouseEnter(Sender: TObject);
+    procedure QueryEditMouseEnter(Sender: TObject);
   private
     { Private declarations }
     FResultsList: TList<Integer>;
@@ -143,6 +145,12 @@ begin
   end;
 end;
 
+procedure TSearchForm.QueryEditMouseEnter(Sender: TObject);
+begin
+  if Self.Enabled and Self.Visible then
+    Self.FocusControl(QueryEdit);
+end;
+
 procedure TSearchForm.ResultsListClick(Sender: TObject);
 begin
   case SearchType of
@@ -200,6 +208,12 @@ begin
         end;
     end;
   end;
+end;
+
+procedure TSearchForm.ResultsListMouseEnter(Sender: TObject);
+begin
+  if Self.Enabled and Self.Visible then
+    Self.FocusControl(ResultsList);
 end;
 
 procedure TSearchForm.SearchBtnClick(Sender: TObject);

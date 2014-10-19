@@ -47,6 +47,7 @@ object SearchForm: TSearchForm
     LabelPosition = lpLeft
     TabOrder = 0
     OnKeyDown = QueryEditKeyDown
+    OnMouseEnter = QueryEditMouseEnter
   end
   object SearchBtn: TButton
     Left = 552
@@ -81,6 +82,7 @@ object SearchForm: TSearchForm
     ViewStyle = vsReport
     OnClick = ResultsListClick
     OnDblClick = ResultsListDblClick
+    OnMouseEnter = ResultsListMouseEnter
   end
   object chkCloseOnPlayBtn: TCheckBox
     Left = 8

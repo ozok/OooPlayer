@@ -1,3 +1,7 @@
+--1.8
+-Fixed: Clearing the playlist will clear queue list too
+-Fixed: Couldn't read artwork in some cases and showed cover art from previous file
+
 --1.7
 -Added: A new interface layout moving lyric out of tabs
 -Added: An option close search window when a result is selected to play (thx to Midas)

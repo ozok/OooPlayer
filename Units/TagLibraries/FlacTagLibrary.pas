@@ -160,8 +160,8 @@ type
     PictureType: Cardinal;
     MIMEType: String;
     Description: String;
-    Width: Word;
-    Height: Word;
+    Width: Cardinal;
+    Height: Cardinal;
     ColorDepth: Cardinal;
     NoOfColors: Cardinal;
     PictureData: Pointer;
@@ -1302,14 +1302,8 @@ begin
     Stream.Read(LengthOfPictureData, 4);
     LengthOfPictureData := ReverseBytes(LengthOfPictureData);
     SizeOfPictureData := LengthOfPictureData;
-    if Assigned(Stream) and Assigned(PictureStream) then
-    begin
-      if Stream.Size > 0 then
-      begin
-        PictureStream.CopyFrom(Stream, LengthOfPictureData);
-        PictureStream.Seek(0, soBeginning);
-      end;
-    end;
+    PictureStream.CopyFrom(Stream, LengthOfPictureData);
+    PictureStream.Seek(0, soBeginning);
   end;
   Result := True;
 end;

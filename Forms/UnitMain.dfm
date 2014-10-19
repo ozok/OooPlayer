@@ -415,6 +415,7 @@ object MainForm: TMainForm
       Images = ImageList1
       TabOrder = 10
       OnClick = G1Click
+      OnMouseEnter = SettingsBtnMouseEnter
     end
     object Button1: TButton
       Left = 513
@@ -428,6 +429,7 @@ object MainForm: TMainForm
       Images = ImageList1
       TabOrder = 11
       OnClick = L2Click
+      OnMouseEnter = Button1MouseEnter
     end
     object SearchBtn: TButton
       Left = 413
@@ -441,6 +443,7 @@ object MainForm: TMainForm
       Images = ImageList1
       TabOrder = 12
       OnClick = S2Click
+      OnMouseEnter = SearchBtnMouseEnter
     end
   end
   object StatusBar1: TStatusBar
@@ -6290,7 +6293,7 @@ object MainForm: TMainForm
     Left = 444
     Top = 418
     Bitmap = {
-      494C010108000D00040020002000FFFFFFFF1910FFFFFFFFFFFFFFFF424D3600
+      494C010108000D00080020002000FFFFFFFF1910FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000800000006000000001001800000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

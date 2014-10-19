@@ -35,6 +35,7 @@ type
     constructor Create(const SourceImg: string; const DestImg: string);
     destructor Destroy; override;
 
+    function ResizeJpgStream(const inFile, outFile: TStream): Boolean;
     procedure Resize;
   end;
 
@@ -57,16 +58,74 @@ procedure TImageResizer.Resize;
 var
   LExt: string;
 begin
-  if not FileExists(FSourcePath) then Exit;
-
-  LExt := LowerCase(ExtractFileExt(FSourcePath));
-  if (LExt = '.jpeg') or (LExt = '.jpg') then
+  if FileExists(FSourcePath) then
   begin
-    ResizeJpgEx(FSourcePath, FDestPath)
+    // external cover art
+    LExt := LowerCase(ExtractFileExt(FSourcePath));
+    if (LExt = '.jpeg') or (LExt = '.jpg') then
+    begin
+      ResizeJpgEx(FSourcePath, FDestPath)
+    end;
   end;
 end;
 
 function TImageResizer.ResizeJpgEx(const inFile, outFile: string): Boolean;
+var
+  LJpeg: TJPEGImage;
+  LBMP: TBitmap;
+  LJpegBMP: TBitmap;
+  LOutJpeg: TJPEGImage;
+begin
+  Result := FileExists(inFile);
+
+  LJpeg := TJPEGImage.Create;
+  LBMP := TBitmap.Create;
+  LJpegBMP := TBitmap.Create;
+  try
+    // try to load jpg from file
+    try
+      LJpeg.LoadFromFile(inFile);
+    except
+      Result := False;
+      Exit;
+    end;
+    // output bitmap
+    LBMP.PixelFormat := pf24bit;
+    LBMP.Width := 98;
+    LBMP.Height := Round(98 * (LJpeg.Height / LJpeg.Width));
+    // bitmap to hold data from jpeg
+    LJpegBMP.PixelFormat := pf24bit;
+    LJpegBMP.Width := LJpeg.Width;
+    LJpegBMP.Height :=LJpeg.Height;
+    LJpegBMP.Assign(LJpeg);
+
+    try
+      StretchBitmap(LJpegBMP, LBMP, nil, nil, sqVeryHigh);
+    except
+      Result := False;
+      Exit;
+    end;
+
+    LOutJpeg := TJPEGImage.Create;
+    try
+      LOutJpeg.Assign(LBMP);
+      try
+        LOutJpeg.SaveToFile(outFile);
+      except
+        Result := False;
+        Exit;
+      end;
+    finally
+      LOutJpeg.Free;
+    end;
+  finally
+    LJpeg.Free;
+    LBMP.Free;
+    LJpegBMP.Free;
+  end;
+end;
+
+function TImageResizer.ResizeJpgStream(const inFile, outFile: TStream): Boolean;
 var
   LJpeg: TJPEGImage;
   LBMP: TBitmap;

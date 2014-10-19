@@ -31,7 +31,7 @@ uses
   JvAppIniStorage, StrUtils, ShellAPI, JvComputerInfoEx, UnitTagTypes, UnitTagReader, PNGImage, JvDragDrop,
   JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon, Jpeg, UnitMusicPlayer, Bass, BASSenc,
   IdBaseComponent, IdThreadComponent, UnitLyricDownloader, UnitTagWriter,
-  JvAnimatedImage, JvGIFCtrl, UnitImageResize, madExceptVcl;
+  JvAnimatedImage, JvGIFCtrl;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -119,7 +119,6 @@ type
     N4: TMenuItem;
     E2: TMenuItem;
     PositionBar: TJvTrackBar;
-    CoverImage: TImage;
     L2: TMenuItem;
     ProgressPanel: TPanel;
     AbortBtn: TButton;
@@ -193,6 +192,7 @@ type
     SettingsBtn: TButton;
     Button1: TButton;
     SearchBtn: TButton;
+    CoverImage: TImage;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -285,6 +285,9 @@ type
     procedure NextBtnMouseEnter(Sender: TObject);
     procedure PositionBarMouseEnter(Sender: TObject);
     procedure VolumeBarMouseEnter(Sender: TObject);
+    procedure SearchBtnMouseEnter(Sender: TObject);
+    procedure SettingsBtnMouseEnter(Sender: TObject);
+    procedure Button1MouseEnter(Sender: TObject);
   private
     { Private declarations }
     FStoppedByUser: Boolean;
@@ -827,6 +830,12 @@ begin
   end;
 end;
 
+procedure TMainForm.Button1MouseEnter(Sender: TObject);
+begin
+  if Self.Enabled and Self.Visible then
+    Self.FocusControl(VolumeBar);
+end;
+
 procedure TMainForm.RadioRecordingOptionsBtnClick(Sender: TObject);
 begin
   Self.Enabled := False;
@@ -1328,7 +1337,7 @@ begin
           Extension := LowerCase(ExtractFileExt(FileName));
           if (Extension = '.jpg') or (Extension = '.jpeg') then
           begin
-            if ContainsText(Search.Name, 'folder') or ContainsText(Search.Name, 'cover') or ContainsText(Search.Name, 'front') or ContainsText(Search.Name, 'cd') then
+            if ContainsText(Search.Name, 'folder') or ContainsText(Search.Name, 'cover') or ContainsText(Search.Name, 'front') or ContainsText(Search.Name, 'cd') or ContainsText(Search.Name, 'back') or ContainsText(Search.Name, 'cover') then
             begin
               Result := FileName;
               Break;
@@ -1501,10 +1510,15 @@ begin
   begin
     try
       FJpeg.LoadFromStream(Stream);
+      FJpeg.DIBNeeded;
       CoverImage.Picture.Assign(FJpeg);
+//      CoverImage.Picture.Bitmap.LoadFromStream(Stream);
     except
       on E: Exception do
+      begin
+        LogForm.LogList.Lines.Add('Internal cover load problem: ' + E.Message);
         CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
+      end;
     end;
   end
   else if PicType = png then
@@ -1514,7 +1528,10 @@ begin
       CoverImage.Picture.Assign(FPng);
     except
       on E: Exception do
+      begin
+        LogForm.LogList.Lines.Add('Internal cover load problem: ' + E.Message);
         CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
+      end;
     end;
   end
   else if PicType = bmp then
@@ -3352,6 +3369,12 @@ begin
   end;
 end;
 
+procedure TMainForm.SearchBtnMouseEnter(Sender: TObject);
+begin
+  if Self.Enabled and Self.Visible then
+    Self.FocusControl(VolumeBar);
+end;
+
 procedure TMainForm.SetPlayerBuffer(const Buffer: DWORD);
 begin
   FPlayer.SetBuffer(Buffer);
@@ -3360,6 +3383,12 @@ end;
 procedure TMainForm.SetRadioVolume(const Volume: integer);
 begin
   BASS_ChannelSetAttribute(FRadioHandle, BASS_ATTRIB_VOL, Volume / 100.0)
+end;
+
+procedure TMainForm.SettingsBtnMouseEnter(Sender: TObject);
+begin
+  if Self.Enabled and Self.Visible then
+    Self.FocusControl(VolumeBar);
 end;
 
 procedure TMainForm.Splitter1Moved(Sender: TObject);
