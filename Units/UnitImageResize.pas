@@ -21,7 +21,7 @@ unit UnitImageResize;
 
 interface
 
-uses Classes, Windows, SysUtils, Messages, StrUtils, Jpeg, Graphics, madGraphics;
+uses Classes, Windows, SysUtils, Messages, StrUtils, Jpeg, Graphics, madGraphics, PNGImage;
 
 type
   TImageResizer = class(TObject)
@@ -29,13 +29,15 @@ type
     FSourcePath: string;
     FDestPath: string;
 
-    function ResizeJpgEx(const inFile, outFile: string): Boolean;
   public
 
-    constructor Create(const SourceImg: string; const DestImg: string);
+    constructor Create;
     destructor Destroy; override;
 
-    function ResizeJpgStream(const inFile, outFile: TStream): Boolean;
+    function ResizeJpgEx(const inFile, outFile: string): Boolean;
+    function ResizeJpgStream(const inFile: TStream; const TmpFile: string): Boolean;
+    function ResizePNGEx(const inFile, outFile: string): Boolean;
+    function ResizePngStream(const inFile: TStream; const TmpFile: string): Boolean;
     procedure Resize;
   end;
 
@@ -43,10 +45,9 @@ implementation
 
 { TImageResizer }
 
-constructor TImageResizer.Create(const SourceImg, DestImg: string);
+constructor TImageResizer.Create;
 begin
-  FSourcePath := SourceImg;
-  FDestPath := DestImg;
+
 end;
 
 destructor TImageResizer.Destroy;
@@ -125,24 +126,22 @@ begin
   end;
 end;
 
-function TImageResizer.ResizeJpgStream(const inFile, outFile: TStream): Boolean;
+function TImageResizer.ResizeJpgStream(const inFile: TStream; const TmpFile: string): Boolean;
 var
   LJpeg: TJPEGImage;
   LBMP: TBitmap;
   LJpegBMP: TBitmap;
   LOutJpeg: TJPEGImage;
 begin
-  Result := FileExists(inFile);
-
   LJpeg := TJPEGImage.Create;
   LBMP := TBitmap.Create;
   LJpegBMP := TBitmap.Create;
+  Result := inFile.Size <> 0;
   try
-    // try to load jpg from file
+    // try to load jpg
     try
-      LJpeg.LoadFromFile(inFile);
+      LJpeg.LoadFromStream(inFile);
     except
-      Result := False;
       Exit;
     end;
     // output bitmap
@@ -158,7 +157,6 @@ begin
     try
       StretchBitmap(LJpegBMP, LBMP, nil, nil, sqVeryHigh);
     except
-      Result := False;
       Exit;
     end;
 
@@ -166,9 +164,8 @@ begin
     try
       LOutJpeg.Assign(LBMP);
       try
-        LOutJpeg.SaveToFile(outFile);
+        LOutJpeg.SaveToFile(TmpFile);
       except
-        Result := False;
         Exit;
       end;
     finally
@@ -178,6 +175,113 @@ begin
     LJpeg.Free;
     LBMP.Free;
     LJpegBMP.Free;
+  end;
+end;
+
+function TImageResizer.ResizePNGEx(const inFile, outFile: string): Boolean;
+var
+  LPng: TPngImage;
+  LBMP: TBitmap;
+  LPngBMP: TBitmap;
+  LOutPng: TPngImage;
+begin
+  Result := FileExists(inFile);
+
+  LPng := TPngImage.Create;
+  LBMP := TBitmap.Create;
+  LPngBMP := TBitmap.Create;
+  try
+    // try to load png from file
+    try
+      LPng.LoadFromFile(inFile);
+    except
+      Result := False;
+      Exit;
+    end;
+    // output bitmap
+    LBMP.PixelFormat := pf24bit;
+    LBMP.Width := 98;
+    LBMP.Height := Round(98 * (LPng.Height / LPng.Width));
+    // bitmap to hold data from png
+    LPngBMP.PixelFormat := pf24bit;
+    LPngBMP.Width := LPng.Width;
+    LPngBMP.Height := LPng.Height;
+    LPngBMP.Assign(LPng);
+
+    try
+      StretchBitmap(LPngBMP, LBMP, nil, nil, sqVeryHigh);
+    except
+      Result := False;
+      Exit;
+    end;
+
+    LOutPng := TPngImage.Create;
+    try
+      LOutPng.Assign(LBMP);
+      try
+        LOutPng.SaveToFile(outFile);
+      except
+        Result := False;
+        Exit;
+      end;
+    finally
+      LOutPng.Free;
+    end;
+  finally
+    LPng.Free;
+    LBMP.Free;
+    LPngBMP.Free;
+  end;
+end;
+
+function TImageResizer.ResizePngStream(const inFile: TStream; const TmpFile: string): Boolean;
+var
+  LPng: TPngImage;
+  LBMP: TBitmap;
+  LPngBMP: TBitmap;
+  LOutPng: TPngImage;
+begin
+  LPng := TPngImage.Create;
+  LBMP := TBitmap.Create;
+  LPngBMP := TBitmap.Create;
+  Result := inFile.Size <> 0;
+  try
+    // try to load jpg
+    try
+      LPng.LoadFromStream(inFile);
+    except
+      Exit;
+    end;
+    // output bitmap
+    LBMP.PixelFormat := pf24bit;
+    LBMP.Width := 98;
+    LBMP.Height := Round(98 * (LPng.Height / LPng.Width));
+    // bitmap to hold data from jpeg
+    LPngBMP.PixelFormat := pf24bit;
+    LPngBMP.Width := LPng.Width;
+    LPngBMP.Height := LPng.Height;
+    LPngBMP.Assign(LPng);
+    try
+      StretchBitmap(LPngBMP, LBMP, nil, nil, sqVeryHigh);
+    except
+      Exit;
+    end;
+
+    LOutPng := TPngImage.Create;
+    try
+      LOutPng.Assign(LBMP);
+      try
+        LOutPng.SaveToFile(TmpFile);
+      except
+        Exit;
+      end;
+    finally
+      LOutPng.Free;
+    end;
+  finally
+    LPng.Free;
+    LBMP.Free;
+    LPngBMP.Free;
   end;
 end;
 

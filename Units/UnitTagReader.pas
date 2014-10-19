@@ -115,9 +115,10 @@ begin
   try
     FPicType := none;
     try
-     FPicStream.Seek(0, soBeginning);
-     FPicStream.Size := 0;
-    except on E: Exception do
+      FPicStream.Seek(0, soBeginning);
+      FPicStream.Size := 0;
+    except
+      on E: Exception do
     end;
 
     if FID3v2Tag.LoadFromFile(FileName) = 0 then

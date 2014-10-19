@@ -30,8 +30,8 @@ uses
   JvThreadTimer, windows7taskbar, JvExStdCtrls, JvListBox, IniFiles, Vcl.Buttons, JvFormPlacement, JvAppStorage,
   JvAppIniStorage, StrUtils, ShellAPI, JvComputerInfoEx, UnitTagTypes, UnitTagReader, PNGImage, JvDragDrop,
   JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon, Jpeg, UnitMusicPlayer, Bass, BASSenc,
-  IdBaseComponent, IdThreadComponent, UnitLyricDownloader, UnitTagWriter,
-  JvAnimatedImage, JvGIFCtrl;
+  IdBaseComponent, IdThreadComponent, UnitLyricDownloader, UnitTagWriter, UnitImageResize,
+  JvAnimatedImage, JvGIFCtrl, JvExExtCtrls, JvImage;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -192,7 +192,7 @@ type
     SettingsBtn: TButton;
     Button1: TButton;
     SearchBtn: TButton;
-    CoverImage: TImage;
+    CoverImage: TJvImage;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -291,7 +291,6 @@ type
   private
     { Private declarations }
     FStoppedByUser: Boolean;
-    FLastCoverPath: string;
     FLastDir: string;
     FStopAddFiles: Boolean;
     FDraggingCurrentFile: Boolean;
@@ -303,6 +302,7 @@ type
     FLyricDownloader: TLyricDownloader;
     FPageHasntChangedYet: Boolean;
     FTagWriter: TTagWriter;
+    FTempCoverPath: string;
 
     procedure AddFile(const FileName: string);
     procedure ReScanFile(const FileIndex: integer);
@@ -1235,6 +1235,7 @@ begin
   FPageHasntChangedYet := True;
   PortableMode := Portable;
   FTagWriter := TTagWriter.Create;
+  FTempCoverPath := FAppDataFolder + '\cover';
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -1335,9 +1336,9 @@ begin
           FileName := Dir + '\' + Search.Name;
 
           Extension := LowerCase(ExtractFileExt(FileName));
-          if (Extension = '.jpg') or (Extension = '.jpeg') then
+          if (Extension = '.jpg') or (Extension = '.jpeg') or (Extension = '.png') or (Extension = '.bmp') or (Extension = '.gif') then
           begin
-            if ContainsText(Search.Name, 'folder') or ContainsText(Search.Name, 'cover') or ContainsText(Search.Name, 'front') or ContainsText(Search.Name, 'cd') or ContainsText(Search.Name, 'back') or ContainsText(Search.Name, 'cover') then
+            if ContainsText(Search.Name, 'folder') or ContainsText(Search.Name, 'cover') or ContainsText(Search.Name, 'front') or ContainsText(Search.Name, 'cd') or ContainsText(Search.Name, 'back') then
             begin
               Result := FileName;
               Break;
@@ -1427,22 +1428,32 @@ end;
 function TMainForm.LoadExternalCoverArt(const FileName: string): Boolean;
 var
   LImageFile: string;
+  LImgResizer: TImageResizer;
 begin
   Result := False;
   LImageFile := GetImage(ExtractFileDir(FileName));
   if FileExists(LImageFile) then
   begin
-    if FLastCoverPath <> LImageFile then
-    begin
-      CoverImage.Picture.LoadFromFile(LImageFile);
-    end;
-    FLastCoverPath := LImageFile;
+      LImgResizer := TImageResizer.Create;
+      try
+        if (LowerCase(ExtractFileExt(LImageFile)) = '.jpg') or (LowerCase(ExtractFileExt(LImageFile)) = '.jpeg') then
+        begin
+          LImgResizer.ResizeJpgEx(LImageFile, FTempCoverPath + '.jpg');
+          CoverImage.Picture.LoadFromFile(FTempCoverPath + '.jpg');
+        end
+        else if LowerCase(ExtractFileExt(LImageFile)) = '.png' then
+        begin
+          LImgResizer.ResizePNGEx(LImageFile, FTempCoverPath + '.png');
+          CoverImage.Picture.LoadFromFile(FTempCoverPath + '.png');
+        end;
+      finally
+        LImgResizer.Free;
+      end;
     Result := True;
   end
   else
   begin
     CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
-    FLastCoverPath := '';
   end;
 end;
 
@@ -1459,7 +1470,6 @@ begin
   begin
     LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
     CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
-    FLastCoverPath := LImageFile;
     Exit;
   end;
   if FTagReader.PicType <> none then
@@ -1471,7 +1481,6 @@ begin
   begin
     LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
     CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
-    FLastCoverPath := LImageFile;
   end;
 end;
 
@@ -1501,6 +1510,9 @@ begin
 end;
 
 procedure TMainForm.LoadPicFromStream(const Stream: TStream; const PicType: TCoverArtType);
+var
+  LImgResizer: TImageResizer;
+  LTmpFile: string;
 begin
   if PicType = none then
   begin
@@ -1509,14 +1521,20 @@ begin
   else if PicType = TCoverArtType.Jpeg then
   begin
     try
-      FJpeg.LoadFromStream(Stream);
-      FJpeg.DIBNeeded;
-      CoverImage.Picture.Assign(FJpeg);
-//      CoverImage.Picture.Bitmap.LoadFromStream(Stream);
+      LImgResizer := TImageResizer.Create;
+      try
+        LTmpFile := FAppDataFolder + '\cover.jpg';
+        LImgResizer.ResizeJpgStream(Stream, LTmpFile);
+        FJpeg.LoadFromFile(LTmpFile);
+        FJpeg.DIBNeeded;
+        CoverImage.Picture.Assign(FJpeg);
+      finally
+        LImgResizer.Free;
+      end;
     except
       on E: Exception do
       begin
-        LogForm.LogList.Lines.Add('Internal cover load problem: ' + E.Message);
+        LogForm.LogList.Lines.Add('Internal jpg cover load problem: ' + E.Message);
         CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
       end;
     end;
@@ -1524,12 +1542,19 @@ begin
   else if PicType = png then
   begin
     try
-      FPng.LoadFromStream(Stream);
-      CoverImage.Picture.Assign(FPng);
+      LImgResizer := TImageResizer.Create;
+      try
+        LTmpFile := FAppDataFolder + '\cover.png';
+        LImgResizer.ResizePngStream(Stream, LTmpFile);
+        FPng.LoadFromFile(LTmpFile);
+        CoverImage.Picture.Assign(FPng);
+      finally
+        LImgResizer.Free;
+      end;
     except
       on E: Exception do
       begin
-        LogForm.LogList.Lines.Add('Internal cover load problem: ' + E.Message);
+        LogForm.LogList.Lines.Add('Internal png cover load problem: ' + E.Message);
         CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
       end;
     end;
@@ -2307,11 +2332,7 @@ begin
       else
       begin
         LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
-        if FLastCoverPath <> LImageFile then
-        begin
-          CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
-          FLastCoverPath := LImageFile;
-        end;
+        CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
       end;
       // lyric
       LyricList.Lines.Clear;
@@ -2369,7 +2390,6 @@ begin
       FStoppedByUser := False;
       LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
       CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
-      FLastCoverPath := LImageFile;
 
       LogForm.LogList.Lines.Add('[' + DateTimeToStr(Now) + '] Reached the end of the playlist');
       if not LogForm.Visible then

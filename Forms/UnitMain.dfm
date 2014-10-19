@@ -374,18 +374,19 @@ object MainForm: TMainForm
       Height = 100
       Anchors = [akRight, akBottom]
       TabOrder = 8
-      object CoverImage: TImage
+      object CoverImage: TJvImage
         Left = 1
         Top = 1
         Width = 98
         Height = 98
-        Hint = 'Cover art'
         Align = alClient
         Center = True
         Proportional = True
-        Stretch = True
-        ExplicitLeft = 16
-        ExplicitTop = 41
+        Transparent = True
+        ExplicitLeft = 40
+        ExplicitTop = 54
+        ExplicitWidth = 105
+        ExplicitHeight = 105
       end
     end
     object VolumeBar: TJvTrackBar
@@ -6293,7 +6294,7 @@ object MainForm: TMainForm
     Left = 444
     Top = 418
     Bitmap = {
-      494C010108000D00080020002000FFFFFFFF1910FFFFFFFFFFFFFFFF424D3600
+      494C010108000D000C0020002000FFFFFFFF1910FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000800000006000000001001800000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

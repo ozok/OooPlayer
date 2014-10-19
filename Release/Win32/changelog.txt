@@ -1,4 +1,6 @@
 --1.8
+-Added: Support for external png, bmp and gif cover art files
+-Improved: Cover art display performance
 -Fixed: Clearing the playlist will clear queue list too
 -Fixed: Couldn't read artwork in some cases and showed cover art from previous file
 
