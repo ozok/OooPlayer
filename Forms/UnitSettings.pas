@@ -26,7 +26,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls, IniFiles,
-  Vcl.Mask, JvExMask, JvSpin;
+  Vcl.Mask, JvExMask, JvSpin, JvThread, JvComponentBase, JvUrlListGrabber,
+  JvUrlGrabbers, ShellAPI;
 
 type
   TSettingsForm = class(TForm)
@@ -45,11 +46,17 @@ type
     LogLyricFailBtn: TCheckBox;
     BufferEdit: TJvSpinEdit;
     Label1: TLabel;
+    UpdateChecker: TJvHttpUrlGrabber;
+    UpdateThread: TJvThread;
+    Button2: TButton;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LoadArtBtnClick(Sender: TObject);
     procedure BufferEditChange(Sender: TObject);
+    procedure UpdateThreadExecute(Sender: TObject; Params: Pointer);
+    procedure Button2Click(Sender: TObject);
+    procedure UpdateCheckerDoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string);
   private
     { Private declarations }
     procedure LoadSettings;
@@ -75,6 +82,11 @@ end;
 procedure TSettingsForm.Button1Click(Sender: TObject);
 begin
   Self.Close;
+end;
+
+procedure TSettingsForm.Button2Click(Sender: TObject);
+begin
+  UpdateThread.Execute(nil);
 end;
 
 procedure TSettingsForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -135,6 +147,50 @@ begin
   finally
     SettingsFile.Free;
   end;
+end;
+
+procedure TSettingsForm.UpdateCheckerDoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string);
+var
+  VersionFile: TStringList;
+  LatestVersion: Integer;
+begin
+  VersionFile := TStringList.Create;
+  try
+    if StreamSize > 0 then
+    begin
+      VersionFile.LoadFromStream(Stream);
+      if VersionFile.Count = 1 then
+      begin
+        if TryStrToInt(VersionFile.Strings[0], LatestVersion) then
+        begin
+          if LatestVersion > BuildInt then
+          begin
+            if ID_YES = Application.MessageBox('There is a new version. Would you like to go homepage and download it?', 'New Version', MB_ICONQUESTION or MB_YESNO) then
+            begin
+              ShellExecute(Handle, 'open', 'http://www.fosshub.com/OooPlayer.html', nil, nil, SW_NORMAL);
+            end;
+          end
+          else
+          begin
+            Application.MessageBox('You have the latest version.', 'Update Check', MB_ICONINFORMATION);
+          end;
+        end;
+      end;
+    end;
+  finally
+    FreeAndNil(VersionFile);
+  end;
+end;
+
+procedure TSettingsForm.UpdateThreadExecute(Sender: TObject; Params: Pointer);
+begin
+  with UpdateChecker do
+  begin
+    Url := 'http://sourceforge.net/projects/oooplayer/files/version.txt/download';
+    Start;
+  end;
+
+  UpdateThread.CancelExecute;
 end;
 
 end.

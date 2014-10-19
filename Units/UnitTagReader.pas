@@ -58,7 +58,6 @@ implementation
 
 procedure TTagReader.ClearArtwork;
 begin
-  FPicStream := nil;
   FPicType := none;
 end;
 
@@ -268,7 +267,7 @@ begin
           begin
             if FWMATag.Frames[i].Name = g_wszWMPicture then
             begin
-              if FWMATag.GetCoverArtFromFrame(i, FPicStream, LID3Mime, LWMACoverType, str1) then
+              if FWMATag.GetCoverArtFromFrame(i, FPicStream, LID3Mime, LWMACoverType, Str1) then
               begin
                 LID3Mime := LowerCase(LID3Mime);
                 if (LID3Mime = 'image/jpeg') or (LID3Mime = 'image/jpg') then

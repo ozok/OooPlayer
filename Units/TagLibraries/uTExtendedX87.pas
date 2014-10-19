@@ -242,7 +242,7 @@ procedure ResetFPU;
       /// <summary>Checks whether the ST(0) FPU register contains anything (i.e. is 'valid') </summary>
       /// <returns>TRUE if ST(0) is valid/contains a value; FALSE otherwise </returns>
       /// <remarks>If FALSE, the FPU stack is empty</remarks>
-        function IsST0Valid: boolean;
+        function IsST0Valid: Boolean;
 
         /// <summary>Pops topmost value from FPU stack</summary>
         /// <remarks>Handle with care! Only exectue if ST(0) is valid (you can check e.g. by using IsST0Valid). Keeping track of the FPU stack is the user's responsibility. Incorrect handling can lead to exceptions.</remarks>
@@ -294,22 +294,22 @@ procedure ResetFPU;
                               /// <summary>Converts 80-bit TExtendedX87 to double</summary>
                               /// <param name="Ext87: TExtendedX87">Value to be converted</param>
                               /// <returns>double value</returns>
-                                function Ext2Dbl(const Ext87: TExtendedX87): double;
+                                function Ext2Dbl(const Ext87: TExtendedX87): Double;
 
                                 /// <summary>Converts 80-bit TExtendedX87 to single</summary>
                                 /// <param name="Ext87: TExtendedX87">Value to be converted</param>
                                 /// <returns>single value</returns>
-                                  function Ext2Sgl(const Ext87: TExtendedX87): single;
+                                  function Ext2Sgl(const Ext87: TExtendedX87): Single;
 
                                   /// <summary>Converts double to 80-bit TExtendedX87</summary>
                                   /// <param name="Dbl: Double">Value to be converted</param>
                                   /// <returns> TExtendedX87 value</returns>
-                                    function Dbl2Ext(const Dbl: double): TExtendedX87;
+                                    function Dbl2Ext(const Dbl: Double): TExtendedX87;
 
                                     /// <summary>Converts single to 80-bit TExtendedX87</summary>
                                     /// <param name="Sgl: Single">Value to be converted</param>
                                     /// <returns> TExtendedX87 value</returns>
-                                      function Sgl2Ext(const Sgl: single): TExtendedX87;
+                                      function Sgl2Ext(const Sgl: Single): TExtendedX87;
 {$ENDIF}
 {$IF defined(CPUX64) or defined(DontUseSystemUnitOn32bit)}
                                       /// <summary>Returns the absolute value </summary>
@@ -335,7 +335,7 @@ procedure ResetFPU;
                                         /// <summary>Returns  the fractional part of an TExtendedX87 80-bit floating point value </summary>
                                         /// <param name="X: TExtendedX87">Input value</param>
                                         /// <returns> TExtendedX87 value</returns>
-                                        function frac(const X: TExtendedX87): TExtendedX87;
+                                        function Frac(const X: TExtendedX87): TExtendedX87;
 
                                         /// <summary>Returns e^X (i.e., the base of natural logarithms, e, raised to the power X </summary>
                                         /// <param name="X: TExtendedX87">Power to which e shall be raised</param>
@@ -373,7 +373,7 @@ procedure ResetFPU;
                                         { ***** TExtendedX87 ***** }
 
 {$IFDEF WIN64}
-                                        class operator TExtendedX87.Implicit(D: double): TExtendedX87;
+                                        class operator TExtendedX87.Implicit(D: Double): TExtendedX87;
                                         // Win64: @SELF in RCX, D in XMM1
                                         asm
                                         movsd [rsp+08h], D                 ;// xmm1
@@ -563,7 +563,7 @@ procedure ResetFPU;
                                         emms
                                         end;
 
-                                        function IsST0Valid: boolean;
+                                        function IsST0Valid: Boolean;
                                         asm
                                         fxam                           ;// Examine ST(0) state
                                         fstsw ax                       ;// Get FPU Status Word in AX
@@ -668,7 +668,7 @@ procedure ResetFPU;
                                         {$ENDIF}
                                         end;
 
-                                        function Ext2Dbl(Const Ext87: TExtendedX87): double;
+                                        function Ext2Dbl(Const Ext87: TExtendedX87): Double;
                                         asm
                                         fld tbyte ptr [Ext87]
                                         {$IFDEF Win64}
@@ -682,7 +682,7 @@ procedure ResetFPU;
                                         {$ENDIF}
                                         end;
 
-                                        function Ext2Sgl(const Ext87: TExtendedX87): single;
+                                        function Ext2Sgl(const Ext87: TExtendedX87): Single;
                                         asm
                                         fld tbyte ptr [Ext87]
                                         {$IFDEF Win64}
@@ -696,7 +696,7 @@ procedure ResetFPU;
                                         {$ENDIF}
                                         end;
 
-                                        function Sgl2Ext(const Sgl: single): TExtendedX87;
+                                        function Sgl2Ext(const Sgl: Single): TExtendedX87;
                                         asm
                                         {$IFDEF Win64}
                                         movss [rsp+08h], xmm1
@@ -711,7 +711,7 @@ procedure ResetFPU;
                                         {$ENDIF}
                                         end;
 
-                                        function Dbl2Ext(const Dbl: double): TExtendedX87;
+                                        function Dbl2Ext(const Dbl: Double): TExtendedX87;
                                         asm
                                         {$IFDEF Win64}
                                         movsd [rsp+08h], xmm1
@@ -806,7 +806,7 @@ procedure ResetFPU;
                                         {$ENDIF}
                                         end;
 
-                                        function frac(const X: TExtendedX87): TExtendedX87;
+                                        function Frac(const X: TExtendedX87): TExtendedX87;
                                         var
                                         SaveCW, ScratchCW: word;
                                         asm

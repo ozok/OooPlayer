@@ -350,7 +350,8 @@ type
   IWMHeaderInfo2 = interface(IWMHeaderInfo)
     ['{15CF9781-454E-482e-B393-85FAE487A810}']
     function GetCodecInfoCount(out pcCodecInfos: LongWord): HRESULT; stdcall;
-    function GetCodecInfo(wIndex: LongWord; var pcchName: Word; pwszName: PWideChar; var pcchDescription: Word; pwszDescription: PWideChar; out pCodecType: WMT_CODEC_INFO_TYPE; var pcbCodecInfo: Word; pbCodecInfo: PBYTE): HRESULT; stdcall;
+    function GetCodecInfo(wIndex: LongWord; var pcchName: Word; pwszName: PWideChar; var pcchDescription: Word; pwszDescription: PWideChar; out pCodecType: WMT_CODEC_INFO_TYPE; var pcbCodecInfo: Word;
+      pbCodecInfo: PBYTE): HRESULT; stdcall;
   end;
 
 type
@@ -358,7 +359,8 @@ type
     ['{15CC68E3-27CC-4ecd-B222-3F5D02D80BD5}']
     function GetAttributeCountEx(wStreamNum: Word; out pcAttributes: Word): HRESULT; stdcall;
     function GetAttributeIndices(wStreamNum: Word; pwszName: PWideChar; pwLangIndex: PWORD; pwIndices: PWORD; var pwCount: Word): HRESULT; stdcall;
-    function GetAttributeByIndexEx(wStreamNum: Word; wIndex: Word; pwszName: PWideChar; var pwNameLen: Word; out pType: TWMTAttrDataType; out pwLangIndex: Word; pValue: PBYTE; var pdwDataLength: LongWord): HRESULT; stdcall;
+    function GetAttributeByIndexEx(wStreamNum: Word; wIndex: Word; pwszName: PWideChar; var pwNameLen: Word; out pType: TWMTAttrDataType; out pwLangIndex: Word; pValue: PBYTE;
+      var pdwDataLength: LongWord): HRESULT; stdcall;
     function ModifyAttribute(wStreamNum: Word; wIndex: Word; Type_: TWMTAttrDataType; wLangIndex: Word; pValue: PBYTE; dwLength: LongWord): HRESULT; stdcall;
     function AddAttribute(wStreamNum: Word; pszName: PWideChar; out pwIndex: Word; Type_: TWMTAttrDataType; wLangIndex: Word; pValue: PBYTE; dwLength: LongWord): HRESULT; stdcall;
     function DeleteAttribute(wStreamNum, wIndex: Word): HRESULT; stdcall;
@@ -473,7 +475,7 @@ type
 
   PCardinal = ^Cardinal;
 
-function DurationToStr(Duration: int64; ShowMs: boolean): string;
+function DurationToStr(Duration: int64; ShowMs: Boolean): string;
 
 function WMATagErrorCode2String(ErrorCode: Integer): String;
 
@@ -910,7 +912,7 @@ function TWMATag.GetCoverArtFromFrame(Index: Integer; var PictureStream: TStream
 var
   PictureDataLength: DWord;
   Data: Byte;
-  DataWord: WORD;
+  DataWord: Word;
 begin
   Result := False;
   MIMEType := '';
@@ -961,7 +963,7 @@ function TWMATag.GetCoverArtInfo(Index: Integer; var MIMEType: String; var Pictu
 var
   PictureDataLength: DWord;
   Data: Byte;
-  DataWord: WORD;
+  DataWord: Word;
 begin
   Result := False;
   MIMEType := '';
@@ -1215,19 +1217,19 @@ end;
 function TWMATag.GetAttribIndex(Attrib: string): Integer;
 var
   AttribName: PWideChar;
-  P, Lang: PWord;
+  P, Lang: PWORD;
   AttribLen: Word;
 begin
   Result := -1;
   AttribName := StringToOleStr(Attrib);
-  Lang := PWord(0);
+  Lang := PWORD(0);
   ppHeaderInfo3.GetAttributeIndices($FFFF, AttribName, Lang, nil, AttribLen);
   if AttribLen <> 0 then
   begin
     P := AllocMem(AttribLen);
     try
       ppHeaderInfo3.GetAttributeIndices($FFFF, AttribName, Lang, P, AttribLen);
-      Result := PWord(P)^;
+      Result := PWORD(P)^;
     finally
       FreeMem(P);
     end;
@@ -1248,14 +1250,14 @@ function TWMATag.LoadTags(FileName: String): Integer;
 var
   AttributeCount: Word;
   pType: TWMTAttrDataType;
-  pValue: PByte;
+  pValue: PBYTE;
   I: Integer;
   HR: HRESULT;
   wIndex: Word;
   pwszName: PWideChar;
   pwNameLen: Word;
   pwLangIndex: Word;
-  pdwDataLength: DWORD;
+  pdwDataLength: DWord;
 begin
   if DllHandleWMVCORE = 0 then
   begin
@@ -1306,17 +1308,17 @@ begin
       pdwDataLength := 0;
       ppHeaderInfo3.GetAttributeByIndexEx(65535, wIndex, nil, pwNameLen, pType, pwLangIndex, nil, pdwDataLength);
       pwszName := AllocMem(pwNameLen * 2);
-      PValue := AllocMem(pdwDataLength);
+      pValue := AllocMem(pdwDataLength);
       ppHeaderInfo3.GetAttributeByIndexEx(65535, wIndex, pwszName, pwNameLen, pType, pwLangIndex, pValue, pdwDataLength);
       // * 3delite
-      if PValue = nil then
+      if pValue = nil then
       begin
         Continue;
       end;
       with AddFrame(pwszName) do
       begin
         Format := pType;
-        Stream.Write(Pointer(PValue)^, pdwDataLength);
+        Stream.Write(Pointer(pValue)^, pdwDataLength);
         Stream.Seek(0, soBeginning);
         {
           if pwszName = 'WM/Picture' then begin
@@ -1325,7 +1327,7 @@ begin
         }
       end;
       FreeMem(pwszName);
-      FreeMem(PValue);
+      FreeMem(pValue);
     end;
     Result := WMATAGLIBRARY_SUCCESS;
     ppHeaderInfo3 := nil;
@@ -1441,9 +1443,9 @@ begin
               end;
               end else begin
             }
-            if nlength <> 0 then
+            if nLength <> 0 then
             begin
-              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_DWORD, 0, PByte(pValue), nLength);
+              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_DWORD, 0, PBYTE(pValue), nLength);
             end;
             // end;
           end;
@@ -1460,9 +1462,9 @@ begin
               end;
               end else begin
             }
-            if nlength <> 0 then
+            if nLength <> 0 then
             begin
-              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_STRING, 0, PByte(pValue), nLength);
+              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_STRING, 0, PBYTE(pValue), nLength);
             end;
             // end;
           end;
@@ -1479,9 +1481,9 @@ begin
               end;
               end else begin
             }
-            if nlength <> 0 then
+            if nLength <> 0 then
             begin
-              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_BINARY, 0, PByte(pValue), nLength);
+              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_BINARY, 0, PBYTE(pValue), nLength);
             end;
             // end;
           end;
@@ -1498,9 +1500,9 @@ begin
               end;
               end else begin
             }
-            if nlength <> 0 then
+            if nLength <> 0 then
             begin
-              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_BOOL, 0, PByte(pValue), nLength);
+              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_BOOL, 0, PBYTE(pValue), nLength);
             end;
             // end;
           end;
@@ -1517,9 +1519,9 @@ begin
               end;
               end else begin
             }
-            if nlength <> 0 then
+            if nLength <> 0 then
             begin
-              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_QWORD, 0, PByte(pValue), nLength);
+              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_QWORD, 0, PBYTE(pValue), nLength);
             end;
             // end;
           end;
@@ -1536,9 +1538,9 @@ begin
               end;
               end else begin
             }
-            if nlength <> 0 then
+            if nLength <> 0 then
             begin
-              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_WORD, 0, PByte(pValue), nLength);
+              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_WORD, 0, PBYTE(pValue), nLength);
             end;
             // end;
           end;
@@ -1555,9 +1557,9 @@ begin
               end;
               end else begin
             }
-            if nlength <> 0 then
+            if nLength <> 0 then
             begin
-              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_GUID, 0, PByte(pValue), nLength);
+              ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_GUID, 0, PBYTE(pValue), nLength);
             end;
             // end;
           end;
@@ -1581,7 +1583,7 @@ begin
       begin
         if (pValue <> '') AND (nLength > 0) then
         begin
-          ppHeaderInfo3.ModifyAttribute(0, nIndex, WMT_TYPE_BINARY, 0, PByte(pValue), nLength)
+          ppHeaderInfo3.ModifyAttribute(0, nIndex, WMT_TYPE_BINARY, 0, PBYTE(pValue), nLength)
         end
         else
         begin
@@ -1590,9 +1592,9 @@ begin
       end
       else
       begin
-        if nlength <> 0 then
+        if nLength <> 0 then
         begin
-          ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_BINARY, 0, PByte(pValue), nLength);
+          ppHeaderInfo3.AddAttribute(0, AttribName, pwIndex, WMT_TYPE_BINARY, 0, PBYTE(pValue), nLength);
         end;
       end;
     end;
@@ -1788,9 +1790,9 @@ begin
   end;
 end;
 
-function DurationToStr(Duration: int64; ShowMs: boolean): String;
+function DurationToStr(Duration: int64; ShowMs: Boolean): String;
 begin
-  if ShowMS then
+  if ShowMs then
   begin
     if Duration >= 3600000 then
       Result := Format('%d:%2.2d:%2.2d.%3.3d', [Duration div 3600000, (Duration mod 3600000) div 60000, (Duration mod 60000) div 1000, Duration mod 1000])

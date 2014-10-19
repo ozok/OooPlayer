@@ -2,8 +2,8 @@ object InfoForm: TInfoForm
   Left = 0
   Top = 0
   Caption = 'File Info'
-  ClientHeight = 415
-  ClientWidth = 524
+  ClientHeight = 562
+  ClientWidth = 784
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -16,30 +16,30 @@ object InfoForm: TInfoForm
   OnClose = FormClose
   OnShow = FormShow
   DesignSize = (
-    524
-    415)
+    784
+    562)
   PixelsPerInch = 96
   TextHeight = 13
   object PageControl1: TPageControl
     Left = 8
     Top = 8
-    Width = 506
-    Height = 370
+    Width = 766
+    Height = 517
     ActivePage = TabSheet2
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
+    ExplicitWidth = 506
+    ExplicitHeight = 370
     object TabSheet2: TTabSheet
       Caption = 'Details'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 498
+      ExplicitHeight = 342
       object InfoList: TTreeView
         Left = 0
         Top = 0
-        Width = 498
-        Height = 342
+        Width = 758
+        Height = 489
         Align = alClient
         BorderStyle = bsNone
         HideSelection = False
@@ -47,17 +47,21 @@ object InfoForm: TInfoForm
         ReadOnly = True
         RowSelect = True
         TabOrder = 0
+        ExplicitWidth = 498
+        ExplicitHeight = 342
       end
     end
   end
   object Button1: TButton
-    Left = 439
-    Top = 384
+    Left = 699
+    Top = 531
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'Close'
     TabOrder = 1
     OnClick = Button1Click
+    ExplicitLeft = 439
+    ExplicitTop = 384
   end
 end

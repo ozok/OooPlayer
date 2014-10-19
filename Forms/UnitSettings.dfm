@@ -43,6 +43,15 @@ object SettingsForm: TSettingsForm
         Caption = 'Check updates on start'
         TabOrder = 0
       end
+      object Button2: TButton
+        Left = 151
+        Top = 12
+        Width = 75
+        Height = 25
+        Caption = 'Check now'
+        TabOrder = 1
+        OnClick = Button2Click
+      end
     end
     object TabSheet2: TTabSheet
       Caption = 'Playback'
@@ -169,5 +178,25 @@ object SettingsForm: TSettingsForm
     Caption = 'OK'
     TabOrder = 1
     OnClick = Button1Click
+  end
+  object UpdateChecker: TJvHttpUrlGrabber
+    FileName = 'output.txt'
+    OutputMode = omStream
+    Agent = 'JEDI-VCL'
+    Port = 0
+    ProxyAddresses = 'proxyserver'
+    ProxyIgnoreList = '<local>'
+    OnDoneStream = UpdateCheckerDoneStream
+    Left = 84
+    Top = 86
+  end
+  object UpdateThread: TJvThread
+    Exclusive = True
+    MaxCount = 0
+    RunOnCreate = True
+    FreeOnTerminate = True
+    OnExecute = UpdateThreadExecute
+    Left = 164
+    Top = 86
   end
 end

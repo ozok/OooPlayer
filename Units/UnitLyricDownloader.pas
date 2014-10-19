@@ -88,7 +88,7 @@ begin
     OnDoneStream := DoneStream;
     OnError := Error;
     OutputMode := omStream;
-    Agent := '';
+    Agent := 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:32.0) Gecko/20100101 Firefox/32.0';
   end;
 
   FLyricFolder := LyricFolder;
@@ -131,6 +131,11 @@ begin
     except
 
     end;
+    try
+      FThread.Synchronize(EnableUIControls);
+    except
+
+    end;
     if SettingsForm.LogLyricFailBtn.Checked then
     begin
       FLogLine := 'Failed to download lyric from ' + FPageDownloader.Url;
@@ -145,7 +150,7 @@ begin
   else
   begin
     LAddToLyricFile := False;
-    LSR := TStreamReader.Create(Stream);
+    LSR := TStreamReader.Create(Stream, True);
     try
       case FLyricSourceIndex of
         0: // az
@@ -377,7 +382,7 @@ begin
   try
     FThread.Start;
   except
-    on e: Exception do
+    on E: Exception do
     begin
       FStatus := lsDone;
     end;

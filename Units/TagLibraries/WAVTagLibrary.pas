@@ -86,19 +86,19 @@ type
 
   TWaveHeader = record
     ident1: TRIFFID; // Must be "RIFF"
-    len: DWORD; // Remaining length after this header
+    len: DWord; // Remaining length after this header
   end;
 
 type
   TWaveds64 = record
-    ds64Size: DWORD;
-    RIFFSizeLow: DWORD;
-    RIFFSizeHigh: DWORD;
-    DataSizeLow: DWORD;
-    DataSizeHigh: DWORD;
-    SampleCountLow: DWORD;
-    SampleCountHigh: DWORD;
-    TableLength: DWORD;
+    ds64Size: DWord;
+    RIFFSizeLow: DWord;
+    RIFFSizeHigh: DWord;
+    DataSizeLow: DWord;
+    DataSizeHigh: DWord;
+    SampleCountLow: DWord;
+    SampleCountHigh: DWord;
+    TableLength: DWord;
   end;
 
 type
@@ -137,14 +137,14 @@ type
 
   TAG_CART_TIMER = packed record
     Usage: TCART_TIMER_Usage;
-    Value: DWORD;
+    Value: DWord;
   end;
 
   TTAG_CART_TIMERS = Array [0 .. 7] of TAG_CART_TIMER;
 
   TCART_TIMER = packed record
     Usage: String;
-    Value: DWORD;
+    Value: DWord;
   end;
 
   TAG_CART = packed record
@@ -163,7 +163,7 @@ type
     ProducerAppID: Array [0 .. 63] of Byte;
     ProducerAppVersion: Array [0 .. 63] of Byte;
     UserDef: Array [0 .. 63] of Byte;
-    dwLevelReference: DWORD;
+    dwLevelReference: DWord;
     PostTimer: TTAG_CART_TIMERS;
     Reserved: Array [0 .. 275] of Byte;
     URL: Array [0 .. 1023] of Byte;
@@ -250,7 +250,7 @@ type
     function GetProducerAppID: String;
     function GetProducerAppVersion: String;
     function GetUserDef: String;
-    function GetLevelReference: DWORD;
+    function GetLevelReference: DWord;
     function _GetPostTimer: TTAG_CART_TIMERS;
     function GetReserved: String;
     function GetURL: String;
@@ -270,7 +270,7 @@ type
     procedure SetProducerAppID(Value: String);
     procedure SetProducerAppVersion(Value: String);
     procedure SetUserDef(Value: String);
-    procedure SetLevelReference(Value: DWORD);
+    procedure SetLevelReference(Value: DWord);
     procedure _SetPostTimer(Value: TTAG_CART_TIMERS);
     procedure SetReserved(Value: String);
     procedure SetURL(Value: String);
@@ -299,7 +299,7 @@ type
     property ProducerAppID: String read GetProducerAppID write SetProducerAppID;
     property ProducerAppVersion: String read GetProducerAppVersion write SetProducerAppVersion;
     property UserDef: String read GetUserDef write SetUserDef;
-    property LevelReference: DWORD read GetLevelReference write SetLevelReference;
+    property LevelReference: DWord read GetLevelReference write SetLevelReference;
     property PostTimer: TTAG_CART_TIMERS read _GetPostTimer write _SetPostTimer;
     property Reserved: String read GetReserved write SetReserved;
     property URL: String read GetURL write SetURL;
@@ -702,9 +702,9 @@ begin
         // * Set new RF64 size
         DestinationStream.Seek(StartPositionDestination + 20, soBeginning);
         Data := LowDWordOfInt64(TotalSize);
-        DestinationStream.write(Data, 4);
+        DestinationStream.Write(Data, 4);
         Data := HighDWordOfInt64(TotalSize);
-        DestinationStream.write(Data, 4);
+        DestinationStream.Write(Data, 4);
       end;
     end;
     DestinationStream.Seek(0, soEnd);
@@ -2421,7 +2421,7 @@ begin
   Result := BytesToString(@CARTChunk.EndTime[0], SizeOf(CARTChunk.EndTime));
 end;
 
-function TCART.GetLevelReference: DWORD;
+function TCART.GetLevelReference: DWord;
 begin
   Result := CARTChunk.dwLevelReference;
 end;
@@ -2549,7 +2549,7 @@ begin
   TBytesToBytes(Bytes, @CARTChunk.EndTime[0], SizeOf(CARTChunk.EndTime));
 end;
 
-procedure TCART.SetLevelReference(Value: DWORD);
+procedure TCART.SetLevelReference(Value: DWord);
 begin
   CARTChunk.dwLevelReference := Value;
 end;

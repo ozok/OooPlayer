@@ -1716,8 +1716,8 @@ begin
   try
     FillChar(Identification, SizeOf(Identification), 0);
     TagStream.Read(Identification[1], 8);
-    if (Identification[1] = APEv2ID[1]) AND (Identification[2] = APEv2ID[2]) AND (Identification[3] = APEv2ID[3]) AND (Identification[4] = APEv2ID[4]) AND (Identification[5] = APEv2ID[5]) AND (Identification[6] = APEv2ID[6]) AND
-      (Identification[7] = APEv2ID[7]) AND (Identification[8] = APEv2ID[8]) then
+    if (Identification[1] = APEv2ID[1]) AND (Identification[2] = APEv2ID[2]) AND (Identification[3] = APEv2ID[3]) AND (Identification[4] = APEv2ID[4]) AND (Identification[5] = APEv2ID[5]) AND
+      (Identification[6] = APEv2ID[6]) AND (Identification[7] = APEv2ID[7]) AND (Identification[8] = APEv2ID[8]) then
     begin
       Result := True;
     end;

@@ -92,7 +92,7 @@ implementation
 uses UnitMain, UnitSettings, UnitLog;
 
 // procedure SyncProc(hSync: Thandle; hChan: THandle; NotUsed: DWord; MyObject: DWord); stdcall;
-procedure SyncProc(hSync: Thandle; hChan: HSTREAM; NotUsed: DWord; MyObject: DWord); stdcall;
+procedure SyncProc(hSync: Thandle; hChan: HSTREAM; NotUsed: DWORD; MyObject: DWORD); stdcall;
 var
   LRndIndex: integer;
 begin
@@ -171,6 +171,8 @@ begin
             ArtistLabel.Caption := '';
             AlbumLabel.Caption := '';
             PlaybackInfoLabel.Caption := '';
+            if MainForm.Enabled and MainForm.Visible then
+              MainForm.FocusControl(VolumeBar);
           end;
         end;
       1: // random
@@ -498,7 +500,7 @@ procedure TMusicPlayer.Resume;
 begin
   if GetMixerPlayStatus = psPaused then
   begin
-    if Bass_ChannelPlay(FMixHandle, False) then
+    if BASS_ChannelPlay(FMixHandle, False) then
       FPlayerStatus := psPlaying;
   end;
 end;

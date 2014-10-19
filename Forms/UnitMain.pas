@@ -24,17 +24,14 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
-  Vcl.ExtCtrls, Generics.Collections, Vcl.Menus, JvExControls,
-  JvArrowButton, JvComponentBase, JvSearchFiles, JvBaseDlg, JvBrowseFolder,
-  MediaInfoDll, JvExComCtrls, JvComCtrls, Vcl.ImgList, JvThreadTimer,
-  windows7taskbar,
-  JvExStdCtrls, JvListBox, IniFiles, Vcl.Buttons, JvFormPlacement, JvAppStorage,
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
+  Vcl.ExtCtrls, Generics.Collections, Vcl.Menus, JvExControls, JvArrowButton, JvComponentBase,
+  JvSearchFiles, JvBaseDlg, JvBrowseFolder, MediaInfoDll, JvExComCtrls, JvComCtrls, Vcl.ImgList,
+  JvThreadTimer, windows7taskbar, JvExStdCtrls, JvListBox, IniFiles, Vcl.Buttons, JvFormPlacement, JvAppStorage,
   JvAppIniStorage, StrUtils, ShellAPI, JvComputerInfoEx, UnitTagTypes, UnitTagReader, PNGImage, JvDragDrop,
   JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon, Jpeg, UnitMusicPlayer, Bass, BASSenc,
   IdBaseComponent, IdThreadComponent, UnitLyricDownloader, UnitTagWriter,
-  JvAnimatedImage, JvGIFCtrl;
+  JvAnimatedImage, JvGIFCtrl, UnitImageResize, madExceptVcl;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -192,6 +189,10 @@ type
     LyricList: TMemo;
     RadioConnectionImg: TJvGIFAnimator;
     VolumeBar: TJvTrackBar;
+    ImageList1: TImageList;
+    SettingsBtn: TButton;
+    Button1: TButton;
+    SearchBtn: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -235,7 +236,7 @@ type
     procedure C2Click(Sender: TObject);
     procedure E3Click(Sender: TObject);
     procedure A1Click(Sender: TObject);
-    procedure UpdateCheckerDoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string);
+    procedure UpdateCheckerDoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; URL: string);
     procedure UpdateThreadExecute(Sender: TObject; Params: Pointer);
     procedure A3Click(Sender: TObject);
     procedure S4Click(Sender: TObject);
@@ -391,7 +392,7 @@ var
   FRadioRecordingInfo: TRadioRecordInfo;
 
 const
-  BuildInt = 1570;
+  BuildInt = 1748;
   Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
@@ -405,7 +406,6 @@ const
   STOP_IMG_ANIM = 10;
   DOWNLOAD_LYRIC = 11;
   START_RECORDING = 12;
-  ADD_TO_LOG = 13;
 
 implementation
 
@@ -415,15 +415,15 @@ uses UnitSearch, UnitSettings, UnitFileInfo, UnitLog, UnitAbout, UnitRadioInfo,
   UnitNewRadio, UnitRadioRecordOptions;
 
 // radio sync func
-procedure StatusProc(buffer: Pointer; len: DWORD; user: Pointer); stdcall;
+procedure StatusProc(Buffer: Pointer; len: DWORD; user: Pointer); stdcall;
 var
   LFS: TFileStream;
 begin
-  if (buffer <> nil) and (len = 0) then
+  if (Buffer <> nil) and (len = 0) then
   begin
-    SendMessage(WinHandle, WM_INFO_UPDATE, STATUS_UPDATE, DWORD(PAnsiChar(buffer)));
+    SendMessage(WinHandle, WM_INFO_UPDATE, STATUS_UPDATE, DWORD(PAnsiChar(Buffer)));
   end
-  else if (buffer <> nil) and (len > 0) and FRecordingRadio then
+  else if (Buffer <> nil) and (len > 0) and FRecordingRadio then
   begin
     if Length(FRadioRecordingInfo.FileName) > 0 then
     begin
@@ -437,7 +437,7 @@ begin
       end;
       try
         LFS.Seek(0, soEnd);
-        LFS.Write(buffer^, len);
+        LFS.Write(Buffer^, len);
       finally
         LFS.Free;
       end;
@@ -454,11 +454,11 @@ begin
   meta := BASS_ChannelGetTags(FRadioHandle, BASS_TAG_META);
   if (meta <> nil) then
   begin
-    p := Pos('StreamTitle=', String(AnsiString(meta)));
+    p := Pos('StreamTitle=', String(Ansistring(meta)));
     if (p = 0) then
       Exit;
     p := p + 13;
-    SendMessage(WinHandle, WM_INFO_UPDATE, UPDATE_META, DWORD(PAnsiChar(AnsiString(Copy(meta, p, Pos(';', String(meta)) - p - 1)))));
+    SendMessage(WinHandle, WM_INFO_UPDATE, UPDATE_META, DWORD(PAnsiChar(Ansistring(Copy(meta, p, Pos(';', String(meta)) - p - 1)))));
   end;
 end;
 
@@ -837,7 +837,7 @@ procedure TMainForm.RadioRecordOutputFolderBtnClick(Sender: TObject);
 begin
   if DirectoryExists(RadioRecordOptionsForm.RecordSaveEdit.Text) then
   begin
-    ShellExecute(Handle, 'open', 'explorer', PChar(RadioRecordOptionsForm.RecordSaveEdit.Text), nil, SW_SHOWNORMAL);
+    ShellExecute(handle, 'open', 'explorer', PChar(RadioRecordOptionsForm.RecordSaveEdit.Text), nil, SW_SHOWNORMAL);
   end;
 end;
 
@@ -850,6 +850,8 @@ begin
   begin
     FPlayListItems[i].Free;
   end;
+  FQueuedItems.Clear;
+  QueueList.Items.Clear;
   FPlayListItems.Clear;
   PlayList.Items.Count := 0;
   FCurrentItemInfo.ItemIndex := -1;
@@ -862,7 +864,7 @@ end;
 
 procedure TMainForm.C2Click(Sender: TObject);
 begin
-  ShellExecute(Handle, 'open', PWideChar(ExtractFileDir(Application.ExeName) + '\changelog.txt'), nil, nil, SW_SHOWNORMAL);
+  ShellExecute(handle, 'open', PWideChar(ExtractFileDir(Application.ExeName) + '\changelog.txt'), nil, nil, SW_SHOWNORMAL);
 end;
 
 function TMainForm.CreateLyricFileName(const Title, Artist, Album: string): string;
@@ -1060,8 +1062,9 @@ begin
         end
         else
         begin
-          if (Extension = '.mp3') or (Extension = '.aac') or (Extension = '.ogg') or (Extension = '.opus') or (Extension = '.flac') or (Extension = '.alac') or (Extension = '.ape') or (Extension = '.mpc') or (Extension = '.tta') or
-            (Extension = '.wv') or (Extension = '.wma') or (Extension = '.ac3') or (Extension = '.spx') or (Extension = '.tak') or (Extension = '.ofr') or (Extension = '.wav') then
+          if (Extension = '.mp3') or (Extension = '.aac') or (Extension = '.ogg') or (Extension = '.opus') or (Extension = '.flac') or (Extension = '.alac') or (Extension = '.ape') or
+            (Extension = '.mpc') or (Extension = '.tta') or (Extension = '.wv') or (Extension = '.wma') or (Extension = '.ac3') or (Extension = '.spx') or (Extension = '.tak') or
+            (Extension = '.ofr') or (Extension = '.wav') then
           begin
             AddFile(Value[i]);
             FLastDir := ExtractFileDir(Value[i]);
@@ -1109,7 +1112,7 @@ var
 begin
   mailbody := AboutForm.Label1.Caption;
   mailbody := mailbody + NewLine + 'Bugs: ' + NewLine + NewLine + NewLine + 'Suggestions: ' + NewLine + NewLine + NewLine;
-  mail := PwideChar('mailto:ozok26@gmail.com?subject=OooPlayer&body=' + mailbody);
+  mail := PWideChar('mailto:ozok26@gmail.com?subject=OooPlayer&body=' + mailbody);
 
   ShellExecute(0, 'open', mail, nil, nil, SW_SHOWNORMAL);
 end;
@@ -1134,7 +1137,7 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
-  FPlayer := TMusicPlayer.Create(Handle);
+  FPlayer := TMusicPlayer.Create(handle);
   case FPlayer.ErrorMsg of
     MY_ERROR_BASS_NOT_LOADED:
       begin
@@ -1186,7 +1189,7 @@ begin
   // radio playe config
   BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1);
   BASS_SetConfig(BASS_CONFIG_NET_PREBUF, 0);
-  WinHandle := Handle;
+  WinHandle := handle;
 
   if Portable then
   begin
@@ -1476,7 +1479,7 @@ begin
       begin
         Application.ProcessMessages;
         LLine := Trim(LStreamReader.ReadLine);
-        if copy(LLine, 1, 1) <> '#' then
+        if Copy(LLine, 1, 1) <> '#' then
         begin
           AddFile(LLine);
         end;
@@ -1494,7 +1497,7 @@ begin
   begin
     CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
   end
-  else if PicType = TCoverArtType.jpeg then
+  else if PicType = TCoverArtType.Jpeg then
   begin
     try
       FJpeg.LoadFromStream(Stream);
@@ -1703,7 +1706,7 @@ begin
       FuncPages.ActivePageIndex := ReadInteger('general', 'func', 0);
       FCurrentRadioIndex := ReadInteger('radio', 'curr', -1);
       QueueList.Height := ReadInteger('ui', 'queueh', 120);
-      RadioRecordFormatList.ItemIndex := ReadInteger('radio', 'recformat2', 4);
+      RadioRecordFormatList.ItemIndex := ReadInteger('radio', 'recformat2', 0);
       RadioRecordModeList.ItemIndex := ReadInteger('radio', 'recmethod', 0);
       LyricSourceList.ItemIndex := ReadInteger('lyric', 'source2', 1);
       SearchForm.chkCloseOnPlayBtn.Checked := ReadBool('search', 'close', True);
@@ -1741,7 +1744,6 @@ begin
         if SettingsForm.LyricBtn.Checked then
         begin
           FLyricDownloader.Stop;
-          // todo: disable lyric download when no
           if FPlayListItems.Count < 1 then
             Exit;
 
@@ -1769,6 +1771,8 @@ begin
         if SettingsForm.LyricBtn.Checked then
         begin
           FLyricDownloader.Stop;
+          if FPlayListItems.Count < 1 then
+            Exit;
           FLyricDownloader.SongTitle := LyricTitleEdit.Text;
           FLyricDownloader.Artist := LyricArtistEdit.Text;
           FLyricDownloader.Album := 'Radio';
@@ -1947,7 +1951,7 @@ begin
 
     if DirectoryExists(FileDir) then
     begin
-      ShellExecute(Handle, 'open', 'explorer', PChar(' /n,/select, ' + '"' + FPlayListItems[index].FullFileName + '"'), nil, SW_SHOWNORMAL);
+      ShellExecute(handle, 'open', 'explorer', PChar(' /n,/select, ' + '"' + FPlayListItems[index].FullFileName + '"'), nil, SW_SHOWNORMAL);
     end;
   end;
 end;
@@ -1976,7 +1980,7 @@ begin
     begin
       FPlayer.Pause;
       PositionTimer.Enabled := False;
-      SetProgressState(Handle, tbpsPaused);
+      SetProgressState(handle, tbpsPaused);
       PlaybackInfoLabel.Caption := 'Paused | ' + FCurrentItemInfo.StatusInfoText;
     end
     else if FPlayer.PlayerStatus = psPaused then
@@ -1984,7 +1988,7 @@ begin
       FPlayer.Resume;
       FPlayer.SetVolume(100 - VolumeBar.Position);
       PositionTimer.Enabled := True;
-      SetProgressState(Handle, tbpsNormal);
+      SetProgressState(handle, tbpsNormal);
       PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
     end;
   end
@@ -2045,7 +2049,7 @@ begin
           FPlayer.Pause;
           FPlayer.SetVolume(100 - VolumeBar.Position);
           PositionTimer.Enabled := True;
-          SetProgressState(Handle, tbpsNormal);
+          SetProgressState(handle, tbpsNormal);
           PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
         end
         else
@@ -2151,7 +2155,7 @@ begin
         begin
           // resume
           ResumeRadio;
-          SetProgressState(Handle, tbpsNormal);
+          SetProgressState(handle, tbpsNormal);
         end
         else
         begin
@@ -2253,8 +2257,8 @@ begin
       begin
         LPlayCountStr := FloatToStr(FPlayListItems[FCurrentItemInfo.ItemIndex].PlayCount) + ' times'
       end;
-      FCurrentItemInfo.StatusInfoText := FPlayListItems[FCurrentItemInfo.ItemIndex].Bitrate + ' | ' + FPlayListItems[FCurrentItemInfo.ItemIndex].Channels + ' | ' + FPlayListItems[FCurrentItemInfo.ItemIndex].Codec + ' | ' +
-        FPlayListItems[FCurrentItemInfo.ItemIndex].SampleRate + ' Hz | ' + LPlayCountStr;
+      FCurrentItemInfo.StatusInfoText := FPlayListItems[FCurrentItemInfo.ItemIndex].Bitrate + ' | ' + FPlayListItems[FCurrentItemInfo.ItemIndex].Channels + ' | ' +
+        FPlayListItems[FCurrentItemInfo.ItemIndex].Codec + ' | ' + FPlayListItems[FCurrentItemInfo.ItemIndex].SampleRate + ' Hz | ' + LPlayCountStr;
       PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
       PositionBar.Position := 0;
       FPlayer.SetVolume(100 - VolumeBar.Position);
@@ -2264,7 +2268,7 @@ begin
 
       PlayList.ItemIndex := -1;
       PlayList.ItemIndex := FCurrentItemInfo.ItemIndex;
-      SetProgressState(Handle, tbpsNormal);
+      SetProgressState(handle, tbpsNormal);
       PlayList.Refresh;
       with FPlayListItems[FCurrentItemInfo.ItemIndex] do
       begin
@@ -2304,10 +2308,12 @@ begin
       LyricSourceList.Enabled := False;
       if SettingsForm.LyricBtn.Checked then
       begin
-        if FileExists(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlayListItems[FCurrentItemInfo.ItemIndex].Title, FPlayListItems[FCurrentItemInfo.ItemIndex].Artist, FPlayListItems[FCurrentItemInfo.ItemIndex].Album)) then
+        if FileExists(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlayListItems[FCurrentItemInfo.ItemIndex].Title, FPlayListItems[FCurrentItemInfo.ItemIndex].Artist,
+          FPlayListItems[FCurrentItemInfo.ItemIndex].Album)) then
         begin
           LyricList.Lines.Clear;
-          LyricList.Lines.LoadFromFile(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlayListItems[FCurrentItemInfo.ItemIndex].Title, FPlayListItems[FCurrentItemInfo.ItemIndex].Artist, FPlayListItems[FCurrentItemInfo.ItemIndex].Album));
+          LyricList.Lines.LoadFromFile(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlayListItems[FCurrentItemInfo.ItemIndex].Title, FPlayListItems[FCurrentItemInfo.ItemIndex].Artist,
+            FPlayListItems[FCurrentItemInfo.ItemIndex].Album));
           LyricStatusLabel.Caption := 'Loaded local lyric file';
           LyricSearchBtn.Enabled := True;
           LyricArtistEdit.Enabled := True;
@@ -2317,6 +2323,8 @@ begin
         else
         begin
           FLyricDownloader.Stop;
+          if FPlayListItems.Count < 1 then
+            Exit;
           FLyricDownloader.SongTitle := FPlayListItems[FCurrentItemInfo.ItemIndex].Title;
           FLyricDownloader.Artist := FPlayListItems[FCurrentItemInfo.ItemIndex].Artist;
           FLyricDownloader.Album := FPlayListItems[FCurrentItemInfo.ItemIndex].Album;
@@ -2488,7 +2496,7 @@ begin
   ArtistLabel.Caption := '';
   AlbumLabel.Caption := '';
   PlaybackInfoLabel.Caption := '';
-  SetProgressValue(Handle, 0, MaxInt);
+  SetProgressValue(handle, 0, MaxInt);
   PlayList.Invalidate;
   PositionTimer.Enabled := False;
   FPlaybackType := radio;
@@ -2552,7 +2560,7 @@ begin
           PositionBar.Position := FPlayer.Position;
         end;
       finally
-        sleep(100);
+        Sleep(100);
         PositionTimer.Enabled := True;
         FPlayer.Resume;
       end;
@@ -2576,7 +2584,7 @@ begin
     if LPosition > PositionBar.Position then
     begin
       PositionBar.Position := LPosition;
-      SetProgressValue(Handle, LPosition, MaxInt);
+      SetProgressValue(handle, LPosition, MaxInt);
       PositionLabel.Caption := FPlayer.PositionStr + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt - FPlayer.PositionAsSec) + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt);
     end;
   end
@@ -2782,7 +2790,7 @@ begin
       ReloadRadioCategory;
       if RadioList.Items.Count > 0 then
       begin
-        if (FCurrentRadioIndex < radioList.Items.Count) and (FCurrentRadioIndex > -1) then
+        if (FCurrentRadioIndex < RadioList.Items.Count) and (FCurrentRadioIndex > -1) then
         begin
           RadioList.Items[FCurrentRadioIndex].MakeVisible(False);
         end;
@@ -2899,7 +2907,7 @@ begin
       LLen := BASS_StreamGetFilePosition(FRadioHandle, BASS_FILEPOS_END);
       if (LLen = DW_Error) then
       begin
-        break;
+        Break;
       end;
       LCacheProgress := (BASS_StreamGetFilePosition(FRadioHandle, BASS_FILEPOS_BUFFER) * 100) div LLen;
       // update ui
@@ -2913,7 +2921,6 @@ begin
       // try http if icy fails
       LMeta := BASS_ChannelGetTags(FRadioHandle, BASS_TAG_HTTP);
       SendMessage(WinHandle, WM_INFO_UPDATE, UPDATE_META_NAME, DWORD(PAnsiChar(LMeta)));
-      SendMessage(WinHandle, WM_INFO_UPDATE, ADD_TO_LOG, DWORD(PAnsiChar('Http failed')));
     end;
     if (LMeta <> nil) then
     begin
@@ -2925,16 +2932,12 @@ begin
           SendMessage(WinHandle, WM_INFO_UPDATE, UPDATE_META_BITRATE, DWORD(PAnsiChar('Bitrate: ' + Copy(LMeta, 8, MaxInt))));
         LMeta := LMeta + Length(LMeta) + 1;
       end;
-    end
-    else
-    begin
-      SendMessage(WinHandle, WM_INFO_UPDATE, ADD_TO_LOG, DWORD(PAnsiChar('is nil')));
     end;
     // get the stream title and set sync for subsequent titles
     DoMeta();
     BASS_ChannelSetSync(FRadioHandle, BASS_SYNC_META, 0, @MetaSync, nil);
     // play it!
-    BASS_ChannelPlay(FRadioHandle, FALSE);
+    BASS_ChannelPlay(FRadioHandle, False);
     SetRadioVolume(100 - VolumeBar.Position);
     // re-paint radio list
     SendMessage(WinHandle, WM_INFO_UPDATE, REPAINT_RADIO_LIST, 0);
@@ -2955,7 +2958,7 @@ begin
   RecordRadioBtn.Enabled := False;
   StopRadioRecordBtn.Enabled := True;
   RadioRecordFormatList.Enabled := False;
-  RadioRecordModeList.Enabled := false;
+  RadioRecordModeList.Enabled := False;
 end;
 
 procedure TMainForm.RecordingEnableUI;
@@ -3209,7 +3212,8 @@ procedure TMainForm.S7Click(Sender: TObject);
 begin
   if PlayList.ItemIndex > -1 then
   begin
-    ShellExecute(Handle, 'open', PChar('http://www.youtube.com/results?search_query=' + FPlayListItems[PlayList.ItemIndex].Artist + '+' + FPlayListItems[PlayList.ItemIndex].Title), nil, nil, SW_SHOWNORMAL);
+    ShellExecute(handle, 'open', PChar('http://www.youtube.com/results?search_query=' + FPlayListItems[PlayList.ItemIndex].Artist + '+' + FPlayListItems[PlayList.ItemIndex].Title), nil, nil,
+      SW_SHOWNORMAL);
   end;
 end;
 
@@ -3217,8 +3221,8 @@ procedure TMainForm.S8Click(Sender: TObject);
 begin
   if PlayList.ItemIndex > -1 then
   begin
-    ShellExecute(Handle, 'open', PChar('https://www.google.com.tr/search?q=' + StringReplace(FPlayListItems[PlayList.ItemIndex].Artist, ' ', '+', [rfReplaceAll]) + '+' + StringReplace(FPlayListItems[PlayList.ItemIndex].Title, ' ', '+',
-      [rfReplaceAll])), nil, nil, SW_SHOWNORMAL);
+    ShellExecute(handle, 'open', PChar('https://www.google.com.tr/search?q=' + StringReplace(FPlayListItems[PlayList.ItemIndex].Artist, ' ', '+', [rfReplaceAll]) + '+' +
+      StringReplace(FPlayListItems[PlayList.ItemIndex].Title, ' ', '+', [rfReplaceAll])), nil, nil, SW_SHOWNORMAL);
   end;
 end;
 
@@ -3265,7 +3269,8 @@ begin
     begin
       with FPlayListItems[i] do
       begin
-        LStreamWriter.WriteLine(FullFileName + '|' + Artist + '|' + Album + '|' + Title + '|' + DurationStr + '|' + Bitrate + '|' + Channels + '|' + Codec + '|' + SampleRate + '|' + FloatToStr(PlayCount) + '|' + FloatToStr(Stars));
+        LStreamWriter.WriteLine(FullFileName + '|' + Artist + '|' + Album + '|' + Title + '|' + DurationStr + '|' + Bitrate + '|' + Channels + '|' + Codec + '|' + SampleRate + '|' +
+          FloatToStr(PlayCount) + '|' + FloatToStr(Stars));
       end;
     end;
   finally
@@ -3391,17 +3396,17 @@ begin
           LEncodeCMD := '';
           case RadioRecordFormatList.ItemIndex of
             0: // mp3
-              LEncodeCMD := PWideChar('"' + FLamePath + '" -r -s ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' --tt ' + LRadioInfo.Title + ' --ta ' + LRadioInfo.Artist + ' - -o ' +
-                LRadioInfo.FileName);
+              LEncodeCMD := PWideChar('"' + FLamePath + '" -r -s ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' --tt ' + LRadioInfo.Title + ' --ta ' +
+                LRadioInfo.Artist + ' - -o ' + LRadioInfo.FileName);
             1: // ogg
-              LEncodeCMD := PWideChar('"' + FOggEncPath + '" --ignorelength -r -R ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' -t ' + LRadioInfo.Title + ' -a ' + LRadioInfo.Artist + ' - -o ' +
-                LRadioInfo.FileName);
+              LEncodeCMD := PWideChar('"' + FOggEncPath + '" --ignorelength -r -R ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' -t ' + LRadioInfo.Title + ' -a '
+                + LRadioInfo.Artist + ' - -o ' + LRadioInfo.FileName);
             2: // opus
-              LEncodeCMD := PWideChar('"' + FOpusEncPath + '" --hard-cbr --bitrate ' + RadioRecordOptionsForm.BitrateList.Text + ' --title ' + LRadioInfo.Title + ' --artist ' + LRadioInfo.Artist + ' --raw --raw-rate ' +
-                FloatToStr(LChanInfo.freq) + ' - ' + LRadioInfo.FileName);
+              LEncodeCMD := PWideChar('"' + FOpusEncPath + '" --hard-cbr --bitrate ' + RadioRecordOptionsForm.BitrateList.Text + ' --title ' + LRadioInfo.Title + ' --artist ' + LRadioInfo.Artist +
+                ' --raw --raw-rate ' + FloatToStr(LChanInfo.freq) + ' - ' + LRadioInfo.FileName);
             3: // aac
-              LEncodeCMD := PWideChar('"' + FFDKPath + '" -m 0 -b ' + RadioRecordOptionsForm.BitrateList.Text + ' --title ' + LRadioInfo.Title + ' --artist ' + LRadioInfo.Artist + ' --moov-before-mdat --ignorelength -R --raw-rate ' +
-                FloatToStr(LChanInfo.freq) + ' - -o ' + LRadioInfo.FileName);
+              LEncodeCMD := PWideChar('"' + FFDKPath + '" -m 0 -b ' + RadioRecordOptionsForm.BitrateList.Text + ' --title ' + LRadioInfo.Title + ' --artist ' + LRadioInfo.Artist +
+                ' --moov-before-mdat --ignorelength -R --raw-rate ' + FloatToStr(LChanInfo.freq) + ' - -o ' + LRadioInfo.FileName);
           end;
           FRadioRecordProcessID := BASS_Encode_Start(FRadioHandle, LEncodeCMD, BASS_UNICODE, nil, nil);
           if FRadioRecordProcessID > 0 then
@@ -3456,7 +3461,7 @@ begin
   ArtistLabel.Caption := '';
   AlbumLabel.Caption := '';
   PlaybackInfoLabel.Caption := '';
-  SetProgressValue(Handle, 0, MaxInt);
+  SetProgressValue(handle, 0, MaxInt);
   PlayList.Invalidate;
   RadioList.Invalidate;
   LyricList.Lines.Clear;
@@ -3506,7 +3511,7 @@ begin
     Self.FocusControl(VolumeBar);
 end;
 
-procedure TMainForm.UpdateCheckerDoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string);
+procedure TMainForm.UpdateCheckerDoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; URL: string);
 var
   VersionFile: TStringList;
   LatestVersion: Integer;
@@ -3524,7 +3529,7 @@ begin
           begin
             if ID_YES = Application.MessageBox('There is a new version. Would you like to go homepage and download it?', 'New Version', MB_ICONQUESTION or MB_YESNO) then
             begin
-              ShellExecute(Handle, 'open', 'http://www.fosshub.com/OooPlayer.html', nil, nil, SW_NORMAL);
+              ShellExecute(handle, 'open', 'http://www.fosshub.com/OooPlayer.html', nil, nil, SW_NORMAL);
             end;
           end;
         end;
@@ -3539,7 +3544,7 @@ procedure TMainForm.UpdateThreadExecute(Sender: TObject; Params: Pointer);
 begin
   with UpdateChecker do
   begin
-    Url := 'http://sourceforge.net/projects/oooplayer/files/version.txt/download';
+    URL := 'http://sourceforge.net/projects/oooplayer/files/version.txt/download';
     Start;
   end;
 
@@ -3615,7 +3620,7 @@ begin
         end;
       end;
     end;
-    case msg.WParam of
+    case Msg.WParam of
       RESET_UI:
         begin
           TitleLabel.Caption := 'Connecting...';
@@ -3629,44 +3634,42 @@ begin
       SHOW_ERROR:
         begin
           TitleLabel.Caption := 'Error';
-          FRadioLogItem := 'Unable to play radio. Error code: ' + IntToStr(msg.LParam);
+          FRadioLogItem := 'Unable to play radio. Error code: ' + IntToStr(Msg.LParam);
           AddToRadioLog;
           RadioConnectionImg.Visible := False;
         end;
       UPDATE_PROGRESS:
-        TitleLabel.Caption := Format('Buffering... %d%%', [msg.LParam]);
+        TitleLabel.Caption := Format('Buffering... %d%%', [Msg.LParam]);
       UPDATE_META_NAME:
         begin
-          TitleLabel.Caption := String(PAnsiChar(msg.LParam));
-          Self.Caption := String(PAnsiChar(msg.LParam)) + ' [OooPlayer]';
+          TitleLabel.Caption := String(PAnsiChar(Msg.LParam));
+          Self.Caption := String(PAnsiChar(Msg.LParam)) + ' [OooPlayer]';
         end;
       UPDATE_META_BITRATE:
-        AlbumLabel.Caption := String(PAnsiChar(msg.LParam)) + ' kbps';
+        AlbumLabel.Caption := String(PAnsiChar(Msg.LParam)) + ' kbps';
       // 5:
       // Label5.Caption := String(PAnsiChar(msg.LParam));
       // 6:
       // Label3.Caption := String(PAnsiChar(msg.LParam));
       UPDATE_META:
         begin
-          ArtistLabel.Caption := String(PAnsiChar(msg.LParam));
+          ArtistLabel.Caption := String(PAnsiChar(Msg.LParam));
         end;
       STATUS_UPDATE:
         begin
-          if (String(PAnsiChar(msg.LParam)) = 'ICY 200 OK') or (String(PAnsiChar(msg.LParam)) = 'HTTP/1.0 200 OK') then
+          if (String(PAnsiChar(Msg.LParam)) = 'ICY 200 OK') or (String(PAnsiChar(Msg.LParam)) = 'HTTP/1.0 200 OK') then
           begin
             PlaybackInfoLabel.Caption := 'Playing';
           end
           else
           begin
-            PlaybackInfoLabel.Caption := String(PAnsiChar(msg.LParam));
+            PlaybackInfoLabel.Caption := String(PAnsiChar(Msg.LParam));
           end;
         end;
       REPAINT_RADIO_LIST:
         RadioList.Invalidate;
       STOP_IMG_ANIM:
         RadioConnectionImg.Visible := False;
-      ADD_TO_LOG:
-        LogForm.LogList.Lines.Add(String(PAnsiChar(msg.LParam)));
       DOWNLOAD_LYRIC:
         begin
           // lyric
@@ -3694,6 +3697,8 @@ begin
                 LyricTitleEdit.Enabled := False;
                 LyricSourceList.Enabled := False;
                 FLyricDownloader.Stop;
+                if FPlayListItems.Count < 1 then
+                  Exit;
                 FLyricDownloader.SongTitle := Trim(LSplitList[1]);
                 FLyricDownloader.Artist := Trim(LSplitList[0]);
                 FLyricDownloader.Album := 'Radio';

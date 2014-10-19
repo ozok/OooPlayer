@@ -44,7 +44,8 @@ uses
   bassmix in 'BassUnits\bassmix.pas',
   UnitTagWriter in 'Units\UnitTagWriter.pas',
   Vcl.Themes,
-  Vcl.Styles;
+  Vcl.Styles,
+  UnitImageResize in 'Units\UnitImageResize.pas';
 
 {$R *.res}
 
