@@ -164,6 +164,7 @@ begin
           begin
             // empty playlist
             FPlayer.Stop;
+            MainForm.FStoppedByUser := True;
             PositionBar.Position := 0;
             MainForm.Caption := 'OooPlayer';
             CoverImage.Picture.LoadFromFile('logo.png');
@@ -177,37 +178,91 @@ begin
         end;
       1: // random
         begin
-          Randomize;
-          LRndIndex := Random(FPlayListItems.Count);
-          PositionTimer.Enabled := False;
-          PlayItem(LRndIndex);
+          if PlayList.Items.Count > 0 then
+          begin
+            Randomize;
+            LRndIndex := Random(FPlayListItems.Count);
+            PositionTimer.Enabled := False;
+            PlayItem(LRndIndex);
+          end
+          else
+          begin
+            // empty playlist
+            FPlayer.Stop;
+            MainForm.FStoppedByUser := True;
+            PositionBar.Position := 0;
+            MainForm.Caption := 'OooPlayer';
+            CoverImage.Picture.LoadFromFile('logo.png');
+            TitleLabel.Caption := '';
+            ArtistLabel.Caption := '';
+            AlbumLabel.Caption := '';
+            PlaybackInfoLabel.Caption := '';
+            if MainForm.Enabled and MainForm.Visible then
+              MainForm.FocusControl(VolumeBar);
+          end;
         end;
       2: // repeat track
         begin
-          PositionTimer.Enabled := False;
-          try
-            if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
-            begin
-              PlayItem(FCurrentItemInfo.ItemIndex);
+          if PlayList.Items.Count > 0 then
+          begin
+            PositionTimer.Enabled := False;
+            try
+              if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
+              begin
+                PlayItem(FCurrentItemInfo.ItemIndex);
+              end;
+            finally
+              PositionTimer.Enabled := True;
             end;
-          finally
-            PositionTimer.Enabled := True;
+          end
+          else
+          begin
+            // empty playlist
+            FPlayer.Stop;
+            MainForm.FStoppedByUser := True;
+            PositionBar.Position := 0;
+            MainForm.Caption := 'OooPlayer';
+            CoverImage.Picture.LoadFromFile('logo.png');
+            TitleLabel.Caption := '';
+            ArtistLabel.Caption := '';
+            AlbumLabel.Caption := '';
+            PlaybackInfoLabel.Caption := '';
+            if MainForm.Enabled and MainForm.Visible then
+              MainForm.FocusControl(VolumeBar);
           end;
         end;
       3: // shuffle
         begin
-          PositionTimer.Enabled := False;
-          try
-            if FShuffleIndex + 1 < FShuffleIndexes.Count then
-            begin
-              FShuffleIndex := 1 + FShuffleIndex;
-              if FShuffleIndexes[FShuffleIndex] < FPlayListItems.Count then
+          if PlayList.Items.Count > 0 then
+          begin
+            PositionTimer.Enabled := False;
+            try
+              if FShuffleIndex + 1 < FShuffleIndexes.Count then
               begin
-                PlayItem(FShuffleIndexes[FShuffleIndex]);
+                FShuffleIndex := 1 + FShuffleIndex;
+                if FShuffleIndexes[FShuffleIndex] < FPlayListItems.Count then
+                begin
+                  PlayItem(FShuffleIndexes[FShuffleIndex]);
+                end;
               end;
+            finally
+              PositionTimer.Enabled := True;
             end;
-          finally
-            PositionTimer.Enabled := True;
+          end
+          else
+          begin
+            // empty playlist
+            FPlayer.Stop;
+            MainForm.FStoppedByUser := True;
+            PositionBar.Position := 0;
+            MainForm.Caption := 'OooPlayer';
+            CoverImage.Picture.LoadFromFile('logo.png');
+            TitleLabel.Caption := '';
+            ArtistLabel.Caption := '';
+            AlbumLabel.Caption := '';
+            PlaybackInfoLabel.Caption := '';
+            if MainForm.Enabled and MainForm.Visible then
+              MainForm.FocusControl(VolumeBar);
           end;
         end;
     end;

@@ -299,13 +299,16 @@ begin
     begin
       if FWAVTag.Loaded then
       begin
-        // todo: check artwork for wav
+
       end;
     end;
   finally
-    if FPicStream.Size > 0 then
+    if FPicStream <> nil then
     begin
-      FPicStream.Seek(0, soBeginning);
+      if FPicStream.Size > 0 then
+      begin
+        FPicStream.Seek(0, soBeginning);
+      end;
     end;
     FIsBusy := False;
   end;

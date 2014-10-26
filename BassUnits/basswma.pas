@@ -1,6 +1,6 @@
 {
   BASSWMA 2.4 Delphi unit
-  Copyright (c) 2002-2010 Un4seen Developments Ltd.
+  Copyright (c) 2002-2014 Un4seen Developments Ltd.
 
   See the BASSWMA.CHM file for more detailed documentation
 }
@@ -26,6 +26,7 @@ const
   BASS_CONFIG_WMA_BASSFILE = $10103;
   BASS_CONFIG_WMA_NETSEEK = $10104;
   BASS_CONFIG_WMA_VIDEO = $10105;
+  BASS_CONFIG_WMA_BUFTIME = $10106;
 
   // additional WMA sync types
   BASS_SYNC_WMA_CHANGE = $10100;
@@ -39,8 +40,9 @@ const
   BASS_WMA_ENCODE_PRO = $4000; // WMA Pro
   BASS_WMA_ENCODE_24BIT = $8000; // 24-bit
   BASS_WMA_ENCODE_PCM = $10000; // uncompressed PCM
-  BASS_WMA_ENCODE_SCRIPT = $20000;
-  // set script (mid-stream tags) in the WMA encoding
+  BASS_WMA_ENCODE_SCRIPT = $20000; // set script (mid-stream tags) in the WMA encoding
+  BASS_WMA_ENCODE_QUEUE = $40000; // queue data to feed encoder asynchronously
+  BASS_WMA_ENCODE_SOURCE = $80000; // use a BASS channel as source
 
   // Additional flag for use with BASS_WMA_EncodeGetRates
   BASS_WMA_ENCODE_RATES_VBR = $10000; // get available VBR quality settings

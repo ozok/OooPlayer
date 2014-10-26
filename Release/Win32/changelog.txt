@@ -1,8 +1,10 @@
 --1.8
 -Added: Support for external png, bmp and gif cover art files
--Improved: Cover art display performance
--Fixed: Clearing the playlist will clear queue list too
+-Improved: Jpeg and png cover art display performance
+-Improved: Jpeg and png cover arts are now resized smoother
+-Fixed: Clearing the playlist didn't clear queue list
 -Fixed: Couldn't read artwork in some cases and showed cover art from previous file
+-Updated: Basswma to 2.4.5
 
 --1.7
 -Added: A new interface layout moving lyric out of tabs

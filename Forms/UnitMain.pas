@@ -290,7 +290,6 @@ type
     procedure Button1MouseEnter(Sender: TObject);
   private
     { Private declarations }
-    FStoppedByUser: Boolean;
     FLastDir: string;
     FStopAddFiles: Boolean;
     FDraggingCurrentFile: Boolean;
@@ -338,6 +337,7 @@ type
     FLamePath, FOggEncPath, FOpusEncPath, FFDKPath: string;
     // encoder paths
 
+    FStoppedByUser: Boolean;
     FPlayListItems: TList<TPlayListItem>;
     FRadioStations: TRadioList;
     FCurrentItemInfo: TCurrentItemInfo;
@@ -395,7 +395,7 @@ var
   FRadioRecordingInfo: TRadioRecordInfo;
 
 const
-  BuildInt = 1748;
+  BuildInt = 1835;
   Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
@@ -1338,7 +1338,8 @@ begin
           Extension := LowerCase(ExtractFileExt(FileName));
           if (Extension = '.jpg') or (Extension = '.jpeg') or (Extension = '.png') or (Extension = '.bmp') or (Extension = '.gif') then
           begin
-            if ContainsText(Search.Name, 'folder') or ContainsText(Search.Name, 'cover') or ContainsText(Search.Name, 'front') or ContainsText(Search.Name, 'cd') or ContainsText(Search.Name, 'back') then
+            if ContainsText(Search.Name, 'folder') or ContainsText(Search.Name, 'cover') or ContainsText(Search.Name, 'front') or ContainsText(Search.Name, 'cd') or ContainsText(Search.Name, 'back')
+            then
             begin
               Result := FileName;
               Break;
@@ -1434,21 +1435,21 @@ begin
   LImageFile := GetImage(ExtractFileDir(FileName));
   if FileExists(LImageFile) then
   begin
-      LImgResizer := TImageResizer.Create;
-      try
-        if (LowerCase(ExtractFileExt(LImageFile)) = '.jpg') or (LowerCase(ExtractFileExt(LImageFile)) = '.jpeg') then
-        begin
-          LImgResizer.ResizeJpgEx(LImageFile, FTempCoverPath + '.jpg');
-          CoverImage.Picture.LoadFromFile(FTempCoverPath + '.jpg');
-        end
-        else if LowerCase(ExtractFileExt(LImageFile)) = '.png' then
-        begin
-          LImgResizer.ResizePNGEx(LImageFile, FTempCoverPath + '.png');
-          CoverImage.Picture.LoadFromFile(FTempCoverPath + '.png');
-        end;
-      finally
-        LImgResizer.Free;
+    LImgResizer := TImageResizer.Create;
+    try
+      if (LowerCase(ExtractFileExt(LImageFile)) = '.jpg') or (LowerCase(ExtractFileExt(LImageFile)) = '.jpeg') then
+      begin
+        LImgResizer.ResizeJpgEx(LImageFile, FTempCoverPath + '.jpg');
+        CoverImage.Picture.LoadFromFile(FTempCoverPath + '.jpg');
+      end
+      else if LowerCase(ExtractFileExt(LImageFile)) = '.png' then
+      begin
+        LImgResizer.ResizePNGEx(LImageFile, FTempCoverPath + '.png');
+        CoverImage.Picture.LoadFromFile(FTempCoverPath + '.png');
       end;
+    finally
+      LImgResizer.Free;
+    end;
     Result := True;
   end
   else

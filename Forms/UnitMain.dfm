@@ -438,7 +438,7 @@ object MainForm: TMainForm
       Width = 50
       Height = 37
       Hint = 'Search'
-      Anchors = [akLeft, akTop, akRight]
+      Anchors = [akTop, akRight]
       ImageAlignment = iaCenter
       ImageIndex = 7
       Images = ImageList1
@@ -601,6 +601,10 @@ object MainForm: TMainForm
     object TabSheet2: TTabSheet
       Caption = 'Radio'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object RadioCatList: TComboBox
         Left = 0
         Top = 0
@@ -6294,7 +6298,7 @@ object MainForm: TMainForm
     Left = 444
     Top = 418
     Bitmap = {
-      494C010108000D000C0020002000FFFFFFFF1910FFFFFFFFFFFFFFFF424D3600
+      494C010108000D00180020002000FFFFFFFF1910FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000800000006000000001001800000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
