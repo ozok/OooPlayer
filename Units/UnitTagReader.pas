@@ -305,9 +305,13 @@ begin
   finally
     if FPicStream <> nil then
     begin
-      if FPicStream.Size > 0 then
-      begin
-        FPicStream.Seek(0, soBeginning);
+      try
+        if FPicStream.Size > 0 then
+        begin
+          FPicStream.Seek(0, soBeginning);
+        end;
+      except
+
       end;
     end;
     FIsBusy := False;

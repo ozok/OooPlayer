@@ -1,3 +1,11 @@
+--1.9
+-Added: Program now accepts file paths as parameters, adds them to playlist and starts playback
+-Added: A few interface changes
+-Improved: CPU usage is even lower now
+-Improved: Cover art loading performance
+-Fixed: "No mapping for the Unicode char..." errors while downloading lyrics
+-Fixed: Queue list had no right click menu
+
 --1.8
 -Added: Support for external png, bmp and gif cover art files
 -Improved: Jpeg and png cover art display performance

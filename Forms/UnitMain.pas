@@ -31,7 +31,7 @@ uses
   JvAppIniStorage, StrUtils, ShellAPI, JvComputerInfoEx, UnitTagTypes, UnitTagReader, PNGImage, JvDragDrop,
   JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon, Jpeg, UnitMusicPlayer, Bass, BASSenc,
   IdBaseComponent, IdThreadComponent, UnitLyricDownloader, UnitTagWriter, UnitImageResize,
-  JvAnimatedImage, JvGIFCtrl, JvExExtCtrls, JvImage;
+  JvAnimatedImage, JvGIFCtrl, JvExExtCtrls, JvImage, JvAppInst, UnitInternalArtworkReader;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -99,7 +99,6 @@ type
     FormStorage: TJvFormStorage;
     PlaybackOrderList: TComboBox;
     G1: TMenuItem;
-    PositionLabel: TLabel;
     InfoPanel: TPanel;
     TitleLabel: TLabel;
     AlbumLabel: TLabel;
@@ -118,7 +117,6 @@ type
     L1: TMenuItem;
     N4: TMenuItem;
     E2: TMenuItem;
-    PositionBar: TJvTrackBar;
     L2: TMenuItem;
     ProgressPanel: TPanel;
     AbortBtn: TButton;
@@ -190,9 +188,18 @@ type
     VolumeBar: TJvTrackBar;
     ImageList1: TImageList;
     SettingsBtn: TButton;
-    Button1: TButton;
+    LogsBtn: TButton;
     SearchBtn: TButton;
     CoverImage: TJvImage;
+    QueuelistMenu: TPopupMenu;
+    P8: TMenuItem;
+    R5: TMenuItem;
+    C3: TMenuItem;
+    AppInstances: TJvAppInstances;
+    ProgressTimer: TTimer;
+    Panel1: TPanel;
+    PositionBar: TJvTrackBar;
+    PositionLabel: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -287,7 +294,9 @@ type
     procedure VolumeBarMouseEnter(Sender: TObject);
     procedure SearchBtnMouseEnter(Sender: TObject);
     procedure SettingsBtnMouseEnter(Sender: TObject);
-    procedure Button1MouseEnter(Sender: TObject);
+    procedure LogsBtnMouseEnter(Sender: TObject);
+    procedure AppInstancesCmdLineReceived(Sender: TObject; CmdLine: TStrings);
+    procedure ProgressTimerTimer(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -302,6 +311,9 @@ type
     FPageHasntChangedYet: Boolean;
     FTagWriter: TTagWriter;
     FTempCoverPath: string;
+    FInternalArtworkReader: TInternalArtworkReader;
+
+    procedure Log(s: string);
 
     procedure AddFile(const FileName: string);
     procedure ReScanFile(const FileIndex: integer);
@@ -315,12 +327,6 @@ type
     procedure ScrollToCurrentSong;
 
     procedure GenerateShuffleList;
-
-    function GetImage(const Dir: string): string;
-    procedure LoadPicFromStream(const Stream: TStream; const PicType: TCoverArtType);
-    procedure LoadCoverArt(const FileName: string);
-    function LoadExternalCoverArt(const FileName: string): Boolean;
-    function LoadInternalCoverArt(const FileName: string): Boolean;
 
     procedure LoadM3UPlaylist(const PlaylistPath: string);
     procedure LoadPPFPlaylist(const PlaylistPath: string);
@@ -383,6 +389,14 @@ type
     function CreateLyricFileName(const Title, Artist, Album: string): string;
     function BassErrorCodeToString(const ErrorCode: integer): string;
     procedure SetPlayerBuffer(const Buffer: DWORD);
+
+    function GetImage(const Dir: string): string;
+    procedure LoadPicFromStream(const Stream: TStream; const PicType: TCoverArtType);
+    procedure LoadCoverArt(const FileName: string);
+    procedure LoadCoverArtEx(const FileName: string);
+    function LoadExternalCoverArt(const FileName: string): Boolean;
+    function LoadInternalCoverArt(const FileName: string): Boolean;
+    function LoadInternalCoverArtEx(const FileName: string): Boolean;
   end;
 
 var
@@ -754,6 +768,46 @@ begin
   end;
 end;
 
+procedure TMainForm.AppInstancesCmdLineReceived(Sender: TObject; CmdLine: TStrings);
+var
+  i: integer;
+begin
+  if CmdLine.Count >= 1 then
+  begin
+    FStopAddFiles := False;
+    PlayList.Items.BeginUpdate;
+    ProgressPanel.Visible := True;
+    try
+      for I := 0 to CmdLine.Count - 1 do
+      begin
+        Application.ProcessMessages;
+        ProgressLabel.Caption := ExtractFileDir(CmdLine[i]);
+        if FStopAddFiles then
+        begin
+          Break;
+        end
+        else
+        begin
+          AddFile(CmdLine[i]);
+        end;
+      end;
+    finally
+      ProgressPanel.Visible := False;
+      PlayList.Items.EndUpdate;
+      SavePlayList;
+      // FLastDir := OpenFolder.Directory;
+      Self.Width := Self.Width + 1;
+      Self.Width := Self.Width - 1;
+      GenerateShuffleList;
+      StatusBar1.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+      if PlayList.Items.Count > 0 then
+      begin
+        PlayItem(PlayList.Items.Count - 1);
+      end;
+    end;
+  end;
+end;
+
 function TMainForm.BassErrorCodeToString(const ErrorCode: integer): string;
 begin
   case ErrorCode of
@@ -830,7 +884,7 @@ begin
   end;
 end;
 
-procedure TMainForm.Button1MouseEnter(Sender: TObject);
+procedure TMainForm.LogsBtnMouseEnter(Sender: TObject);
 begin
   if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
@@ -1236,6 +1290,7 @@ begin
   PortableMode := Portable;
   FTagWriter := TTagWriter.Create;
   FTempCoverPath := FAppDataFolder + '\cover';
+  FInternalArtworkReader := TInternalArtworkReader.Create;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -1257,6 +1312,7 @@ begin
   FLyricDownloader.Free;
   FQueuedItems.Free;
   FTagWriter.Free;
+  FInternalArtworkReader.Free;
 end;
 
 procedure TMainForm.FormResize(Sender: TObject);
@@ -1268,6 +1324,8 @@ begin
 end;
 
 procedure TMainForm.FormShow(Sender: TObject);
+var
+  I: Integer;
 begin
   LoadPlayList;
   LoadSettings;
@@ -1293,6 +1351,41 @@ begin
   end;
   PlayList.Columns[0].Width := PlayList.ClientWidth - PlayList.Columns[1].Width;
   FPlayer.SetBuffer(Round(SettingsForm.BufferEdit.Value));
+
+  if ParamCount >= 1 then
+  begin
+    FStopAddFiles := False;
+    PlayList.Items.BeginUpdate;
+    ProgressPanel.Visible := True;
+    try
+      for I := 1 to ParamCount do
+      begin
+        Application.ProcessMessages;
+        ProgressLabel.Caption := ExtractFileDir(ParamStr(i));
+        if FStopAddFiles then
+        begin
+          Break;
+        end
+        else
+        begin
+          AddFile(ParamStr(i));
+        end;
+      end;
+    finally
+      ProgressPanel.Visible := False;
+      PlayList.Items.EndUpdate;
+      SavePlayList;
+      // FLastDir := OpenFolder.Directory;
+      Self.Width := Self.Width + 1;
+      Self.Width := Self.Width - 1;
+      GenerateShuffleList;
+      StatusBar1.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+      if PlayList.Items.Count > 0 then
+      begin
+        PlayItem(PlayList.Items.Count - 1);
+      end;
+    end;
+  end;
 end;
 
 procedure TMainForm.G1Click(Sender: TObject);
@@ -1426,6 +1519,14 @@ begin
   end;
 end;
 
+procedure TMainForm.LoadCoverArtEx(const FileName: string);
+begin
+  if not FInternalArtworkReader.Busy then
+  begin
+    LoadCoverArt(FileName);
+  end;
+end;
+
 function TMainForm.LoadExternalCoverArt(const FileName: string): Boolean;
 var
   LImageFile: string;
@@ -1465,10 +1566,12 @@ begin
   Result := False;
   if not FTagReader.IsBusy then
   begin
+    Log('2');
     FTagReader.ReadArtwork(FileName);
   end
   else
   begin
+    Log('3');
     LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
     CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
     Exit;
@@ -1482,6 +1585,17 @@ begin
   begin
     LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
     CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
+  end;
+end;
+
+function TMainForm.LoadInternalCoverArtEx(const FileName: string): Boolean;
+begin
+  Log('0');
+  if not FInternalArtworkReader.Busy then
+  begin
+    Log('1');
+    FInternalArtworkReader.FileName := FileName;
+    FInternalArtworkReader.Start;
   end;
 end;
 
@@ -1760,6 +1874,11 @@ begin
   end;
 end;
 
+procedure TMainForm.Log(s: string);
+begin
+  LogForm.LogList.Lines.Add(s);
+end;
+
 procedure TMainForm.LyricListMouseEnter(Sender: TObject);
 begin
   if Self.Enabled and Self.Visible then
@@ -1886,6 +2005,7 @@ begin
       0: // normal
         begin
           PositionTimer.Enabled := False;
+          ProgressTimer.Enabled := PositionTimer.Enabled;
           // first try queue
           if FQueuedItems.Count > 0 then
           begin
@@ -1940,11 +2060,13 @@ begin
           Randomize;
           LRndIndex := Random(FPlayListItems.Count);
           PositionTimer.Enabled := False;
+          ProgressTimer.Enabled := PositionTimer.Enabled;
           PlayItem(LRndIndex);
         end;
       2: // repear track
         begin
           PositionTimer.Enabled := False;
+          ProgressTimer.Enabled := PositionTimer.Enabled;
           try
             if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
             begin
@@ -1952,11 +2074,13 @@ begin
             end;
           finally
             PositionTimer.Enabled := True;
+            ProgressTimer.Enabled := PositionTimer.Enabled;
           end;
         end;
       3: // shuffle
         begin
           PositionTimer.Enabled := False;
+          ProgressTimer.Enabled := PositionTimer.Enabled;
           try
             if FShuffleIndex + 1 < FShuffleIndexes.Count then
             begin
@@ -1968,6 +2092,7 @@ begin
             end;
           finally
             PositionTimer.Enabled := True;
+            ProgressTimer.Enabled := PositionTimer.Enabled;
           end;
         end;
     end;
@@ -2023,6 +2148,7 @@ begin
     begin
       FPlayer.Pause;
       PositionTimer.Enabled := False;
+      ProgressTimer.Enabled := PositionTimer.Enabled;
       SetProgressState(handle, tbpsPaused);
       PlaybackInfoLabel.Caption := 'Paused | ' + FCurrentItemInfo.StatusInfoText;
     end
@@ -2031,6 +2157,7 @@ begin
       FPlayer.Resume;
       FPlayer.SetVolume(100 - VolumeBar.Position);
       PositionTimer.Enabled := True;
+      ProgressTimer.Enabled := PositionTimer.Enabled;
       SetProgressState(handle, tbpsNormal);
       PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
     end;
@@ -2092,6 +2219,7 @@ begin
           FPlayer.Pause;
           FPlayer.SetVolume(100 - VolumeBar.Position);
           PositionTimer.Enabled := True;
+          ProgressTimer.Enabled := PositionTimer.Enabled;
           SetProgressState(handle, tbpsNormal);
           PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
         end
@@ -2116,6 +2244,7 @@ begin
                     if PlayList.ItemIndex <> FCurrentItemInfo.ItemIndex then
                     begin
                       PositionTimer.Enabled := False;
+                      ProgressTimer.Enabled := PositionTimer.Enabled;
                       PlayItem(PlayList.ItemIndex);
                     end
                     else
@@ -2130,6 +2259,7 @@ begin
                       begin
                         // if stopped start platyng
                         PositionTimer.Enabled := False;
+                        ProgressTimer.Enabled := PositionTimer.Enabled;
                         PlayItem(PlayList.ItemIndex);
                       end;
                     end;
@@ -2146,6 +2276,7 @@ begin
                     begin
                       // if stopped start platyng
                       PositionTimer.Enabled := False;
+                      ProgressTimer.Enabled := PositionTimer.Enabled;
                       PlayItem(PlayList.ItemIndex);
                     end;
                   end;
@@ -2155,11 +2286,13 @@ begin
                   Randomize;
                   LRndIndex := Random(FPlayListItems.Count);
                   PositionTimer.Enabled := False;
+                  ProgressTimer.Enabled := PositionTimer.Enabled;
                   PlayItem(LRndIndex);
                 end;
               2: // repear track
                 begin
                   PositionTimer.Enabled := False;
+                  ProgressTimer.Enabled := PositionTimer.Enabled;
                   try
                     if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
                     begin
@@ -2167,11 +2300,13 @@ begin
                     end;
                   finally
                     PositionTimer.Enabled := True;
+                    ProgressTimer.Enabled := PositionTimer.Enabled;
                   end;
                 end;
               3: // shuffle
                 begin
                   PositionTimer.Enabled := False;
+                  ProgressTimer.Enabled := PositionTimer.Enabled;
                   try
                     if FShuffleIndex + 1 < FShuffleIndexes.Count then
                     begin
@@ -2183,6 +2318,7 @@ begin
                     end;
                   finally
                     PositionTimer.Enabled := True;
+                    ProgressTimer.Enabled := PositionTimer.Enabled;
                   end;
                 end;
             end;
@@ -2260,6 +2396,7 @@ var
 begin
   FPlaybackType := music;
   PositionTimer.Enabled := False;
+  ProgressTimer.Enabled := PositionTimer.Enabled;
   StopRadio;
   FPlayer.Stop;
 
@@ -2308,6 +2445,7 @@ begin
       FStoppedByUser := False;
 
       PositionTimer.Enabled := True;
+      ProgressTimer.Enabled := PositionTimer.Enabled;
 
       PlayList.ItemIndex := -1;
       PlayList.ItemIndex := FCurrentItemInfo.ItemIndex;
@@ -2452,6 +2590,7 @@ begin
   if PlayList.ItemIndex > -1 then
   begin
     PositionTimer.Enabled := False;
+    ProgressTimer.Enabled := PositionTimer.Enabled;
     PlayItem(PlayList.ItemIndex);
   end;
 end;
@@ -2537,6 +2676,7 @@ begin
   SetProgressValue(handle, 0, MaxInt);
   PlayList.Invalidate;
   PositionTimer.Enabled := False;
+  ProgressTimer.Enabled := PositionTimer.Enabled;
   FPlaybackType := radio;
   RadioConnectionImg.Visible := True;
   // stop radio player
@@ -2566,6 +2706,7 @@ begin
   if (FPlayer.PlayerStatus2 = psPlaying) or (FPlayer.PlayerStatus2 = psPaused) then
   begin
     PositionTimer.Enabled := False;
+    ProgressTimer.Enabled := PositionTimer.Enabled;
     try
       if not FPlayer.SetPosition((FPlayer.TotalLength * PositionBar.Position) div MaxInt) then
       begin
@@ -2573,6 +2714,7 @@ begin
       end;
     finally
       PositionTimer.Enabled := True;
+      ProgressTimer.Enabled := PositionTimer.Enabled;
     end;
   end;
   if Self.Enabled and Self.Visible then
@@ -2591,6 +2733,7 @@ begin
     begin
       PositionBar.Position := NewTractBarPosition;
       PositionTimer.Enabled := False;
+      ProgressTimer.Enabled := PositionTimer.Enabled;
       FPlayer.Pause;
       try
         if not FPlayer.SetPosition((FPlayer.TotalLength * PositionBar.Position) div MaxInt) then
@@ -2600,6 +2743,7 @@ begin
       finally
         Sleep(100);
         PositionTimer.Enabled := True;
+        ProgressTimer.Enabled := PositionTimer.Enabled;
         FPlayer.Resume;
       end;
     end;
@@ -2623,7 +2767,7 @@ begin
     begin
       PositionBar.Position := LPosition;
       SetProgressValue(handle, LPosition, MaxInt);
-      PositionLabel.Caption := FPlayer.PositionStr + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt - FPlayer.PositionAsSec) + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt);
+      // PositionLabel.Caption := FPlayer.PositionStr + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt - FPlayer.PositionAsSec) + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt);
     end;
   end
   else
@@ -2632,6 +2776,7 @@ begin
     if FStoppedByUser then
     begin
       PositionTimer.Enabled := False;
+      ProgressTimer.Enabled := PositionTimer.Enabled;
       PlaybackInfoLabel.Caption := '';
     end;
   end;
@@ -2647,6 +2792,7 @@ begin
       0: // normal
         begin
           PositionTimer.Enabled := False;
+          ProgressTimer.Enabled := PositionTimer.Enabled;
           if FCurrentItemInfo.ItemIndex > 0 then
           begin
             PlayItem(FCurrentItemInfo.ItemIndex - 1);
@@ -2657,11 +2803,13 @@ begin
           Randomize;
           LRndIndex := Random(FPlayListItems.Count);
           PositionTimer.Enabled := False;
+          ProgressTimer.Enabled := PositionTimer.Enabled;
           PlayItem(LRndIndex);
         end;
       2: // repear track
         begin
           PositionTimer.Enabled := False;
+          ProgressTimer.Enabled := PositionTimer.Enabled;
           try
             if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
             begin
@@ -2669,11 +2817,13 @@ begin
             end;
           finally
             PositionTimer.Enabled := True;
+            ProgressTimer.Enabled := PositionTimer.Enabled;
           end;
         end;
       3: // shuffle
         begin
           PositionTimer.Enabled := False;
+          ProgressTimer.Enabled := PositionTimer.Enabled;
           try
             if FShuffleIndex + 1 < FShuffleIndexes.Count then
             begin
@@ -2685,6 +2835,7 @@ begin
             end;
           finally
             PositionTimer.Enabled := True;
+            ProgressTimer.Enabled := PositionTimer.Enabled;
           end;
         end;
     end;
@@ -2707,6 +2858,14 @@ procedure TMainForm.ProgressPanelMouseEnter(Sender: TObject);
 begin
   if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
+end;
+
+procedure TMainForm.ProgressTimerTimer(Sender: TObject);
+begin
+  if FPlayer.PlayerStatus2 = psPlaying then
+  begin
+    PositionLabel.Caption := FPlayer.PositionStr + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt - FPlayer.PositionAsSec) + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt);
+  end;
 end;
 
 procedure TMainForm.QueueListDblClick(Sender: TObject);

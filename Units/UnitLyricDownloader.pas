@@ -1,9 +1,28 @@
+ï»¿{ *
+  * Copyright (C) 2014 ozok <ozok26@gmail.com>
+  *
+  * This file is part of OooPlayer.
+  *
+  * OooPlayer is free software: you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation, either version 2 of the License, or
+  * (at your option) any later version.
+  *
+  * OooPlayer is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with OooPlayer.  If not, see <http://www.gnu.org/licenses/>.
+  *
+  * }
 unit UnitLyricDownloader;
 
 interface
 
 uses System.Classes, IdBaseComponent, IdThreadComponent, StrUtils, SysUtils, IdThread, JvComponentBase,
-  JvUrlListGrabber, JvUrlGrabbers, JvTypes, dialogs;
+  JvUrlListGrabber, JvUrlGrabbers, JvTypes, Rest.Utils;
 
 type
   TLyricDownloaderStatus = (lsDownloading = 0, lsDone = 1, lsError = 2, lsIdle = 3);
@@ -150,14 +169,18 @@ begin
   else
   begin
     LAddToLyricFile := False;
-    LSR := TStreamReader.Create(Stream, True);
+    LSR := TStreamReader.Create(Stream, TEncoding.UTF8);
     try
       case FLyricSourceIndex of
         0: // az
           begin
             while not LSR.EndOfStream do
             begin
-              LLine := Trim(LSR.ReadLine);
+              try
+                LLine := Trim(LSR.ReadLine);
+              except
+
+              end;
               if LLine = START_STR then
               begin
                 LAddToLyricFile := True;
@@ -176,7 +199,11 @@ begin
           begin
             while not LSR.EndOfStream do
             begin
-              LLine := Trim(LSR.ReadLine);
+              try
+                LLine := Trim(LSR.ReadLine);
+              except
+
+              end;
               if Copy(LLine, 1, Length(START_STR_BAT)) = START_STR_BAT then
               begin
                 LAddToLyricFile := True;
@@ -198,7 +225,11 @@ begin
           begin
             while not LSR.EndOfStream do
             begin
-              LLine := Trim(LSR.ReadLine);
+              try
+                LLine := Trim(LSR.ReadLine);
+              except
+
+              end;
               if LLine = METRO_START then
               begin
                 LAddToLyricFile := True;
@@ -315,6 +346,8 @@ begin
   Result := Trim(StringReplace(Result, '<pre id="from_pre">', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '</pre>', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<br/>', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, 'Âº', 'ÅŸ', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, 'Ã¾', 'ÅŸ', [rfReplaceAll]));
 
   Result := Trim(Result)
 end;
@@ -326,8 +359,8 @@ begin
       begin
         Result := LowerCase(StringReplace(Str, ' ', '', [rfReplaceAll]));
         Result := LowerCase(StringReplace(Result, '&', '', [rfReplaceAll]));
-        Result := LowerCase(StringReplace(Result, 'Ö', 'o', [rfReplaceAll]));
-        Result := LowerCase(StringReplace(Result, 'ö', 'o', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, 'Ã–', 'o', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, 'Ã¶', 'o', [rfReplaceAll]));
         Result := LowerCase(StringReplace(Result, '''', '', [rfReplaceAll]));
         Result := Trim(StringReplace(Result, ',', '', [rfReplaceAll]));
         Result := Trim(StringReplace(Result, '!', '', [rfReplaceAll]));
@@ -343,8 +376,8 @@ begin
       begin
         Result := LowerCase(StringReplace(Str, ' & ', 'and', [rfReplaceAll]));
         Result := LowerCase(StringReplace(Result, ' ', '_', [rfReplaceAll]));
-        Result := LowerCase(StringReplace(Result, 'Ö', 'o', [rfReplaceAll]));
-        Result := LowerCase(StringReplace(Result, 'ö', 'o', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, 'Ã–', 'o', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, 'Ã¶', 'o', [rfReplaceAll]));
         Result := Trim(StringReplace(Result, ',', '', [rfReplaceAll]));
         Result := Trim(StringReplace(Result, '!', '', [rfReplaceAll]));
         Result := Trim(StringReplace(Result, '?', '', [rfReplaceAll]));
@@ -356,8 +389,8 @@ begin
       begin
         Result := LowerCase(StringReplace(Str, ' & ', '-', [rfReplaceAll]));
         Result := LowerCase(StringReplace(Result, ' ', '-', [rfReplaceAll]));
-        Result := LowerCase(StringReplace(Result, 'Ö', 'o', [rfReplaceAll]));
-        Result := LowerCase(StringReplace(Result, 'ö', 'o', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, 'Ã–', 'o', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, 'Ã¶', 'o', [rfReplaceAll]));
         Result := LowerCase(StringReplace(Result, '''', '', [rfReplaceAll]));
         Result := Trim(StringReplace(Result, ',', '', [rfReplaceAll]));
         Result := Trim(StringReplace(Result, '!', '', [rfReplaceAll]));
@@ -413,11 +446,11 @@ begin
   FLyricSourceIndex := MainForm.LyricSourceList.ItemIndex;
   case FLyricSourceIndex of
     0:
-      FPageDownloader.Url := 'http://www.azlyrics.com/lyrics/' + FixStrings(FArtist) + '/' + FixStrings(FSongName) + '.html';
+      FPageDownloader.Url := 'http://www.azlyrics.com/lyrics/' + URIEncode(FixStrings(FArtist) + '/' + FixStrings(FSongName)) + '.html';
     1:
-      FPageDownloader.Url := 'http://batlyrics.net/' + FixStrings(FSongName) + '-lyrics-' + FixStrings(FArtist) + '.html';
+      FPageDownloader.Url := 'http://batlyrics.net/' + URIEncode(FixStrings(FSongName) + '-lyrics-' + FixStrings(FArtist)) + '.html';
     2:
-      FPageDownloader.Url := 'http://www.metrolyrics.com/' + FixStrings(FSongName) + '-lyrics-' + FixStrings(FArtist) + '.html';
+      FPageDownloader.Url := 'http://www.metrolyrics.com/' + URIEncode(FixStrings(FSongName) + '-lyrics-' + FixStrings(FArtist)) + '.html';
   end;
   FPageDownloader.Start;
   while FPageDownloader.Status <> gsStopped do

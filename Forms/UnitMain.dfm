@@ -65,23 +65,8 @@ object MainForm: TMainForm
     DesignSize = (
       1008
       127)
-    object PositionLabel: TLabel
-      Left = 612
-      Top = 11
-      Width = 156
-      Height = 13
-      Anchors = [akTop, akRight]
-      Caption = '00:00:00/00:00:00/00:00:00'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'Tahoma'
-      Font.Style = [fsBold]
-      ParentFont = False
-      ExplicitLeft = 473
-    end
     object RadioConnectionImg: TJvGIFAnimator
-      Left = 569
+      Left = 731
       Top = 0
       Width = 37
       Height = 37
@@ -174,7 +159,6 @@ object MainForm: TMainForm
         35DBB6A4C9133B4100003B}
       Anchors = [akTop, akRight]
       Visible = False
-      ExplicitLeft = 430
     end
     object PauseBtn: TButton
       Left = 60
@@ -185,7 +169,7 @@ object MainForm: TMainForm
       ImageAlignment = iaCenter
       ImageIndex = 1
       Images = ImageList1
-      TabOrder = 3
+      TabOrder = 2
       OnClick = PauseBtnClick
       OnMouseEnter = PauseBtnMouseEnter
     end
@@ -198,7 +182,7 @@ object MainForm: TMainForm
       ImageAlignment = iaCenter
       ImageIndex = 2
       Images = ImageList1
-      TabOrder = 4
+      TabOrder = 3
       OnClick = StopBtnClick
       OnMouseEnter = StopBtnMouseEnter
     end
@@ -211,7 +195,7 @@ object MainForm: TMainForm
       ImageAlignment = iaCenter
       ImageIndex = 3
       Images = ImageList1
-      TabOrder = 5
+      TabOrder = 4
       OnClick = PrevBtnClick
       OnMouseEnter = PrevBtnMouseEnter
     end
@@ -230,7 +214,7 @@ object MainForm: TMainForm
       ImageIndex = 4
       Images = ImageList1
       ParentFont = False
-      TabOrder = 6
+      TabOrder = 5
       OnClick = NextBtnClick
       OnMouseEnter = NextBtnMouseEnter
     end
@@ -249,7 +233,7 @@ object MainForm: TMainForm
       ImageIndex = 0
       Images = ImageList1
       ParentFont = False
-      TabOrder = 2
+      TabOrder = 1
       OnClick = PlayBtnClick
       OnMouseEnter = PlayBtnMouseEnter
     end
@@ -271,23 +255,6 @@ object MainForm: TMainForm
         'Repeat Track'
         'Shuffle')
     end
-    object PositionBar: TJvTrackBar
-      Left = 0
-      Top = 104
-      Width = 1008
-      Height = 23
-      Hint = 'Position'
-      Align = alBottom
-      LineSize = 10
-      PageSize = 4
-      TabOrder = 1
-      TickMarks = tmBoth
-      TickStyle = tsNone
-      ShowRange = False
-      OnMouseEnter = PositionBarMouseEnter
-      OnChanged = PositionBarChanged
-      OnMouseDown = PositionBarMouseDown
-    end
     object InfoPanel: TPanel
       Left = 16
       Top = 44
@@ -295,7 +262,7 @@ object MainForm: TMainForm
       Height = 59
       Anchors = [akLeft, akRight, akBottom]
       BevelOuter = bvNone
-      TabOrder = 7
+      TabOrder = 6
       object AlbumLabel: TLabel
         Left = 0
         Top = 29
@@ -373,7 +340,7 @@ object MainForm: TMainForm
       Width = 100
       Height = 100
       Anchors = [akRight, akBottom]
-      TabOrder = 8
+      TabOrder = 7
       object CoverImage: TJvImage
         Left = 1
         Top = 1
@@ -398,14 +365,14 @@ object MainForm: TMainForm
       Max = 100
       Orientation = trVertical
       ShowSelRange = False
-      TabOrder = 9
+      TabOrder = 8
       TickMarks = tmBoth
       TickStyle = tsNone
       OnChange = VolumeBarChange
       OnMouseEnter = VolumeBarMouseEnter
     end
     object SettingsBtn: TButton
-      Left = 463
+      Left = 625
       Top = 0
       Width = 50
       Height = 37
@@ -414,12 +381,12 @@ object MainForm: TMainForm
       ImageAlignment = iaCenter
       ImageIndex = 5
       Images = ImageList1
-      TabOrder = 10
+      TabOrder = 9
       OnClick = G1Click
       OnMouseEnter = SettingsBtnMouseEnter
     end
-    object Button1: TButton
-      Left = 513
+    object LogsBtn: TButton
+      Left = 675
       Top = 0
       Width = 50
       Height = 37
@@ -428,12 +395,12 @@ object MainForm: TMainForm
       ImageAlignment = iaCenter
       ImageIndex = 6
       Images = ImageList1
-      TabOrder = 11
+      TabOrder = 10
       OnClick = L2Click
-      OnMouseEnter = Button1MouseEnter
+      OnMouseEnter = LogsBtnMouseEnter
     end
     object SearchBtn: TButton
-      Left = 413
+      Left = 575
       Top = 0
       Width = 50
       Height = 37
@@ -442,9 +409,55 @@ object MainForm: TMainForm
       ImageAlignment = iaCenter
       ImageIndex = 7
       Images = ImageList1
-      TabOrder = 12
+      TabOrder = 11
       OnClick = S2Click
       OnMouseEnter = SearchBtnMouseEnter
+    end
+    object Panel1: TPanel
+      Left = 0
+      Top = 104
+      Width = 1008
+      Height = 23
+      Align = alBottom
+      BevelOuter = bvNone
+      TabOrder = 12
+      object PositionLabel: TLabel
+        AlignWithMargins = True
+        Left = 849
+        Top = 3
+        Width = 156
+        Height = 17
+        Align = alRight
+        Caption = '00:00:00/00:00:00/00:00:00'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
+        Layout = tlCenter
+        ExplicitLeft = 700
+        ExplicitTop = 10
+        ExplicitHeight = 13
+      end
+      object PositionBar: TJvTrackBar
+        Left = 0
+        Top = 0
+        Width = 846
+        Height = 23
+        Hint = 'Position'
+        Align = alClient
+        LineSize = 10
+        PageSize = 4
+        TabOrder = 0
+        TickMarks = tmBoth
+        TickStyle = tsNone
+        ShowRange = False
+        OnMouseEnter = PositionBarMouseEnter
+        OnChanged = PositionBarChanged
+        OnMouseDown = PositionBarMouseDown
+        ExplicitWidth = 817
+      end
     end
   end
   object StatusBar1: TStatusBar
@@ -589,6 +602,7 @@ object MainForm: TMainForm
         MultiSelect = True
         ReadOnly = True
         RowSelect = True
+        PopupMenu = QueuelistMenu
         ShowColumnHeaders = False
         StateImages = PlayBackImgs
         TabOrder = 1
@@ -601,10 +615,6 @@ object MainForm: TMainForm
     object TabSheet2: TTabSheet
       Caption = 'Radio'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object RadioCatList: TComboBox
         Left = 0
         Top = 0
@@ -6257,7 +6267,7 @@ object MainForm: TMainForm
   end
   object PositionTimer: TTimer
     Enabled = False
-    Interval = 100
+    Interval = 250
     OnTimer = PositionTimerTimer
     Left = 400
     Top = 280
@@ -6298,7 +6308,7 @@ object MainForm: TMainForm
     Left = 444
     Top = 418
     Bitmap = {
-      494C010108000D00180020002000FFFFFFFF1910FFFFFFFFFFFFFFFF424D3600
+      494C010108000D002C0020002000FFFFFFFF1910FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000800000006000000001001800000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7504,5 +7514,30 @@ object MainForm: TMainForm
       FFFFFFFFC003C003FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000000000000000000000000000
       000000000000}
+  end
+  object QueuelistMenu: TPopupMenu
+    Left = 336
+    Top = 376
+    object P8: TMenuItem
+      Caption = 'Play'
+    end
+    object R5: TMenuItem
+      Caption = 'Remove Selected'
+    end
+    object C3: TMenuItem
+      Caption = 'Clear All'
+    end
+  end
+  object AppInstances: TJvAppInstances
+    OnCmdLineReceived = AppInstancesCmdLineReceived
+    Left = 232
+    Top = 240
+  end
+  object ProgressTimer: TTimer
+    Enabled = False
+    Interval = 500
+    OnTimer = ProgressTimerTimer
+    Left = 472
+    Top = 280
   end
 end

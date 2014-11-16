@@ -102,6 +102,7 @@ begin
       0: // normal
         begin
           PositionTimer.Enabled := False;
+          ProgressTimer.Enabled := PositionTimer.Enabled;
           // if playlist is not empty
           if PlayList.Items.Count > 0 then
           begin
@@ -183,6 +184,7 @@ begin
             Randomize;
             LRndIndex := Random(FPlayListItems.Count);
             PositionTimer.Enabled := False;
+            ProgressTimer.Enabled := PositionTimer.Enabled;
             PlayItem(LRndIndex);
           end
           else
@@ -206,6 +208,7 @@ begin
           if PlayList.Items.Count > 0 then
           begin
             PositionTimer.Enabled := False;
+            ProgressTimer.Enabled := PositionTimer.Enabled;
             try
               if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
               begin
@@ -213,6 +216,7 @@ begin
               end;
             finally
               PositionTimer.Enabled := True;
+              ProgressTimer.Enabled := PositionTimer.Enabled;
             end;
           end
           else
@@ -236,6 +240,7 @@ begin
           if PlayList.Items.Count > 0 then
           begin
             PositionTimer.Enabled := False;
+            ProgressTimer.Enabled := PositionTimer.Enabled;
             try
               if FShuffleIndex + 1 < FShuffleIndexes.Count then
               begin
@@ -247,6 +252,7 @@ begin
               end;
             finally
               PositionTimer.Enabled := True;
+              ProgressTimer.Enabled := PositionTimer.Enabled;
             end;
           end
           else

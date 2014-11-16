@@ -45,7 +45,8 @@ uses
   UnitTagWriter in 'Units\UnitTagWriter.pas',
   Vcl.Themes,
   Vcl.Styles,
-  UnitImageResize in 'Units\UnitImageResize.pas';
+  UnitImageResize in 'Units\UnitImageResize.pas',
+  UnitInternalArtworkReader in 'Units\UnitInternalArtworkReader.pas';
 
 {$R *.res}
 
