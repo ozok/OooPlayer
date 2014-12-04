@@ -1,10 +1,20 @@
+--1.9.1
+-Updated: BassFLAC to 2.4.2 (security update)
+
 --1.9
 -Added: Program now accepts file paths as parameters, adds them to playlist and starts playback
--Added: A few interface changes
--Improved: CPU usage is even lower now
+-Added: Many Interface changes (thx to Alptekin)
+-Added: Taskbar overlay icon and thumbbuttons for Windows 7 and later (thx to Alptekin)
+-Improved: CPU usage is even lower now in most cases
 -Improved: Cover art loading performance
+-Fixed: Cover art loading could interfere with gapless playback in some PCs
 -Fixed: "No mapping for the Unicode char..." errors while downloading lyrics
 -Fixed: Queue list had no right click menu
+-Fixed: Position text and lyric box weren't reseted after stoping in some cases
+-Fixed: Couldn't load ppf playlist files (thx to Alptekin)
+-Fixed: Couldn't resume with play button (thx to Alptekin)
+-Updated: ID3v1 and ID3v2 libraries
+-Updated: MediaInfo to 0.7.71
 
 --1.8
 -Added: Support for external png, bmp and gif cover art files

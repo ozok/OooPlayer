@@ -51,7 +51,6 @@ type
     procedure QueryEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure A1Click(Sender: TObject);
-    procedure ResultsListMouseEnter(Sender: TObject);
     procedure QueryEditMouseEnter(Sender: TObject);
   private
     { Private declarations }
@@ -208,12 +207,6 @@ begin
         end;
     end;
   end;
-end;
-
-procedure TSearchForm.ResultsListMouseEnter(Sender: TObject);
-begin
-  if Self.Enabled and Self.Visible then
-    Self.FocusControl(ResultsList);
 end;
 
 procedure TSearchForm.SearchBtnClick(Sender: TObject);

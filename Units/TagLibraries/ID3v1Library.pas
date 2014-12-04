@@ -1,6 +1,6 @@
 //********************************************************************************************************************************
 //*                                                                                                                              *
-//*     ID3v1 Library 2.0.34.84 © 3delite 2010-2014                                                                              *
+//*     ID3v1 Library 2.0.35.85 © 3delite 2010-2014                                                                              *
 //*     See ID3v2 Library 2.0 ReadMe.txt for details                                                                             *
 //*                                                                                                                              *
 //* Two licenses are available for commercial usage of this component:                                                           *
@@ -1037,7 +1037,6 @@ Initialization
     INDFieldID[8] := Ord('3');
 
 end.
-
 
 
 

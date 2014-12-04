@@ -172,6 +172,8 @@ begin
             TitleLabel.Caption := '';
             ArtistLabel.Caption := '';
             AlbumLabel.Caption := '';
+            PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
+            LyricList.Lines.Clear;
             PlaybackInfoLabel.Caption := '';
             if MainForm.Enabled and MainForm.Visible then
               MainForm.FocusControl(VolumeBar);
@@ -198,6 +200,8 @@ begin
             TitleLabel.Caption := '';
             ArtistLabel.Caption := '';
             AlbumLabel.Caption := '';
+            PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
+            LyricList.Lines.Clear;
             PlaybackInfoLabel.Caption := '';
             if MainForm.Enabled and MainForm.Visible then
               MainForm.FocusControl(VolumeBar);
@@ -230,6 +234,8 @@ begin
             TitleLabel.Caption := '';
             ArtistLabel.Caption := '';
             AlbumLabel.Caption := '';
+            PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
+            LyricList.Lines.Clear;
             PlaybackInfoLabel.Caption := '';
             if MainForm.Enabled and MainForm.Visible then
               MainForm.FocusControl(VolumeBar);
@@ -266,6 +272,8 @@ begin
             TitleLabel.Caption := '';
             ArtistLabel.Caption := '';
             AlbumLabel.Caption := '';
+            PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
+            LyricList.Lines.Clear;
             PlaybackInfoLabel.Caption := '';
             if MainForm.Enabled and MainForm.Visible then
               MainForm.FocusControl(VolumeBar);
@@ -315,7 +323,7 @@ end;
 
 function TMusicPlayer.GetBassStreamStatus: TPlayerStatus;
 begin
-  case BASS_ChannelIsActive(FBassHandle) of
+  case BASS_ChannelIsActive(FMixHandle) of
     BASS_ACTIVE_STOPPED:
       Result := psStopped;
     BASS_ACTIVE_PLAYING:

@@ -27,11 +27,12 @@ uses
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
   Vcl.ExtCtrls, Generics.Collections, Vcl.Menus, JvExControls, JvArrowButton, JvComponentBase,
   JvSearchFiles, JvBaseDlg, JvBrowseFolder, MediaInfoDll, JvExComCtrls, JvComCtrls, Vcl.ImgList,
-  JvThreadTimer, windows7taskbar, JvExStdCtrls, JvListBox, IniFiles, Vcl.Buttons, JvFormPlacement, JvAppStorage,
+  JvThreadTimer, JvExStdCtrls, JvListBox, IniFiles, Vcl.Buttons, JvFormPlacement, JvAppStorage,
   JvAppIniStorage, StrUtils, ShellAPI, JvComputerInfoEx, UnitTagTypes, UnitTagReader, PNGImage, JvDragDrop,
   JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon, Jpeg, UnitMusicPlayer, Bass, BASSenc,
   IdBaseComponent, IdThreadComponent, UnitLyricDownloader, UnitTagWriter, UnitImageResize,
-  JvAnimatedImage, JvGIFCtrl, JvExExtCtrls, JvImage, JvAppInst, UnitInternalArtworkReader;
+  JvAnimatedImage, JvGIFCtrl, JvExExtCtrls, JvImage, JvAppInst, UnitInternalArtworkReader, Vcl.Taskbar,
+  System.Win.TaskbarCore;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -200,6 +201,13 @@ type
     Panel1: TPanel;
     PositionBar: TJvTrackBar;
     PositionLabel: TLabel;
+    VolumePnl: TPanel;
+    VolumeLowImg: TImage;
+    VolumeMuteImg: TImage;
+    VolumeMidImg: TImage;
+    VolumeHighImg: TImage;
+    Taskbar: TTaskbar;
+    OverlayImgs: TImageList;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -297,6 +305,8 @@ type
     procedure LogsBtnMouseEnter(Sender: TObject);
     procedure AppInstancesCmdLineReceived(Sender: TObject; CmdLine: TStrings);
     procedure ProgressTimerTimer(Sender: TObject);
+    procedure VolumeBarToolTip(Sender: TObject; var ToolTipText: string);
+    procedure TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
   private
     { Private declarations }
     FLastDir: string;
@@ -312,8 +322,7 @@ type
     FTagWriter: TTagWriter;
     FTempCoverPath: string;
     FInternalArtworkReader: TInternalArtworkReader;
-
-    procedure Log(s: string);
+    FVolumeImgIndex: integer;
 
     procedure AddFile(const FileName: string);
     procedure ReScanFile(const FileIndex: integer);
@@ -337,6 +346,8 @@ type
     procedure MoveRadioStations;
 
     procedure WriteTagsToRecordFile;
+
+    procedure UpdateOverlayIcon(const Index: integer);
   public
     { Public declarations }
     // encoder paths
@@ -356,6 +367,9 @@ type
     FShuffleIndex: Integer;
     FQueuedItems: TList<Integer>;
     PortableMode: Boolean;
+    ArtworkFileName: string;
+
+    procedure Log(s: string);
 
     procedure ScrollToItem(const ItemIndex: integer);
 
@@ -392,11 +406,9 @@ type
 
     function GetImage(const Dir: string): string;
     procedure LoadPicFromStream(const Stream: TStream; const PicType: TCoverArtType);
-    procedure LoadCoverArt(const FileName: string);
-    procedure LoadCoverArtEx(const FileName: string);
+    procedure LoadCoverArt;
     function LoadExternalCoverArt(const FileName: string): Boolean;
     function LoadInternalCoverArt(const FileName: string): Boolean;
-    function LoadInternalCoverArtEx(const FileName: string): Boolean;
   end;
 
 var
@@ -409,7 +421,7 @@ var
   FRadioRecordingInfo: TRadioRecordInfo;
 
 const
-  BuildInt = 1835;
+  BuildInt = 1917;
   Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
@@ -1215,14 +1227,7 @@ begin
     Application.MessageBox('Couldn''t load mediainfo.dll library.', 'Fatal Error', MB_ICONERROR);
     Application.Terminate;
   end;
-  // windows 7 taskbar
-  if CheckWin32Version(6, 1) then
-  begin
-    if not InitializeTaskbarAPI then
-    begin
-      Application.MessageBox('You seem to have Windows 7 but OooPlayer can''t start taskbar progressbar!', 'Error', MB_ICONERROR);
-    end;
-  end;
+
   // encoder paths
   FLamePath := ExtractFileDir(Application.ExeName) + '\Encoders\lame.exe';
   FOggEncPath := ExtractFileDir(Application.ExeName) + '\Encoders\oggenc2.exe';
@@ -1291,6 +1296,7 @@ begin
   FTagWriter := TTagWriter.Create;
   FTempCoverPath := FAppDataFolder + '\cover';
   FInternalArtworkReader := TInternalArtworkReader.Create;
+  Taskbar.ProgressMaxValue := MaxInt;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -1499,31 +1505,23 @@ begin
   LogForm.Show;
 end;
 
-procedure TMainForm.LoadCoverArt(const FileName: string);
+procedure TMainForm.LoadCoverArt;
 begin
   case SettingsForm.CoverArtList.ItemIndex of
     0: // external
       begin
-        if not LoadExternalCoverArt(FileName) then
+        if not LoadExternalCoverArt(ArtworkFileName) then
         begin
-          LoadInternalCoverArt(FileName)
+          LoadInternalCoverArt(ArtworkFileName)
         end;
       end;
     1: // internal first
       begin
-        if not LoadInternalCoverArt(FileName) then
+        if not LoadInternalCoverArt(ArtworkFileName) then
         begin
-          LoadExternalCoverArt(FileName)
+          LoadExternalCoverArt(ArtworkFileName)
         end;
       end;
-  end;
-end;
-
-procedure TMainForm.LoadCoverArtEx(const FileName: string);
-begin
-  if not FInternalArtworkReader.Busy then
-  begin
-    LoadCoverArt(FileName);
   end;
 end;
 
@@ -1566,12 +1564,10 @@ begin
   Result := False;
   if not FTagReader.IsBusy then
   begin
-    Log('2');
     FTagReader.ReadArtwork(FileName);
   end
   else
   begin
-    Log('3');
     LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
     CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
     Exit;
@@ -1585,17 +1581,6 @@ begin
   begin
     LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
     CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
-  end;
-end;
-
-function TMainForm.LoadInternalCoverArtEx(const FileName: string): Boolean;
-begin
-  Log('0');
-  if not FInternalArtworkReader.Busy then
-  begin
-    Log('1');
-    FInternalArtworkReader.FileName := FileName;
-    FInternalArtworkReader.Start;
   end;
 end;
 
@@ -1790,6 +1775,7 @@ begin
               LPlayListItem.Stars := LInt;
             end;
           end;
+          FPlayListItems.Add(LPlayListItem);
         end;
       end;
     finally
@@ -1876,6 +1862,7 @@ end;
 
 procedure TMainForm.Log(s: string);
 begin
+  exit;
   LogForm.LogList.Lines.Add(s);
 end;
 
@@ -2149,7 +2136,8 @@ begin
       FPlayer.Pause;
       PositionTimer.Enabled := False;
       ProgressTimer.Enabled := PositionTimer.Enabled;
-      SetProgressState(handle, tbpsPaused);
+      Taskbar.ProgressState := TTaskBarProgressState.Paused;
+      UpdateOverlayIcon(2);
       PlaybackInfoLabel.Caption := 'Paused | ' + FCurrentItemInfo.StatusInfoText;
     end
     else if FPlayer.PlayerStatus = psPaused then
@@ -2158,7 +2146,8 @@ begin
       FPlayer.SetVolume(100 - VolumeBar.Position);
       PositionTimer.Enabled := True;
       ProgressTimer.Enabled := PositionTimer.Enabled;
-      SetProgressState(handle, tbpsNormal);
+      Taskbar.ProgressState := TTaskBarProgressState.Normal;
+      UpdateOverlayIcon(1);
       PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
     end;
   end
@@ -2209,47 +2198,247 @@ procedure TMainForm.PlayBtnClick(Sender: TObject);
 var
   LRndIndex: Integer;
 begin
-  case FuncPages.ActivePageIndex of
-    0: // music player
-      begin
+  if (FPlayer.PlayerStatus2 = psPlaying) or (FPlayer.PlayerStatus2 = psPaused) then
+  begin
+    // music playing
 {$REGION 'music play'}
-        if FPlayer.PlayerStatus2 = psPaused then
+    if FPlayer.PlayerStatus2 = psPaused then
+    begin
+      // if paused then resume
+      FPlayer.Resume;
+      FPlayer.SetVolume(100 - VolumeBar.Position);
+      PositionTimer.Enabled := True;
+      ProgressTimer.Enabled := PositionTimer.Enabled;
+      Taskbar.ProgressState := TTaskBarProgressState.Normal;
+      UpdateOverlayIcon(1);
+      PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
+    end
+    else
+    begin
+      if PlayList.ItemIndex = -1 then
+      begin
+        if PlayList.Items.Count > 0 then
         begin
-          // if paused then resume
-          FPlayer.Pause;
-          FPlayer.SetVolume(100 - VolumeBar.Position);
-          PositionTimer.Enabled := True;
-          ProgressTimer.Enabled := PositionTimer.Enabled;
-          SetProgressState(handle, tbpsNormal);
-          PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
+          PlayList.ItemIndex := 0;
+        end;
+      end;
+      if PlayList.ItemIndex > -1 then
+      begin
+        case PlaybackOrderList.ItemIndex of
+          0: // normal
+            begin
+              if SettingsForm.PlayCursorBtn.Checked then
+              begin
+                // follow the cursor
+                // if selected a different item
+                if PlayList.ItemIndex <> FCurrentItemInfo.ItemIndex then
+                begin
+                  PositionTimer.Enabled := False;
+                  ProgressTimer.Enabled := PositionTimer.Enabled;
+                  PlayItem(PlayList.ItemIndex);
+                end
+                else
+                begin
+                  // current item is selected
+                  // if paused continue
+                  if FPlayer.PlayerStatus2 = psPaused then
+                  begin
+                    FPlayer.Pause;
+                  end
+                  else if FPlayer.PlayerStatus2 = psStopped then
+                  begin
+                    // if stopped start platyng
+                    PositionTimer.Enabled := False;
+                    ProgressTimer.Enabled := PositionTimer.Enabled;
+                    PlayItem(PlayList.ItemIndex);
+                  end;
+                end;
+              end
+              else
+              begin
+                // don't follow the cursor
+                // if paused continue
+                if FPlayer.PlayerStatus2 = psPaused then
+                begin
+                  FPlayer.Pause;
+                end
+                else if FPlayer.PlayerStatus2 = psStopped then
+                begin
+                  // if stopped start platyng
+                  PositionTimer.Enabled := False;
+                  ProgressTimer.Enabled := PositionTimer.Enabled;
+                  PlayItem(PlayList.ItemIndex);
+                end;
+              end;
+            end;
+          1: // random
+            begin
+              Randomize;
+              LRndIndex := Random(FPlayListItems.Count);
+              PositionTimer.Enabled := False;
+              ProgressTimer.Enabled := PositionTimer.Enabled;
+              PlayItem(LRndIndex);
+            end;
+          2: // repear track
+            begin
+              PositionTimer.Enabled := False;
+              ProgressTimer.Enabled := PositionTimer.Enabled;
+              try
+                if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
+                begin
+                  PlayItem(FCurrentItemInfo.ItemIndex);
+                end;
+              finally
+                PositionTimer.Enabled := True;
+                ProgressTimer.Enabled := PositionTimer.Enabled;
+              end;
+            end;
+          3: // shuffle
+            begin
+              PositionTimer.Enabled := False;
+              ProgressTimer.Enabled := PositionTimer.Enabled;
+              try
+                if FShuffleIndex + 1 < FShuffleIndexes.Count then
+                begin
+                  FShuffleIndex := 1 + FShuffleIndex;
+                  if FShuffleIndexes[FShuffleIndex] < FPlayListItems.Count then
+                  begin
+                    PlayItem(FShuffleIndexes[FShuffleIndex]);
+                  end;
+                end;
+              finally
+                PositionTimer.Enabled := True;
+                ProgressTimer.Enabled := PositionTimer.Enabled;
+              end;
+            end;
+        end;
+      end;
+      if Self.Enabled and Self.Visible then
+        Self.FocusControl(VolumeBar);
+    end;
+{$ENDREGION}
+  end
+  else if not IsRadioPlayerStopped then
+  begin
+    // radio playing
+{$REGION 'Radio'}
+    begin
+      if IsRadioPlayerPaused then
+      begin
+        // resume
+        ResumeRadio;
+        Taskbar.ProgressState := TTaskBarProgressState.Normal;
+      UpdateOverlayIcon(1);
+      end
+      else
+      begin
+        // start playing selected radio
+        // make sure a radio is selected
+        if RadioList.ItemIndex = -1 then
+        begin
+          if RadioList.Items.Count > 0 then
+          begin
+            RadioList.ItemIndex := 0;
+          end;
+        end;
+        // start playing
+        // if selected a different radio
+        if PlayList.ItemIndex <> FCurrentRadioIndex then
+        begin
+          // kill prev process
+          if not IsRadioPlayerStopped then
+          begin
+            StopRadio;
+          end;
+          FCurrentRadioIndex := RadioList.ItemIndex;
+          PlayRadio(FRadioStations[FCurrentRadioIndex].URL);
         end
         else
         begin
-          if PlayList.ItemIndex = -1 then
+          // current radio is selected
+          if IsRadioPlayerPaused then
           begin
-            if PlayList.Items.Count > 0 then
+            ResumeRadio
+          end
+          else if IsRadioPlayerStopped then
+          begin
+            // kill prev process
+            if not IsRadioPlayerStopped then
             begin
-              PlayList.ItemIndex := 0;
+              StopRadio;
             end;
+            FCurrentRadioIndex := RadioList.ItemIndex;
+            PlayRadio(FRadioStations[FCurrentRadioIndex].URL);
           end;
-          if PlayList.ItemIndex > -1 then
+        end;
+      end;
+    end;
+{$ENDREGION}
+  end
+  else
+  begin
+    // nothing plays
+    // start according to selected tab page
+    case FuncPages.ActivePageIndex of
+      0: // music player
+        begin
+{$REGION 'music play'}
+          if FPlayer.PlayerStatus2 = psPaused then
           begin
-            case PlaybackOrderList.ItemIndex of
-              0: // normal
-                begin
-                  if SettingsForm.PlayCursorBtn.Checked then
+            // if paused then resume
+            // it'll not reach here, this code is dead
+            FPlayer.Pause;
+            FPlayer.SetVolume(100 - VolumeBar.Position);
+            PositionTimer.Enabled := True;
+            ProgressTimer.Enabled := PositionTimer.Enabled;
+            Taskbar.ProgressState := TTaskBarProgressState.Normal;
+      UpdateOverlayIcon(1);
+            PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
+          end
+          else
+          begin
+            if PlayList.ItemIndex = -1 then
+            begin
+              if PlayList.Items.Count > 0 then
+              begin
+                PlayList.ItemIndex := 0;
+              end;
+            end;
+            if PlayList.ItemIndex > -1 then
+            begin
+              case PlaybackOrderList.ItemIndex of
+                0: // normal
                   begin
-                    // follow the cursor
-                    // if selected a different item
-                    if PlayList.ItemIndex <> FCurrentItemInfo.ItemIndex then
+                    if SettingsForm.PlayCursorBtn.Checked then
                     begin
-                      PositionTimer.Enabled := False;
-                      ProgressTimer.Enabled := PositionTimer.Enabled;
-                      PlayItem(PlayList.ItemIndex);
+                      // follow the cursor
+                      // if selected a different item
+                      if PlayList.ItemIndex <> FCurrentItemInfo.ItemIndex then
+                      begin
+                        PositionTimer.Enabled := False;
+                        ProgressTimer.Enabled := PositionTimer.Enabled;
+                        PlayItem(PlayList.ItemIndex);
+                      end
+                      else
+                      begin
+                        // current item is selected
+                        // if paused continue
+                        if FPlayer.PlayerStatus2 = psPaused then
+                        begin
+                          FPlayer.Pause;
+                        end
+                        else if FPlayer.PlayerStatus2 = psStopped then
+                        begin
+                          // if stopped start platyng
+                          PositionTimer.Enabled := False;
+                          ProgressTimer.Enabled := PositionTimer.Enabled;
+                          PlayItem(PlayList.ItemIndex);
+                        end;
+                      end;
                     end
                     else
                     begin
-                      // current item is selected
+                      // don't follow the cursor
                       // if paused continue
                       if FPlayer.PlayerStatus2 = psPaused then
                       begin
@@ -2263,110 +2452,78 @@ begin
                         PlayItem(PlayList.ItemIndex);
                       end;
                     end;
-                  end
-                  else
+                  end;
+                1: // random
                   begin
-                    // don't follow the cursor
-                    // if paused continue
-                    if FPlayer.PlayerStatus2 = psPaused then
-                    begin
-                      FPlayer.Pause;
-                    end
-                    else if FPlayer.PlayerStatus2 = psStopped then
-                    begin
-                      // if stopped start platyng
-                      PositionTimer.Enabled := False;
-                      ProgressTimer.Enabled := PositionTimer.Enabled;
-                      PlayItem(PlayList.ItemIndex);
-                    end;
-                  end;
-                end;
-              1: // random
-                begin
-                  Randomize;
-                  LRndIndex := Random(FPlayListItems.Count);
-                  PositionTimer.Enabled := False;
-                  ProgressTimer.Enabled := PositionTimer.Enabled;
-                  PlayItem(LRndIndex);
-                end;
-              2: // repear track
-                begin
-                  PositionTimer.Enabled := False;
-                  ProgressTimer.Enabled := PositionTimer.Enabled;
-                  try
-                    if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
-                    begin
-                      PlayItem(FCurrentItemInfo.ItemIndex);
-                    end;
-                  finally
-                    PositionTimer.Enabled := True;
+                    Randomize;
+                    LRndIndex := Random(FPlayListItems.Count);
+                    PositionTimer.Enabled := False;
                     ProgressTimer.Enabled := PositionTimer.Enabled;
+                    PlayItem(LRndIndex);
                   end;
-                end;
-              3: // shuffle
-                begin
-                  PositionTimer.Enabled := False;
-                  ProgressTimer.Enabled := PositionTimer.Enabled;
-                  try
-                    if FShuffleIndex + 1 < FShuffleIndexes.Count then
-                    begin
-                      FShuffleIndex := 1 + FShuffleIndex;
-                      if FShuffleIndexes[FShuffleIndex] < FPlayListItems.Count then
+                2: // repear track
+                  begin
+                    PositionTimer.Enabled := False;
+                    ProgressTimer.Enabled := PositionTimer.Enabled;
+                    try
+                      if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
                       begin
-                        PlayItem(FShuffleIndexes[FShuffleIndex]);
+                        PlayItem(FCurrentItemInfo.ItemIndex);
                       end;
+                    finally
+                      PositionTimer.Enabled := True;
+                      ProgressTimer.Enabled := PositionTimer.Enabled;
                     end;
-                  finally
-                    PositionTimer.Enabled := True;
-                    ProgressTimer.Enabled := PositionTimer.Enabled;
                   end;
-                end;
+                3: // shuffle
+                  begin
+                    PositionTimer.Enabled := False;
+                    ProgressTimer.Enabled := PositionTimer.Enabled;
+                    try
+                      if FShuffleIndex + 1 < FShuffleIndexes.Count then
+                      begin
+                        FShuffleIndex := 1 + FShuffleIndex;
+                        if FShuffleIndexes[FShuffleIndex] < FPlayListItems.Count then
+                        begin
+                          PlayItem(FShuffleIndexes[FShuffleIndex]);
+                        end;
+                      end;
+                    finally
+                      PositionTimer.Enabled := True;
+                      ProgressTimer.Enabled := PositionTimer.Enabled;
+                    end;
+                  end;
+              end;
             end;
+            if Self.Enabled and Self.Visible then
+              Self.FocusControl(VolumeBar);
           end;
-          if Self.Enabled and Self.Visible then
-            Self.FocusControl(VolumeBar);
-        end;
 {$ENDREGION}
-      end;
-    1: // radio
-      begin
-        if IsRadioPlayerPaused then
+        end;
+      1: // radio
+{$REGION 'Radio'}
         begin
-          // resume
-          ResumeRadio;
-          SetProgressState(handle, tbpsNormal);
-        end
-        else
-        begin
-          // start playing selected radio
-          // make sure a radio is selected
-          if RadioList.ItemIndex = -1 then
+          if IsRadioPlayerPaused then
           begin
-            if RadioList.Items.Count > 0 then
-            begin
-              RadioList.ItemIndex := 0;
-            end;
-          end;
-          // start playing
-          // if selected a different radio
-          if PlayList.ItemIndex <> FCurrentRadioIndex then
-          begin
-            // kill prev process
-            if not IsRadioPlayerStopped then
-            begin
-              StopRadio;
-            end;
-            FCurrentRadioIndex := RadioList.ItemIndex;
-            PlayRadio(FRadioStations[FCurrentRadioIndex].URL);
+            // resume
+            ResumeRadio;
+            Taskbar.ProgressState := TTaskBarProgressState.Normal;
+      UpdateOverlayIcon(1);
           end
           else
           begin
-            // current radio is selected
-            if IsRadioPlayerPaused then
+            // start playing selected radio
+            // make sure a radio is selected
+            if RadioList.ItemIndex = -1 then
             begin
-              ResumeRadio
-            end
-            else if IsRadioPlayerStopped then
+              if RadioList.Items.Count > 0 then
+              begin
+                RadioList.ItemIndex := 0;
+              end;
+            end;
+            // start playing
+            // if selected a different radio
+            if PlayList.ItemIndex <> FCurrentRadioIndex then
             begin
               // kill prev process
               if not IsRadioPlayerStopped then
@@ -2375,10 +2532,29 @@ begin
               end;
               FCurrentRadioIndex := RadioList.ItemIndex;
               PlayRadio(FRadioStations[FCurrentRadioIndex].URL);
+            end
+            else
+            begin
+              // current radio is selected
+              if IsRadioPlayerPaused then
+              begin
+                ResumeRadio
+              end
+              else if IsRadioPlayerStopped then
+              begin
+                // kill prev process
+                if not IsRadioPlayerStopped then
+                begin
+                  StopRadio;
+                end;
+                FCurrentRadioIndex := RadioList.ItemIndex;
+                PlayRadio(FRadioStations[FCurrentRadioIndex].URL);
+              end;
             end;
           end;
         end;
-      end;
+{$ENDREGION}
+    end;
   end;
 end;
 
@@ -2449,7 +2625,8 @@ begin
 
       PlayList.ItemIndex := -1;
       PlayList.ItemIndex := FCurrentItemInfo.ItemIndex;
-      SetProgressState(handle, tbpsNormal);
+      Taskbar.ProgressState := TTaskBarProgressState.Normal;
+      UpdateOverlayIcon(1);
       PlayList.Refresh;
       with FPlayListItems[FCurrentItemInfo.ItemIndex] do
       begin
@@ -2466,7 +2643,12 @@ begin
       end;
       if SettingsForm.LoadArtBtn.Checked then
       begin
-        LoadCoverArt(FCurrentItemInfo.FullFileName);
+        if not FInternalArtworkReader.Busy then
+        begin
+          FInternalArtworkReader.FileName := FCurrentItemInfo.FullFileName;
+          FInternalArtworkReader.Start;
+          // LoadCoverArt(FCurrentItemInfo.FullFileName);
+        end;
       end
       else
       begin
@@ -2539,14 +2721,18 @@ begin
   end
   else
   begin
-    LogForm.LogList.Lines.Add('[' + DateTimeToStr(Now) + '] Error:' + FloatToStr(FPlayer.ErrorMsg));
+    // fplayer didn't return OK
+    // FPlayer.Stop;
+    // FStoppedByUser := False;
+    StopBtnClick(Self);
+
+    LogForm.LogList.Lines.Add('[' + DateTimeToStr(Now) + '] Player returned error code: ' + FloatToStr(FPlayer.ErrorMsg));
     if not LogForm.Visible then
     begin
       LogForm.Show;
     end;
-    FPlayer.Stop;
-    FStoppedByUser := False;
   end;
+
 end;
 
 procedure TMainForm.PlayListAdvancedCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
@@ -2668,12 +2854,17 @@ begin
   StopRadioRecording;
   PositionBar.Position := 0;
   Self.Caption := 'OooPlayer';
+  PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
   CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
   TitleLabel.Caption := 'Trying to connect to the radio station...';
   ArtistLabel.Caption := '';
   AlbumLabel.Caption := '';
+  PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
+  LyricList.Lines.Clear;
   PlaybackInfoLabel.Caption := '';
-  SetProgressValue(handle, 0, MaxInt);
+  Taskbar.ProgressMaxValue := MaxInt;
+  Taskbar.ProgressValue := 0;
+  UpdateOverlayIcon(3);
   PlayList.Invalidate;
   PositionTimer.Enabled := False;
   ProgressTimer.Enabled := PositionTimer.Enabled;
@@ -2741,7 +2932,7 @@ begin
           PositionBar.Position := FPlayer.Position;
         end;
       finally
-        Sleep(100);
+        Sleep(10);
         PositionTimer.Enabled := True;
         ProgressTimer.Enabled := PositionTimer.Enabled;
         FPlayer.Resume;
@@ -2766,7 +2957,8 @@ begin
     if LPosition > PositionBar.Position then
     begin
       PositionBar.Position := LPosition;
-      SetProgressValue(handle, LPosition, MaxInt);
+      Taskbar.ProgressMaxValue := MaxInt;
+      Taskbar.ProgressValue := LPosition;
       // PositionLabel.Caption := FPlayer.PositionStr + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt - FPlayer.PositionAsSec) + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt);
     end;
   end
@@ -3669,8 +3861,12 @@ begin
   TitleLabel.Caption := '';
   ArtistLabel.Caption := '';
   AlbumLabel.Caption := '';
+  PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
+  LyricList.Lines.Clear;
   PlaybackInfoLabel.Caption := '';
-  SetProgressValue(handle, 0, MaxInt);
+  Taskbar.ProgressMaxValue := MaxInt;
+  Taskbar.ProgressValue := 0;
+  UpdateOverlayIcon(3);
   PlayList.Invalidate;
   RadioList.Invalidate;
   LyricList.Lines.Clear;
@@ -3714,6 +3910,22 @@ begin
   end;
 end;
 
+procedure TMainForm.TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
+begin
+  case AButtonID of
+    0:
+      PlayBtnClick(Self);
+    1:
+      PauseBtnClick(Self);
+    2:
+      StopBtnClick(Self);
+    3:
+      PrevBtnClick(Self);
+    4:
+      NextBtnClick(Self);
+  end;
+end;
+
 procedure TMainForm.TopBarPnlMouseEnter(Sender: TObject);
 begin
   if Self.Enabled and Self.Visible then
@@ -3749,6 +3961,12 @@ begin
   end;
 end;
 
+procedure TMainForm.UpdateOverlayIcon(const Index: integer);
+begin
+  Taskbar.OverlayIcon.LoadFromFile(ExtractFileDir(Application.ExeName) + '\ico\'+FloatToStr(Index)+'.ico');
+  Taskbar.ApplyChanges;
+end;
+
 procedure TMainForm.UpdateThreadExecute(Sender: TObject; Params: Pointer);
 begin
   with UpdateChecker do
@@ -3777,6 +3995,8 @@ begin
 end;
 
 procedure TMainForm.VolumeBarChange(Sender: TObject);
+var
+  LVolLvl: integer;
 begin
 
   if FPlaybackType = music then
@@ -3795,6 +4015,36 @@ begin
       SetRadioVolume(100 - VolumeBar.Position);
     end;
   end;
+  LVolLvl := 100 - VolumeBar.Position;
+  if LVolLvl = 0 then
+  begin
+    VolumeMuteImg.Visible := True;
+    VolumeMidImg.Visible := False;
+    VolumeHighImg.Visible := False;
+    VolumeLowImg.Visible := False;
+  end
+  else if LVolLvl <= 25 then
+  begin
+    VolumeMuteImg.Visible := False;
+    VolumeMidImg.Visible := False;
+    VolumeHighImg.Visible := False;
+    VolumeLowImg.Visible := True;
+  end
+  else if LVolLvl <= 75 then
+  begin
+    VolumeMuteImg.Visible := False;
+    VolumeMidImg.Visible := True;
+    VolumeHighImg.Visible := False;
+    VolumeLowImg.Visible := False;
+  end
+  else
+  begin
+    VolumeMuteImg.Visible := False;
+    VolumeMidImg.Visible := False;
+    VolumeHighImg.Visible := True;
+    VolumeLowImg.Visible := False;
+  end;
+
   StatusBar1.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
 end;
 
@@ -3802,6 +4052,11 @@ procedure TMainForm.VolumeBarMouseEnter(Sender: TObject);
 begin
   if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
+end;
+
+procedure TMainForm.VolumeBarToolTip(Sender: TObject; var ToolTipText: string);
+begin
+  ToolTipText := FloatToStr(100 - VolumeBar.Position)
 end;
 
 procedure TMainForm.WndProc(var Msg: TMessage);
@@ -3813,7 +4068,6 @@ begin
   begin
     if (Msg.WParam = UPDATE_META) or (Msg.WParam = UPDATE_META_NAME) then
     begin
-      LogForm.LogList.Lines.Add('recoding winproc');
       // radio recording
       // seperate file for each song
       if FRecordingRadio then

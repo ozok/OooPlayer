@@ -75,10 +75,8 @@ begin
   try
     if FileExists(FFile) then
     begin
-      if not MainForm.LoadInternalCoverArt(FFile) then
-      begin
-        MainForm.LoadExternalCoverArt(FileName);
-      end;
+      MainForm.ArtworkFileName := FileName;
+      FThread.Synchronize(MainForm.LoadCoverArt);
     end;
   finally
     Busy := False;

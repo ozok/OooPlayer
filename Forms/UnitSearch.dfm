@@ -82,7 +82,6 @@ object SearchForm: TSearchForm
     ViewStyle = vsReport
     OnClick = ResultsListClick
     OnDblClick = ResultsListDblClick
-    OnMouseEnter = ResultsListMouseEnter
   end
   object chkCloseOnPlayBtn: TCheckBox
     Left = 8

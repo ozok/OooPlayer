@@ -1,6 +1,6 @@
 //********************************************************************************************************************************
 //*                                                                                                                              *
-//*     ID3v2 Library 2.0.34.84 © 3delite 2010-2014                                                                              *
+//*     ID3v2 Library 2.0.35.85 © 3delite 2010-2014                                                                              *
 //*     See ID3v2 Library 2.0 ReadMe.txt for details                                                                             *
 //*                                                                                                                              *
 //* Two licenses are available for commercial usage of this component:                                                           *
@@ -61,7 +61,7 @@ Uses
     Classes;
 
 Const
-    ID3V2LIBRARY_VERSION = $02003484;
+    ID3V2LIBRARY_VERSION = $02003585;
 
 Const
     ID3V2LIBRARY_DEFAULT_PARSE_AUDIO_ATTRBIUTES = True;
@@ -1835,6 +1835,7 @@ begin
                 end;
                 //* Unicode format UTF-8
                 3: begin
+                    SetLength(Bytes, 0);
                     ByteCounter := 0;
                     repeat
                         Frames[FrameIndex].Stream.Read(Data, 1);
@@ -2646,6 +2647,7 @@ begin
         case Data of
             //* ISO-8859-1
             0: begin
+                SetLength(Bytes, 0);
                 ByteCounter := 0;
                 repeat
                     Frames[FrameIndex].Stream.Read(Data, 1);
@@ -2665,7 +2667,11 @@ begin
                         end;
                     end;
                 until Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size;
-                Result := StringOf(Bytes);
+                try
+                    Result := StringOf(Bytes);
+                except
+                    Result := TEncoding.ANSI.GetString(Bytes);
+                end;
             end;
             //* UTF-16
             1: begin
@@ -3466,11 +3472,9 @@ begin
             Exit;
         end;
         Frames[FrameIndex].Stream.Seek(0, soBeginning);
-
         //* Get text encoding
         Frames[FrameIndex].Stream.Read(Data, 1);
         TextEncoding := Data;
-
         //* Get MIME type
         repeat
             Frames[FrameIndex].Stream.Read(Data, 1);
@@ -3479,11 +3483,9 @@ begin
             end;
         until (Data = 0)
         OR (Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size);
-
         //* Get picture type
         Frames[FrameIndex].Stream.Read(Data, 1);
         CoverType := Data;
-
         //* Get description
         //* ASCII format ISO-8859-1
         case TextEncoding of
@@ -3538,7 +3540,6 @@ begin
                 Description := TEncoding.UTF8.GetString(Bytes);
             end;
         end;
-
         //* Get binary picture data
         PictureStream.Seek(0, soBeginning);
         try
@@ -4145,6 +4146,7 @@ begin
             end;
             3: begin
                 //* Get description
+                SetLength(Bytes, 0);
                 ByteCounter  := 0;
                 repeat
                     Frames[FrameIndex].Stream.Read(Data, 1);
@@ -4589,6 +4591,7 @@ begin
             end;
             3: begin
                 Frames[FrameIndex].Stream.Seek(1, soBeginning);
+                SetLength(Bytes, 0);
                 ByteCounter := 0;
                 repeat
                     SetLength(Bytes, Length(Bytes) + 1);
@@ -7499,6 +7502,7 @@ begin
             end;
             3: begin
                 //* Get description
+                SetLength(Bytes, 0);
                 ByteCounter := 0;
                 repeat
                     Frames[FrameIndex].Stream.Read(Data, 1);
@@ -7511,6 +7515,7 @@ begin
                 OR (Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size);
                 Description := TEncoding.UTF8.GetString(Bytes);
                 //* Get the content
+                SetLength(Bytes, 0);
                 ByteCounter := 0;
                 repeat
                     Frames[FrameIndex].Stream.Read(Data, 1);
@@ -8180,6 +8185,7 @@ begin
                 repeat
                     Name := '';
                     Value := '';
+                    SetLength(Bytes, 0);
                     ByteCounter := 0;
                     repeat
                         Frames[FrameIndex].Stream.Read(Data, 1);
@@ -9652,4 +9658,3 @@ Initialization
     DSFfmt_ID[3] := Ord(' ');
 
 end.
-

@@ -5,7 +5,6 @@ uses
   Vcl.Forms,
   UnitMain in 'Forms\UnitMain.pas' {MainForm} ,
   MediaInfoDLL in 'Units\MediaInfoDLL.pas',
-  windows7taskbar in 'Units\windows7taskbar.pas',
   UnitSearch in 'Forms\UnitSearch.pas' {SearchForm} ,
   UnitSettings in 'Forms\UnitSettings.pas' {SettingsForm} ,
   UnitFileInfo in 'Forms\UnitFileInfo.pas' {InfoForm} ,
