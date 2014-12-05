@@ -38,6 +38,13 @@ type
   TPlaybackType = (music = 0, radio = 1);
 
 type
+  TPlaylistFile = packed record
+    Name, PlaylistFile: string;
+  end;
+
+  TPlaylistFiles = TList<TPlaylistFile>;
+
+type
   TRadioStation = packed record
     Name: string;
     URL: Ansistring;
@@ -112,7 +119,7 @@ type
     NextBtn: TButton;
     SysInfo: TJvComputerInfoEx;
     R1: TMenuItem;
-    StatusBar1: TStatusBar;
+    StatusBar: TStatusBar;
     N1: TMenuItem;
     s3: TMenuItem;
     L1: TMenuItem;
@@ -208,6 +215,11 @@ type
     VolumeHighImg: TImage;
     Taskbar: TTaskbar;
     OverlayImgs: TImageList;
+    PlaylistList: TComboBox;
+    Panel3: TPanel;
+    AddPlaylistBtn: TButton;
+    RemovePlaylistBtn: TButton;
+    Bevel1: TBevel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -307,6 +319,8 @@ type
     procedure ProgressTimerTimer(Sender: TObject);
     procedure VolumeBarToolTip(Sender: TObject; var ToolTipText: string);
     procedure TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
+    procedure AddPlaylistBtnClick(Sender: TObject);
+    procedure PlaylistListChange(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -322,7 +336,7 @@ type
     FTagWriter: TTagWriter;
     FTempCoverPath: string;
     FInternalArtworkReader: TInternalArtworkReader;
-    FVolumeImgIndex: integer;
+    FPlayListFiles: TPlaylistFiles;
 
     procedure AddFile(const FileName: string);
     procedure ReScanFile(const FileIndex: integer);
@@ -355,7 +369,7 @@ type
     // encoder paths
 
     FStoppedByUser: Boolean;
-    FPlayListItems: TList<TPlayListItem>;
+    FPlaylists: TList<TPlaylist>;
     FRadioStations: TRadioList;
     FCurrentItemInfo: TCurrentItemInfo;
     FTagReader: TTagReader;
@@ -368,6 +382,7 @@ type
     FQueuedItems: TList<Integer>;
     PortableMode: Boolean;
     ArtworkFileName: string;
+    FSelectedPlaylistIndex: integer;
 
     procedure Log(s: string);
 
@@ -519,8 +534,8 @@ begin
         PlayList.Invalidate;
         // add to queue list
         LItem := QueueList.Items.Add;
-        LItem.Caption := FPlayListItems[i].Artist + ' - ' + FPlayListItems[i].Album + ' - ' + FPlayListItems[i].Title;
-        LItem.SubItems.Add(FPlayListItems[i].DurationStr);
+        LItem.Caption := FPlaylists[FSelectedPlaylistIndex][i].Artist + ' - ' + FPlaylists[FSelectedPlaylistIndex][i].Album + ' - ' + FPlaylists[FSelectedPlaylistIndex][i].Title;
+        LItem.SubItems.Add(FPlaylists[FSelectedPlaylistIndex][i].DurationStr);
       end;
     end;
   end;
@@ -561,7 +576,7 @@ begin
       Self.Width := Self.Width + 1;
       Self.Width := Self.Width - 1;
       GenerateShuffleList;
-      StatusBar1.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+      StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
     end;
   end;
 end;
@@ -588,7 +603,7 @@ begin
       Self.Width := Self.Width + 1;
       Self.Width := Self.Width - 1;
       GenerateShuffleList;
-      StatusBar1.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+      StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
     end;
   end;
 end;
@@ -652,7 +667,7 @@ begin
     Self.Width := Self.Width + 1;
     Self.Width := Self.Width - 1;
     GenerateShuffleList;
-    StatusBar1.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+    StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
   end;
   FStopAddFiles := True;
 end;
@@ -660,7 +675,7 @@ end;
 procedure TMainForm.AddFile(const FileName: string);
 var
   MediaInfoHandle: Cardinal;
-  LPlayListItem, LTmpItem: TPlayListItem;
+  LPlayListItem, LTmpItem: TPlayItem;
   LTitle, LArtist, LAlbum, LDuration, LBitrate, LChannels, LCodec, LSampleRate: string;
 begin
 
@@ -689,6 +704,7 @@ begin
         LBitrate := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'BitRate/String', Info_Text, Info_Name);
         LChannels := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Channel(s)/String', Info_Text, Info_Name);
         LCodec := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Codec/String', Info_Text, Info_Name);
+        // a workaround for ALAC being reported as "Lossless"
         if LCodec = 'Lossless' then
         begin
           LCodec := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Format', Info_Text, Info_Name);
@@ -752,7 +768,7 @@ begin
         // increase playlist item count
         PlayList.Items.Count := PlayList.Items.Count + 1;
 
-        LPlayListItem := TPlayListItem.Create;
+        LPlayListItem := TPlayItem.Create;
         LPlayListItem.FullFileName := FileName;
         LPlayListItem.DurationStr := LDuration;
         LPlayListItem.Title := LTitle;
@@ -763,11 +779,51 @@ begin
         LPlayListItem.Channels := LChannels;
         LPlayListItem.Codec := LCodec;
         LPlayListItem.SampleRate := LSampleRate;
-        FPlayListItems.Add(LPlayListItem);
+        FPlaylists[FSelectedPlaylistIndex].Add(LPlayListItem);
       finally
         MediaInfo_Close(MediaInfoHandle);
       end;
     end;
+  end;
+end;
+
+procedure TMainForm.AddPlaylistBtnClick(Sender: TObject);
+var
+  LName: string;
+  LPlaylistFile: TPlaylistFile;
+  I: Integer;
+  LPlaylist: TPlaylist;
+  LSW: TStreamWriter;
+begin
+  LName := InputBox('New playlist name', 'Name', 'Playlist' + FPlayListFiles.Count.ToString());
+  if LName.Length > 0 then
+  begin
+    LPlaylistFile.Name := LName;
+    LPlaylistFile.PlaylistFile := FAppDataFolder + '\playlist' + FPlayListFiles.Count.ToString() + '.dat';
+    FPlayListFiles.Add(LPlaylistFile);
+    LSW := TStreamWriter.Create(FAppDataFolder + '\playlists.dat', False);
+    try
+      for I := 0 to FPlayListFiles.Count-1 do
+      begin
+        LSW.WriteLine(FPlayListFiles[i].Name + '|' + FPlayListFiles[i].PlaylistFile);
+      end;
+    finally
+      LSW.Close;
+      LSW.Free;
+    end;
+
+    PlaylistList.Items.Clear;
+    for I := 0 to FPlayListFiles.Count - 1 do
+    begin
+      PlaylistList.Items.Add(FPlayListFiles[i].Name);
+    end;
+    FSelectedPlaylistIndex := FPlayListFiles.Count - 1;
+    PlaylistList.ItemIndex := FSelectedPlaylistIndex;
+
+    LPlaylist := TPlaylist.Create;
+    FPlaylists.Add(LPlaylist);
+    SavePlayList;
+    PlaylistListChange(Self);
   end;
 end;
 
@@ -811,7 +867,7 @@ begin
       Self.Width := Self.Width + 1;
       Self.Width := Self.Width - 1;
       GenerateShuffleList;
-      StatusBar1.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+      StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
       if PlayList.Items.Count > 0 then
       begin
         PlayItem(PlayList.Items.Count - 1);
@@ -921,20 +977,20 @@ var
   I: Integer;
 begin
   PlayList.Items.Clear;
-  for I := 0 to FPlayListItems.Count - 1 do
+  for I := 0 to FPlaylists[FSelectedPlaylistIndex].Count - 1 do
   begin
-    FPlayListItems[i].Free;
+    FPlaylists[FSelectedPlaylistIndex][i].Free;
   end;
   FQueuedItems.Clear;
   QueueList.Items.Clear;
-  FPlayListItems.Clear;
+  FPlaylists[FSelectedPlaylistIndex].Clear;
   PlayList.Items.Count := 0;
   FCurrentItemInfo.ItemIndex := -1;
   FCurrentItemInfo.FullFileName := '';
   FShuffleIndexes.Clear;
   FShuffleIndex := -1;
   SavePlayList;
-  StatusBar1.Panels[0].Text := '0 files';
+  StatusBar.Panels[0].Text := '0 files';
 end;
 
 procedure TMainForm.C2Click(Sender: TObject);
@@ -1074,19 +1130,19 @@ procedure TMainForm.D1Click(Sender: TObject);
 var
   i: Integer;
 begin
-  for i := 0 to FPlayListItems.Count - 1 do
+  for i := 0 to FPlaylists[FSelectedPlaylistIndex].Count - 1 do
   begin
     if PlayList.Items[i].Selected then
     begin
       PlayList.Items.Count := PlayList.Items.Count - 1;
-      FPlayListItems.Delete(i);
+      FPlaylists[FSelectedPlaylistIndex].Delete(i);
       if i < FCurrentItemInfo.ItemIndex then
       begin
         FCurrentItemInfo.ItemIndex := FCurrentItemInfo.ItemIndex - 1;
       end
       else if i = FCurrentItemInfo.ItemIndex then
       begin
-        if (FCurrentItemInfo.ItemIndex + 1) < FPlayListItems.Count then
+        if (FCurrentItemInfo.ItemIndex + 1) < FPlaylists[FSelectedPlaylistIndex].Count then
         begin
           FCurrentItemInfo.ItemIndex := FCurrentItemInfo.ItemIndex + 1;
         end
@@ -1169,7 +1225,7 @@ begin
     Self.Width := Self.Width + 1;
     Self.Width := Self.Width - 1;
     GenerateShuffleList;
-    StatusBar1.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+    StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
   end;
 end;
 
@@ -1277,7 +1333,7 @@ begin
   end;
   ForceDirectories(FAppDataFolder + '\lyric\');
 
-  FPlayListItems := TList<TPlayListItem>.Create;
+  FPlaylists := TList<TPlaylist>.Create;
   FCurrentItemInfo.ItemIndex := -1;
   FCurrentRadioIndex := -1;
   FStoppedByUser := False;
@@ -1297,18 +1353,23 @@ begin
   FTempCoverPath := FAppDataFolder + '\cover';
   FInternalArtworkReader := TInternalArtworkReader.Create;
   Taskbar.ProgressMaxValue := MaxInt;
+  FPlayListFiles := TPlaylistFiles.Create;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 var
   I: Integer;
+  j: Integer;
 begin
   FPlayer.Free;
-  for I := 0 to FPlayListItems.Count - 1 do
+  for I := 0 to FPlaylists.Count - 1 do
   begin
-    FPlayListItems[i].Free;
+    for j := 0 to FPlaylists[i].Count - 1 do
+    begin
+      FPlaylists[i][j].Free;
+    end;
   end;
-  FPlayListItems.Free;
+  FPlaylists.Free;
   FShuffleIndexes.Free;
   FTagReader.Free;
   FJpeg.Free;
@@ -1319,13 +1380,14 @@ begin
   FQueuedItems.Free;
   FTagWriter.Free;
   FInternalArtworkReader.Free;
+  FPlayListFiles.Free;
 end;
 
 procedure TMainForm.FormResize(Sender: TObject);
 begin
   PlayList.Columns[0].Width := PlayList.ClientWidth - PlayList.Columns[1].Width - PlayList.Columns[2].Width;
   QueueList.Columns[0].Width := QueueList.ClientWidth - QueueList.Columns[1].Width;
-  StatusBar1.Panels[0].Width := StatusBar1.ClientWidth - StatusBar1.Panels[1].Width;
+  StatusBar.Panels[0].Width := StatusBar.ClientWidth - StatusBar.Panels[1].Width;
   RadioList.Columns[0].Width := RadioList.ClientWidth;
 end;
 
@@ -1339,8 +1401,10 @@ begin
   CreateUserRadioLists;
   LoadRadioStations;
   GenerateShuffleList;
-  StatusBar1.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
-  if FCurrentItemInfo.ItemIndex < FPlayListItems.Count then
+  StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+  PlaylistListChange(Self);
+
+  if FCurrentItemInfo.ItemIndex < FPlaylists[FSelectedPlaylistIndex].Count then
   begin
     PlayList.ItemIndex := FCurrentItemInfo.ItemIndex;
     ScrollToCurrentSong;
@@ -1385,7 +1449,7 @@ begin
       Self.Width := Self.Width + 1;
       Self.Width := Self.Width - 1;
       GenerateShuffleList;
-      StatusBar1.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+      StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
       if PlayList.Items.Count > 0 then
       begin
         PlayItem(PlayList.Items.Count - 1);
@@ -1405,15 +1469,18 @@ var
   LIndex: Integer;
 begin
   FShuffleIndexes.Clear;
-  for I := 0 to FPlayListItems.Count - 1 do
+  if FPlaylists.Count > FSelectedPlaylistIndex then
   begin
-    FShuffleIndexes.Add(i);
-  end;
-  Randomize;
-  for I := FShuffleIndexes.Count - 1 downto 0 do
-  begin
-    LIndex := Random(FShuffleIndexes.Count);
-    FShuffleIndexes.Exchange(i, LIndex);
+    for I := 0 to FPlaylists[FSelectedPlaylistIndex].Count - 1 do
+    begin
+      FShuffleIndexes.Add(i);
+    end;
+    Randomize;
+    for I := FShuffleIndexes.Count - 1 downto 0 do
+    begin
+      LIndex := Random(FShuffleIndexes.Count);
+      FShuffleIndexes.Exchange(i, LIndex);
+    end;
   end;
 end;
 
@@ -1493,7 +1560,7 @@ begin
     end;
   finally
     LOpenDlg.Free;
-    PlayList.Items.Count := FPlayListItems.Count;
+    PlayList.Items.Count := FPlaylists[FSelectedPlaylistIndex].Count;
     Self.Width := Self.Width + 1;
     Self.Width := Self.Width - 1;
     PlayList.Items.EndUpdate;
@@ -1668,14 +1735,20 @@ end;
 procedure TMainForm.LoadPlayList;
 var
   LStreamReader: TStreamReader;
-  LPlayListItem: TPlayListItem;
+  LPlayListItem: TPlayItem;
   LLine: string;
   LSpltLst: TStringList;
   LInt: integer;
+  LPlaylistFile: TPlaylistFile;
+  LStreamWriter: TStreamWriter;
+  i: integer;
+  LPlaylist: TPlaylist;
 begin
-  if FileExists(FAppDataFolder + '\playlist.dat') then
+  // load playlists.
+  // if playlists file doesnt exists, create it.
+  if FileExists(FAppDataFolder + '\playlists.dat') then
   begin
-    LStreamReader := TStreamReader.Create(FAppDataFolder + '\playlist.dat', True);
+    LStreamReader := TStreamReader.Create(FAppDataFolder + '\playlists.dat', True);
     LSpltLst := TStringList.Create;
     try
       LSpltLst.Delimiter := '|';
@@ -1686,42 +1759,113 @@ begin
         LLine := Trim(LStreamReader.ReadLine);
 
         LSpltLst.DelimitedText := LLine;
-        if LSpltLst.Count >= 9 then
+        if LSpltLst.Count = 2 then
         begin
-          LPlayListItem := TPlayListItem.Create;
-          LPlayListItem.FullFileName := LSpltLst[0];
-          LPlayListItem.Artist := LSpltLst[1];
-          LPlayListItem.Album := LSpltLst[2];
-          LPlayListItem.Title := LSpltLst[3];
-          LPlayListItem.DurationStr := LSpltLst[4];
-          LPlayListItem.Bitrate := LSpltLst[5];
-          LPlayListItem.Channels := LSpltLst[6];
-          LPlayListItem.Codec := LSpltLst[7];
-          LPlayListItem.SampleRate := LSpltLst[8];
-          LPlayListItem.PlayCount := 0;
-          LPlayListItem.Stars := 0;
-          // play count and star.
-          // this values are added later so in onder to keep compability with
-          // older versions we must check the size.
-          if LSpltLst.Count >= 11 then
-          begin
-            if TryStrToInt(LSpltLst[9], LInt) then
-            begin
-              LPlayListItem.PlayCount := LInt;
-            end;
-            if TryStrToInt(LSpltLst[10], LInt) then
-            begin
-              LPlayListItem.Stars := LInt;
-            end;
-          end;
-          FPlayListItems.Add(LPlayListItem);
+          LPlaylistFile.Name := LSpltLst[0];
+          LPlaylistFile.PlaylistFile := LSpltLst[1];
+          FPlayListFiles.Add(LPlaylistFile);
         end;
       end;
     finally
       LStreamReader.Close;
       LStreamReader.Free;
       LSpltLst.Free;
-      PlayList.Items.Count := FPlayListItems.Count;
+      PlaylistList.Items.Clear;
+      for I := 0 to FPlayListFiles.Count - 1 do
+      begin
+        PlaylistList.Items.Add(FPlayListFiles[i].Name);
+      end;
+      FSelectedPlaylistIndex := FPlayListFiles.Count - 1;
+      PlayList.ItemIndex := FSelectedPlaylistIndex;
+    end;
+  end
+  else
+  begin
+    // create playlists file and default playlist to it
+    LStreamWriter := TStreamWriter.Create(FAppDataFolder + '\playlists.dat', False);
+    try
+      LStreamWriter.WriteLine('Default|' + FAppDataFolder + '\playlist.dat');
+    finally
+      LStreamWriter.Close;
+      LStreamWriter.Free;
+    end;
+    LPlaylistFile.Name := 'Default';
+    LPlaylistFile.PlaylistFile := FAppDataFolder + '\playlist.dat';
+    FPlayListFiles.Add(LPlaylistFile);
+    PlaylistList.Items.Clear;
+    for I := 0 to FPlayListFiles.Count - 1 do
+    begin
+      PlaylistList.Items.Add(FPlayListFiles[i].Name);
+    end;
+  end;
+
+  // load actual files to memory
+  for I := 0 to FPlayListFiles.Count - 1 do
+  begin
+    if FileExists(FPlayListFiles[i].PlaylistFile) then
+    begin
+      LStreamReader := TStreamReader.Create(FPlayListFiles[i].PlaylistFile, True);
+      LSpltLst := TStringList.Create;
+      LPlaylist := TPlaylist.Create;
+      try
+        LSpltLst.Delimiter := '|';
+        LSpltLst.StrictDelimiter := True;
+
+        while not LStreamReader.EndOfStream do
+        begin
+          LLine := Trim(LStreamReader.ReadLine);
+
+          LSpltLst.DelimitedText := LLine;
+          if LSpltLst.Count >= 9 then
+          begin
+            LPlayListItem := TPlayItem.Create;
+            LPlayListItem.FullFileName := LSpltLst[0];
+            LPlayListItem.Artist := LSpltLst[1];
+            LPlayListItem.Album := LSpltLst[2];
+            LPlayListItem.Title := LSpltLst[3];
+            LPlayListItem.DurationStr := LSpltLst[4];
+            LPlayListItem.Bitrate := LSpltLst[5];
+            LPlayListItem.Channels := LSpltLst[6];
+            LPlayListItem.Codec := LSpltLst[7];
+            LPlayListItem.SampleRate := LSpltLst[8];
+            LPlayListItem.PlayCount := 0;
+            LPlayListItem.Stars := 0;
+            // play count and star.
+            // this values are added later so in onder to keep compability with
+            // older versions we must check the size.
+            if LSpltLst.Count >= 11 then
+            begin
+              if TryStrToInt(LSpltLst[9], LInt) then
+              begin
+                LPlayListItem.PlayCount := LInt;
+              end;
+              if TryStrToInt(LSpltLst[10], LInt) then
+              begin
+                LPlayListItem.Stars := LInt;
+              end;
+            end;
+            LPlaylist.Add(LPlayListItem);
+          end;
+        end;
+      finally
+        FPlaylists.Add(LPlaylist);
+        LStreamReader.Close;
+        LStreamReader.Free;
+        LSpltLst.Free;
+        PlayList.Items.Count := FPlaylists[i].Count;
+      end;
+    end
+    else
+    begin
+      // create an empty playlist file if playlistfilename doesnt exist
+      LStreamWriter := TStreamWriter.Create(FPlayListFiles[i].PlaylistFile, False);
+      try
+        LPlaylist := TPlaylist.Create;
+        FPlaylists.Add(LPlaylist);
+      finally
+        LStreamWriter.Close;
+        LStreamWriter.Free;
+      end;
     end;
   end;
 end;
@@ -1729,7 +1873,7 @@ end;
 procedure TMainForm.LoadPPFPlaylist(const PlaylistPath: string);
 var
   LStreamReader: TStreamReader;
-  LPlayListItem: TPlayListItem;
+  LPlayListItem: TPlayItem;
   LLine: string;
   LSpltLst: TStringList;
   LInt: integer;
@@ -1749,7 +1893,7 @@ begin
         LSpltLst.DelimitedText := LLine;
         if LSpltLst.Count >= 9 then
         begin
-          LPlayListItem := TPlayListItem.Create;
+          LPlayListItem := TPlayItem.Create;
           LPlayListItem.FullFileName := LSpltLst[0];
           LPlayListItem.Artist := LSpltLst[1];
           LPlayListItem.Album := LSpltLst[2];
@@ -1775,7 +1919,7 @@ begin
               LPlayListItem.Stars := LInt;
             end;
           end;
-          FPlayListItems.Add(LPlayListItem);
+          FPlaylists[FSelectedPlaylistIndex].Add(LPlayListItem);
         end;
       end;
     finally
@@ -1854,6 +1998,8 @@ begin
       LyricSourceList.ItemIndex := ReadInteger('lyric', 'source2', 1);
       SearchForm.chkCloseOnPlayBtn.Checked := ReadBool('search', 'close', True);
       LyricPanel.Width := ReadInteger('player', 'lyricw', 250);
+      FSelectedPlaylistIndex := ReadInteger('player', 'playlistindex', 0);
+      PlaylistList.ItemIndex := FSelectedPlaylistIndex;
     end;
   finally
     SettingsFile.Free;
@@ -1862,7 +2008,7 @@ end;
 
 procedure TMainForm.Log(s: string);
 begin
-  exit;
+  Exit;
   LogForm.LogList.Lines.Add(s);
 end;
 
@@ -1893,15 +2039,15 @@ begin
         if SettingsForm.LyricBtn.Checked then
         begin
           FLyricDownloader.Stop;
-          if FPlayListItems.Count < 1 then
+          if FPlaylists[FSelectedPlaylistIndex].Count < 1 then
             Exit;
 
           FLyricDownloader.SongTitle := LyricTitleEdit.Text;
           FLyricDownloader.Artist := LyricArtistEdit.Text;
-          FLyricDownloader.Album := FPlayListItems[FCurrentItemInfo.ItemIndex].Album;
-          FLyricDownloader.ItemInfo.Title := FPlayListItems[FCurrentItemInfo.ItemIndex].Title;
-          FLyricDownloader.ItemInfo.Artist := FPlayListItems[FCurrentItemInfo.ItemIndex].Artist;
-          FLyricDownloader.ItemInfo.Album := FPlayListItems[FCurrentItemInfo.ItemIndex].Album;
+          FLyricDownloader.Album := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album;
+          FLyricDownloader.ItemInfo.Title := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title;
+          FLyricDownloader.ItemInfo.Artist := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist;
+          FLyricDownloader.ItemInfo.Album := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album;
           FLyricDownloader.Start;
         end;
       end;
@@ -1920,7 +2066,7 @@ begin
         if SettingsForm.LyricBtn.Checked then
         begin
           FLyricDownloader.Stop;
-          if FPlayListItems.Count < 1 then
+          if FPlaylists[FSelectedPlaylistIndex].Count < 1 then
             Exit;
           FLyricDownloader.SongTitle := LyricTitleEdit.Text;
           FLyricDownloader.Artist := LyricArtistEdit.Text;
@@ -2045,7 +2191,7 @@ begin
       1: // random
         begin
           Randomize;
-          LRndIndex := Random(FPlayListItems.Count);
+          LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
           PlayItem(LRndIndex);
@@ -2072,7 +2218,7 @@ begin
             if FShuffleIndex + 1 < FShuffleIndexes.Count then
             begin
               FShuffleIndex := 1 + FShuffleIndex;
-              if FShuffleIndexes[FShuffleIndex] < FPlayListItems.Count then
+              if FShuffleIndexes[FShuffleIndex] < FPlaylists[FSelectedPlaylistIndex].Count then
               begin
                 PlayItem(FShuffleIndexes[FShuffleIndex]);
               end;
@@ -2102,11 +2248,11 @@ begin
   index := PlayList.ItemIndex;
   if index > -1 then
   begin
-    FileDir := ExtractFileDir(FPlayListItems[index].FullFileName);
+    FileDir := ExtractFileDir(FPlaylists[FSelectedPlaylistIndex][index].FullFileName);
 
     if DirectoryExists(FileDir) then
     begin
-      ShellExecute(handle, 'open', 'explorer', PChar(' /n,/select, ' + '"' + FPlayListItems[index].FullFileName + '"'), nil, SW_SHOWNORMAL);
+      ShellExecute(handle, 'open', 'explorer', PChar(' /n,/select, ' + '"' + FPlaylists[FSelectedPlaylistIndex][index].FullFileName + '"'), nil, SW_SHOWNORMAL);
     end;
   end;
 end;
@@ -2274,7 +2420,7 @@ begin
           1: // random
             begin
               Randomize;
-              LRndIndex := Random(FPlayListItems.Count);
+              LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
               PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
               PlayItem(LRndIndex);
@@ -2301,7 +2447,7 @@ begin
                 if FShuffleIndex + 1 < FShuffleIndexes.Count then
                 begin
                   FShuffleIndex := 1 + FShuffleIndex;
-                  if FShuffleIndexes[FShuffleIndex] < FPlayListItems.Count then
+                  if FShuffleIndexes[FShuffleIndex] < FPlaylists[FSelectedPlaylistIndex].Count then
                   begin
                     PlayItem(FShuffleIndexes[FShuffleIndex]);
                   end;
@@ -2328,7 +2474,7 @@ begin
         // resume
         ResumeRadio;
         Taskbar.ProgressState := TTaskBarProgressState.Normal;
-      UpdateOverlayIcon(1);
+        UpdateOverlayIcon(1);
       end
       else
       begin
@@ -2392,7 +2538,7 @@ begin
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
             Taskbar.ProgressState := TTaskBarProgressState.Normal;
-      UpdateOverlayIcon(1);
+            UpdateOverlayIcon(1);
             PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
           end
           else
@@ -2456,7 +2602,7 @@ begin
                 1: // random
                   begin
                     Randomize;
-                    LRndIndex := Random(FPlayListItems.Count);
+                    LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
                     PositionTimer.Enabled := False;
                     ProgressTimer.Enabled := PositionTimer.Enabled;
                     PlayItem(LRndIndex);
@@ -2483,7 +2629,7 @@ begin
                       if FShuffleIndex + 1 < FShuffleIndexes.Count then
                       begin
                         FShuffleIndex := 1 + FShuffleIndex;
-                        if FShuffleIndexes[FShuffleIndex] < FPlayListItems.Count then
+                        if FShuffleIndexes[FShuffleIndex] < FPlaylists[FSelectedPlaylistIndex].Count then
                         begin
                           PlayItem(FShuffleIndexes[FShuffleIndex]);
                         end;
@@ -2508,7 +2654,7 @@ begin
             // resume
             ResumeRadio;
             Taskbar.ProgressState := TTaskBarProgressState.Normal;
-      UpdateOverlayIcon(1);
+            UpdateOverlayIcon(1);
           end
           else
           begin
@@ -2579,42 +2725,42 @@ begin
   if FPlayer.ErrorMsg = MY_ERROR_OK then
   begin
     LPlayIndex := ItemIndex;
-    while not FileExists(FPlayListItems[LPlayIndex].FullFileName) do
+    while not FileExists(FPlaylists[FSelectedPlaylistIndex][LPlayIndex].FullFileName) do
     begin
-      LogForm.LogList.Lines.Add('[' + DateTimeToStr(Now) + '] Unable to find ' + FPlayListItems[LPlayIndex].FullFileName);
+      LogForm.LogList.Lines.Add('[' + DateTimeToStr(Now) + '] Unable to find ' + FPlaylists[FSelectedPlaylistIndex][LPlayIndex].FullFileName);
       if not LogForm.Visible then
       begin
         LogForm.Show;
       end;
       Inc(LPlayIndex);
-      if LPlayIndex >= FPlayListItems.Count then
+      if LPlayIndex >= FPlaylists[FSelectedPlaylistIndex].Count then
       begin
         Break;
       end;
     end;
 
-    if LPlayIndex < FPlayListItems.Count then
+    if LPlayIndex < FPlaylists[FSelectedPlaylistIndex].Count then
     begin
       if FCurrentItemInfo.ItemIndex > -1 then
       begin
         PlayList.Items[FCurrentItemInfo.ItemIndex].Selected := False;
       end;
       FCurrentItemInfo.ItemIndex := LPlayIndex;
-      FCurrentItemInfo.FullFileName := FPlayListItems[FCurrentItemInfo.ItemIndex].FullFileName;
+      FCurrentItemInfo.FullFileName := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].FullFileName;
       FPlayer.FileName := FCurrentItemInfo.FullFileName;
       FPlayer.Play;
       FCurrentItemInfo.DurationBass := FPlayer.TotalLength;
       FCurrentItemInfo.DurationAsSecInt := FPlayer.DurationAsSec;
-      if FPlayListItems[FCurrentItemInfo.ItemIndex].PlayCount = 1 then
+      if FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].PlayCount = 1 then
       begin
         LPlayCountStr := '1 time'
       end
       else
       begin
-        LPlayCountStr := FloatToStr(FPlayListItems[FCurrentItemInfo.ItemIndex].PlayCount) + ' times'
+        LPlayCountStr := FloatToStr(FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].PlayCount) + ' times'
       end;
-      FCurrentItemInfo.StatusInfoText := FPlayListItems[FCurrentItemInfo.ItemIndex].Bitrate + ' | ' + FPlayListItems[FCurrentItemInfo.ItemIndex].Channels + ' | ' +
-        FPlayListItems[FCurrentItemInfo.ItemIndex].Codec + ' | ' + FPlayListItems[FCurrentItemInfo.ItemIndex].SampleRate + ' Hz | ' + LPlayCountStr;
+      FCurrentItemInfo.StatusInfoText := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Bitrate + ' | ' + FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Channels +
+        ' | ' + FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Codec + ' | ' + FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].SampleRate + ' Hz | ' + LPlayCountStr;
       PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
       PositionBar.Position := 0;
       FPlayer.SetVolume(100 - VolumeBar.Position);
@@ -2628,7 +2774,7 @@ begin
       Taskbar.ProgressState := TTaskBarProgressState.Normal;
       UpdateOverlayIcon(1);
       PlayList.Refresh;
-      with FPlayListItems[FCurrentItemInfo.ItemIndex] do
+      with FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex] do
       begin
         Self.Caption := Title + ' - ' + Album + ' - ' + Artist + ' - [OooPlayer]';
         TitleLabel.Caption := Title;
@@ -2658,21 +2804,21 @@ begin
       // lyric
       LyricList.Lines.Clear;
       LyricStatusLabel.Caption := '';
-      LyricTitleEdit.Text := FPlayListItems[FCurrentItemInfo.ItemIndex].Title;
-      LyricArtistEdit.Text := FPlayListItems[FCurrentItemInfo.ItemIndex].Artist;
-      FLyricAlbumStr := FPlayListItems[FCurrentItemInfo.ItemIndex].Album;
+      LyricTitleEdit.Text := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title;
+      LyricArtistEdit.Text := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist;
+      FLyricAlbumStr := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album;
       LyricSearchBtn.Enabled := False;
       LyricArtistEdit.Enabled := False;
       LyricTitleEdit.Enabled := False;
       LyricSourceList.Enabled := False;
       if SettingsForm.LyricBtn.Checked then
       begin
-        if FileExists(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlayListItems[FCurrentItemInfo.ItemIndex].Title, FPlayListItems[FCurrentItemInfo.ItemIndex].Artist,
-          FPlayListItems[FCurrentItemInfo.ItemIndex].Album)) then
+        if FileExists(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title,
+          FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist, FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album)) then
         begin
           LyricList.Lines.Clear;
-          LyricList.Lines.LoadFromFile(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlayListItems[FCurrentItemInfo.ItemIndex].Title, FPlayListItems[FCurrentItemInfo.ItemIndex].Artist,
-            FPlayListItems[FCurrentItemInfo.ItemIndex].Album));
+          LyricList.Lines.LoadFromFile(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title,
+            FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist, FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album));
           LyricStatusLabel.Caption := 'Loaded local lyric file';
           LyricSearchBtn.Enabled := True;
           LyricArtistEdit.Enabled := True;
@@ -2682,14 +2828,14 @@ begin
         else
         begin
           FLyricDownloader.Stop;
-          if FPlayListItems.Count < 1 then
+          if FPlaylists[FSelectedPlaylistIndex].Count < 1 then
             Exit;
-          FLyricDownloader.SongTitle := FPlayListItems[FCurrentItemInfo.ItemIndex].Title;
-          FLyricDownloader.Artist := FPlayListItems[FCurrentItemInfo.ItemIndex].Artist;
-          FLyricDownloader.Album := FPlayListItems[FCurrentItemInfo.ItemIndex].Album;
-          FLyricDownloader.ItemInfo.Title := FPlayListItems[FCurrentItemInfo.ItemIndex].Title;
-          FLyricDownloader.ItemInfo.Artist := FPlayListItems[FCurrentItemInfo.ItemIndex].Artist;
-          FLyricDownloader.ItemInfo.Album := FPlayListItems[FCurrentItemInfo.ItemIndex].Album;
+          FLyricDownloader.SongTitle := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title;
+          FLyricDownloader.Artist := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist;
+          FLyricDownloader.Album := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album;
+          FLyricDownloader.ItemInfo.Title := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title;
+          FLyricDownloader.ItemInfo.Artist := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist;
+          FLyricDownloader.ItemInfo.Album := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album;
           FLyricDownloader.Start;
         end;
       end
@@ -2756,18 +2902,22 @@ end;
 
 procedure TMainForm.PlayListData(Sender: TObject; Item: TListItem);
 begin
-  if Item.Index < FPlayListItems.Count then
+  if FPlaylists.Count > FSelectedPlaylistIndex then
   begin
-    Item.Caption := FloatToStr(Item.Index + 1) + '. ' + FPlayListItems[Item.Index].Artist + ' - ' + FPlayListItems[Item.Index].Album + ' - ' + FPlayListItems[Item.Index].Title;
-    if FQueuedItems.Contains(Item.Index) then
+    if Item.Index < FPlaylists[FSelectedPlaylistIndex].Count then
     begin
-      Item.SubItems.Add('Q')
-    end
-    else
-    begin
-      Item.SubItems.Add('')
+      Item.Caption := FloatToStr(Item.Index + 1) + '. ' + FPlaylists[FSelectedPlaylistIndex][Item.Index].Artist + ' - ' + FPlaylists[FSelectedPlaylistIndex][Item.Index].Album + ' - ' +
+        FPlaylists[FSelectedPlaylistIndex][Item.Index].Title;
+      if FQueuedItems.Contains(Item.Index) then
+      begin
+        Item.SubItems.Add('Q')
+      end
+      else
+      begin
+        Item.SubItems.Add('')
+      end;
+      Item.SubItems.Add(FPlaylists[FSelectedPlaylistIndex][Item.Index].DurationStr);
     end;
-    Item.SubItems.Add(FPlayListItems[Item.Index].DurationStr);
   end;
 end;
 
@@ -2788,7 +2938,7 @@ begin
   Item := PlayList.GetItemAt(X, Y);
   if Item <> nil then
   begin
-    FPlayListItems.Move(TMyDragObject(Source).ItemIndex, Item.Index);
+    FPlaylists[FSelectedPlaylistIndex].Move(TMyDragObject(Source).ItemIndex, Item.Index);
     if FDraggingCurrentFile then
     begin
       FCurrentItemInfo.ItemIndex := Item.Index;
@@ -2806,6 +2956,27 @@ end;
 procedure TMainForm.PlayListDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
 begin
   Accept := (Source is TMyDragObject);
+end;
+
+procedure TMainForm.PlaylistListChange(Sender: TObject);
+begin
+  if PlaylistList.ItemIndex > -1 then
+  begin
+    PlayList.Items.Count := 0;
+    FCurrentItemInfo.ItemIndex := -1;
+    FCurrentItemInfo.FullFileName := '';
+    FShuffleIndexes.Clear;
+    FShuffleIndex := -1;
+    FQueuedItems.Clear;
+    QueueList.Items.Clear;
+    PlayList.Items.Count := 0;
+    FSelectedPlaylistIndex := PlaylistList.ItemIndex;
+    PlayList.Items.Count := FPlaylists[FSelectedPlaylistIndex].Count;
+    GenerateShuffleList;
+    PlayList.Repaint;
+    PlayList.Refresh;
+    StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+  end;
 end;
 
 procedure TMainForm.PlayListMouseEnter(Sender: TObject);
@@ -2993,7 +3164,7 @@ begin
       1: // random
         begin
           Randomize;
-          LRndIndex := Random(FPlayListItems.Count);
+          LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
           PlayItem(LRndIndex);
@@ -3020,7 +3191,7 @@ begin
             if FShuffleIndex + 1 < FShuffleIndexes.Count then
             begin
               FShuffleIndex := 1 + FShuffleIndex;
-              if FShuffleIndexes[FShuffleIndex] < FPlayListItems.Count then
+              if FShuffleIndexes[FShuffleIndex] < FPlaylists[FSelectedPlaylistIndex].Count then
               begin
                 PlayItem(FShuffleIndexes[FShuffleIndex]);
               end;
@@ -3091,7 +3262,7 @@ var
 begin
   PlayList.Items.BeginUpdate;
   try
-    for I := 0 to FPlayListItems.Count - 1 do
+    for I := 0 to FPlaylists[FSelectedPlaylistIndex].Count - 1 do
     begin
       Application.ProcessMessages;
       ReScanFile(i);
@@ -3133,10 +3304,10 @@ begin
       QueueList.Items.Delete(FDeletedQueueIndex);
     end;
     PlayList.Items[PlayList.ItemIndex].Delete;
-    FPlayListItems.Delete(PlayList.ItemIndex);
+    FPlaylists[FSelectedPlaylistIndex].Delete(PlayList.ItemIndex);
     PlayList.Items.Count := PlayList.Items.Count - 1;
     PlayList.Repaint;
-    StatusBar1.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+    StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
   end;
 end;
 
@@ -3432,11 +3603,11 @@ end;
 procedure TMainForm.ReScanFile(const FileIndex: integer);
 var
   MediaInfoHandle: Cardinal;
-  LPlayListItem, LTmpItem: TPlayListItem;
+  LPlayListItem, LTmpItem: TPlayItem;
   LTitle, LArtist, LAlbum, LDuration, LBitrate, LChannels, LCodec, LSampleRate: string;
 begin
 
-  if (FileExists(FPlayListItems[FileIndex].FullFileName)) then
+  if (FileExists(FPlaylists[FSelectedPlaylistIndex][FileIndex].FullFileName)) then
   begin
 
     // New handle for mediainfo
@@ -3455,7 +3626,7 @@ begin
 
       try
         // read duration of file
-        MediaInfo_Open(MediaInfoHandle, PWideChar(FPlayListItems[FileIndex].FullFileName));
+        MediaInfo_Open(MediaInfoHandle, PWideChar(FPlaylists[FSelectedPlaylistIndex][FileIndex].FullFileName));
         MediaInfo_Option(MediaInfoHandle, 'Complete', '1');
 
         LDuration := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Duration/String3', Info_Text, Info_Name);
@@ -3464,7 +3635,7 @@ begin
         LCodec := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Codec/String', Info_Text, Info_Name);
         LSampleRate := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'SamplingRate', Info_Text, Info_Name);
         // tags
-        LTmpItem := FTagReader.ReadTags(FPlayListItems[FileIndex].FullFileName);
+        LTmpItem := FTagReader.ReadTags(FPlaylists[FSelectedPlaylistIndex][FileIndex].FullFileName);
         LTitle := LTmpItem.Title;
         LArtist := LTmpItem.Artist;
         LAlbum := LTmpItem.Album;
@@ -3480,7 +3651,7 @@ begin
         begin
           // if cannot get title
           // set to file name
-          LTitle := ChangeFileExt(ExtractFileName(FPlayListItems[FileIndex].FullFileName), '');
+          LTitle := ChangeFileExt(ExtractFileName(FPlaylists[FSelectedPlaylistIndex][FileIndex].FullFileName), '');
         end;
 
         if (Length(LArtist) < 1) then
@@ -3518,7 +3689,7 @@ begin
           LSampleRate := 'N/A';
         end;
 
-        LPlayListItem := FPlayListItems[FileIndex];
+        LPlayListItem := FPlaylists[FSelectedPlaylistIndex][FileIndex];
 
         LPlayListItem.DurationStr := LDuration;
         LPlayListItem.Title := LTitle;
@@ -3529,7 +3700,7 @@ begin
         LPlayListItem.Channels := LChannels;
         LPlayListItem.Codec := LCodec;
         LPlayListItem.SampleRate := LSampleRate;
-        FPlayListItems[FileIndex] := LPlayListItem;
+        FPlaylists[FSelectedPlaylistIndex][FileIndex] := LPlayListItem;
       finally
         MediaInfo_Close(MediaInfoHandle);
       end;
@@ -3601,8 +3772,8 @@ procedure TMainForm.S7Click(Sender: TObject);
 begin
   if PlayList.ItemIndex > -1 then
   begin
-    ShellExecute(handle, 'open', PChar('http://www.youtube.com/results?search_query=' + FPlayListItems[PlayList.ItemIndex].Artist + '+' + FPlayListItems[PlayList.ItemIndex].Title), nil, nil,
-      SW_SHOWNORMAL);
+    ShellExecute(handle, 'open', PChar('http://www.youtube.com/results?search_query=' + FPlaylists[FSelectedPlaylistIndex][PlayList.ItemIndex].Artist + '+' + FPlaylists[FSelectedPlaylistIndex]
+      [PlayList.ItemIndex].Title), nil, nil, SW_SHOWNORMAL);
   end;
 end;
 
@@ -3610,8 +3781,8 @@ procedure TMainForm.S8Click(Sender: TObject);
 begin
   if PlayList.ItemIndex > -1 then
   begin
-    ShellExecute(handle, 'open', PChar('https://www.google.com.tr/search?q=' + StringReplace(FPlayListItems[PlayList.ItemIndex].Artist, ' ', '+', [rfReplaceAll]) + '+' +
-      StringReplace(FPlayListItems[PlayList.ItemIndex].Title, ' ', '+', [rfReplaceAll])), nil, nil, SW_SHOWNORMAL);
+    ShellExecute(handle, 'open', PChar('https://www.google.com.tr/search?q=' + StringReplace(FPlaylists[FSelectedPlaylistIndex][PlayList.ItemIndex].Artist, ' ', '+', [rfReplaceAll]) + '+' +
+      StringReplace(FPlaylists[FSelectedPlaylistIndex][PlayList.ItemIndex].Title, ' ', '+', [rfReplaceAll])), nil, nil, SW_SHOWNORMAL);
   end;
 end;
 
@@ -3629,10 +3800,10 @@ begin
     LStreamWriter := TStreamWriter.Create(FileName, False, TEncoding.UTF8);
   end;
   try
-    for I := 0 to FPlayListItems.Count - 1 do
+    for I := 0 to FPlaylists[FSelectedPlaylistIndex].Count - 1 do
     begin
       Application.ProcessMessages;
-      with FPlayListItems[i] do
+      with FPlaylists[FSelectedPlaylistIndex][i] do
       begin
         LStreamWriter.WriteLine(FullFileName);
       end;
@@ -3647,24 +3818,28 @@ procedure TMainForm.SavePlayList;
 var
   LStreamWriter: TStreamWriter;
   I: Integer;
+  j: Integer;
 begin
-  if FileExists(FAppDataFolder + '\playlist.dat') then
+  for j := 0 to FPlayListFiles.Count - 1 do
   begin
-    DeleteFile(FAppDataFolder + '\playlist.dat')
-  end;
-  LStreamWriter := TStreamWriter.Create(FAppDataFolder + '\playlist.dat', False, TEncoding.UTF8);
-  try
-    for I := 0 to FPlayListItems.Count - 1 do
+    if FileExists(FPlayListFiles[j].PlaylistFile) then
     begin
-      with FPlayListItems[i] do
-      begin
-        LStreamWriter.WriteLine(FullFileName + '|' + Artist + '|' + Album + '|' + Title + '|' + DurationStr + '|' + Bitrate + '|' + Channels + '|' + Codec + '|' + SampleRate + '|' +
-          FloatToStr(PlayCount) + '|' + FloatToStr(Stars));
-      end;
+      DeleteFile(FPlayListFiles[j].PlaylistFile)
     end;
-  finally
-    LStreamWriter.Close;
-    LStreamWriter.Free;
+    LStreamWriter := TStreamWriter.Create(FPlayListFiles[j].PlaylistFile, False, TEncoding.UTF8);
+    try
+      for I := 0 to FPlaylists[j].Count - 1 do
+      begin
+        with FPlaylists[j][i] do
+        begin
+          LStreamWriter.WriteLine(FullFileName + '|' + Artist + '|' + Album + '|' + Title + '|' + DurationStr + '|' + Bitrate + '|' + Channels + '|' + Codec + '|' + SampleRate + '|' +
+            FloatToStr(PlayCount) + '|' + FloatToStr(Stars));
+        end;
+      end;
+    finally
+      LStreamWriter.Close;
+      LStreamWriter.Free;
+    end;
   end;
 end;
 
@@ -3675,10 +3850,10 @@ var
 begin
   LStreamWriter := TStreamWriter.Create(FileName, False, TEncoding.UTF8);
   try
-    for I := 0 to FPlayListItems.Count - 1 do
+    for I := 0 to FPlaylists[FSelectedPlaylistIndex].Count - 1 do
     begin
       Application.ProcessMessages;
-      with FPlayListItems[i] do
+      with FPlaylists[FSelectedPlaylistIndex][i] do
       begin
         LStreamWriter.WriteLine(FullFileName + '|' + Artist + '|' + Album + '|' + Title + '|' + DurationStr + '|' + Bitrate + '|' + Channels + '|' + Codec + '|' + SampleRate);
       end;
@@ -3710,6 +3885,7 @@ begin
       WriteInteger('lyric', 'source2', LyricSourceList.ItemIndex);
       WriteBool('search', 'close', SearchForm.chkCloseOnPlayBtn.Checked);
       WriteInteger('player', 'lyricw', LyricPanel.Width);
+      WriteInteger('player', 'playlistindex', FSelectedPlaylistIndex);
     end;
   finally
     SettingsFile.Free;
@@ -3718,7 +3894,8 @@ end;
 
 procedure TMainForm.ScrollToCurrentSong;
 begin
-  if (FCurrentItemInfo.ItemIndex < FPlayListItems.Count) and (FCurrentItemInfo.ItemIndex > -1) then
+//  ShowMessage(FCurrentItemInfo.ItemIndex.ToString() + '/' + FPlaylists[FSelectedPlaylistIndex].Count.ToString());
+  if (FCurrentItemInfo.ItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) and (FCurrentItemInfo.ItemIndex > -1) then
   begin
     PlayList.Items[FCurrentItemInfo.ItemIndex].MakeVisible(False);
     PlayList.ItemIndex := -1;
@@ -3733,7 +3910,7 @@ end;
 
 procedure TMainForm.ScrollToItem(const ItemIndex: integer);
 begin
-  if (ItemIndex < FPlayListItems.Count) and (ItemIndex > -1) then
+  if (ItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) and (ItemIndex > -1) then
   begin
     PlayList.Items[ItemIndex].MakeVisible(False);
     PlayList.ItemIndex := -1;
@@ -3772,7 +3949,7 @@ procedure TMainForm.Splitter2Moved(Sender: TObject);
 begin
   PlayList.Columns[0].Width := PlayList.ClientWidth - PlayList.Columns[1].Width - PlayList.Columns[2].Width;
   QueueList.Columns[0].Width := QueueList.ClientWidth - QueueList.Columns[1].Width;
-  StatusBar1.Panels[0].Width := StatusBar1.ClientWidth - StatusBar1.Panels[1].Width;
+  StatusBar.Panels[0].Width := StatusBar.ClientWidth - StatusBar.Panels[1].Width;
   RadioList.Columns[0].Width := RadioList.ClientWidth - 20;
 end;
 
@@ -3963,7 +4140,7 @@ end;
 
 procedure TMainForm.UpdateOverlayIcon(const Index: integer);
 begin
-  Taskbar.OverlayIcon.LoadFromFile(ExtractFileDir(Application.ExeName) + '\ico\'+FloatToStr(Index)+'.ico');
+  Taskbar.OverlayIcon.LoadFromFile(ExtractFileDir(Application.ExeName) + '\ico\' + FloatToStr(Index) + '.ico');
   Taskbar.ApplyChanges;
 end;
 
@@ -4005,7 +4182,7 @@ begin
     begin
       FPlayer.SetVolume(100 - VolumeBar.Position);
     end;
-    StatusBar1.Panels[1].Text := FloatToStr(VolumeBar.Position) + '%'
+    StatusBar.Panels[1].Text := FloatToStr(VolumeBar.Position) + '%'
   end
   else if FPlaybackType = radio then
   begin
@@ -4045,7 +4222,7 @@ begin
     VolumeLowImg.Visible := False;
   end;
 
-  StatusBar1.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
+  StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
 end;
 
 procedure TMainForm.VolumeBarMouseEnter(Sender: TObject);
@@ -4160,7 +4337,7 @@ begin
                 LyricTitleEdit.Enabled := False;
                 LyricSourceList.Enabled := False;
                 FLyricDownloader.Stop;
-                if FPlayListItems.Count < 1 then
+                if FPlaylists[FSelectedPlaylistIndex].Count < 1 then
                   Exit;
                 FLyricDownloader.SongTitle := Trim(LSplitList[1]);
                 FLyricDownloader.Artist := Trim(LSplitList[0]);

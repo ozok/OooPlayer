@@ -184,7 +184,7 @@ begin
           if PlayList.Items.Count > 0 then
           begin
             Randomize;
-            LRndIndex := Random(FPlayListItems.Count);
+            LRndIndex := Random(FPlayLists.Count);
             PositionTimer.Enabled := False;
             ProgressTimer.Enabled := PositionTimer.Enabled;
             PlayItem(LRndIndex);
@@ -251,7 +251,7 @@ begin
               if FShuffleIndex + 1 < FShuffleIndexes.Count then
               begin
                 FShuffleIndex := 1 + FShuffleIndex;
-                if FShuffleIndexes[FShuffleIndex] < FPlayListItems.Count then
+                if FShuffleIndexes[FShuffleIndex] < FPlayLists.Count then
                 begin
                   PlayItem(FShuffleIndexes[FShuffleIndex]);
                 end;

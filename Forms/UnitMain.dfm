@@ -620,7 +620,7 @@ object MainForm: TMainForm
       end
     end
   end
-  object StatusBar1: TStatusBar
+  object StatusBar: TStatusBar
     Left = 0
     Top = 557
     Width = 1008
@@ -702,11 +702,19 @@ object MainForm: TMainForm
         ExplicitTop = 225
         ExplicitWidth = 598
       end
+      object Bevel1: TBevel
+        Left = 0
+        Top = 30
+        Width = 644
+        Height = 3
+        Align = alTop
+        Shape = bsTopLine
+      end
       object PlayList: TListView
         Left = 0
-        Top = 0
+        Top = 33
         Width = 644
-        Height = 234
+        Height = 201
         Hint = 'Playlist'
         Margins.Left = 0
         Margins.Top = 0
@@ -770,6 +778,47 @@ object MainForm: TMainForm
         OnDblClick = QueueListDblClick
         OnMouseEnter = QueueListMouseEnter
         OnMouseLeave = QueueListMouseLeave
+      end
+      object Panel3: TPanel
+        Left = 0
+        Top = 0
+        Width = 644
+        Height = 30
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 2
+        object PlaylistList: TComboBox
+          AlignWithMargins = True
+          Left = 3
+          Top = 3
+          Width = 536
+          Height = 21
+          Align = alClient
+          Style = csDropDownList
+          TabOrder = 0
+          OnChange = PlaylistListChange
+        end
+        object AddPlaylistBtn: TButton
+          AlignWithMargins = True
+          Left = 545
+          Top = 3
+          Width = 45
+          Height = 24
+          Align = alRight
+          Caption = '+'
+          TabOrder = 1
+          OnClick = AddPlaylistBtnClick
+        end
+        object RemovePlaylistBtn: TButton
+          AlignWithMargins = True
+          Left = 596
+          Top = 3
+          Width = 45
+          Height = 24
+          Align = alRight
+          Caption = '-'
+          TabOrder = 2
+        end
       end
     end
     object TabSheet2: TTabSheet
@@ -6468,7 +6517,7 @@ object MainForm: TMainForm
     Left = 452
     Top = 434
     Bitmap = {
-      494C010108000D00400020002000FFFFFFFF1910FFFFFFFFFFFFFFFF424D3600
+      494C010108000D00480020002000FFFFFFFF1910FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000800000006000000001001800000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7913,7 +7962,7 @@ object MainForm: TMainForm
     Left = 360
     Top = 432
     Bitmap = {
-      494C010105000800180016001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800200016001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

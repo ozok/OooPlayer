@@ -1,6 +1,6 @@
 // ********************************************************************************************************************************
 // *                                                                                                                              *
-// *     WMA Tag Library 1.0.7.10 © 3delite 2013-2014                                                                             *
+// *     WMA Tag Library 1.0.8.11 © 3delite 2013-2014                                                                             *
 // *     See WMA Tag Library ReadMe.txt for details                                                                               *
 // *                                                                                                                              *
 // * Two licenses are available for commercial usage of this component:                                                           *
@@ -449,6 +449,7 @@ type
     function GetHasFileTransferStream: Boolean;
     function GetContainerFormat: Boolean;
   public
+    Destructor Destroy; override;
     property Duration: Int64 read GetDuration;
     property BitRate: Integer read GetBitRate;
     property Seekable: Boolean read GetSeekable;
@@ -798,6 +799,14 @@ begin
   begin
     Result := DeleteFrame(Index);
   end;
+end;
+
+destructor TWMATag.Destroy;
+begin
+  ppEditor := nil;
+  ppHeaderInfo3 := nil;
+  Clear;
+  inherited;
 end;
 
 function TWMATag.FrameExists(Name: String): Integer;

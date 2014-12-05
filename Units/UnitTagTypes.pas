@@ -22,7 +22,7 @@ unit UnitTagTypes;
 
 interface
 
-uses Classes;
+uses Classes, Generics.Collections;
 
 type
   TCoverArtType = (none = 0, jpeg = 1, png = 2, bmp = 3, gif = 4);
@@ -44,7 +44,7 @@ type
   end;
 
 type
-  TPlayListItem = class
+  TPlayItem = class
     FullFileName: string;
     DurationStr: string;
     Bitrate: string;
@@ -60,16 +60,18 @@ type
     destructor Destroy; override;
   end;
 
+  TPlaylist = TList<TPlayItem>;
+
 implementation
 
 { TPlayListItem }
 
-constructor TPlayListItem.Create;
+constructor TPlayItem.Create;
 begin
 
 end;
 
-destructor TPlayListItem.Destroy;
+destructor TPlayItem.Destroy;
 begin
 
 end;

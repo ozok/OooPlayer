@@ -47,7 +47,7 @@ type
     constructor Create;
     destructor Destroy(); override;
 
-    function ReadTags(const FileName: string): TPlayListItem;
+    function ReadTags(const FileName: string): TPlayItem;
     procedure ReadArtwork(const FileName: string);
     procedure ClearArtwork;
   end;
@@ -318,10 +318,10 @@ begin
   end;
 end;
 
-function TTagReader.ReadTags(const FileName: string): TPlayListItem;
+function TTagReader.ReadTags(const FileName: string): TPlayItem;
 begin
   FIsBusy := True;
-  Result := TPlayListItem.Create;
+  Result := TPlayItem.Create;
   try
     if FID3v2Tag.LoadFromFile(FileName) = 0 then
     begin

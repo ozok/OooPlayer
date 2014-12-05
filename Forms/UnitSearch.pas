@@ -89,8 +89,9 @@ begin
           PlayList.Invalidate;
           // add to queue list
           LItem := QueueList.Items.Add;
-          LItem.Caption := FPlayListItems[LItemIndex].Artist + ' - ' + FPlayListItems[LItemIndex].Album + ' - ' + FPlayListItems[LItemIndex].Title;
-          LItem.SubItems.Add(FPlayListItems[LItemIndex].DurationStr);
+          LItem.Caption := FPlaylists[FSelectedPlaylistIndex][LItemIndex].Artist + ' - ' + FPlaylists[FSelectedPlaylistIndex][LItemIndex].Album + ' - ' + FPlaylists[FSelectedPlaylistIndex]
+            [LItemIndex].Title;
+          LItem.SubItems.Add(FPlaylists[FSelectedPlaylistIndex][LItemIndex].DurationStr);
         end;
       end;
     end;
@@ -226,17 +227,18 @@ begin
       case SearchType of
         stmusic:
           begin
-            for I := 0 to MainForm.FPlayListItems.Count - 1 do
+            for I := 0 to MainForm.FPlaylists.Count - 1 do
             begin
               Application.ProcessMessages;
-              if ContainsText(MainForm.FPlayListItems[i].Title, LQuery) or ContainsText(MainForm.FPlayListItems[i].Artist, LQuery) or ContainsText(MainForm.FPlayListItems[i].Album, LQuery) or
-                ContainsText(MainForm.FPlayListItems[i].FullFileName, LQuery) then
+              if ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Title, LQuery) or ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Artist, LQuery) or
+                ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Album, LQuery) or ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].FullFileName, LQuery) then
               begin
                 FResultsList.Add(i);
 
                 LListItem := ResultsList.Items.Add;
-                LListItem.Caption := MainForm.FPlayListItems[i].Artist + ' - ' + MainForm.FPlayListItems[i].Album + ' - ' + MainForm.FPlayListItems[i].Title;
-                LListItem.SubItems.Add(MainForm.FPlayListItems[i].DurationStr);
+                LListItem.Caption := MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Artist + ' - ' + MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Album + ' - ' +
+                  MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Title;
+                LListItem.SubItems.Add(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].DurationStr);
               end;
             end;
           end;

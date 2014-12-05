@@ -33,6 +33,8 @@ object InfoForm: TInfoForm
     object TabSheet2: TTabSheet
       Caption = 'Details'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 498
       ExplicitHeight = 342
       object InfoList: TTreeView
