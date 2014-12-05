@@ -171,80 +171,86 @@ begin
     LAddToLyricFile := False;
     LSR := TStreamReader.Create(Stream, TEncoding.UTF8);
     try
-      case FLyricSourceIndex of
-        0: // az
-          begin
-            while not LSR.EndOfStream do
+      try
+        case FLyricSourceIndex of
+          0: // az
             begin
-              try
-                LLine := Trim(LSR.ReadLine);
-              except
+              while not LSR.EndOfStream do
+              begin
+                try
+                  LLine := Trim(LSR.ReadLine);
+                except
 
-              end;
-              if LLine = START_STR then
-              begin
-                LAddToLyricFile := True;
-              end
-              else if LLine = END_STR then
-              begin
-                Break;
-              end;
-              if LAddToLyricFile then
-              begin
-                FLyricFile.Add(Trim(FixLine(LLine)));
-              end;
-            end;
-          end;
-        1: // bat
-          begin
-            while not LSR.EndOfStream do
-            begin
-              try
-                LLine := Trim(LSR.ReadLine);
-              except
-
-              end;
-              if Copy(LLine, 1, Length(START_STR_BAT)) = START_STR_BAT then
-              begin
-                LAddToLyricFile := True;
-              end
-              else if Copy(LLine, 1, Length(END_STR_BAT)) = END_STR_BAT then
-              begin
-                Break;
-              end;
-              if LAddToLyricFile then
-              begin
-                if Copy(LLine, 1, Length(BAT_SPAN)) <> BAT_SPAN then
+                end;
+                if LLine = START_STR then
+                begin
+                  LAddToLyricFile := True;
+                end
+                else if LLine = END_STR then
+                begin
+                  Break;
+                end;
+                if LAddToLyricFile then
                 begin
                   FLyricFile.Add(Trim(FixLine(LLine)));
                 end;
               end;
             end;
-          end;
-        2: // metro
-          begin
-            while not LSR.EndOfStream do
+          1: // bat
             begin
-              try
-                LLine := Trim(LSR.ReadLine);
-              except
+              while not LSR.EndOfStream do
+              begin
+                try
+                  LLine := Trim(LSR.ReadLine);
+                except
 
-              end;
-              if LLine = METRO_START then
-              begin
-                LAddToLyricFile := True;
-              end
-              else if LLine = METRO_END then
-              begin
-                Break;
-              end;
-              if LAddToLyricFile then
-              begin
-                FLyricFile.Add(Trim(FixLine(LLine)));
+                end;
+                if Copy(LLine, 1, Length(START_STR_BAT)) = START_STR_BAT then
+                begin
+                  LAddToLyricFile := True;
+                end
+                else if Copy(LLine, 1, Length(END_STR_BAT)) = END_STR_BAT then
+                begin
+                  Break;
+                end;
+                if LAddToLyricFile then
+                begin
+                  if Copy(LLine, 1, Length(BAT_SPAN)) <> BAT_SPAN then
+                  begin
+                    FLyricFile.Add(Trim(FixLine(LLine)));
+                  end;
+                end;
               end;
             end;
-          end;
+          2: // metro
+            begin
+              while not LSR.EndOfStream do
+              begin
+                try
+                  LLine := Trim(LSR.ReadLine);
+                except
+
+                end;
+                if LLine = METRO_START then
+                begin
+                  LAddToLyricFile := True;
+                end
+                else if LLine = METRO_END then
+                begin
+                  Break;
+                end;
+                if LAddToLyricFile then
+                begin
+                  FLyricFile.Add(Trim(FixLine(LLine)));
+                end;
+              end;
+            end;
+        end;
+      except
+        on E: Exception do
+          LogForm.LogList.Lines.Add('Lyric downloader error: ' + E.Message)
       end;
+
     finally
       LSR.Close;
       LSR.Free;

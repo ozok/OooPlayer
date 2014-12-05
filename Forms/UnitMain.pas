@@ -220,6 +220,7 @@ type
     AddPlaylistBtn: TButton;
     RemovePlaylistBtn: TButton;
     Bevel1: TBevel;
+    S9: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -321,6 +322,7 @@ type
     procedure TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
     procedure AddPlaylistBtnClick(Sender: TObject);
     procedure PlaylistListChange(Sender: TObject);
+    procedure S9Click(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -803,7 +805,7 @@ begin
     FPlayListFiles.Add(LPlaylistFile);
     LSW := TStreamWriter.Create(FAppDataFolder + '\playlists.dat', False);
     try
-      for I := 0 to FPlayListFiles.Count-1 do
+      for I := 0 to FPlayListFiles.Count - 1 do
       begin
         LSW.WriteLine(FPlayListFiles[i].Name + '|' + FPlayListFiles[i].PlaylistFile);
       end;
@@ -1394,6 +1396,7 @@ end;
 procedure TMainForm.FormShow(Sender: TObject);
 var
   I: Integer;
+  LSF: TIniFile;
 begin
   LoadPlayList;
   LoadSettings;
@@ -1404,6 +1407,14 @@ begin
   StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
   PlaylistListChange(Self);
 
+  // FCurrentItemInfo.ItemIndex is reseted to -1 above so we need to
+  // re-read it from ini file
+  LSF := TIniFile.Create(FAppDataFolder + '\settings.ini');
+  try
+    FCurrentItemInfo.ItemIndex := LSF.ReadInteger('player', 'itemindex', -1);
+  finally
+    LSF.Free;
+  end;
   if FCurrentItemInfo.ItemIndex < FPlaylists[FSelectedPlaylistIndex].Count then
   begin
     PlayList.ItemIndex := FCurrentItemInfo.ItemIndex;
@@ -2000,6 +2011,8 @@ begin
       LyricPanel.Width := ReadInteger('player', 'lyricw', 250);
       FSelectedPlaylistIndex := ReadInteger('player', 'playlistindex', 0);
       PlaylistList.ItemIndex := FSelectedPlaylistIndex;
+      LyricPanel.Visible := ReadBool('player', 'lyricvisible', true);
+      S9.Checked := not LyricPanel.Visible;
     end;
   finally
     SettingsFile.Free;
@@ -2327,7 +2340,8 @@ procedure TMainForm.PauseRadio;
 begin
   if BASS_ChannelIsActive(FRadioHandle) = BASS_ACTIVE_PLAYING then
   begin
-    BASS_ChannelPause(FRadioHandle)
+    BASS_ChannelPause(FRadioHandle);
+    UpdateOverlayIcon(2);
   end;
 end;
 
@@ -3060,6 +3074,7 @@ begin
   RadioList.Invalidate;
   FRadioURL := URL;
   PlaybackInfoLabel.Caption := 'Connecting...';
+  UpdateOverlayIcon(1);
   RadioThread.Start;
 end;
 
@@ -3453,11 +3468,15 @@ begin
   FRadioHandle := BASS_StreamCreateURL(PAnsiChar(FRadioURL), 0, BASS_STREAM_BLOCK or BASS_STREAM_STATUS or BASS_STREAM_AUTOFREE, @StatusProc, nil);
   if FRadioHandle = 0 then
   begin
-    FRadioLogItem := 'Unable to play: ' + string(FRadioURL);
-    RadioThread.Synchronize(AddToRadioLog);
-    FRadioLogItem := 'Bass radio error: ' + BassErrorCodeToString(BASS_ErrorGetCode());
-    RadioThread.Synchronize(AddToRadioLog);
-    RadioThread.Synchronize(RadioResetUI);
+    try
+      FRadioLogItem := 'Unable to play: ' + string(FRadioURL);
+      RadioThread.Synchronize(AddToRadioLog);
+      FRadioLogItem := 'Bass radio error: ' + BassErrorCodeToString(BASS_ErrorGetCode());
+      RadioThread.Synchronize(AddToRadioLog);
+      RadioThread.Synchronize(RadioResetUI);
+    except on E: Exception do
+
+    end;
     SendMessage(WinHandle, WM_INFO_UPDATE, STOP_IMG_ANIM, LCacheProgress);
   end
   else
@@ -3712,7 +3731,8 @@ procedure TMainForm.ResumeRadio;
 begin
   if BASS_ChannelIsActive(FRadioHandle) = BASS_ACTIVE_PAUSED then
   begin
-    BASS_ChannelPlay(FRadioHandle, False)
+    BASS_ChannelPlay(FRadioHandle, False);
+    UpdateOverlayIcon(1);
   end;
 end;
 
@@ -3786,6 +3806,13 @@ begin
   end;
 end;
 
+procedure TMainForm.S9Click(Sender: TObject);
+begin
+  LyricPanel.Visible := not LyricPanel.Visible;
+  S9.Checked := not LyricPanel.Visible;
+  FormResize(Self);
+end;
+
 procedure TMainForm.SaveM3UPlayList(const FileName: string; const UTF8: Boolean);
 var
   LStreamWriter: TStreamWriter;
@@ -3822,10 +3849,12 @@ var
 begin
   for j := 0 to FPlayListFiles.Count - 1 do
   begin
+    // delete all playlists file prior to creating them again
     if FileExists(FPlayListFiles[j].PlaylistFile) then
     begin
       DeleteFile(FPlayListFiles[j].PlaylistFile)
     end;
+    // create a playlist file for each playlist
     LStreamWriter := TStreamWriter.Create(FPlayListFiles[j].PlaylistFile, False, TEncoding.UTF8);
     try
       for I := 0 to FPlaylists[j].Count - 1 do
@@ -3886,6 +3915,7 @@ begin
       WriteBool('search', 'close', SearchForm.chkCloseOnPlayBtn.Checked);
       WriteInteger('player', 'lyricw', LyricPanel.Width);
       WriteInteger('player', 'playlistindex', FSelectedPlaylistIndex);
+      WriteBool('player', 'lyricvisible', LyricPanel.Visible);
     end;
   finally
     SettingsFile.Free;
@@ -3894,7 +3924,6 @@ end;
 
 procedure TMainForm.ScrollToCurrentSong;
 begin
-//  ShowMessage(FCurrentItemInfo.ItemIndex.ToString() + '/' + FPlaylists[FSelectedPlaylistIndex].Count.ToString());
   if (FCurrentItemInfo.ItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) and (FCurrentItemInfo.ItemIndex > -1) then
   begin
     PlayList.Items[FCurrentItemInfo.ItemIndex].MakeVisible(False);

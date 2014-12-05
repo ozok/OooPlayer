@@ -408,9 +408,9 @@ object MainForm: TMainForm
       TabOrder = 11
       object PositionLabel: TLabel
         AlignWithMargins = True
-        Left = 865
+        Left = 849
         Top = 3
-        Width = 140
+        Width = 156
         Height = 17
         Align = alRight
         Caption = '00:00:00/00:00:00/00:00:00'
@@ -418,15 +418,16 @@ object MainForm: TMainForm
         Font.Color = clWindowText
         Font.Height = -11
         Font.Name = 'Tahoma'
-        Font.Style = []
+        Font.Style = [fsBold]
         ParentFont = False
         Layout = tlCenter
+        ExplicitLeft = 865
         ExplicitHeight = 13
       end
       object PositionBar: TJvTrackBar
         Left = 0
         Top = 0
-        Width = 862
+        Width = 846
         Height = 23
         Hint = 'Position'
         Align = alClient
@@ -439,6 +440,7 @@ object MainForm: TMainForm
         OnMouseEnter = PositionBarMouseEnter
         OnChanged = PositionBarChanged
         OnMouseDown = PositionBarMouseDown
+        ExplicitWidth = 862
       end
     end
     object VolumePnl: TPanel
@@ -1136,6 +1138,8 @@ object MainForm: TMainForm
       TabOrder = 1
       OnMouseEnter = LyricListMouseEnter
       OnMouseLeave = LyricListMouseLeave
+      ExplicitLeft = 0
+      ExplicitTop = 111
     end
   end
   object OpenFolder: TJvBrowseForFolderDialog
@@ -1173,7 +1177,6 @@ object MainForm: TMainForm
     Top = 304
   end
   object MainMenu1: TMainMenu
-    OwnerDraw = True
     Left = 112
     Top = 376
     object F1: TMenuItem
@@ -1230,6 +1233,10 @@ object MainForm: TMainForm
         Caption = 'Radio'
         ShortCut = 16434
         OnClick = R3Click
+      end
+      object S9: TMenuItem
+        Caption = 'Hide lyric panel'
+        OnClick = S9Click
       end
     end
     object P1: TMenuItem
