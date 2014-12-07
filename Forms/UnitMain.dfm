@@ -421,7 +421,6 @@ object MainForm: TMainForm
         Font.Style = [fsBold]
         ParentFont = False
         Layout = tlCenter
-        ExplicitLeft = 865
         ExplicitHeight = 13
       end
       object PositionBar: TJvTrackBar
@@ -440,7 +439,6 @@ object MainForm: TMainForm
         OnMouseEnter = PositionBarMouseEnter
         OnChanged = PositionBarChanged
         OnMouseDown = PositionBarMouseDown
-        ExplicitWidth = 862
       end
     end
     object VolumePnl: TPanel
@@ -1138,8 +1136,6 @@ object MainForm: TMainForm
       TabOrder = 1
       OnMouseEnter = LyricListMouseEnter
       OnMouseLeave = LyricListMouseLeave
-      ExplicitLeft = 0
-      ExplicitTop = 111
     end
   end
   object OpenFolder: TJvBrowseForFolderDialog
@@ -6524,7 +6520,7 @@ object MainForm: TMainForm
     Left = 452
     Top = 434
     Bitmap = {
-      494C010108000D00480020002000FFFFFFFF1910FFFFFFFFFFFFFFFF424D3600
+      494C010108000D00500020002000FFFFFFFF1910FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000800000006000000001001800000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7969,7 +7965,7 @@ object MainForm: TMainForm
     Left = 360
     Top = 432
     Bitmap = {
-      494C010105000800200016001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800280016001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

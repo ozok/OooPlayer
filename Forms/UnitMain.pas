@@ -578,6 +578,7 @@ begin
       Self.Width := Self.Width + 1;
       Self.Width := Self.Width - 1;
       GenerateShuffleList;
+      FShuffleIndex := -1;
       StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
     end;
   end;
@@ -605,6 +606,7 @@ begin
       Self.Width := Self.Width + 1;
       Self.Width := Self.Width - 1;
       GenerateShuffleList;
+      FShuffleIndex := -1;
       StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
     end;
   end;
@@ -669,6 +671,7 @@ begin
     Self.Width := Self.Width + 1;
     Self.Width := Self.Width - 1;
     GenerateShuffleList;
+    FShuffleIndex := -1;
     StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
   end;
   FStopAddFiles := True;
@@ -869,6 +872,7 @@ begin
       Self.Width := Self.Width + 1;
       Self.Width := Self.Width - 1;
       GenerateShuffleList;
+      FShuffleIndex := -1;
       StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
       if PlayList.Items.Count > 0 then
       begin
@@ -1227,6 +1231,7 @@ begin
     Self.Width := Self.Width + 1;
     Self.Width := Self.Width - 1;
     GenerateShuffleList;
+    FShuffleIndex := -1;
     StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
   end;
 end;
@@ -1404,6 +1409,7 @@ begin
   CreateUserRadioLists;
   LoadRadioStations;
   GenerateShuffleList;
+  FShuffleIndex := -1;
   StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
   PlaylistListChange(Self);
 
@@ -1460,6 +1466,7 @@ begin
       Self.Width := Self.Width + 1;
       Self.Width := Self.Width - 1;
       GenerateShuffleList;
+      FShuffleIndex := -1;
       StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
       if PlayList.Items.Count > 0 then
       begin
@@ -2011,7 +2018,7 @@ begin
       LyricPanel.Width := ReadInteger('player', 'lyricw', 250);
       FSelectedPlaylistIndex := ReadInteger('player', 'playlistindex', 0);
       PlaylistList.ItemIndex := FSelectedPlaylistIndex;
-      LyricPanel.Visible := ReadBool('player', 'lyricvisible', true);
+      LyricPanel.Visible := ReadBool('player', 'lyricvisible', True);
       S9.Checked := not LyricPanel.Visible;
     end;
   finally
@@ -2209,7 +2216,7 @@ begin
           ProgressTimer.Enabled := PositionTimer.Enabled;
           PlayItem(LRndIndex);
         end;
-      2: // repear track
+      2: // repeat track
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
@@ -2987,6 +2994,7 @@ begin
     FSelectedPlaylistIndex := PlaylistList.ItemIndex;
     PlayList.Items.Count := FPlaylists[FSelectedPlaylistIndex].Count;
     GenerateShuffleList;
+    FShuffleIndex := -1;
     PlayList.Repaint;
     PlayList.Refresh;
     StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
@@ -3474,7 +3482,8 @@ begin
       FRadioLogItem := 'Bass radio error: ' + BassErrorCodeToString(BASS_ErrorGetCode());
       RadioThread.Synchronize(AddToRadioLog);
       RadioThread.Synchronize(RadioResetUI);
-    except on E: Exception do
+    except
+      on E: Exception do
 
     end;
     SendMessage(WinHandle, WM_INFO_UPDATE, STOP_IMG_ANIM, LCacheProgress);
