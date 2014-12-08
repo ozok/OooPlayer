@@ -194,7 +194,6 @@ type
     LyricList: TMemo;
     RadioConnectionImg: TJvGIFAnimator;
     VolumeBar: TJvTrackBar;
-    ImageList1: TImageList;
     SettingsBtn: TButton;
     LogsBtn: TButton;
     SearchBtn: TButton;

@@ -227,7 +227,7 @@ begin
       case SearchType of
         stmusic:
           begin
-            for I := 0 to MainForm.FPlaylists.Count - 1 do
+            for I := 0 to MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex].Count - 1 do
             begin
               Application.ProcessMessages;
               if ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Title, LQuery) or ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Artist, LQuery) or
