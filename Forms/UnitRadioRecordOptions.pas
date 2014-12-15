@@ -3,20 +3,22 @@ unit UnitRadioRecordOptions;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, JvExMask,
-  JvToolEdit, Vcl.ComCtrls, IniFiles, JvComponentBase, JvComputerInfoEx, ShellAPI;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
+  Vcl.Mask, JvExMask, JvToolEdit, Vcl.ComCtrls, IniFiles, JvComponentBase,
+  JvComputerInfoEx, ShellAPI, sComboBox, sButton, sLabel, sSkinProvider;
 
 type
   TRadioRecordOptionsForm = class(TForm)
     RecordSaveEdit: TJvDirectoryEdit;
-    Label1: TLabel;
-    Button1: TButton;
-    Button2: TButton;
-    Label2: TLabel;
-    BitrateList: TComboBox;
+    Label1: TsLabel;
+    Button1: TsButton;
+    Button2: TsButton;
+    Label2: TsLabel;
+    BitrateList: TsComboBox;
     Info: TJvComputerInfoEx;
-    Label3: TLabel;
+    Label3: TsLabel;
+    sSkinProvider1: TsSkinProvider;
     procedure Button2Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);

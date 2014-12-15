@@ -23,15 +23,17 @@ unit UnitFileInfo;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls, MediaInfoDll;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, 
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, 
+  Vcl.ComCtrls, MediaInfoDll, sButton, sTreeView, sPageControl, sSkinProvider;
 
 type
   TInfoForm = class(TForm)
-    PageControl1: TPageControl;
-    TabSheet2: TTabSheet;
-    Button1: TButton;
-    InfoList: TTreeView;
+    PageControl1: TsPageControl;
+    TabSheet2: TsTabSheet;
+    Button1: TsButton;
+    InfoList: TsTreeView;
+    sSkinProvider1: TsSkinProvider;
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
@@ -124,4 +126,4 @@ begin
   end;
 end;
 
-end.
+end.

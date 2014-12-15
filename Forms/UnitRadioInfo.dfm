@@ -21,65 +21,65 @@ object RadioInfoForm: TRadioInfoForm
     99)
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object Label1: TsLabel
     Left = 8
     Top = 8
     Width = 67
     Height = 13
     Caption = 'Station name:'
   end
-  object Label2: TLabel
+  object Label2: TsLabel
     Left = 29
     Top = 27
     Width = 46
     Height = 13
     Caption = 'Web site:'
   end
-  object Label3: TLabel
+  object Label3: TsLabel
     Left = 19
     Top = 46
     Width = 56
     Height = 13
     Caption = 'Stream link:'
   end
-  object NameLabel: TLabel
+  object NameLabel: TsLabel
     Left = 81
     Top = 8
     Width = 52
     Height = 13
     Caption = 'NameLabel'
   end
-  object WebLabel: TLabel
+  object WebLabel: TsLabel
     Left = 81
     Top = 27
     Width = 47
     Height = 13
     Cursor = crHandPoint
     Caption = 'WebLabel'
+    ParentFont = False
+    OnClick = WebLabelClick
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlue
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
-    ParentFont = False
-    OnClick = WebLabelClick
   end
-  object StreamLabel: TLabel
+  object StreamLabel: TsLabel
     Left = 81
     Top = 46
     Width = 59
     Height = 13
     Cursor = crHandPoint
     Caption = 'StreamLabel'
+    ParentFont = False
+    OnClick = StreamLabelClick
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlue
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
-    ParentFont = False
-    OnClick = StreamLabelClick
   end
-  object Button1: TButton
+  object Button1: TsButton
     Left = 511
     Top = 66
     Width = 75
@@ -94,5 +94,17 @@ object RadioInfoForm: TRadioInfoForm
     ParentFont = False
     TabOrder = 0
     OnClick = Button1Click
+    SkinData.SkinSection = 'BUTTON'
+  end
+  object sSkinProvider1: TsSkinProvider
+    AddedTitle.Font.Charset = DEFAULT_CHARSET
+    AddedTitle.Font.Color = clNone
+    AddedTitle.Font.Height = -11
+    AddedTitle.Font.Name = 'Tahoma'
+    AddedTitle.Font.Style = []
+    SkinData.SkinSection = 'FORM'
+    TitleButtons = <>
+    Left = 288
+    Top = 48
   end
 end

@@ -26,7 +26,7 @@ object SearchForm: TSearchForm
     304)
   PixelsPerInch = 96
   TextHeight = 13
-  object ResultsLbl: TLabel
+  object ResultsLbl: TsLabel
     Left = 0
     Top = 291
     Width = 635
@@ -49,7 +49,7 @@ object SearchForm: TSearchForm
     OnKeyDown = QueryEditKeyDown
     OnMouseEnter = QueryEditMouseEnter
   end
-  object SearchBtn: TButton
+  object SearchBtn: TsButton
     Left = 552
     Top = 8
     Width = 75
@@ -58,13 +58,25 @@ object SearchForm: TSearchForm
     Caption = 'Search'
     TabOrder = 1
     OnClick = SearchBtnClick
+    SkinData.SkinSection = 'BUTTON'
   end
-  object ResultsList: TListView
+  object ResultsList: TsListView
     Left = 8
     Top = 39
     Width = 619
     Height = 223
+    BoundLabel.Indent = 0
+    BoundLabel.Font.Charset = DEFAULT_CHARSET
+    BoundLabel.Font.Color = clWindowText
+    BoundLabel.Font.Height = -11
+    BoundLabel.Font.Name = 'Tahoma'
+    BoundLabel.Font.Style = []
+    BoundLabel.Layout = sclLeft
+    BoundLabel.MaxWidth = 0
+    BoundLabel.UseSkinColor = True
+    SkinData.SkinSection = 'EDIT'
     Anchors = [akLeft, akTop, akRight, akBottom]
+    Color = 2038810
     Columns = <
       item
         Caption = 'Title'
@@ -74,8 +86,14 @@ object SearchForm: TSearchForm
         Caption = 'Duration'
         Width = 80
       end>
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = 13417908
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
     ReadOnly = True
     RowSelect = True
+    ParentFont = False
     PopupMenu = ListMenu
     ShowColumnHeaders = False
     TabOrder = 2
@@ -83,15 +101,18 @@ object SearchForm: TSearchForm
     OnClick = ResultsListClick
     OnDblClick = ResultsListDblClick
   end
-  object chkCloseOnPlayBtn: TCheckBox
+  object chkCloseOnPlayBtn: TsCheckBox
     Left = 8
     Top = 268
-    Width = 273
-    Height = 17
+    Width = 250
+    Height = 19
     Caption = 'Close this window if a result is selected to play'
     Checked = True
     State = cbChecked
     TabOrder = 3
+    SkinData.SkinSection = 'CHECKBOX'
+    ImgChecked = 0
+    ImgUnchecked = 0
   end
   object ListMenu: TPopupMenu
     Left = 312
@@ -100,5 +121,16 @@ object SearchForm: TSearchForm
       Caption = 'Add to queue'
       OnClick = A1Click
     end
+  end
+  object sSkinProvider1: TsSkinProvider
+    AddedTitle.Font.Charset = DEFAULT_CHARSET
+    AddedTitle.Font.Color = clNone
+    AddedTitle.Font.Height = -11
+    AddedTitle.Font.Name = 'Tahoma'
+    AddedTitle.Font.Style = []
+    SkinData.SkinSection = 'FORM'
+    TitleButtons = <>
+    Left = 320
+    Top = 160
   end
 end

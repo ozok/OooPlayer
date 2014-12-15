@@ -21,21 +21,21 @@ object RadioRecordOptionsForm: TRadioRecordOptionsForm
     92)
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object Label1: TsLabel
     Left = 8
     Top = 11
     Width = 118
     Height = 13
     Caption = 'Recording save location:'
   end
-  object Label2: TLabel
+  object Label2: TsLabel
     Left = 57
     Top = 38
     Width = 69
     Height = 13
     Caption = 'Bitrate (kbps):'
   end
-  object Label3: TLabel
+  object Label3: TsLabel
     Left = 8
     Top = 71
     Width = 291
@@ -52,7 +52,7 @@ object RadioRecordOptionsForm: TRadioRecordOptionsForm
     TabOrder = 0
     Text = ''
   end
-  object Button1: TButton
+  object Button1: TsButton
     Left = 562
     Top = 8
     Width = 75
@@ -61,8 +61,9 @@ object RadioRecordOptionsForm: TRadioRecordOptionsForm
     Caption = 'Open'
     TabOrder = 1
     OnClick = Button1Click
+    SkinData.SkinSection = 'BUTTON'
   end
-  object Button2: TButton
+  object Button2: TsButton
     Left = 562
     Top = 59
     Width = 75
@@ -71,15 +72,28 @@ object RadioRecordOptionsForm: TRadioRecordOptionsForm
     Caption = 'Close'
     TabOrder = 2
     OnClick = Button2Click
+    SkinData.SkinSection = 'BUTTON'
   end
-  object BitrateList: TComboBox
+  object BitrateList: TsComboBox
     Left = 132
     Top = 35
     Width = 75
     Height = 21
-    Color = clWhite
+    Alignment = taLeftJustify
+    BoundLabel.Indent = 0
+    BoundLabel.Font.Charset = DEFAULT_CHARSET
+    BoundLabel.Font.Color = clWindowText
+    BoundLabel.Font.Height = -11
+    BoundLabel.Font.Name = 'Tahoma'
+    BoundLabel.Font.Style = []
+    BoundLabel.Layout = sclLeft
+    BoundLabel.MaxWidth = 0
+    BoundLabel.UseSkinColor = True
+    SkinData.SkinSection = 'COMBOBOX'
+    VerticalAlignment = taAlignTop
+    Color = 2038810
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
+    Font.Color = 13417908
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
@@ -104,5 +118,16 @@ object RadioRecordOptionsForm: TRadioRecordOptionsForm
   object Info: TJvComputerInfoEx
     Left = 384
     Top = 32
+  end
+  object sSkinProvider1: TsSkinProvider
+    AddedTitle.Font.Charset = DEFAULT_CHARSET
+    AddedTitle.Font.Color = clNone
+    AddedTitle.Font.Height = -11
+    AddedTitle.Font.Name = 'Tahoma'
+    AddedTitle.Font.Style = []
+    SkinData.SkinSection = 'FORM'
+    TitleButtons = <>
+    Left = 312
+    Top = 48
   end
 end

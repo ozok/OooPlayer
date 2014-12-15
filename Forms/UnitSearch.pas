@@ -24,9 +24,9 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.StdCtrls,
-  Vcl.ExtCtrls, Generics.Collections, StrUtils, Vcl.Menus;
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls,
+  Vcl.StdCtrls, Vcl.ExtCtrls, Generics.Collections, StrUtils, Vcl.Menus,
+  sCheckBox, sListView, sButton, sLabel, sSkinProvider;
 
 type
   TSearchType = (stmusic = 0, stradio = 1);
@@ -34,12 +34,13 @@ type
 type
   TSearchForm = class(TForm)
     QueryEdit: TLabeledEdit;
-    SearchBtn: TButton;
-    ResultsList: TListView;
-    ResultsLbl: TLabel;
+    SearchBtn: TsButton;
+    ResultsList: TsListView;
+    ResultsLbl: TsLabel;
     ListMenu: TPopupMenu;
     A1: TMenuItem;
-    chkCloseOnPlayBtn: TCheckBox;
+    chkCloseOnPlayBtn: TsCheckBox;
+    sSkinProvider1: TsSkinProvider;
     procedure FormResize(Sender: TObject);
     procedure SearchBtnClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);

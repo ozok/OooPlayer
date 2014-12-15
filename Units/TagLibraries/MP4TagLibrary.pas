@@ -1,6 +1,6 @@
 // ********************************************************************************************************************************
 // *                                                                                                                              *
-// *     MP4 Tag Library 1.0.21.37 © 3delite 2012-2014                                                                            *
+// *     MP4 Tag Library 1.0.24.53 © 3delite 2012-2014                                                                           *
 // *     See MP4 Tag Library ReadMe.txt for details                                                                               *
 // *                                                                                                                              *
 // * Two licenses are available for commercial usage of this component:                                                           *
@@ -12,6 +12,10 @@
 // * Using the component in free programs is free.                                                                                *
 // *                                                                                                                              *
 // *     http://www.3delite.hu/Object%20Pascal%20Developer%20Resources/MP4TagLibrary.html                                         *
+// *                                                                                                                              *
+// * This component is also available as a part of Tags Library:                                                                  *
+// *                                                                                                                              *
+// *     http://www.3delite.hu/Object%20Pascal%20Developer%20Resources/TagsLibrary.html                                           *
 // *                                                                                                                              *
 // * There is also an ID3v2 Library available at:                                                                                 *
 // *                                                                                                                              *
@@ -79,7 +83,8 @@ Const
   MP4TAGLIBRARY_ERROR_UPDATE_co64 = 12;
 
 Const
-  MP4TAGLIBRARY_DEFAULT_PADDING_SIZE = 4096 - 8;
+  MP4TAGLIBRARY_DEFAULT_PADDING_SIZE = 4096;
+  MP4TAGLIBRARY_FAIL_ON_CURRUPT_FILE = False;
 
 const
   ID3Genres: Array [0 .. 148] of String = (
@@ -88,8 +93,7 @@ const
     'Pop', 'R&B', 'Rap', 'Reggae', 'Rock', 'Techno', 'Industrial', 'Alternative', 'Ska', 'Death Metal', 'Pranks', 'Soundtrack', 'Euro-Techno', 'Ambient', 'Trip-Hop', 'Vocal', 'Jazz+Funk', 'Fusion',
     'Trance', 'Classical', 'Instrumental', 'Acid', 'House', 'Game', 'Sound Clip', 'Gospel', 'Noise', 'AlternRock', 'Bass', 'Soul', 'Punk', 'Space', 'Meditative', 'Instrumental Pop',
     'Instrumental Rock', 'Ethnic', 'Gothic', 'Darkwave', 'Techno-Industrial', 'Electronic', 'Pop-Folk', 'Eurodance', 'Dream', 'Southern Rock', 'Comedy', 'Cult', 'Gangsta', 'Top 40', 'Christian Rap',
-    'Pop/Funk', 'Jungle', 'Native American', 'Cabaret', 'New Wave', 'Psychedelic',
-    // = 'Psychadelic' in ID3 docs, 'Psychedelic' in winamp.
+    'Pop/Funk', 'Jungle', 'Native American', 'Cabaret', 'New Wave', 'Psychedelic', // = 'Psychadelic' in ID3 docs, 'Psychedelic' in winamp.
     'Rave', 'Showtunes', 'Trailer', 'Lo-Fi', 'Tribal', 'Acid Punk', 'Acid Jazz', 'Polka', 'Retro', 'Musical', 'Rock & Roll', 'Hard Rock',
     { The following genres are Winamp extensions }
     'Folk', 'Folk-Rock', 'National Folk', 'Swing', 'Fast Fusion', 'Bebob', 'Latin', 'Revival', 'Celtic', 'Bluegrass', 'Avantgarde', 'Gothic Rock', 'Progressive Rock', 'Psychedelic Rock',
@@ -130,6 +134,8 @@ type
     procedure Clear;
     function Write(MP4Stream: TStream): Boolean;
     function Assign(MP4Atommean: TMP4Atommean): Boolean;
+    function GetAsText: String;
+    function SetAsText(Text: String): Boolean;
   end;
 
   TMP4Atomname = class
@@ -143,6 +149,8 @@ type
     procedure Clear;
     function Write(MP4Stream: TStream): Boolean;
     function Assign(MP4Atomname: TMP4Atomname): Boolean;
+    function GetAsText: String;
+    function SetAsText(Text: String): Boolean;
   end;
 
   TMP4AtomData = class
@@ -213,7 +221,7 @@ type
     function CalculateAtomSize: Cardinal;
     function Write(MP4Stream: TStream): Boolean;
     procedure Delete;
-    function DeleteData(Index: Integer): Boolean;
+    function DeleteData(AtomIndex: Integer): Boolean;
     function Deletemean: Boolean;
     function Deletename: Boolean;
     procedure CompactAtomDataList;
@@ -230,11 +238,11 @@ type
     Version: Byte;
     Flags: DWord;
     PaddingToWrite: Cardinal;
-    UTF8Encoding: TEncoding;
+    // UTF8Encoding: TEncoding;
     Constructor Create;
     Destructor Destroy; override;
-    function LoadFromFile(FileName: String): Integer;
-    function SaveToFile(FileName: String): Integer;
+    function LoadFromFile(MP4FileName: String): Integer;
+    function SaveToFile(MP4FileName: String; KeepPadding: Boolean = True): Integer;
     function AddAtom(AtomName: TAtomName): TMP4Atom; overload;
     function AddAtom(AtomName: String): TMP4Atom; overload;
     function ReadAtom(MP4Stream: TFileStream; var MP4Atom: TMP4Atom): Boolean;
@@ -302,7 +310,7 @@ type
     procedure SetMultipleValues(AtomName: String; List: TStrings); overload;
   end;
 
-function ReadAtomHeader(MP4Stream: TFileStream; var AtomName: TAtomName; var AtomSize: Int64): Boolean;
+function ReadAtomHeader(MP4Stream: TFileStream; var AtomName: TAtomName; var AtomSize: Int64; var Is64BitSize: Boolean; FailOnCurrupt: Boolean = True): Boolean;
 function WriteAtomHeader(MP4Stream: TFileStream; AtomName: TAtomName; AtomSize: Int64): Boolean; overload;
 function WriteAtomHeader(MP4Stream: TFileStream; AtomName: String; AtomSize: Int64): Boolean; overload;
 function WritePadding(MP4Stream: TStream; PaddingSize: Integer): Integer;
@@ -348,6 +356,8 @@ var
   MP4AtomDataID: TAtomName;
   MP4AtommeanID: TAtomName;
   MP4AtomnameID: TAtomName;
+  MP4TagLibraryDefaultPaddingSize: Integer = MP4TAGLIBRARY_DEFAULT_PADDING_SIZE;
+  MP4TagLibraryFailOnCorruptFile: Boolean = MP4TAGLIBRARY_FAIL_ON_CURRUPT_FILE;
 
 function ReverseBytes32(Value: Cardinal): Cardinal;
 begin
@@ -427,6 +437,57 @@ begin
   Inherited;
 end;
 
+function TMP4Atommean.GetAsText: String;
+var
+  i: Integer;
+  DataByte: Byte;
+  Bytes: TBytes;
+begin
+  Result := '';
+  if Data.Size < 4 then
+  begin
+    Exit;
+  end;
+  Data.Seek(4, soBeginning);
+  SetLength(Bytes, Data.Size - 4);
+  for i := 0 to Data.Size - 1 - 4 do
+  begin
+    Data.Read(DataByte, 1);
+    Bytes[i] := DataByte;
+  end;
+  Data.Seek(0, soBeginning);
+{$IFDEF FPC}
+  SetLength(Result, Length(Bytes) + 1);
+  Move(Bytes[0], Result[1], Length(Bytes));
+{$ELSE}
+  Result := TEncoding.UTF8.GetString(Bytes);
+{$ENDIF}
+end;
+
+function TMP4Atommean.SetAsText(Text: String): Boolean;
+var
+  Zero: DWord;
+  Bytes: TBytes;
+begin
+  Data.Clear;
+  if Text = '' then
+  begin
+    Result := True;
+    Exit;
+  end;
+{$IFDEF FPC}
+  SetLength(Bytes, Length(Text) + 1);
+  Move(Text[1], Bytes[0], Length(Text));
+{$ELSE}
+  Bytes := TEncoding.UTF8.GetBytes(Text);
+{$ENDIF}
+  Zero := 0;
+  Data.Write(Zero, 4);
+  Data.Write(Bytes[0], Length(Bytes));
+  Data.Seek(0, soBeginning);
+  Result := True;
+end;
+
 procedure TMP4Atommean.Clear;
 begin
   Data.Clear;
@@ -478,6 +539,57 @@ Destructor TMP4Atomname.Destroy;
 begin
   FreeAndNil(Data);
   Inherited;
+end;
+
+function TMP4Atomname.GetAsText: String;
+var
+  i: Integer;
+  DataByte: Byte;
+  Bytes: TBytes;
+begin
+  Result := '';
+  if Data.Size < 4 then
+  begin
+    Exit;
+  end;
+  Data.Seek(4, soBeginning);
+  SetLength(Bytes, Data.Size - 4);
+  for i := 0 to Data.Size - 1 - 4 do
+  begin
+    Data.Read(DataByte, 1);
+    Bytes[i] := DataByte;
+  end;
+  Data.Seek(0, soBeginning);
+{$IFDEF FPC}
+  SetLength(Result, Length(Bytes) + 1);
+  Move(Bytes[0], Result[1], Length(Bytes));
+{$ELSE}
+  Result := TEncoding.UTF8.GetString(Bytes);
+{$ENDIF}
+end;
+
+function TMP4Atomname.SetAsText(Text: String): Boolean;
+var
+  Zero: DWord;
+  Bytes: TBytes;
+begin
+  Data.Clear;
+  if Text = '' then
+  begin
+    Result := True;
+    Exit;
+  end;
+{$IFDEF FPC}
+  SetLength(Bytes, Length(Text) + 1);
+  Move(Text[1], Bytes[0], Length(Text));
+{$ELSE}
+  Bytes := TEncoding.UTF8.GetBytes(Text);
+{$ENDIF}
+  Zero := 0;
+  Data.Write(Zero, 4);
+  Data.Write(Bytes[0], Length(Bytes));
+  Data.Seek(0, soBeginning);
+  Result := True;
 end;
 
 procedure TMP4Atomname.Clear;
@@ -552,7 +664,12 @@ begin
     Bytes[i] := DataByte;
   end;
   Data.Seek(0, soBeginning);
-  Result := Parent.Parent.UTF8Encoding.GetString(Bytes);
+{$IFDEF FPC}
+  SetLength(Result, Length(Bytes) + 1);
+  Move(Bytes[0], Result[1], Length(Bytes));
+{$ELSE}
+  Result := TEncoding.UTF8.GetString(Bytes);
+{$ENDIF}
 end;
 
 function TMP4AtomData.GetAsInteger: Int64;
@@ -678,7 +795,12 @@ function TMP4AtomData.SetAsText(Text: String): Boolean;
 var
   Bytes: TBytes;
 begin
-  Bytes := Parent.Parent.UTF8Encoding.GetBytes(Text);
+{$IFDEF FPC}
+  SetLength(Bytes, Length(Text) + 1);
+  Move(Text[1], Bytes[0], Length(Text));
+{$ELSE}
+  Bytes := TEncoding.UTF8.GetBytes(Text);
+{$ENDIF}
   Data.Clear;
   Data.Write(Bytes[0], Length(Bytes));
   Data.Seek(0, soBeginning);
@@ -765,10 +887,10 @@ end;
 
 function TMP4AtomData.SetAsBool(Value: Boolean): Boolean;
 var
-  Data: Byte;
+  DataByte: Byte;
 begin
-  Data := Byte(Value);
-  Result := SetAsInteger8(Data);
+  DataByte := Byte(Value);
+  Result := SetAsInteger8(DataByte);
 end;
 
 procedure TMP4AtomData.Clear;
@@ -990,7 +1112,7 @@ begin
   end;
 end;
 
-function TMP4Atom.Count;
+function TMP4Atom.Count: Integer;
 begin
   Result := Length(Datas);
 end;
@@ -1069,7 +1191,7 @@ begin
   Parent.DeleteAtom(Self.Index);
 end;
 
-function TMP4Atom.DeleteData(Index: Integer): Boolean;
+function TMP4Atom.DeleteData(AtomIndex: Integer): Boolean;
 begin
   Result := False;
   if (Index >= Length(Datas)) OR (Index < 0) then
@@ -1144,9 +1266,9 @@ end;
 Constructor TMP4Tag.Create;
 begin
   Inherited;
-  UTF8Encoding := TEncoding.UTF8;
+  // UTF8Encoding := TEncoding.UTF8;
   Clear;
-  PaddingToWrite := MP4TAGLIBRARY_DEFAULT_PADDING_SIZE
+  PaddingToWrite := MP4TagLibraryDefaultPaddingSize;
 end;
 
 Destructor TMP4Tag.Destroy;
@@ -1155,7 +1277,7 @@ begin
   Inherited;
 end;
 
-function TMP4Tag.LoadFromFile(FileName: String): Integer;
+function TMP4Tag.LoadFromFile(MP4FileName: String): Integer;
 var
   MP4Stream: TFileStream;
   AtomName: TAtomName;
@@ -1164,12 +1286,13 @@ var
   ilstAtomPosition: Int64;
   NewAtom: TMP4Atom;
   moovAtomSize: Int64;
+  Is64BitAtomSize: Boolean;
 begin
   Clear;
   Self.Loaded := False;
-  Self.FileName := FileName;
+  Self.FileName := MP4FileName;
   try
-    MP4Stream := TFileStream.Create(FileName, fmOpenRead OR fmShareDenyWrite);
+    MP4Stream := TFileStream.Create(MP4FileName, fmOpenRead OR fmShareDenyWrite);
   except
     Result := MP4TAGLIBRARY_ERROR_OPENING_FILE;
     Exit;
@@ -1177,7 +1300,7 @@ begin
   try
     try
       Result := MP4TAGLIBRARY_ERROR_NO_TAG_FOUND;
-      ReadAtomHeader(MP4Stream, AtomName, AtomSize);
+      ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize);
       if NOT IsSameAtomName(AtomName, 'ftyp') then
       begin
         Result := MP4TAGLIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
@@ -1185,21 +1308,21 @@ begin
       end;
       MP4Stream.Seek(AtomSize - 8, soCurrent);
       repeat
-        ReadAtomHeader(MP4Stream, AtomName, moovAtomSize);
+        ReadAtomHeader(MP4Stream, AtomName, moovAtomSize, Is64BitAtomSize);
         if IsSameAtomName(AtomName, 'moov') then
         begin
           repeat
-            ReadAtomHeader(MP4Stream, AtomName, AtomSize);
+            ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize);
             if IsSameAtomName(AtomName, 'udta') then
             begin
               repeat
-                ReadAtomHeader(MP4Stream, AtomName, AtomSize);
+                ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize);
                 if IsSameAtomName(AtomName, 'meta') then
                 begin
                   MP4Stream.Read(Version, 1);
                   MP4Stream.Read(Flags, 3);
                   repeat
-                    ReadAtomHeader(MP4Stream, AtomName, ilstAtomSize);
+                    ReadAtomHeader(MP4Stream, AtomName, ilstAtomSize, Is64BitAtomSize);
                     if IsSameAtomName(AtomName, 'ilst') then
                     begin
                       ilstAtomPosition := MP4Stream.Position - 8;
@@ -1272,28 +1395,34 @@ begin
   end;
 end;
 
-function ReadAtomHeader(MP4Stream: TFileStream; var AtomName: TAtomName; var AtomSize: Int64): Boolean;
+function ReadAtomHeader(MP4Stream: TFileStream; var AtomName: TAtomName; var AtomSize: Int64; var Is64BitSize: Boolean; FailOnCurrupt: Boolean = True): Boolean;
 begin
   Result := False;
-  try
-    FillChar(AtomName, SizeOf(AtomName), 0);
-    AtomSize := 0;
-    MP4Stream.Read(AtomSize, 4);
-    MP4Stream.Read(AtomName, 4);
-    AtomSize := ReverseBytes32(AtomSize);
-    // * 64 bit
-    if AtomSize = 1 then
+  if MP4Stream.Position >= MP4Stream.Size then
+  begin
+    Exit;
+  end;
+  Is64BitSize := False;
+  FillChar(AtomName, SizeOf(AtomName), 0);
+  AtomSize := 0;
+  MP4Stream.Read(AtomSize, 4);
+  MP4Stream.Read(AtomName, 4);
+  AtomSize := ReverseBytes32(AtomSize);
+  // * 64 bit
+  if AtomSize = 1 then
+  begin
+    MP4Stream.Read(AtomSize, 8);
+    AtomSize := ReverseBytes64(AtomSize);
+    Is64BitSize := True;
+  end;
+  if FailOnCurrupt OR MP4TagLibraryFailOnCorruptFile then
+  begin
+    if (AtomSize < 8) OR (AtomSize > MP4Stream.Size) then
     begin
-      MP4Stream.Read(AtomSize, 8);
-      AtomSize := ReverseBytes64(AtomSize);
-    end;
-    Result := True;
-  except
-    On E: exception do
-    begin
-      // *
+      raise exception.Create('Corrupted MP4 file. Atom name: ' + AtomNameToString(AtomName));
     end;
   end;
+  Result := True;
 end;
 
 function WriteAtomHeader(MP4Stream: TFileStream; AtomName: TAtomName; AtomSize: Int64): Boolean;
@@ -1473,6 +1602,8 @@ begin
   SetLength(Atoms, 0);
   Version := 0;
   Flags := 0;
+  Loaded := False;
+  Size := 0;
 end;
 
 function TMP4Tag.DeleteAtom(Index: Integer): Boolean;
@@ -1556,7 +1687,7 @@ begin
   end;
 end;
 
-function TMP4Tag.SaveToFile(FileName: String): Integer;
+function TMP4Tag.SaveToFile(MP4FileName: String; KeepPadding: Boolean = True): Integer;
 var
   MP4Stream: TFileStream;
   AtomName: TAtomName;
@@ -1568,19 +1699,8 @@ var
   metaAtomSize: Int64;
   metaAtomPosition: Int64;
   freeAtomSize: Int64;
-  ilstAtomSize: Int64;
-  ilstAtomPosition: Int64;
-  NewmoovAtomSize: Int64;
-  NewudtaAtomSize: Int64;
-  NewmetaAtomSize: Int64;
-  NewilstAtomSize: Int64;
-  ilstAtomFound: Boolean;
-  metaAtomFound: Boolean;
-  udtaAtomFound: Boolean;
   i: Integer;
-  NewTagSize: Cardinal;
-  Version: Byte;
-  Flags: DWord;
+  NewTagSize: UInt64;
   StreamRest: TFileStream;
   moovAtomRest: TFileStream;
   udtaAtomRest: TFileStream;
@@ -1589,66 +1709,49 @@ var
   moovAtomRestFileName: String;
   udtaAtomRestFileName: String;
   metaAtomRestFileName: String;
-  PaddingToWrite: Integer;
-  NeedToUpdateRootAtoms: Boolean;
-  freeAtomWasRootAtom: Boolean;
   mdatPreviousLocation: Int64;
   mdatNewLocation: Int64;
-  NewAtomHeaderSize: Integer;
-  CreateNewmetaAtom: Boolean;
-  CreateNewudtaAtom: Boolean;
-  metaAtomWas32bit: Boolean;
-  udtaAtomWas32bit: Boolean;
-  moovAtomWas32bit: Boolean;
+  AvailableSpace: UInt64;
+  NeededSpace: UInt64;
+  PaddingNeededToWrite: Integer;
+  moovProcessingFinished: Boolean;
+  Temp: DWord;
+  Is64BitAtomSize: Boolean;
+  moovIs64BitAtomSize: Boolean;
 begin
+  // Result := MP4TAGLIBRARY_ERROR;
   NewTagSize := CalculateSize;
   if NewTagSize = 0 then
   begin
-    Result := MP4TAGLIBRARY_ERROR_EMPTY_TAG;
-    Exit;
+    NewTagSize := 8;
   end;
   Self.Loaded := False;
-  Self.FileName := FileName;
-  Version := 0;
+  Self.FileName := MP4FileName;
   Flags := 0;
   moovAtomSize := 0;
   moovAtomPosition := 0;
-  udtaAtomSize := 0;
-  udtaAtomPosition := 0;
-  metaAtomSize := 0;
-  metaAtomPosition := 0;
-  freeAtomSize := 0;
-  ilstAtomSize := 0;
-  ilstAtomPosition := 0;
-  NewAtomHeaderSize := 0;
-  NeedToUpdateRootAtoms := False;
-  freeAtomWasRootAtom := False;
-  ilstAtomFound := False;
-  metaAtomFound := False;
-  udtaAtomFound := False;
-  CreateNewmetaAtom := False;
-  CreateNewudtaAtom := False;
-  metaAtomWas32bit := False;
-  udtaAtomWas32bit := False;
-  moovAtomWas32bit := False;
+  AvailableSpace := 0;
+  moovIs64BitAtomSize := False;
   try
-    if NOT FileExists(FileName) then
+    if NOT FileExists(MP4FileName) then
     begin
-      MP4Stream := TFileStream.Create(FileName, fmCreate OR fmShareDenyWrite);
+      MP4Stream := TFileStream.Create(MP4FileName, fmCreate OR fmShareDenyWrite);
+      // * When creating new file add a fake ftyp
+      WriteAtomHeader(MP4Stream, 'ftyp', 8);
     end
     else
     begin
-      MP4Stream := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareDenyWrite);
+      MP4Stream := TFileStream.Create(MP4FileName, fmOpenReadWrite OR fmShareDenyWrite);
     end;
   except
     Result := MP4TAGLIBRARY_ERROR_OPENING_FILE;
     Exit;
   end;
   try
-    StreamRestFileName := ChangeFileExt(FileName, '.rest');
-    moovAtomRestFileName := ChangeFileExt(FileName, '.moovAtomRest');
-    udtaAtomRestFileName := ChangeFileExt(FileName, '.udtaAtomRest');
-    metaAtomRestFileName := ChangeFileExt(FileName, '.metaAtomRest');
+    StreamRestFileName := ChangeFileExt(FileName, '.rest.tmp');
+    moovAtomRestFileName := ChangeFileExt(FileName, '.moovAtom.tmp');
+    udtaAtomRestFileName := ChangeFileExt(FileName, '.udtaAtom.tmp');
+    metaAtomRestFileName := ChangeFileExt(FileName, '.metaAtom.tmp');
     StreamRest := TFileStream.Create(StreamRestFileName, fmCreate);
     moovAtomRest := TFileStream.Create(moovAtomRestFileName, fmCreate);
     udtaAtomRest := TFileStream.Create(udtaAtomRestFileName, fmCreate);
@@ -1656,232 +1759,63 @@ begin
     MP4Stream.Seek(0, soBeginning);
     mdatPreviousLocation := MP4mdatAtomLocation(MP4Stream);
     MP4Stream.Seek(0, soBeginning);
+    // * Locate moov atom and calc free atoms after it (moovAtomPosition is used for where to write the new tag, if free atom is before moov atom then use that)
+    moovProcessingFinished := False;
     repeat
-      ReadAtomHeader(MP4Stream, AtomName, AtomSize);
+      ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize);
       if IsSameAtomName(AtomName, 'moov') then
       begin
         moovAtomSize := AtomSize;
-        if moovAtomSize > High(Cardinal) then
+        moovIs64BitAtomSize := Is64BitAtomSize;
+        if Is64BitAtomSize then
         begin
-          moovAtomPosition := MP4Stream.Position - 16;
-        end
-        else
-        begin
-          moovAtomPosition := MP4Stream.Position - 8;
-        end;
-        MP4Stream.Seek(moovAtomPosition + moovAtomSize, soBeginning);
-        ReadAtomHeader(MP4Stream, AtomName, AtomSize);
-        if IsSameAtomName(AtomName, 'free') then
-        begin
-          freeAtomSize := AtomSize;
-          // freeAtomPosition := MP4Stream.Position - 8;
-          if moovAtomPosition + moovAtomSize < MP4Stream.Size then
+          Inc(AvailableSpace, AtomSize);
+          if moovAtomPosition = 0 then
           begin
-            MP4Stream.Seek(moovAtomPosition + moovAtomSize + freeAtomSize, soBeginning);
-            StreamRest.CopyFrom(MP4Stream, MP4Stream.Size - (moovAtomPosition + moovAtomSize + freeAtomSize));
-            if moovAtomSize > High(Cardinal) then
-            begin
-              MP4Stream.Seek(moovAtomPosition + 16, soBeginning);
-            end
-            else
-            begin
-              MP4Stream.Seek(moovAtomPosition + 8, soBeginning);
-            end;
+            moovAtomPosition := MP4Stream.Position - 16;
           end;
-          NeedToUpdateRootAtoms := True;
-          freeAtomWasRootAtom := True;
         end
         else
         begin
-          if moovAtomPosition + moovAtomSize < MP4Stream.Size then
+          Inc(AvailableSpace, AtomSize);
+          if moovAtomPosition = 0 then
           begin
-            MP4Stream.Seek(moovAtomPosition + moovAtomSize, soBeginning);
-            StreamRest.CopyFrom(MP4Stream, MP4Stream.Size - (moovAtomPosition + moovAtomSize));
-            if moovAtomSize > High(Cardinal) then
-            begin
-              MP4Stream.Seek(moovAtomPosition + 16, soBeginning);
-            end
-            else
-            begin
-              MP4Stream.Seek(moovAtomPosition + 8, soBeginning);
-            end;
+            moovAtomPosition := MP4Stream.Position - 8;
           end;
         end;
         if moovAtomSize > High(Cardinal) then
         begin
-          MP4Stream.Seek(moovAtomPosition + 16, soBeginning);
+          MP4Stream.Seek(moovAtomSize - 16, soCurrent);
         end
         else
         begin
-          MP4Stream.Seek(moovAtomPosition + 8, soBeginning);
+          MP4Stream.Seek(moovAtomSize - 8, soCurrent);
+        end;
+        if ((AtomSize < 8 + 1) AND (NOT Is64BitAtomSize)) OR ((AtomSize < 16 + 1) AND (Is64BitAtomSize)) then
+        begin
+          Continue;
         end;
         repeat
-          ReadAtomHeader(MP4Stream, AtomName, AtomSize);
-          if IsSameAtomName(AtomName, 'udta') then
+          ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize);
+          if IsSameAtomName(AtomName, 'free') then
           begin
-            udtaAtomFound := True;
-            udtaAtomSize := AtomSize;
-            if udtaAtomSize > High(Cardinal) then
+            if Is64BitAtomSize then
             begin
-              udtaAtomPosition := MP4Stream.Position - 16;
+              Inc(AvailableSpace, AtomSize);
+              if moovAtomPosition = 0 then
+              begin
+                moovAtomPosition := MP4Stream.Position - 16;
+              end;
             end
             else
             begin
-              udtaAtomPosition := MP4Stream.Position - 8;
-            end;
-            if udtaAtomPosition + udtaAtomSize < moovAtomPosition + moovAtomSize then
-            begin
-              MP4Stream.Seek(udtaAtomPosition + udtaAtomSize, soBeginning);
-              moovAtomRest.CopyFrom(MP4Stream, (moovAtomPosition + moovAtomSize) - (udtaAtomPosition + udtaAtomSize));
-              if udtaAtomSize > High(Cardinal) then
+              Inc(AvailableSpace, AtomSize);
+              if moovAtomPosition = 0 then
               begin
-                MP4Stream.Seek(udtaAtomPosition + 16, soBeginning);
-              end
-              else
-              begin
-                MP4Stream.Seek(udtaAtomPosition + 8, soBeginning);
+                moovAtomPosition := MP4Stream.Position - 8;
               end;
             end;
-            repeat
-              ReadAtomHeader(MP4Stream, AtomName, AtomSize);
-              if IsSameAtomName(AtomName, 'meta') then
-              begin
-                metaAtomFound := True;
-                metaAtomSize := AtomSize;
-                if metaAtomSize > High(Cardinal) then
-                begin
-                  metaAtomPosition := MP4Stream.Position - 16;
-                end
-                else
-                begin
-                  metaAtomPosition := MP4Stream.Position - 8;
-                end;
-                if metaAtomPosition + metaAtomSize < udtaAtomPosition + udtaAtomSize then
-                begin
-                  MP4Stream.Seek(metaAtomPosition + metaAtomSize, soBeginning);
-                  udtaAtomRest.CopyFrom(MP4Stream, (udtaAtomPosition + udtaAtomSize) - (metaAtomPosition + metaAtomSize));
-                  if metaAtomSize > High(Cardinal) then
-                  begin
-                    MP4Stream.Seek(metaAtomPosition + 16, soBeginning);
-                  end
-                  else
-                  begin
-                    MP4Stream.Seek(metaAtomPosition + 8, soBeginning);
-                  end;
-                end;
-                MP4Stream.Read(Version, 1);
-                MP4Stream.Read(Flags, 3);
-                repeat
-                  ReadAtomHeader(MP4Stream, AtomName, AtomSize);
-                  if IsSameAtomName(AtomName, 'ilst') then
-                  begin
-                    ilstAtomFound := True;
-                    ilstAtomSize := AtomSize;
-                    if ilstAtomSize > High(Cardinal) then
-                    begin
-                      ilstAtomPosition := MP4Stream.Position - 16;
-                    end
-                    else
-                    begin
-                      ilstAtomPosition := MP4Stream.Position - 8;
-                    end;
-                    if ilstAtomPosition + ilstAtomSize < metaAtomPosition + metaAtomSize then
-                    begin
-                      MP4Stream.Seek(ilstAtomPosition + ilstAtomSize, soBeginning);
-                      metaAtomRest.CopyFrom(MP4Stream, (metaAtomPosition + metaAtomSize) - (ilstAtomPosition + ilstAtomSize));
-                      MP4Stream.Seek(ilstAtomPosition + ilstAtomSize, soBeginning);
-                      AtomSize := 0;
-                    end;
-                    MP4Stream.Seek(ilstAtomPosition + ilstAtomSize, soBeginning);
-                  end
-                  else
-                  begin
-                    if (IsSameAtomName(AtomName, 'free')) AND (NOT NeedToUpdateRootAtoms) AND (NOT freeAtomWasRootAtom) then
-                    begin
-                      NeedToUpdateRootAtoms := False;
-                      freeAtomWasRootAtom := False;
-                      freeAtomSize := freeAtomSize + AtomSize;
-                      // freeAtomPosition := MP4Stream.Position - 8;
-                      if freeAtomSize = metaAtomRest.Size then
-                      begin
-                        metaAtomRest.Size := 0;
-                      end;
-                      if AtomSize > High(Cardinal) then
-                      begin
-                        MP4Stream.Seek(MP4Stream.Position - 16 + AtomSize, soBeginning);
-                      end
-                      else
-                      begin
-                        MP4Stream.Seek(MP4Stream.Position - 8 + AtomSize, soBeginning);
-                      end;
-                    end
-                    else
-                    begin
-                      if NOT ilstAtomFound then
-                      begin
-                        if AtomSize > High(Cardinal) then
-                        begin
-                          ilstAtomPosition := MP4Stream.Position - 16 + AtomSize;
-                        end
-                        else
-                        begin
-                          ilstAtomPosition := MP4Stream.Position - 8 + AtomSize;
-                        end;
-                      end;
-                      if AtomSize > High(Cardinal) then
-                      begin
-                        MP4Stream.Seek(AtomSize - 16, soCurrent);
-                      end
-                      else
-                      begin
-                        MP4Stream.Seek(AtomSize - 8, soCurrent);
-                      end;
-                    end;
-                  end;
-                until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= metaAtomPosition + metaAtomSize);
-              end
-              else
-              begin
-                // * Could fail for unknown new atoms after the moov atom
-                if (NOT metaAtomFound) AND (NOT IsSameAtomName(AtomName, 'free')) AND (NOT IsSameAtomName(AtomName, 'mdat')) then
-                begin
-                  if AtomSize > High(Cardinal) then
-                  begin
-                    metaAtomPosition := MP4Stream.Position - 16 + AtomSize;
-                  end
-                  else
-                  begin
-                    metaAtomPosition := MP4Stream.Position - 8 + AtomSize;
-                  end;
-                end;
-                if AtomSize > High(Cardinal) then
-                begin
-                  MP4Stream.Seek(AtomSize - 16, soCurrent);
-                end
-                else
-                begin
-                  MP4Stream.Seek(AtomSize - 8, soCurrent);
-                end;
-              end;
-            until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= udtaAtomPosition + udtaAtomSize);
-          end
-          else
-          begin
-            // * Could fail for unknown new atoms
-            if (NOT udtaAtomFound)
-            // AND (AtomName <> 'mdat')
-            then
-            begin
-              if AtomSize > High(Cardinal) then
-              begin
-                udtaAtomPosition := MP4Stream.Position - 16 + AtomSize;
-              end
-              else
-              begin
-                udtaAtomPosition := MP4Stream.Position - 8 + AtomSize;
-              end;
-            end;
-            if AtomSize > High(Cardinal) then
+            if Is64BitAtomSize then
             begin
               MP4Stream.Seek(AtomSize - 16, soCurrent);
             end
@@ -1889,12 +1823,16 @@ begin
             begin
               MP4Stream.Seek(AtomSize - 8, soCurrent);
             end;
+          end
+          else
+          begin
+            moovProcessingFinished := True;
           end;
-        until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= moovAtomPosition + moovAtomSize);
+        until NOT IsSameAtomName(AtomName, 'free') OR (MP4Stream.Position >= MP4Stream.Size) OR moovProcessingFinished;
       end
       else
       begin
-        if AtomSize > High(Cardinal) then
+        if Is64BitAtomSize then
         begin
           MP4Stream.Seek(AtomSize - 16, soCurrent);
         end
@@ -1903,148 +1841,271 @@ begin
           MP4Stream.Seek(AtomSize - 8, soCurrent);
         end;
       end;
-    until (MP4Stream.Position >= MP4Stream.Size) OR (AtomSize = 0);
-    NewilstAtomSize := NewTagSize;
-    if (NewTagSize <= ilstAtomSize + (freeAtomSize - 8))
-    // * Compact check here
-      AND (NOT((ilstAtomSize + (freeAtomSize - 8)) - NewTagSize > Self.PaddingToWrite)) AND (NOT NeedToUpdateRootAtoms) then
+    until (MP4Stream.Position >= MP4Stream.Size)
+    // OR ((moovAtomPosition > 0) AND (MP4Stream.Position >= moovAtomPosition + moovAtomSize))
+      OR moovProcessingFinished OR (AtomSize = 0);
+    // * Load the content of the moov atom
+    if (moovAtomPosition > 0) AND (((moovAtomSize > 8 + 1) AND (NOT moovIs64BitAtomSize)) OR ((moovAtomSize > 16 + 1) AND (moovIs64BitAtomSize))) then
     begin
-      PaddingToWrite := (ilstAtomSize + (freeAtomSize - 8)) - NewTagSize;
+      if moovIs64BitAtomSize then
+      begin
+        MP4Stream.Seek(moovAtomPosition + 16, soBeginning);
+      end
+      else
+      begin
+        MP4Stream.Seek(moovAtomPosition + 8, soBeginning);
+      end;
+      // * Process all moov sub-atoms
+      repeat
+        ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize);
+        if IsSameAtomName(AtomName, 'udta') then
+        begin
+          udtaAtomSize := AtomSize;
+          if Is64BitAtomSize then
+          begin
+            udtaAtomPosition := MP4Stream.Position - 16;
+          end
+          else
+          begin
+            udtaAtomPosition := MP4Stream.Position - 8;
+          end;
+          if ((AtomSize < 8 + 1) AND (NOT Is64BitAtomSize)) OR ((AtomSize < 16 + 1) AND (Is64BitAtomSize)) then
+          begin
+            Continue;
+          end;
+          repeat
+            ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize);
+            if IsSameAtomName(AtomName, 'meta') then
+            begin
+              metaAtomSize := AtomSize;
+              if Is64BitAtomSize then
+              begin
+                metaAtomPosition := MP4Stream.Position - 16;
+              end
+              else
+              begin
+                metaAtomPosition := MP4Stream.Position - 8;
+              end;
+              if ((AtomSize >= 8 + 4) AND (NOT Is64BitAtomSize)) OR ((AtomSize >= 16 + 4) AND (Is64BitAtomSize)) then
+              begin
+                MP4Stream.Read(Temp, 1);
+                MP4Stream.Read(Temp, 3);
+              end;
+              if ((AtomSize <= 8 + 4) AND (NOT Is64BitAtomSize)) OR ((AtomSize <= 16 + 4) AND (Is64BitAtomSize)) then
+              begin
+                Continue;
+              end;
+              repeat
+                ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize);
+                if IsSameAtomName(AtomName, 'ilst') then
+                begin
+                  // ilstAtomSize := AtomSize;
+                  if Is64BitAtomSize then
+                  begin
+                    MP4Stream.Seek(AtomSize - 16, soCurrent);
+                  end
+                  else
+                  begin
+                    MP4Stream.Seek(AtomSize - 8, soCurrent);
+                  end;
+                end
+                else if NOT IsSameAtomName(AtomName, 'free') then
+                begin
+                  if Is64BitAtomSize then
+                  begin
+                    MP4Stream.Seek(-16, soCurrent);
+                  end
+                  else
+                  begin
+                    MP4Stream.Seek(-8, soCurrent);
+                  end;
+                  metaAtomRest.CopyFrom(MP4Stream, AtomSize);
+                end
+                else
+                begin
+                  if Is64BitAtomSize then
+                  begin
+                    MP4Stream.Seek(AtomSize - 16, soCurrent);
+                  end
+                  else
+                  begin
+                    MP4Stream.Seek(AtomSize - 8, soCurrent);
+                  end;
+                end;
+              until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= metaAtomPosition + metaAtomSize);
+            end
+            else if NOT IsSameAtomName(AtomName, 'free') then
+            begin
+              if Is64BitAtomSize then
+              begin
+                MP4Stream.Seek(-16, soCurrent);
+              end
+              else
+              begin
+                MP4Stream.Seek(-8, soCurrent);
+              end;
+              udtaAtomRest.CopyFrom(MP4Stream, AtomSize);
+            end
+            else
+            begin
+              if Is64BitAtomSize then
+              begin
+                MP4Stream.Seek(AtomSize - 16, soCurrent);
+              end
+              else
+              begin
+                MP4Stream.Seek(AtomSize - 8, soCurrent);
+              end;
+            end;
+          until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= udtaAtomPosition + udtaAtomSize);
+        end
+        else if NOT IsSameAtomName(AtomName, 'free') then
+        begin
+          if Is64BitAtomSize then
+          begin
+            MP4Stream.Seek(-16, soCurrent);
+          end
+          else
+          begin
+            MP4Stream.Seek(-8, soCurrent);
+          end;
+          moovAtomRest.CopyFrom(MP4Stream, AtomSize);
+        end
+        else
+        begin
+          if Is64BitAtomSize then
+          begin
+            MP4Stream.Seek(AtomSize - 16, soCurrent);
+          end
+          else
+          begin
+            MP4Stream.Seek(AtomSize - 8, soCurrent);
+          end;
+        end;
+      until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= moovAtomPosition + moovAtomSize);
+    end;
+    // * Calculate needed space
+    NeededSpace := NewTagSize;
+    // * meta
+    if NeededSpace + metaAtomRest.Size + 8 + 4 > High(Cardinal) then
+    begin
+      Inc(NeededSpace, metaAtomRest.Size + 16 + 4); // * + 4 bytes for version/flags
     end
     else
     begin
-      PaddingToWrite := Self.PaddingToWrite;
-      if freeAtomWasRootAtom then
-      begin
-        freeAtomSize := 0;
-      end;
-      // * When creating new file
-      if MP4Stream.Size = 0 then
-      begin
-        WriteAtomHeader(MP4Stream, 'ftyp', 8);
-        moovAtomPosition := 8;
-        udtaAtomPosition := 16;
-        metaAtomPosition := 24;
-        ilstAtomPosition := 32 + 4;
-      end;
-      if metaAtomSize = 0 then
-      begin
-        CreateNewmetaAtom := True;
-        metaAtomSize := 8 + 4;
-      end;
-      if udtaAtomSize = 0 then
-      begin
-        CreateNewudtaAtom := True;
-        udtaAtomSize := 8;
-      end;
-      if moovAtomSize = 0 then
-      begin
-        moovAtomSize := 8;
-      end;
-      if metaAtomSize <= High(Cardinal) then
-      begin
-        metaAtomWas32bit := True;
-      end;
-      NewmetaAtomSize := (metaAtomSize - ilstAtomSize - freeAtomSize) + NewilstAtomSize + PaddingToWrite + 8;
-      if (NewmetaAtomSize > High(Cardinal)) AND metaAtomWas32bit then
-      begin
-        Inc(NewmetaAtomSize, 8);
-      end;
-      if udtaAtomSize <= High(Cardinal) then
-      begin
-        udtaAtomWas32bit := True;
-      end;
-      NewudtaAtomSize := (udtaAtomSize - ilstAtomSize - freeAtomSize) + NewilstAtomSize + PaddingToWrite + 8;
-      if CreateNewmetaAtom then
-      begin
-        Inc(NewudtaAtomSize, 8 + 4);
-      end;
-      if metaAtomWas32bit AND (NewmetaAtomSize > High(Cardinal)) then
-      begin
-        Inc(NewudtaAtomSize, 8);
-      end;
-      if (NewudtaAtomSize > High(Cardinal)) AND udtaAtomWas32bit then
-      begin
-        Inc(NewudtaAtomSize, 8);
-      end;
-      if moovAtomSize <= High(Cardinal) then
-      begin
-        moovAtomWas32bit := True;
-      end;
-      NewmoovAtomSize := (moovAtomSize - ilstAtomSize - freeAtomSize) + NewilstAtomSize + PaddingToWrite + 8;
-      if CreateNewmetaAtom then
-      begin
-        Inc(NewmoovAtomSize, 8 + 4);
-      end;
-      if CreateNewudtaAtom then
-      begin
-        Inc(NewmoovAtomSize, 8);
-      end;
-      if metaAtomWas32bit AND (NewmetaAtomSize > High(Cardinal)) then
-      begin
-        Inc(NewmoovAtomSize, 8);
-      end;
-      if udtaAtomWas32bit AND (NewudtaAtomSize > High(Cardinal)) then
-      begin
-        Inc(NewmoovAtomSize, 8);
-      end;
-      if (NewmoovAtomSize > High(Cardinal)) AND moovAtomWas32bit then
-      begin
-        Inc(NewmoovAtomSize, 8);
-      end;
-      MP4Stream.Seek(moovAtomPosition, soBeginning);
-      // * Write moov
-      WriteAtomHeader(MP4Stream, 'moov', NewmoovAtomSize);
-      if udtaAtomPosition > 0 then
-      begin
-        MP4Stream.Seek(udtaAtomPosition, soBeginning);
-      end
-      else
-      begin
-        MP4Stream.Seek(moovAtomPosition + moovAtomSize, soBeginning);
-      end;
-      // * Write udta
-      udtaAtomPosition := MP4Stream.Position;
-      WriteAtomHeader(MP4Stream, 'udta', NewudtaAtomSize);
-      if metaAtomPosition > 0 then
-      begin
-        MP4Stream.Seek(metaAtomPosition, soBeginning);
-      end
-      else
-      begin
-        MP4Stream.Seek(udtaAtomPosition + 8, soBeginning);
-      end;
-      // * Write meta
-      WriteAtomHeader(MP4Stream, 'meta', NewmetaAtomSize);
-      // * TODO: Reverse bytes ?
-      MP4Stream.Write(Self.Version, 1);
-      MP4Stream.Write(Self.Flags, 3);
+      Inc(NeededSpace, metaAtomRest.Size + 8 + 4); // * + 4 bytes for version/flags
     end;
-    if ilstAtomPosition > 0 then
+    // * udta
+    if NeededSpace + udtaAtomRest.Size + 8 > High(Cardinal) then
     begin
-      MP4Stream.Seek(ilstAtomPosition, soBeginning);
+      Inc(NeededSpace, udtaAtomRest.Size + 16);
+    end
+    else
+    begin
+      Inc(NeededSpace, udtaAtomRest.Size + 8);
     end;
-    WriteAtomHeader(MP4Stream, 'ilst', NewilstAtomSize);
+    // * moov
+    if NeededSpace + moovAtomRest.Size + 8 > High(Cardinal) then
+    begin
+      Inc(NeededSpace, moovAtomRest.Size + 16);
+    end
+    else
+    begin
+      Inc(NeededSpace, moovAtomRest.Size + 8);
+    end;
+    // * Check if tags fit
+    if (AvailableSpace = NeededSpace) AND KeepPadding then
+    begin
+      PaddingNeededToWrite := 0;
+      // * Fits
+    end
+    else if (AvailableSpace > NeededSpace + 8 + 1) AND KeepPadding then
+    begin
+      PaddingNeededToWrite := AvailableSpace - NeededSpace;
+      // * Doesn't fit
+    end
+    else
+    begin
+      PaddingNeededToWrite := Self.PaddingToWrite;
+      // * Copy everything after moov atom except free atoms following moov atom
+      MP4Stream.Seek(moovAtomPosition + AvailableSpace, soBeginning);
+      if MP4Stream.Size <> MP4Stream.Position then
+      begin
+        StreamRest.CopyFrom(MP4Stream, MP4Stream.Size - MP4Stream.Position);
+      end;
+    end;
+    // * Write the new atoms
+    if moovAtomPosition <> 0 then
+    begin
+      MP4Stream.Seek(moovAtomPosition, soBeginning);
+    end
+    else
+    begin
+      MP4Stream.Seek(0, soEnd);
+    end;
+    // * Write moov
+    if NeededSpace + PaddingNeededToWrite > High(Cardinal) then
+    begin
+      WriteAtomHeader(MP4Stream, 'moov', NeededSpace + PaddingNeededToWrite);
+    end
+    else
+    begin
+      WriteAtomHeader(MP4Stream, 'moov', NeededSpace + PaddingNeededToWrite);
+    end;
+    MP4Stream.CopyFrom(moovAtomRest, 0);
+    // * Write udta
+    if NeededSpace - moovAtomRest.Size + PaddingNeededToWrite - 8 > High(Cardinal) then
+    begin
+      WriteAtomHeader(MP4Stream, 'udta', NeededSpace - moovAtomRest.Size + PaddingNeededToWrite - 16);
+    end
+    else
+    begin
+      WriteAtomHeader(MP4Stream, 'udta', NeededSpace - moovAtomRest.Size + PaddingNeededToWrite - 8);
+    end;
+    MP4Stream.CopyFrom(udtaAtomRest, 0);
+    // * Write meta
+    if NeededSpace - moovAtomRest.Size - udtaAtomRest.Size + PaddingNeededToWrite - 8 - 8 > High(Cardinal) then
+    begin
+      WriteAtomHeader(MP4Stream, 'meta', NeededSpace - moovAtomRest.Size - udtaAtomRest.Size + PaddingNeededToWrite - 16 - 16);
+    end
+    else
+    begin
+      WriteAtomHeader(MP4Stream, 'meta', NeededSpace - moovAtomRest.Size - udtaAtomRest.Size + PaddingNeededToWrite - 8 - 8);
+    end;
+    // * TODO: Reverse bytes ?
+    MP4Stream.Write(Self.Version, 1);
+    MP4Stream.Write(Self.Flags, 3);
+    MP4Stream.CopyFrom(metaAtomRest, 0);
+    // * ilst finally
+    WriteAtomHeader(MP4Stream, 'ilst', NewTagSize);
+    // * Write the new tags
     for i := 0 to Count - 1 do
     begin
       Atoms[i].Write(MP4Stream);
     end;
-    if PaddingToWrite > 0 then
+    // * Write the padding
+    if PaddingNeededToWrite > 0 then
     begin
-      freeAtomSize := PaddingToWrite + 8;
-      // freeAtomPosition := MP4Stream.Position;
+      freeAtomSize := PaddingNeededToWrite;
       WriteAtomHeader(MP4Stream, 'free', freeAtomSize);
-      WritePadding(MP4Stream, PaddingToWrite);
+      if freeAtomSize > High(Cardinal) then
+      begin
+        WritePadding(MP4Stream, PaddingNeededToWrite - 16);
+      end
+      else
+      begin
+        WritePadding(MP4Stream, PaddingNeededToWrite - 8);
+      end;
     end;
-    metaAtomRest.Seek(0, soBeginning);
-    MP4Stream.CopyFrom(metaAtomRest, metaAtomRest.Size);
-    udtaAtomRest.Seek(0, soBeginning);
-    MP4Stream.CopyFrom(udtaAtomRest, udtaAtomRest.Size);
-    moovAtomRest.Seek(0, soBeginning);
-    MP4Stream.CopyFrom(moovAtomRest, moovAtomRest.Size);
-    StreamRest.Seek(0, soBeginning);
-    MP4Stream.CopyFrom(StreamRest, StreamRest.Size);
-    MP4Stream.Size := MP4Stream.Position;
+    // * Copy file rest
+    if StreamRest.Size > 0 then
+    begin
+      // * Truncate file
+      MP4Stream.Size := MP4Stream.Position;
+      // * Copy rest
+      MP4Stream.CopyFrom(StreamRest, 0);
+    end;
+    // * Check and update stco/co64 atom
     MP4Stream.Seek(0, soBeginning);
     mdatNewLocation := MP4mdatAtomLocation(MP4Stream);
     MP4Stream.Seek(0, soBeginning);
@@ -2696,427 +2757,21 @@ end;
 
 function RemoveMP4TagFromFile(FileName: String; KeepPadding: Boolean): Integer;
 var
-  MP4Stream: TFileStream;
-  AtomName: TAtomName;
-  AtomSize: Int64;
-  moovAtomSize: Int64;
-  moovAtomPosition: Int64;
-  udtaAtomSize: Int64;
-  udtaAtomPosition: Int64;
-  metaAtomSize: Int64;
-  metaAtomPosition: Int64;
-  freeAtomSize: Int64;
-  ilstAtomSize: Int64;
-  ilstAtomPosition: Int64;
-  Version: Byte;
-  Flags: DWord;
-  StreamRestFileName: String;
-  moovAtomRestFileName: String;
-  udtaAtomRestFileName: String;
-  metaAtomRestFileName: String;
-  StreamRest: TFileStream;
-  moovAtomRest: TFileStream;
-  udtaAtomRest: TFileStream;
-  metaAtomRest: TFileStream;
-  PaddingToWrite: Integer;
-  mdatPreviousLocation: Int64;
-  mdatNewLocation: Int64;
-  freeAtomWasRootAtom: Boolean;
-  RootAtomSize: Int64;
-  metaAtomWas64bit: Boolean;
-  udtaAtomWas64bit: Boolean;
-  moovAtomWas64bit: Boolean;
+  MP4Tag: TMP4Tag;
 begin
-  Version := 0;
-  Flags := 0;
-  moovAtomSize := 0;
-  moovAtomPosition := 0;
-  udtaAtomSize := 0;
-  udtaAtomPosition := 0;
-  metaAtomSize := 0;
-  metaAtomPosition := 0;
-  freeAtomSize := 0;
-  ilstAtomSize := 0;
-  ilstAtomPosition := 0;
-  freeAtomWasRootAtom := False;
-  metaAtomWas64bit := False;
-  udtaAtomWas64bit := False;
-  moovAtomWas64bit := False;
-  try
-    if NOT FileExists(FileName) then
-    begin
-      Result := MP4TAGLIBRARY_ERROR_OPENING_FILE;
-      Exit;
-    end
-    else
-    begin
-      MP4Stream := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareDenyWrite);
-    end;
-  except
+  if NOT FileExists(FileName) then
+  begin
     Result := MP4TAGLIBRARY_ERROR_OPENING_FILE;
     Exit;
-  end;
-  try
-    ReadAtomHeader(MP4Stream, AtomName, RootAtomSize);
-    if NOT IsSameAtomName(AtomName, 'ftyp') then
-    begin
-      Result := MP4TAGLIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
-      Exit;
+  end
+  else
+  begin
+    MP4Tag := TMP4Tag.Create;
+    try
+      Result := MP4Tag.SaveToFile(FileName);
+    finally
+      FreeAndNil(MP4Tag);
     end;
-    MP4Stream.Seek(0, soBeginning);
-    mdatPreviousLocation := MP4mdatAtomLocation(MP4Stream);
-    MP4Stream.Seek(0, soBeginning);
-    StreamRestFileName := ChangeFileExt(FileName, '.rest');
-    moovAtomRestFileName := ChangeFileExt(FileName, '.moovAtomRest');
-    udtaAtomRestFileName := ChangeFileExt(FileName, '.udtaAtomRest');
-    metaAtomRestFileName := ChangeFileExt(FileName, '.metaAtomRest');
-    StreamRest := TFileStream.Create(StreamRestFileName, fmCreate);
-    moovAtomRest := TFileStream.Create(moovAtomRestFileName, fmCreate);
-    udtaAtomRest := TFileStream.Create(udtaAtomRestFileName, fmCreate);
-    metaAtomRest := TFileStream.Create(metaAtomRestFileName, fmCreate);
-    repeat
-      ReadAtomHeader(MP4Stream, AtomName, RootAtomSize);
-      if IsSameAtomName(AtomName, 'moov') then
-      begin
-        moovAtomSize := RootAtomSize;
-        if moovAtomSize > High(Cardinal) then
-        begin
-          moovAtomPosition := MP4Stream.Position - 16;
-        end
-        else
-        begin
-          moovAtomPosition := MP4Stream.Position - 8;
-        end;
-        MP4Stream.Seek(moovAtomPosition + moovAtomSize, soBeginning);
-        ReadAtomHeader(MP4Stream, AtomName, AtomSize);
-        if IsSameAtomName(AtomName, 'free') then
-        begin
-          freeAtomSize := AtomSize;
-          // freeAtomPosition := MP4Stream.Position - 8;
-          if (moovAtomPosition + moovAtomSize < MP4Stream.Size) AND (MP4Stream.Size - (moovAtomPosition + moovAtomSize + freeAtomSize) > 0) then
-          begin
-            MP4Stream.Seek(moovAtomPosition + moovAtomSize + freeAtomSize, soBeginning);
-            StreamRest.CopyFrom(MP4Stream, MP4Stream.Size - (moovAtomPosition + moovAtomSize + freeAtomSize));
-            if moovAtomSize > High(Cardinal) then
-            begin
-              MP4Stream.Seek(moovAtomPosition + 16, soBeginning);
-            end
-            else
-            begin
-              MP4Stream.Seek(moovAtomPosition + 8, soBeginning);
-            end;
-          end;
-          freeAtomSize := 0;
-          freeAtomWasRootAtom := True;
-        end
-        else
-        begin
-          if moovAtomPosition + moovAtomSize < MP4Stream.Size then
-          begin
-            MP4Stream.Seek(moovAtomPosition + moovAtomSize, soBeginning);
-            StreamRest.CopyFrom(MP4Stream, MP4Stream.Size - (moovAtomPosition + moovAtomSize));
-            if moovAtomSize > High(Cardinal) then
-            begin
-              MP4Stream.Seek(moovAtomPosition + 16, soBeginning);
-            end
-            else
-            begin
-              MP4Stream.Seek(moovAtomPosition + 8, soBeginning);
-            end;
-          end;
-        end;
-        if moovAtomSize > High(Cardinal) then
-        begin
-          MP4Stream.Seek(moovAtomPosition + 16, soBeginning);
-        end
-        else
-        begin
-          MP4Stream.Seek(moovAtomPosition + 8, soBeginning);
-        end;
-        repeat
-          ReadAtomHeader(MP4Stream, AtomName, AtomSize);
-          if IsSameAtomName(AtomName, 'udta') then
-          begin
-            udtaAtomSize := AtomSize;
-            if udtaAtomSize > High(Cardinal) then
-            begin
-              udtaAtomPosition := MP4Stream.Position - 16;
-            end
-            else
-            begin
-              udtaAtomPosition := MP4Stream.Position - 8;
-            end;
-            if udtaAtomPosition + udtaAtomSize < moovAtomPosition + moovAtomSize then
-            begin
-              MP4Stream.Seek(udtaAtomPosition + udtaAtomSize, soBeginning);
-              moovAtomRest.CopyFrom(MP4Stream, (moovAtomPosition + moovAtomSize) - (udtaAtomPosition + udtaAtomSize));
-              if udtaAtomSize > High(Cardinal) then
-              begin
-                MP4Stream.Seek(udtaAtomPosition + 16, soBeginning);
-              end
-              else
-              begin
-                MP4Stream.Seek(udtaAtomPosition + 8, soBeginning);
-              end;
-            end;
-            repeat
-              ReadAtomHeader(MP4Stream, AtomName, AtomSize);
-              if IsSameAtomName(AtomName, 'meta') then
-              begin
-                metaAtomSize := AtomSize;
-                if metaAtomSize > High(Cardinal) then
-                begin
-                  metaAtomPosition := MP4Stream.Position - 16;
-                end
-                else
-                begin
-                  metaAtomPosition := MP4Stream.Position - 8;
-                end;
-                if metaAtomPosition + metaAtomSize < udtaAtomPosition + udtaAtomSize then
-                begin
-                  MP4Stream.Seek(metaAtomPosition + metaAtomSize, soBeginning);
-                  udtaAtomRest.CopyFrom(MP4Stream, (udtaAtomPosition + udtaAtomSize) - (metaAtomPosition + metaAtomSize));
-                  if metaAtomSize > High(Cardinal) then
-                  begin
-                    MP4Stream.Seek(metaAtomPosition + 16, soBeginning);
-                  end
-                  else
-                  begin
-                    MP4Stream.Seek(metaAtomPosition + 8, soBeginning);
-                  end;
-                end;
-                MP4Stream.Read(Version, 1);
-                MP4Stream.Read(Flags, 3);
-                repeat
-                  ReadAtomHeader(MP4Stream, AtomName, AtomSize);
-                  if IsSameAtomName(AtomName, 'ilst') then
-                  begin
-                    ilstAtomSize := AtomSize;
-                    if ilstAtomSize > High(Cardinal) then
-                    begin
-                      ilstAtomPosition := MP4Stream.Position - 16;
-                    end
-                    else
-                    begin
-                      ilstAtomPosition := MP4Stream.Position - 8;
-                    end;
-                    if ilstAtomPosition + ilstAtomSize < metaAtomPosition + metaAtomSize then
-                    begin
-                      MP4Stream.Seek(ilstAtomPosition + ilstAtomSize, soBeginning);
-                      metaAtomRest.CopyFrom(MP4Stream, (metaAtomPosition + metaAtomSize) - (ilstAtomPosition + ilstAtomSize));
-                      MP4Stream.Seek(ilstAtomPosition + ilstAtomSize, soBeginning);
-                      AtomSize := 0;
-                    end
-                    else
-                    begin
-                      if AtomSize > High(Cardinal) then
-                      begin
-                        MP4Stream.Seek(AtomSize - 16, soCurrent);
-                      end
-                      else
-                      begin
-                        MP4Stream.Seek(AtomSize - 8, soCurrent);
-                      end;
-                    end;
-                  end
-                  else
-                  begin
-                    if IsSameAtomName(AtomName, 'free') then
-                    begin
-                      freeAtomSize := freeAtomSize + AtomSize;
-                      // freeAtomPosition := MP4Stream.Position - 8;
-                      if freeAtomSize = metaAtomRest.Size then
-                      begin
-                        metaAtomRest.Size := 0;
-                      end;
-                      if AtomSize > High(Cardinal) then
-                      begin
-                        MP4Stream.Seek(MP4Stream.Position - 16 + AtomSize, soBeginning);
-                      end
-                      else
-                      begin
-                        MP4Stream.Seek(MP4Stream.Position - 8 + AtomSize, soBeginning);
-                      end;
-                    end
-                    else
-                    begin
-                      if AtomSize > High(Cardinal) then
-                      begin
-                        MP4Stream.Seek(AtomSize - 16, soCurrent);
-                      end
-                      else
-                      begin
-                        MP4Stream.Seek(AtomSize - 8, soCurrent);
-                      end;
-                    end;
-                  end;
-                until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= metaAtomPosition + metaAtomSize);
-              end
-              else
-              begin
-                if AtomSize > High(Cardinal) then
-                begin
-                  MP4Stream.Seek(AtomSize - 16, soCurrent);
-                end
-                else
-                begin
-                  MP4Stream.Seek(AtomSize - 8, soCurrent);
-                end;
-              end;
-            until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= udtaAtomPosition + udtaAtomSize);
-          end
-          else
-          begin
-            if AtomSize > High(Cardinal) then
-            begin
-              MP4Stream.Seek(AtomSize - 16, soCurrent);
-            end
-            else
-            begin
-              MP4Stream.Seek(AtomSize - 8, soCurrent);
-            end;
-          end;
-        until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= moovAtomPosition + moovAtomSize);
-      end
-      else
-      begin
-        if IsSameAtomName(AtomName, 'free') then
-        begin
-          freeAtomSize := RootAtomSize;
-        end;
-        if RootAtomSize > High(Cardinal) then
-        begin
-          MP4Stream.Seek(RootAtomSize - 16, soCurrent);
-        end
-        else
-        begin
-          MP4Stream.Seek(RootAtomSize - 8, soCurrent);
-        end;
-      end;
-    until (MP4Stream.Position >= MP4Stream.Size) OR (RootAtomSize = 0);
-    if ilstAtomSize = 0 then
-    begin
-      Result := MP4TAGLIBRARY_ERROR_NO_TAG_FOUND;
-      Exit;
-    end;
-    if freeAtomWasRootAtom then
-    begin
-      freeAtomSize := 0;
-    end;
-    if KeepPadding then
-    begin
-      PaddingToWrite := (ilstAtomSize + (freeAtomSize - 8));
-    end
-    else
-    begin
-      PaddingToWrite := 0;
-      MP4Stream.Seek(moovAtomPosition, soBeginning);
-      if metaAtomSize > High(Cardinal) then
-      begin
-        metaAtomWas64bit := True;
-      end;
-      metaAtomSize := (metaAtomSize - ilstAtomSize - freeAtomSize);
-      if (metaAtomSize <= High(Cardinal)) AND metaAtomWas64bit then
-      begin
-        Dec(metaAtomSize, 8);
-      end;
-      if udtaAtomSize > High(Cardinal) then
-      begin
-        udtaAtomWas64bit := True;
-      end;
-      udtaAtomSize := (udtaAtomSize - ilstAtomSize - freeAtomSize);
-      if (metaAtomSize <= High(Cardinal)) AND metaAtomWas64bit then
-      begin
-        Dec(udtaAtomSize, 8);
-      end;
-      if (udtaAtomSize <= High(Cardinal)) AND udtaAtomWas64bit then
-      begin
-        Dec(udtaAtomSize, 8);
-      end;
-      if moovAtomSize > High(Cardinal) then
-      begin
-        moovAtomWas64bit := True;
-      end;
-      moovAtomSize := (moovAtomSize - ilstAtomSize - freeAtomSize { - 8 } );
-      if (metaAtomSize <= High(Cardinal)) AND metaAtomWas64bit then
-      begin
-        Dec(moovAtomSize, 8);
-      end;
-      if (udtaAtomSize <= High(Cardinal)) AND udtaAtomWas64bit then
-      begin
-        Dec(moovAtomSize, 8);
-      end;
-      if (moovAtomSize <= High(Cardinal)) AND moovAtomWas64bit then
-      begin
-        Dec(moovAtomSize, 8);
-      end;
-      moovAtomPosition := MP4Stream.Position;
-      WriteAtomHeader(MP4Stream, 'moov', moovAtomSize);
-      if udtaAtomPosition > 0 then
-      begin
-        MP4Stream.Seek(udtaAtomPosition, soBeginning);
-      end
-      else
-      begin
-        MP4Stream.Seek(moovAtomPosition + 8, soBeginning);
-      end;
-      udtaAtomPosition := MP4Stream.Position;
-      WriteAtomHeader(MP4Stream, 'udta', udtaAtomSize);
-      if metaAtomPosition > 0 then
-      begin
-        MP4Stream.Seek(metaAtomPosition, soBeginning);
-      end
-      else
-      begin
-        MP4Stream.Seek(udtaAtomPosition + 8, soBeginning);
-      end;
-      // metaAtomPosition := MP4Stream.Position;
-      WriteAtomHeader(MP4Stream, 'meta', metaAtomSize);
-      // * TODO: Reverse bytes ?
-      MP4Stream.Write(Version, 1);
-      MP4Stream.Write(Flags, 3);
-      MP4Stream.Seek(metaAtomSize - 8 - 4, soCurrent);
-    end;
-    if PaddingToWrite > 0 then
-    begin
-      MP4Stream.Seek(ilstAtomPosition, soBeginning);
-      freeAtomSize := PaddingToWrite + 8;
-      // freeAtomPosition := MP4Stream.Position;
-      WriteAtomHeader(MP4Stream, 'free', freeAtomSize);
-      WritePadding(MP4Stream, PaddingToWrite);
-    end;
-    metaAtomRest.Seek(0, soBeginning);
-    MP4Stream.CopyFrom(metaAtomRest, metaAtomRest.Size);
-    udtaAtomRest.Seek(0, soBeginning);
-    MP4Stream.CopyFrom(udtaAtomRest, udtaAtomRest.Size);
-    moovAtomRest.Seek(0, soBeginning);
-    MP4Stream.CopyFrom(moovAtomRest, moovAtomRest.Size);
-    StreamRest.Seek(0, soBeginning);
-    MP4Stream.CopyFrom(StreamRest, StreamRest.Size);
-    MP4Stream.Size := MP4Stream.Position;
-    MP4Stream.Seek(0, soBeginning);
-    mdatNewLocation := MP4mdatAtomLocation(MP4Stream);
-    MP4Stream.Seek(0, soBeginning);
-    if mdatNewLocation - mdatPreviousLocation <> 0 then
-    begin
-      MP4Stream.Seek(0, soBeginning);
-      if NOT MP4UpdatestcoAtom(MP4Stream, mdatNewLocation - mdatPreviousLocation) then
-      begin
-        Result := MP4TAGLIBRARY_ERROR_UPDATE_stco;
-        Exit;
-      end;
-    end;
-    Result := MP4TAGLIBRARY_SUCCESS;
-  finally
-    FreeAndNil(StreamRest);
-    FreeAndNil(moovAtomRest);
-    FreeAndNil(udtaAtomRest);
-    FreeAndNil(metaAtomRest);
-    FreeAndNil(MP4Stream);
-    DeleteFile(StreamRestFileName);
-    DeleteFile(moovAtomRestFileName);
-    DeleteFile(udtaAtomRestFileName);
-    DeleteFile(metaAtomRestFileName);
   end;
 end;
 
@@ -3124,19 +2779,35 @@ function MP4mdatAtomLocation(MP4Stream: TFileStream): Int64;
 var
   AtomName: TAtomName;
   AtomSize: Int64;
+  Is64BitAtomSize: Boolean;
 begin
   Result := -1;
   try
     repeat
-      ReadAtomHeader(MP4Stream, AtomName, AtomSize);
-      if IsSameAtomName(AtomName, 'mdat') then
+      ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize, False);
+      if Is64BitAtomSize then
       begin
-        Result := MP4Stream.Position - 8;
-        Exit;
+        if IsSameAtomName(AtomName, 'mdat') then
+        begin
+          Result := MP4Stream.Position - 16;
+          Exit;
+        end
+        else
+        begin
+          MP4Stream.Seek(AtomSize - 16, soCurrent);
+        end;
       end
       else
       begin
-        MP4Stream.Seek(AtomSize - 8, soCurrent);
+        if IsSameAtomName(AtomName, 'mdat') then
+        begin
+          Result := MP4Stream.Position - 8;
+          Exit;
+        end
+        else
+        begin
+          MP4Stream.Seek(AtomSize - 8, soCurrent);
+        end;
       end;
     until MP4Stream.Position >= MP4Stream.Size;
   except
@@ -3165,6 +2836,12 @@ var
   NumberOfOffsets: Int64;
   OffsetValue: Integer; // DWord;
   i: Integer;
+  moovIs64BitAtomSize: Boolean;
+  trakIs64BitAtomSize: Boolean;
+  mdiaIs64BitAtomSize: Boolean;
+  minfIs64BitAtomSize: Boolean;
+  stblIs64BitAtomSize: Boolean;
+  stcoIs64BitAtomSize: Boolean;
 begin
   Result := True;
   try
@@ -3172,36 +2849,78 @@ begin
     Flags := 0;
     NumberOfOffsets := 0;
     repeat
-      ReadAtomHeader(MP4Stream, AtomName, moovAtomSize);
+      ReadAtomHeader(MP4Stream, AtomName, moovAtomSize, moovIs64BitAtomSize);
       if IsSameAtomName(AtomName, 'moov') then
       begin
-        moovAtomPosition := MP4Stream.Position - 8;
+        if moovIs64BitAtomSize then
+        begin
+          moovAtomPosition := MP4Stream.Position - 16;
+        end
+        else
+        begin
+          moovAtomPosition := MP4Stream.Position - 8;
+        end;
         repeat
-          ReadAtomHeader(MP4Stream, AtomName, trakAtomSize);
+          ReadAtomHeader(MP4Stream, AtomName, trakAtomSize, trakIs64BitAtomSize);
           if IsSameAtomName(AtomName, 'trak') then
           begin
-            trakAtomPosition := MP4Stream.Position - 8;
+            if trakIs64BitAtomSize then
+            begin
+              trakAtomPosition := MP4Stream.Position - 16;
+            end
+            else
+            begin
+              trakAtomPosition := MP4Stream.Position - 8;
+            end;
             repeat
-              ReadAtomHeader(MP4Stream, AtomName, mdiaAtomSize);
+              ReadAtomHeader(MP4Stream, AtomName, mdiaAtomSize, mdiaIs64BitAtomSize);
               if IsSameAtomName(AtomName, 'mdia') then
               begin
-                mdiaAtomPosition := MP4Stream.Position - 8;
+                if mdiaIs64BitAtomSize then
+                begin
+                  mdiaAtomPosition := MP4Stream.Position - 16;
+                end
+                else
+                begin
+                  mdiaAtomPosition := MP4Stream.Position - 8;
+                end;
                 repeat
-                  ReadAtomHeader(MP4Stream, AtomName, minfAtomSize);
+                  ReadAtomHeader(MP4Stream, AtomName, minfAtomSize, minfIs64BitAtomSize);
                   if IsSameAtomName(AtomName, 'minf') then
                   begin
-                    minfAtomPosition := MP4Stream.Position - 8;
+                    if minfIs64BitAtomSize then
+                    begin
+                      minfAtomPosition := MP4Stream.Position - 16;
+                    end
+                    else
+                    begin
+                      minfAtomPosition := MP4Stream.Position - 8;
+                    end;
                     repeat
-                      ReadAtomHeader(MP4Stream, AtomName, stblAtomSize);
+                      ReadAtomHeader(MP4Stream, AtomName, stblAtomSize, stblIs64BitAtomSize);
                       if IsSameAtomName(AtomName, 'stbl') then
                       begin
-                        stblAtomPosition := MP4Stream.Position - 8;
+                        if stblIs64BitAtomSize then
+                        begin
+                          stblAtomPosition := MP4Stream.Position - 16;
+                        end
+                        else
+                        begin
+                          stblAtomPosition := MP4Stream.Position - 8;
+                        end;
                         repeat
-                          ReadAtomHeader(MP4Stream, AtomName, stcoAtomSize);
+                          ReadAtomHeader(MP4Stream, AtomName, stcoAtomSize, stcoIs64BitAtomSize);
                           if IsSameAtomName(AtomName, 'stco') then
                           begin
                             Result := False;
-                            stcoAtomPosition := MP4Stream.Position - 8;
+                            if stcoIs64BitAtomSize then
+                            begin
+                              stcoAtomPosition := MP4Stream.Position - 16;
+                            end
+                            else
+                            begin
+                              stcoAtomPosition := MP4Stream.Position - 8;
+                            end;
                             MP4Stream.Read(Version, 1);
                             MP4Stream.Read(Flags, 3);
                             MP4Stream.Read(NumberOfOffsets, 4);
@@ -3224,37 +2943,79 @@ begin
                           end
                           else
                           begin
-                            MP4Stream.Seek(stcoAtomSize - 8, soCurrent);
+                            if stcoIs64BitAtomSize then
+                            begin
+                              MP4Stream.Seek(stcoAtomSize - 16, soCurrent);
+                            end
+                            else
+                            begin
+                              MP4Stream.Seek(stcoAtomSize - 8, soCurrent);
+                            end;
                           end;
                         until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= stblAtomPosition + stblAtomSize);
                       end
                       else
                       begin
-                        MP4Stream.Seek(stblAtomSize - 8, soCurrent);
+                        if stblIs64BitAtomSize then
+                        begin
+                          MP4Stream.Seek(stblAtomSize - 16, soCurrent);
+                        end
+                        else
+                        begin
+                          MP4Stream.Seek(stblAtomSize - 8, soCurrent);
+                        end;
                       end;
                     until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= minfAtomPosition + minfAtomSize);
                   end
                   else
                   begin
-                    MP4Stream.Seek(minfAtomSize - 8, soCurrent);
+                    if minfIs64BitAtomSize then
+                    begin
+                      MP4Stream.Seek(minfAtomSize - 16, soCurrent);
+                    end
+                    else
+                    begin
+                      MP4Stream.Seek(minfAtomSize - 8, soCurrent);
+                    end;
                   end;
                 until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= mdiaAtomPosition + mdiaAtomSize);
               end
               else
               begin
-                MP4Stream.Seek(mdiaAtomSize - 8, soCurrent);
+                if mdiaIs64BitAtomSize then
+                begin
+                  MP4Stream.Seek(mdiaAtomSize - 16, soCurrent);
+                end
+                else
+                begin
+                  MP4Stream.Seek(mdiaAtomSize - 8, soCurrent);
+                end;
               end;
             until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= trakAtomPosition + trakAtomSize);
           end
           else
           begin
-            MP4Stream.Seek(trakAtomSize - 8, soCurrent);
+            if trakIs64BitAtomSize then
+            begin
+              MP4Stream.Seek(trakAtomSize - 16, soCurrent);
+            end
+            else
+            begin
+              MP4Stream.Seek(trakAtomSize - 8, soCurrent);
+            end;
           end;
         until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= moovAtomPosition + moovAtomSize);
       end
       else
       begin
-        MP4Stream.Seek(moovAtomSize - 8, soCurrent);
+        if moovIs64BitAtomSize then
+        begin
+          MP4Stream.Seek(moovAtomSize - 16, soCurrent);
+        end
+        else
+        begin
+          MP4Stream.Seek(moovAtomSize - 8, soCurrent);
+        end;
       end;
     until (MP4Stream.Position >= MP4Stream.Size) OR (moovAtomSize = 0);
   except
@@ -3283,6 +3044,12 @@ var
   NumberOfOffsets: Int64;
   OffsetValue: UInt64; // DWord;
   i: Integer;
+  moovIs64BitAtomSize: Boolean;
+  trakIs64BitAtomSize: Boolean;
+  mdiaIs64BitAtomSize: Boolean;
+  minfIs64BitAtomSize: Boolean;
+  stblIs64BitAtomSize: Boolean;
+  co64Is64BitAtomSize: Boolean;
 begin
   Result := True;
   try
@@ -3290,36 +3057,78 @@ begin
     Flags := 0;
     NumberOfOffsets := 0;
     repeat
-      ReadAtomHeader(MP4Stream, AtomName, moovAtomSize);
+      ReadAtomHeader(MP4Stream, AtomName, moovAtomSize, moovIs64BitAtomSize);
       if IsSameAtomName(AtomName, 'moov') then
       begin
-        moovAtomPosition := MP4Stream.Position - 8;
+        if moovIs64BitAtomSize then
+        begin
+          moovAtomPosition := MP4Stream.Position - 16;
+        end
+        else
+        begin
+          moovAtomPosition := MP4Stream.Position - 8;
+        end;
         repeat
-          ReadAtomHeader(MP4Stream, AtomName, trakAtomSize);
+          ReadAtomHeader(MP4Stream, AtomName, trakAtomSize, trakIs64BitAtomSize);
           if IsSameAtomName(AtomName, 'trak') then
           begin
-            trakAtomPosition := MP4Stream.Position - 8;
+            if trakIs64BitAtomSize then
+            begin
+              trakAtomPosition := MP4Stream.Position - 16;
+            end
+            else
+            begin
+              trakAtomPosition := MP4Stream.Position - 8;
+            end;
             repeat
-              ReadAtomHeader(MP4Stream, AtomName, mdiaAtomSize);
+              ReadAtomHeader(MP4Stream, AtomName, mdiaAtomSize, mdiaIs64BitAtomSize);
               if IsSameAtomName(AtomName, 'mdia') then
               begin
-                mdiaAtomPosition := MP4Stream.Position - 8;
+                if mdiaIs64BitAtomSize then
+                begin
+                  mdiaAtomPosition := MP4Stream.Position - 16;
+                end
+                else
+                begin
+                  mdiaAtomPosition := MP4Stream.Position - 8;
+                end;
                 repeat
-                  ReadAtomHeader(MP4Stream, AtomName, minfAtomSize);
+                  ReadAtomHeader(MP4Stream, AtomName, minfAtomSize, minfIs64BitAtomSize);
                   if IsSameAtomName(AtomName, 'minf') then
                   begin
-                    minfAtomPosition := MP4Stream.Position - 8;
+                    if minfIs64BitAtomSize then
+                    begin
+                      minfAtomPosition := MP4Stream.Position - 16;
+                    end
+                    else
+                    begin
+                      minfAtomPosition := MP4Stream.Position - 8;
+                    end;
                     repeat
-                      ReadAtomHeader(MP4Stream, AtomName, stblAtomSize);
+                      ReadAtomHeader(MP4Stream, AtomName, stblAtomSize, stblIs64BitAtomSize);
                       if IsSameAtomName(AtomName, 'stbl') then
                       begin
-                        stblAtomPosition := MP4Stream.Position - 8;
+                        if stblIs64BitAtomSize then
+                        begin
+                          stblAtomPosition := MP4Stream.Position - 16;
+                        end
+                        else
+                        begin
+                          stblAtomPosition := MP4Stream.Position - 8;
+                        end;
                         repeat
-                          ReadAtomHeader(MP4Stream, AtomName, co64AtomSize);
+                          ReadAtomHeader(MP4Stream, AtomName, co64AtomSize, co64Is64BitAtomSize);
                           if IsSameAtomName(AtomName, 'co64') then
                           begin
                             Result := False;
-                            co64AtomPosition := MP4Stream.Position - 8;
+                            if co64Is64BitAtomSize then
+                            begin
+                              co64AtomPosition := MP4Stream.Position - 16;
+                            end
+                            else
+                            begin
+                              co64AtomPosition := MP4Stream.Position - 8;
+                            end;
                             MP4Stream.Read(Version, 1);
                             MP4Stream.Read(Flags, 3);
                             MP4Stream.Read(NumberOfOffsets, 4);
@@ -3342,37 +3151,79 @@ begin
                           end
                           else
                           begin
-                            MP4Stream.Seek(co64AtomSize - 8, soCurrent);
+                            if co64Is64BitAtomSize then
+                            begin
+                              MP4Stream.Seek(co64AtomSize - 16, soCurrent);
+                            end
+                            else
+                            begin
+                              MP4Stream.Seek(co64AtomSize - 8, soCurrent);
+                            end;
                           end;
                         until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= stblAtomPosition + stblAtomSize);
                       end
                       else
                       begin
-                        MP4Stream.Seek(stblAtomSize - 8, soCurrent);
+                        if stblIs64BitAtomSize then
+                        begin
+                          MP4Stream.Seek(stblAtomSize - 16, soCurrent);
+                        end
+                        else
+                        begin
+                          MP4Stream.Seek(stblAtomSize - 8, soCurrent);
+                        end;
                       end;
                     until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= minfAtomPosition + minfAtomSize);
                   end
                   else
                   begin
-                    MP4Stream.Seek(minfAtomSize - 8, soCurrent);
+                    if minfIs64BitAtomSize then
+                    begin
+                      MP4Stream.Seek(minfAtomSize - 16, soCurrent);
+                    end
+                    else
+                    begin
+                      MP4Stream.Seek(minfAtomSize - 8, soCurrent);
+                    end;
                   end;
                 until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= mdiaAtomPosition + mdiaAtomSize);
               end
               else
               begin
-                MP4Stream.Seek(mdiaAtomSize - 8, soCurrent);
+                if mdiaIs64BitAtomSize then
+                begin
+                  MP4Stream.Seek(mdiaAtomSize - 16, soCurrent);
+                end
+                else
+                begin
+                  MP4Stream.Seek(mdiaAtomSize - 8, soCurrent);
+                end;
               end;
             until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= trakAtomPosition + trakAtomSize);
           end
           else
           begin
-            MP4Stream.Seek(trakAtomSize - 8, soCurrent);
+            if trakIs64BitAtomSize then
+            begin
+              MP4Stream.Seek(trakAtomSize - 16, soCurrent);
+            end
+            else
+            begin
+              MP4Stream.Seek(trakAtomSize - 8, soCurrent);
+            end;
           end;
         until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position >= moovAtomPosition + moovAtomSize);
       end
       else
       begin
-        MP4Stream.Seek(moovAtomSize - 8, soCurrent);
+        if moovIs64BitAtomSize then
+        begin
+          MP4Stream.Seek(moovAtomSize - 16, soCurrent);
+        end
+        else
+        begin
+          MP4Stream.Seek(moovAtomSize - 8, soCurrent);
+        end;
       end;
     until (MP4Stream.Position >= MP4Stream.Size) OR (moovAtomSize = 0);
   except

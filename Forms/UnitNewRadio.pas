@@ -3,16 +3,18 @@ unit UnitNewRadio;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  sButton, sSkinProvider;
 
 type
   TNewRadioForm = class(TForm)
     NameEdit: TLabeledEdit;
     WebEdit: TLabeledEdit;
     StreamEdit: TLabeledEdit;
-    Button1: TButton;
-    Button2: TButton;
+    Button1: TsButton;
+    Button2: TsButton;
+    sSkinProvider1: TsSkinProvider;
     procedure Button2Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);

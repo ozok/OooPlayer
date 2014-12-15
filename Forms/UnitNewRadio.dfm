@@ -57,7 +57,7 @@ object NewRadioForm: TNewRadioForm
     LabelPosition = lpLeft
     TabOrder = 2
   end
-  object Button1: TButton
+  object Button1: TsButton
     Left = 511
     Top = 94
     Width = 75
@@ -66,8 +66,9 @@ object NewRadioForm: TNewRadioForm
     Caption = 'Add'
     TabOrder = 3
     OnClick = Button1Click
+    SkinData.SkinSection = 'BUTTON'
   end
-  object Button2: TButton
+  object Button2: TsButton
     Left = 430
     Top = 94
     Width = 75
@@ -76,5 +77,17 @@ object NewRadioForm: TNewRadioForm
     Caption = 'Cancel'
     TabOrder = 4
     OnClick = Button2Click
+    SkinData.SkinSection = 'BUTTON'
+  end
+  object sSkinProvider1: TsSkinProvider
+    AddedTitle.Font.Charset = DEFAULT_CHARSET
+    AddedTitle.Font.Color = clNone
+    AddedTitle.Font.Height = -11
+    AddedTitle.Font.Name = 'Tahoma'
+    AddedTitle.Font.Style = []
+    SkinData.SkinSection = 'FORM'
+    TitleButtons = <>
+    Left = 288
+    Top = 64
   end
 end

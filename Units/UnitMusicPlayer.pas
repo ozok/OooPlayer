@@ -111,10 +111,6 @@ begin
             begin
               // play first queue item
               PlayItem(FQueuedItems[0]);
-              // delete it from lists
-              FQueuedItems.Delete(0);
-              QueueList.Items.Delete(0);
-              PlayList.Invalidate;
             end
             else
             begin
@@ -165,18 +161,6 @@ begin
           begin
             // empty playlist
             FPlayer.Stop;
-            MainForm.FStoppedByUser := True;
-            PositionBar.Position := 0;
-            MainForm.Caption := 'OooPlayer';
-            CoverImage.Picture.LoadFromFile('logo.png');
-            TitleLabel.Caption := '';
-            ArtistLabel.Caption := '';
-            AlbumLabel.Caption := '';
-            PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
-            LyricList.Lines.Clear;
-            PlaybackInfoLabel.Caption := '';
-            if MainForm.Enabled and MainForm.Visible then
-              MainForm.FocusControl(VolumeBar);
           end;
         end;
       1: // random
@@ -193,18 +177,6 @@ begin
           begin
             // empty playlist
             FPlayer.Stop;
-            MainForm.FStoppedByUser := True;
-            PositionBar.Position := 0;
-            MainForm.Caption := 'OooPlayer';
-            CoverImage.Picture.LoadFromFile('logo.png');
-            TitleLabel.Caption := '';
-            ArtistLabel.Caption := '';
-            AlbumLabel.Caption := '';
-            PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
-            LyricList.Lines.Clear;
-            PlaybackInfoLabel.Caption := '';
-            if MainForm.Enabled and MainForm.Visible then
-              MainForm.FocusControl(VolumeBar);
           end;
         end;
       2: // repeat track
@@ -227,18 +199,6 @@ begin
           begin
             // empty playlist
             FPlayer.Stop;
-            MainForm.FStoppedByUser := True;
-            PositionBar.Position := 0;
-            MainForm.Caption := 'OooPlayer';
-            CoverImage.Picture.LoadFromFile('logo.png');
-            TitleLabel.Caption := '';
-            ArtistLabel.Caption := '';
-            AlbumLabel.Caption := '';
-            PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
-            LyricList.Lines.Clear;
-            PlaybackInfoLabel.Caption := '';
-            if MainForm.Enabled and MainForm.Visible then
-              MainForm.FocusControl(VolumeBar);
           end;
         end;
       3: // shuffle
@@ -265,23 +225,12 @@ begin
           begin
             // empty playlist
             FPlayer.Stop;
-            MainForm.FStoppedByUser := True;
-            PositionBar.Position := 0;
-            MainForm.Caption := 'OooPlayer';
-            CoverImage.Picture.LoadFromFile('logo.png');
-            TitleLabel.Caption := '';
-            ArtistLabel.Caption := '';
-            AlbumLabel.Caption := '';
-            PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
-            LyricList.Lines.Clear;
-            PlaybackInfoLabel.Caption := '';
-            if MainForm.Enabled and MainForm.Visible then
-              MainForm.FocusControl(VolumeBar);
           end;
         end;
     end;
-    BASS_ChannelSetPosition(FPlayer.MixHandle, 0, BASS_POS_BYTE);
   end;
+  SendMessage(WinHandle, WM_INFO_UPDATE, PLAY_NEXT_SONG, 0);
+  BASS_ChannelSetPosition(FPlayer.MixHandle, 0, BASS_POS_BYTE);
 end;
 
 constructor TMusicPlayer.Create(const WinHandle: Cardinal);

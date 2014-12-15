@@ -3,20 +3,22 @@ unit UnitAbout;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, ShellAPI;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
+  Vcl.ExtCtrls, ShellAPI, sButton, sLabel, sSkinProvider;
 
 type
   TAboutForm = class(TForm)
-    Label1: TLabel;
+    Label1: TsLabel;
     Image1: TImage;
-    Label2: TLabel;
-    Label3: TLabel;
-    Button1: TButton;
-    Button2: TButton;
-    Label4: TLabel;
-    Label5: TLabel;
-    Label6: TLabel;
+    Label2: TsLabel;
+    Label3: TsLabel;
+    Button1: TsButton;
+    Button2: TsButton;
+    Label4: TsLabel;
+    Label5: TsLabel;
+    Label6: TsLabel;
+    sSkinProvider1: TsSkinProvider;
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure Button2Click(Sender: TObject);

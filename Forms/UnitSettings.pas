@@ -24,45 +24,50 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls, IniFiles,
-  Vcl.Mask, JvExMask, JvSpin, JvThread, JvComponentBase, JvUrlListGrabber,
-  JvUrlGrabbers, ShellAPI;
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
+  Vcl.ComCtrls, IniFiles, Vcl.Mask, JvExMask, JvSpin, JvThread, JvComponentBase,
+  JvUrlListGrabber, JvUrlGrabbers, ShellAPI, sComboBox, sLabel, sButton,
+  sCheckBox, sPageControl, sSkinProvider;
 
 type
   TSettingsForm = class(TForm)
-    PageControl1: TPageControl;
-    Button1: TButton;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
-    PlayCursorBtn: TCheckBox;
-    PlayJumpBtn: TCheckBox;
-    CheckUpdateBtn: TCheckBox;
-    TabSheet3: TTabSheet;
-    LoadArtBtn: TCheckBox;
-    CoverArtList: TComboBox;
-    TabSheet5: TTabSheet;
-    LyricBtn: TCheckBox;
-    LogLyricFailBtn: TCheckBox;
+    PageControl1: TsPageControl;
+    Button1: TsButton;
+    TabSheet1: TsTabSheet;
+    TabSheet2: TsTabSheet;
+    PlayCursorBtn: TsCheckBox;
+    PlayJumpBtn: TsCheckBox;
+    CheckUpdateBtn: TsCheckBox;
+    TabSheet3: TsTabSheet;
+    LoadArtBtn: TsCheckBox;
+    CoverArtList: TsComboBox;
+    TabSheet5: TsTabSheet;
+    LyricBtn: TsCheckBox;
+    LogLyricFailBtn: TsCheckBox;
     BufferEdit: TJvSpinEdit;
-    Label1: TLabel;
+    Label1: TsLabel;
     UpdateChecker: TJvHttpUrlGrabber;
     UpdateThread: TJvThread;
-    Button2: TButton;
+    Button2: TsButton;
+    sSkinProvider1: TsSkinProvider;
+    sTabSheet1: TsTabSheet;
+    SkinsList: TsComboBox;
     procedure Button1Click(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LoadArtBtnClick(Sender: TObject);
     procedure BufferEditChange(Sender: TObject);
     procedure UpdateThreadExecute(Sender: TObject; Params: Pointer);
     procedure Button2Click(Sender: TObject);
     procedure UpdateCheckerDoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string);
+    procedure FormShow(Sender: TObject);
+    procedure SkinsListChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
-    procedure LoadSettings;
-    procedure SaveSettings;
   public
     { Public declarations }
+    procedure LoadSettings;
+    procedure SaveSettings;
   end;
 
 var
@@ -95,6 +100,18 @@ begin
 end;
 
 procedure TSettingsForm.FormCreate(Sender: TObject);
+var
+  I: Integer;
+begin
+  SkinsList.Items.Add('Disabled');
+  for I := 0 to MainForm.sSkinManager1.InternalSkins.Count - 1 do
+  begin
+    SkinsList.Items.Add(MainForm.sSkinManager1.InternalSkins[i].Name)
+  end;
+  LoadSettings;
+end;
+
+procedure TSettingsForm.FormShow(Sender: TObject);
 begin
   LoadSettings;
 end;
@@ -120,10 +137,12 @@ begin
       LyricBtn.Checked := SettingsFile.ReadBool('settings', 'lyric', True);
       LogLyricFailBtn.Checked := SettingsFile.ReadBool('settings', 'loglyric', False);
       BufferEdit.Text := SettingsFile.ReadString('settings', 'buffer', '500');
+      SkinsList.ItemIndex := SettingsFile.ReadInteger('settings', 'skin', 1);
     end;
   finally
     SettingsFile.Free;
     LoadArtBtnClick(Self);
+    SkinsListChange(Self);
   end;
 end;
 
@@ -143,9 +162,23 @@ begin
       SettingsFile.WriteBool('settings', 'lyric', LyricBtn.Checked);
       SettingsFile.WriteBool('settings', 'loglyric', LogLyricFailBtn.Checked);
       SettingsFile.WriteString('settings', 'buffer', BufferEdit.Text);
+      SettingsFile.WriteInteger('settings', 'skin', SkinsList.ItemIndex);
     end;
   finally
     SettingsFile.Free;
+  end;
+end;
+
+procedure TSettingsForm.SkinsListChange(Sender: TObject);
+begin
+  if SkinsList.ItemIndex > 0 then
+  begin
+    MainForm.sSkinManager1.SkinName := SkinsList.Text;
+    MainForm.sSkinManager1.Active := True;
+  end
+  else
+  begin
+    MainForm.sSkinManager1.Active := False;
   end;
 end;
 

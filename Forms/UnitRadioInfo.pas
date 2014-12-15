@@ -22,18 +22,20 @@ unit UnitRadioInfo;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, ShellAPI;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, 
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, ShellAPI,
+  sButton, sLabel, sSkinProvider;
 
 type
   TRadioInfoForm = class(TForm)
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    NameLabel: TLabel;
-    WebLabel: TLabel;
-    StreamLabel: TLabel;
-    Button1: TButton;
+    Label1: TsLabel;
+    Label2: TsLabel;
+    Label3: TsLabel;
+    NameLabel: TsLabel;
+    WebLabel: TsLabel;
+    StreamLabel: TsLabel;
+    Button1: TsButton;
+    sSkinProvider1: TsSkinProvider;
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
@@ -78,4 +80,4 @@ begin
   ShellExecute(Handle, 'open', PWideChar(WebLabel.Caption), nil, nil, SW_SHOWNORMAL);
 end;
 
-end.
+end.
