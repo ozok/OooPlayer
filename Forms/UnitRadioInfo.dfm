@@ -5,7 +5,7 @@ object RadioInfoForm: TRadioInfoForm
   Caption = 'Radio Station'
   ClientHeight = 99
   ClientWidth = 594
-  Color = clBtnFace
+  Color = 3485741
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

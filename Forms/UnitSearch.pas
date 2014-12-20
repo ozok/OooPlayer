@@ -187,6 +187,7 @@ begin
             PositionTimer.Enabled := False;
             FPlayer.Stop;
             PlayItem(LItemIndex);
+            PlayItemUIUpdate;
             if chkCloseOnPlayBtn.Checked then
             begin
               Self.Close;

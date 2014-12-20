@@ -5,7 +5,7 @@ object SearchForm: TSearchForm
   Caption = 'Search'
   ClientHeight = 304
   ClientWidth = 635
-  Color = clBtnFace
+  Color = 3485741
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -86,14 +86,8 @@ object SearchForm: TSearchForm
         Caption = 'Duration'
         Width = 80
       end>
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = 13417908
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = []
     ReadOnly = True
     RowSelect = True
-    ParentFont = False
     PopupMenu = ListMenu
     ShowColumnHeaders = False
     TabOrder = 2
@@ -130,7 +124,7 @@ object SearchForm: TSearchForm
     AddedTitle.Font.Style = []
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
-    Left = 320
-    Top = 160
+    Left = 456
+    Top = 144
   end
 end

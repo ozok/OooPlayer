@@ -4,7 +4,7 @@ object InfoForm: TInfoForm
   Caption = 'File Info'
   ClientHeight = 562
   ClientWidth = 784
-  Color = clBtnFace
+  Color = 3485741
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -42,14 +42,8 @@ object InfoForm: TInfoForm
         Align = alClient
         BorderStyle = bsNone
         Color = 2038810
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
         HideSelection = False
         Indent = 19
-        ParentFont = False
         ReadOnly = True
         RowSelect = True
         TabOrder = 0

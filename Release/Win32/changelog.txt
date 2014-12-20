@@ -5,6 +5,7 @@
 -Added: An option to hide/show lyric panel
 -Added: New buttons and icons
 -Fixed: Taskbar overlay icon wasn't updated in radio mode
+-Fixed: Users could clear the playlist while adding files
 -Updated: BassFLAC to 2.4.2
 -Updated: WMA and Mp4 tag libraries
 

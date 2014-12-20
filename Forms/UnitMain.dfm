@@ -783,7 +783,7 @@ object MainForm: TMainForm
       SkinData.SkinSection = 'TOOLBUTTON'
     end
     object PlaybackOrderList: TsComboBox
-      Left = 774
+      Left = 786
       Top = 10
       Width = 89
       Height = 21
@@ -822,7 +822,7 @@ object MainForm: TMainForm
     object InfoPanel: TsPanel
       Left = 0
       Top = 40
-      Width = 863
+      Width = 875
       Height = 61
       Anchors = [akLeft, akRight, akBottom]
       BevelOuter = bvNone
@@ -832,7 +832,7 @@ object MainForm: TMainForm
         AlignWithMargins = True
         Left = 6
         Top = 31
-        Width = 857
+        Width = 869
         Height = 15
         Hint = 'Album'
         Margins.Left = 6
@@ -856,7 +856,7 @@ object MainForm: TMainForm
         AlignWithMargins = True
         Left = 6
         Top = 16
-        Width = 857
+        Width = 869
         Height = 15
         Margins.Left = 6
         Margins.Top = 0
@@ -879,7 +879,7 @@ object MainForm: TMainForm
         AlignWithMargins = True
         Left = 6
         Top = 46
-        Width = 857
+        Width = 869
         Height = 15
         Hint = 'Status, Bitrate, Channels, Codec, Sample Rate, Play Count'
         Margins.Left = 6
@@ -902,7 +902,7 @@ object MainForm: TMainForm
         AlignWithMargins = True
         Left = 6
         Top = 1
-        Width = 857
+        Width = 869
         Height = 15
         Hint = 'Title'
         Margins.Left = 6
@@ -920,10 +920,11 @@ object MainForm: TMainForm
         Font.Style = [fsBold]
         ExplicitLeft = 9
         ExplicitTop = 0
+        ExplicitWidth = 857
       end
     end
-    object Panel2: TsPanel
-      Left = 869
+    object CoverPanel: TsPanel
+      Left = 881
       Top = 3
       Width = 100
       Height = 100
@@ -951,7 +952,7 @@ object MainForm: TMainForm
       end
     end
     object SettingsBtn: TsBitBtn
-      Left = 668
+      Left = 680
       Top = 0
       Width = 50
       Height = 40
@@ -1095,7 +1096,7 @@ object MainForm: TMainForm
       SkinData.SkinSection = 'TOOLBUTTON'
     end
     object LogsBtn: TsBitBtn
-      Left = 718
+      Left = 730
       Top = 0
       Width = 50
       Height = 40
@@ -1175,7 +1176,7 @@ object MainForm: TMainForm
       SkinData.SkinSection = 'TOOLBUTTON'
     end
     object SearchBtn: TsBitBtn
-      Left = 618
+      Left = 630
       Top = 0
       Width = 50
       Height = 40
@@ -1345,7 +1346,6 @@ object MainForm: TMainForm
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
-        ExplicitTop = 3
         ExplicitHeight = 13
       end
       object PositionBar: TsTrackBar
@@ -1364,7 +1364,6 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'TRACKBAR'
         BarOffsetV = 0
         BarOffsetH = 0
-        ExplicitWidth = 846
       end
     end
     object VolumePnl: TsPanel
@@ -1381,7 +1380,6 @@ object MainForm: TMainForm
       BevelOuter = bvNone
       TabOrder = 0
       SkinData.SkinSection = 'PANEL'
-      ExplicitLeft = 985
       object VolumeLowImg: TsImage
         Left = 0
         Top = 23
@@ -1713,7 +1711,7 @@ object MainForm: TMainForm
     object RadioConnectionBar: TsProgressBar
       Left = 258
       Top = 10
-      Width = 354
+      Width = 366
       Height = 20
       Anchors = [akLeft, akTop, akRight]
       DoubleBuffered = False
@@ -1795,8 +1793,6 @@ object MainForm: TMainForm
     OnChange = FuncPagesChange
     OnMouseLeave = FuncPagesMouseLeave
     SkinData.SkinSection = 'PAGECONTROL'
-    ExplicitLeft = 3
-    ExplicitTop = 133
     object TabSheet1: TsTabSheet
       Caption = 'Music'
       SkinData.CustomColor = False
@@ -1862,17 +1858,11 @@ object MainForm: TMainForm
             Width = 100
           end>
         DragMode = dmAutomatic
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
         HideSelection = False
         MultiSelect = True
         OwnerData = True
         ReadOnly = True
         RowSelect = True
-        ParentFont = False
         PopupMenu = PlayListMenu
         ShowColumnHeaders = False
         StateImages = PlayBackImgs
@@ -1927,7 +1917,7 @@ object MainForm: TMainForm
         ViewStyle = vsReport
         OnDblClick = QueueListDblClick
       end
-      object Panel3: TsPanel
+      object PlaylistListPanel: TsPanel
         Left = 0
         Top = 0
         Width = 641
@@ -1967,7 +1957,6 @@ object MainForm: TMainForm
           ParentFont = False
           TabOrder = 0
           OnChange = PlaylistListChange
-          ExplicitWidth = 523
         end
         object AddPlaylistBtn: TsBitBtn
           AlignWithMargins = True
@@ -1982,7 +1971,6 @@ object MainForm: TMainForm
           TabOrder = 1
           OnClick = AddPlaylistBtnClick
           SkinData.SkinSection = 'BUTTON'
-          ExplicitTop = 0
         end
         object RemovePlaylistBtn: TsBitBtn
           AlignWithMargins = True
@@ -1997,7 +1985,6 @@ object MainForm: TMainForm
           TabOrder = 2
           OnClick = RemovePlaylistBtnClick
           SkinData.SkinSection = 'BUTTON'
-          ExplicitLeft = 588
         end
         object RenamePlaylistBtn: TsButton
           AlignWithMargins = True
@@ -2012,8 +1999,6 @@ object MainForm: TMainForm
           TabOrder = 3
           OnClick = RenamePlaylistBtnClick
           SkinData.SkinSection = 'BUTTON'
-          ExplicitLeft = 614
-          ExplicitTop = 0
         end
       end
     end
@@ -2107,16 +2092,10 @@ object MainForm: TMainForm
           item
           end>
         ColumnClick = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
         HideSelection = False
         OwnerData = True
         ReadOnly = True
         RowSelect = True
-        ParentFont = False
         PopupMenu = RadioListMenu
         ShowColumnHeaders = False
         StateImages = PlayBackImgs
@@ -8056,7 +8035,7 @@ object MainForm: TMainForm
     Left = 360
     Top = 432
     Bitmap = {
-      494C010105000800680016001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800740016001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

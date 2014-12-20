@@ -5,7 +5,7 @@ object RadioRecordOptionsForm: TRadioRecordOptionsForm
   Caption = 'Radio Recording Options'
   ClientHeight = 92
   ClientWidth = 645
-  Color = clBtnFace
+  Color = 3485741
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

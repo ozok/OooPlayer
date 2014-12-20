@@ -162,7 +162,7 @@ type
     RadioListMenu: TPopupMenu;
     S6: TMenuItem;
     A2: TMenuItem;
-    Panel2: TsPanel;
+    CoverPanel: TsPanel;
     V5: TMenuItem;
     M1: TMenuItem;
     R3: TMenuItem;
@@ -219,7 +219,7 @@ type
     Taskbar: TTaskbar;
     OverlayImgs: TImageList;
     PlaylistList: TsComboBox;
-    Panel3: TsPanel;
+    PlaylistListPanel: TsPanel;
     AddPlaylistBtn: TsBitBtn;
     RemovePlaylistBtn: TsBitBtn;
     Bevel1: TsBevel;
@@ -998,6 +998,8 @@ procedure TMainForm.C1Click(Sender: TObject);
 var
   I: Integer;
 begin
+  if MusicSearch.Searching then Exit;
+
   PlayList.Items.Clear;
   for I := 0 to FPlaylists[FSelectedPlaylistIndex].Count - 1 do
   begin
@@ -1152,7 +1154,9 @@ procedure TMainForm.D1Click(Sender: TObject);
 var
   i: Integer;
 begin
-  for i := 0 to FPlaylists[FSelectedPlaylistIndex].Count - 1 do
+  if MusicSearch.Searching then Exit;
+
+    for i := 0 to FPlaylists[FSelectedPlaylistIndex].Count - 1 do
   begin
     if PlayList.Items[i].Selected then
     begin
@@ -1360,7 +1364,7 @@ begin
   FCurrentItemInfo.ItemIndex := -1;
   FCurrentRadioIndex := -1;
   FStoppedByUser := False;
-  AppIniFileStorage.FileName := FAppDataFolder + 'position2.ini';
+  AppIniFileStorage.FileName := FAppDataFolder + 'position3.ini';
   FShuffleIndexes := TList<Integer>.Create;
   FTagReader := TTagReader.Create;
   CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
@@ -1409,7 +1413,7 @@ end;
 
 procedure TMainForm.FormResize(Sender: TObject);
 begin
-  PlayList.Columns[0].Width := PlayList.ClientWidth - PlayList.Columns[1].Width - PlayList.Columns[2].Width - 20;
+  PlayList.Columns[0].Width := PlayList.ClientWidth - PlayList.Columns[1].Width - PlayList.Columns[2].Width;
   QueueList.Columns[0].Width := QueueList.ClientWidth - QueueList.Columns[1].Width;
   StatusBar.Panels[0].Width := StatusBar.ClientWidth - StatusBar.Panels[1].Width;
   RadioList.Columns[0].Width := RadioList.ClientWidth;
@@ -3906,9 +3910,9 @@ var
   i: integer;
 begin
   // cannot delete default one
-  if PlaylistList.ItemIndex > 0 then
+  if PlaylistList.Items.Count > 1 then
   begin
-    if ID_YES = Application.MessageBox('Delete selected playlist?', 'Playlist Selection', MB_ICONQUESTION or MB_YESNO) then
+    if ID_YES = Application.MessageBox('Delete selected playlist? This cannot be undone.', 'Playlist Selection', MB_ICONQUESTION or MB_YESNO) then
     begin
       // delete playlist file
       if FileExists(FPlayListFiles[PlaylistList.ItemIndex].PlaylistFile) then
@@ -3950,7 +3954,7 @@ var
   i: integer;
   LOldPlaylistIndex: integer;
 begin
-  if PlaylistList.ItemIndex > 0 then
+  if PlaylistList.Items.Count > 0 then
   begin
     LNewName := InputBox('Playlist name', 'Name', PlaylistList.Text);
     if LNewName.Length > 0 then
