@@ -1384,9 +1384,8 @@ object MainForm: TMainForm
         Left = 0
         Top = 23
         Width = 23
-        Height = 22
+        Height = 23
         Align = alTop
-        AutoSize = True
         Center = True
         Picture.Data = {
           0B54504E4747726170686963C6070000424DC607000000000000360000002800
@@ -1456,7 +1455,6 @@ object MainForm: TMainForm
         Transparent = True
         Visible = False
         SkinData.SkinSection = 'CHECKBOX'
-        ExplicitWidth = 22
       end
       object VolumeMuteImg: TsImage
         Left = 0
@@ -1537,7 +1535,7 @@ object MainForm: TMainForm
       end
       object VolumeMidImg: TsImage
         Left = 0
-        Top = 45
+        Top = 46
         Width = 23
         Height = 23
         Align = alTop
@@ -1613,7 +1611,7 @@ object MainForm: TMainForm
       end
       object VolumeHighImg: TsImage
         Left = 0
-        Top = 68
+        Top = 69
         Width = 23
         Height = 23
         Align = alTop
@@ -1690,9 +1688,9 @@ object MainForm: TMainForm
       end
       object VolumeBar: TsTrackBar
         Left = 0
-        Top = 91
+        Top = 92
         Width = 23
-        Height = 13
+        Height = 12
         Align = alClient
         Max = 100
         Orientation = trVertical
@@ -1706,6 +1704,8 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'TRACKBAR'
         BarOffsetV = 0
         BarOffsetH = 0
+        ExplicitTop = 91
+        ExplicitHeight = 13
       end
     end
     object RadioConnectionBar: TsProgressBar

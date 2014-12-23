@@ -1,3 +1,5 @@
+--2.0.1
+-Updated: Bass to 2.4.11
 --2.0
 -Added: Support for multiple playlists
 -Added: Support for skins
@@ -7,7 +9,7 @@
 -Fixed: Taskbar overlay icon wasn't updated in radio mode
 -Fixed: Users could clear the playlist while adding files
 -Updated: BassFLAC to 2.4.2
--Updated: WMA and Mp4 tag libraries
+-Updated: WMA, Mp4 and APEv2 tag libraries
 
 --1.9
 -Added: Program now accepts file paths as parameters, adds them to playlist and starts playback

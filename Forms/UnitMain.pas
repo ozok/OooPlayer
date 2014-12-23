@@ -452,7 +452,7 @@ var
   FRadioRecordingInfo: TRadioRecordInfo;
 
 const
-  BuildInt = 1917;
+  BuildInt = 2042;
   Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
@@ -570,6 +570,7 @@ begin
   begin
     FStopAddFiles := False;
     PlayList.Items.BeginUpdate;
+    PlaylistListPanel.Enabled := False;
     ProgressPanel.Visible := True;
     try
       for I := 0 to OpenDialog.Files.Count - 1 do
@@ -588,6 +589,7 @@ begin
     finally
       ProgressPanel.Visible := False;
       PlayList.Items.EndUpdate;
+      PlaylistListPanel.Enabled := True;
       SavePlayList;
       FLastDir := OpenFolder.Directory;
       Self.Width := Self.Width + 1;
@@ -608,6 +610,7 @@ begin
   if OpenFolder.Execute then
   begin
     PlayList.Items.BeginUpdate;
+    PlaylistListPanel.Enabled := False;
     ProgressPanel.Visible := True;
     try
       MusicSearch.RecurseDepth := MaxInt;
@@ -616,6 +619,7 @@ begin
     finally
       ProgressPanel.Visible := False;
       PlayList.Items.EndUpdate;
+      PlaylistListPanel.Enabled := True;
       SavePlayList;
       FLastDir := OpenFolder.Directory;
       Self.Width := Self.Width + 1;
@@ -681,6 +685,7 @@ begin
     MusicSearch.Abort;
     ProgressPanel.Visible := False;
     PlayList.Items.EndUpdate;
+    PlaylistListPanel.Enabled := True;
     SavePlayList;
     FLastDir := OpenFolder.Directory;
     Self.Width := Self.Width + 1;
@@ -998,7 +1003,8 @@ procedure TMainForm.C1Click(Sender: TObject);
 var
   I: Integer;
 begin
-  if MusicSearch.Searching then Exit;
+  if MusicSearch.Searching then
+    Exit;
 
   PlayList.Items.Clear;
   for I := 0 to FPlaylists[FSelectedPlaylistIndex].Count - 1 do
@@ -1154,9 +1160,10 @@ procedure TMainForm.D1Click(Sender: TObject);
 var
   i: Integer;
 begin
-  if MusicSearch.Searching then Exit;
+  if MusicSearch.Searching then
+    Exit;
 
-    for i := 0 to FPlaylists[FSelectedPlaylistIndex].Count - 1 do
+  for i := 0 to FPlaylists[FSelectedPlaylistIndex].Count - 1 do
   begin
     if PlayList.Items[i].Selected then
     begin
@@ -1199,6 +1206,7 @@ var
 begin
   FStopAddFiles := False;
   PlayList.Items.BeginUpdate;
+  PlaylistListPanel.Enabled := False;
   ProgressPanel.Visible := True;
   DirectoriesToSearch := TStringList.Create;
   try
@@ -1246,6 +1254,7 @@ begin
   finally
     ProgressPanel.Visible := False;
     PlayList.Items.EndUpdate;
+    PlaylistListPanel.Enabled := True;
     SavePlayList;
     FLastDir := OpenFolder.Directory;
     Self.Width := Self.Width + 1;
@@ -1761,6 +1770,7 @@ var
   LExt: string;
 begin
   PlayList.Items.BeginUpdate;
+  PlaylistListPanel.Enabled := False;
   LOpenDlg := TOpenDialog.Create(Self);
   try
     LOpenDlg.Filter := 'Supported|*.m3u;*.m3u8;*.ppf';
@@ -1786,6 +1796,7 @@ begin
     Self.Width := Self.Width + 1;
     Self.Width := Self.Width - 1;
     PlayList.Items.EndUpdate;
+    PlaylistListPanel.Enabled := True;
   end;
 end;
 

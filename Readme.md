@@ -17,6 +17,7 @@ Features
 * Cover art support: OooPlayer can read both embedded and external cover art and display it
 * Fast search: Oooplayer has a very fast search mechanism
 * Gapless playback: Supports gapless playback
+* Multiple playlist support
 * Queue support: Add songs in queue
 * Radio player: Online radio player that has more than 1500 radio stations
 * Radio recorder: You can record radios to mp3, ogg vorbis, aac and opus
@@ -30,11 +31,10 @@ To-Do
 * Tag editor
 * ReplayGain support
 * Online cover art downloader
-* Multiple playlist support
 
 Version and download location
 ---
-* Latest version of OooPlayer is 1.9
+* Latest version of OooPlayer is 2.0.0
 * You can download OooPlayer from http://www.fosshub.com/OooPlayer.html
 
 Licence

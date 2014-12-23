@@ -1,6 +1,6 @@
 // ********************************************************************************************************************************
 // *                                                                                                                              *
-// *     APEv2 Library 1.0.2.5 © 3delite 2012-2014                                                                                *
+// *     APEv2 Library 1.0.5.6 © 3delite 2012-2014                                                                                *
 // *     See APEv2 Library Readme.txt for details                                                                                 *
 // *                                                                                                                              *
 // * Two licenses are available for commercial usage of this component:                                                           *
@@ -56,7 +56,7 @@ Uses
   Classes;
 
 Const
-  APEv2LIBRARY_VERSION = $01000204;
+  APEv2LIBRARY_VERSION = $01000506;
 
 Const
   APEV2LIBRARY_SUCCESS = 0;
@@ -124,7 +124,6 @@ type
     Flags: Cardinal;
     Size: Cardinal;
     Frames: Array of TAPEv2Frame;
-    UTF8Encoding: TEncoding;
     UpperCaseFieldNamesToWrite: Boolean;
     Constructor Create;
     Destructor Destroy; override;
@@ -137,7 +136,7 @@ type
     procedure DeleteAllFrames;
     procedure DeleteAllCoverArts;
     procedure Clear;
-    function FrameCount: Integer;
+    function Count: Integer;
     function CoverArtCount: Integer;
     function FrameExists(Name: String): Integer; overload;
     function FrameTypeCount(Name: String): Integer;
@@ -316,6 +315,10 @@ begin
   end
   else
   begin
+    if Stream.Size < 1 then
+    begin
+      Exit;
+    end;
     Stream.Seek(0, soBeginning);
     SetLength(Bytes, Stream.Size);
     for i := 0 to Stream.Size - 1 do
@@ -324,7 +327,11 @@ begin
       Bytes[i] := Data;
     end;
     Stream.Seek(0, soBeginning);
-    Result := Parent.UTF8Encoding.GetString(Bytes);
+    Result := TEncoding.UTF8.GetString(Bytes);
+    if Result = '' then
+    begin
+      Result := TEncoding.ANSI.GetString(Bytes);
+    end;
   end;
 end;
 
@@ -332,7 +339,11 @@ function TAPEv2Frame.SetAsText(Text: String): Boolean;
 var
   Bytes: TBytes;
 begin
-  Bytes := Parent.UTF8Encoding.GetBytes(Text);
+  Bytes := TEncoding.UTF8.GetBytes(Text);
+  if Length(Bytes) = 0 then
+  begin
+    Bytes := TEncoding.ANSI.GetBytes(Text);
+  end;
   Stream.Clear;
   Stream.Write(Bytes[0], Length(Bytes));
   Stream.Seek(0, soBeginning);
@@ -355,8 +366,16 @@ begin
   begin
     SetLength(NameBytes, 0);
     SetLength(ValueBytes, 0);
-    NameBytes := Parent.UTF8Encoding.GetBytes(List.Names[i]);
-    ValueBytes := Parent.UTF8Encoding.GetBytes(List.ValueFromIndex[i]);
+    NameBytes := TEncoding.UTF8.GetBytes(List.Names[i]);
+    if Length(NameBytes) = 0 then
+    begin
+      NameBytes := TEncoding.ANSI.GetBytes(List.Names[i]);
+    end;
+    ValueBytes := TEncoding.UTF8.GetBytes(List.ValueFromIndex[i]);
+    if Length(ValueBytes) = 0 then
+    begin
+      ValueBytes := TEncoding.ANSI.GetBytes(List.ValueFromIndex[i]);
+    end;
     Stream.Write(NameBytes[0], Length(NameBytes));
     Data := $0D;
     Stream.Write(Data, 1);
@@ -406,7 +425,11 @@ begin
       Bytes[ByteCounter] := Data;
       Inc(ByteCounter);
     until Stream.Position >= Stream.Size;
-    Name := Parent.UTF8Encoding.GetString(Bytes);
+    Name := TEncoding.UTF8.GetString(Bytes);
+    if Name = '' then
+    begin
+      Name := TEncoding.ANSI.GetString(Bytes);
+    end;
     SetLength(Bytes, 0);
     ByteCounter := 0;
     repeat
@@ -423,7 +446,11 @@ begin
       Bytes[ByteCounter] := Data;
       Inc(ByteCounter);
     until Stream.Position >= Stream.Size;
-    Value := Parent.UTF8Encoding.GetString(Bytes);
+    Value := TEncoding.UTF8.GetString(Bytes);
+    if Value = '' then
+    begin
+      Value := TEncoding.ANSI.GetString(Bytes);
+    end;
     List.Append(Name + '=' + Value);
     Result := True;
   end;
@@ -600,7 +627,6 @@ end;
 Constructor TAPEv2Tag.Create;
 begin
   Inherited;
-  UTF8Encoding := TEncoding.UTF8;
   Clear;
   UpperCaseFieldNamesToWrite := APEv2TagLibraryDefaultUpperCaseFieldNamesToWrite;
 end;
@@ -615,7 +641,7 @@ procedure TAPEv2Tag.DeleteAllCoverArts;
 var
   i: Integer;
 begin
-  for i := FrameCount - 1 downto 0 do
+  for i := Count - 1 downto 0 do
   begin
     if Frames[i].IsCoverArt then
     begin
@@ -629,7 +655,7 @@ var
   i: Integer;
 begin
   Result := 0;
-  for i := FrameCount - 1 downto 0 do
+  for i := Count - 1 downto 0 do
   begin
     if Frames[i].IsCoverArt then
     begin
@@ -739,13 +765,20 @@ begin
             Inc(ByteCounter);
           end;
         until Data = 0;
-        FrameName := UTF8Encoding.GetString(Bytes);
+        FrameName := TEncoding.UTF8.GetString(Bytes);
+        if FrameName = '' then
+        begin
+          FrameName := TEncoding.ANSI.GetString(Bytes);
+        end;
         case (DataFlags and $6) SHR 1 of
           0:
             begin
               with AddFrame(FrameName) do
               begin
-                Stream.CopyFrom(TagStream, DataSize);
+                if DataSize > 0 then
+                begin
+                  Stream.CopyFrom(TagStream, DataSize);
+                end;
                 Format := ffText;
               end;
             end;
@@ -753,7 +786,10 @@ begin
             begin
               with AddFrame(FrameName) do
               begin
-                Stream.CopyFrom(TagStream, DataSize);
+                if DataSize > 0 then
+                begin
+                  Stream.CopyFrom(TagStream, DataSize);
+                end;
                 Format := ffBinary;
               end;
             end;
@@ -989,11 +1025,19 @@ begin
       begin
         if UpperCaseFieldNamesToWrite then
         begin
-          Bytes := UTF8Encoding.GetBytes(UpperCase(Frames[i].Name));
+          Bytes := TEncoding.UTF8.GetBytes(UpperCase(Frames[i].Name));
+          if Length(Bytes) = 0 then
+          begin
+            Bytes := TEncoding.ANSI.GetBytes(UpperCase(Frames[i].Name));
+          end;
         end
         else
         begin
-          Bytes := UTF8Encoding.GetBytes(Frames[i].Name);
+          Bytes := TEncoding.UTF8.GetBytes(Frames[i].Name);
+          if Length(Bytes) = 0 then
+          begin
+            Bytes := TEncoding.ANSI.GetBytes(Frames[i].Name);
+          end;
         end;
         case Frames[i].Format of
           ffText:
@@ -1053,7 +1097,11 @@ begin
   TotalFramesSize := 0;
   for i := 0 to Length(Frames) - 1 do
   begin
-    Bytes := UTF8Encoding.GetBytes(Frames[i].Name);
+    Bytes := TEncoding.UTF8.GetBytes(Frames[i].Name);
+    if Length(Bytes) = 0 then
+    begin
+      Bytes := TEncoding.ANSI.GetBytes(Frames[i].Name);
+    end;
     TotalFramesSize := TotalFramesSize + Frames[i].Stream.Size + Length(Bytes) + 1 + 4 + 4;
   end;
   Result := TotalFramesSize;
@@ -1069,7 +1117,7 @@ begin
   Size := 0;
 end;
 
-function TAPEv2Tag.FrameCount: Integer;
+function TAPEv2Tag.Count: Integer;
 begin
   Result := Length(Frames);
 end;
@@ -1211,7 +1259,11 @@ begin
   ZeroByte := 0;
   Data := TMemoryStream.Create;
   try
-    Bytes := UTF8Encoding.GetBytes(Description);
+    Bytes := TEncoding.UTF8.GetBytes(Description);
+    if Length(Bytes) = 0 then
+    begin
+      Bytes := TEncoding.ANSI.GetBytes(Description);
+    end;
     Data.Write(Bytes[0], Length(Bytes));
     Data.Write(ZeroByte, 1);
     if Assigned(PictureStream) then
@@ -1241,7 +1293,11 @@ begin
   ZeroByte := 0;
   Data := TMemoryStream.Create;
   try
-    Bytes := UTF8Encoding.GetBytes(Description);
+    Bytes := TEncoding.UTF8.GetBytes(Description);
+    if Length(Bytes) = 0 then
+    begin
+      Bytes := TEncoding.ANSI.GetBytes(Description);
+    end;
     Data.Write(Bytes[0], Length(Bytes));
     Data.Write(ZeroByte, 1);
     PictureStream.Seek(0, soBeginning);
@@ -1375,7 +1431,11 @@ begin
       BinaryStream.Seek(0, soBeginning);
       PictureStream.CopyFrom(BinaryStream, PictureStream.Size);
       PictureStream.Seek(0, soBeginning);
-      Description := UTF8Encoding.GetString(Bytes);
+      Description := TEncoding.UTF8.GetString(Bytes);
+      if Description = '' then
+      begin
+        Description := TEncoding.ANSI.GetString(Bytes);
+      end;
       if Result then
       begin
         // *
@@ -1509,7 +1569,11 @@ begin
       end;
       BinaryStream.Write(PPicture^, DataSize - Offset);
       BinaryStream.Seek(0, soBeginning);
-      Description := UTF8Encoding.GetString(Bytes);
+      Description := TEncoding.UTF8.GetString(Bytes);
+      if Description = '' then
+      begin
+        Description := TEncoding.ANSI.GetString(Bytes);
+      end;
       if Result then
       begin
         // *

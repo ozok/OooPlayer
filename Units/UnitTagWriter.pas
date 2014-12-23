@@ -568,7 +568,7 @@ begin
     begin
       if FAPETag.CoverArtCount > 0 then
       begin
-        for I := 0 to FAPETag.FrameCount - 1 do
+        for I := 0 to Length(FAPETag.Frames) - 1 do
         begin
           if FAPETag.Frames[i].Format = ffBinary then
           begin
