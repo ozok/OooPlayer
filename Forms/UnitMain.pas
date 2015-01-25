@@ -403,6 +403,7 @@ type
 
     procedure PlayItem(const ItemIndex: integer);
     procedure PlayItemUIUpdate;
+    function PlayWindowTitle(const Song, Artist, Album: string): string;
 
     function RemoveInvalidChars(const Title: string): string;
 
@@ -427,6 +428,8 @@ type
     procedure RecordingDisableUI;
     procedure RecordingEnableUI;
     function CreateRadioRecordFileName: TRadioRecordInfo;
+    function GetRecordedFileType(const FileName: string):string;
+    function CodecToExtension(const AudioCodec: string): string;
     // Radio player funcs
 
     function CreateLyricFileName(const Title, Artist, Album: string): string;
@@ -452,6 +455,7 @@ var
   FRadioRecordingInfo: TRadioRecordInfo;
 
 const
+{$DEFINE WRITEDEBUGLOG}
   BuildInt = 2042;
   Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
@@ -1028,6 +1032,66 @@ begin
   ShellExecute(handle, 'open', PWideChar(ExtractFileDir(Application.ExeName) + '\changelog.txt'), nil, nil, SW_SHOWNORMAL);
 end;
 
+function TMainForm.CodecToExtension(const AudioCodec: string): string;
+var
+  LCodecStr: string;
+begin
+  LCodecStr := AudioCodec.Trim;
+
+  if ContainsText(LCodecStr, 'vorbis') then
+  begin
+    Result := '.ogg';
+  end
+  else if (LCodecStr = 'MPEG-1 Audio layer 2') or ContainsText(LCodecStr, 'mp2') then
+  begin
+    Result := '.mp2'
+  end
+  else if (LCodecStr = 'MPEG-1 Audio layer 3') or ContainsText(LCodecStr, 'mp3') or ContainsText(LCodecStr, 'lame') or ContainsText(LCodecStr, 'mpeg') or ContainsText(LCodecStr, 'mpa1l3') then
+  begin
+    Result := '.mp3';
+  end
+  else if ContainsText(LCodecStr, 'aac') then
+  begin
+    Result := '.m4a';
+  end
+  else if ContainsText(LCodecStr, 'truehd') then
+  begin
+    Result := '.thd';
+  end
+  else if ContainsText(LCodecStr, 'ac3') then
+  begin
+    Result := '.ac3';
+  end
+  else if ContainsText(LCodecStr, 'wavpack') then
+  begin
+    Result := '.wv';
+  end
+  else if ContainsText(LCodecStr, 'wav') or ContainsText(LCodecStr, 'pcm') then
+  begin
+    Result := '.wav';
+  end
+  else if ContainsText(LCodecStr, 'mpa1l2') then
+  begin
+    Result := '.mp2';
+  end
+  else if ContainsText(LCodecStr, 'amr') then
+  begin
+    Result := '.amr';
+  end
+  else if ContainsText(LCodecStr, 'flac') then
+  begin
+    Result := '.flac';
+  end
+  else if ContainsText(LCodecStr, 'dts') then
+  begin
+    Result := '.dts';
+  end
+  else if ContainsText(LCodecStr, 'monkey') then
+  begin
+    Result := '.ape';
+  end;
+end;
+
 function TMainForm.CreateLyricFileName(const Title, Artist, Album: string): string;
 const
   InvalidChars: array [0 .. 7] of char = ('<', '>', ':', '"', '|', '/', '?', '*');
@@ -1106,7 +1170,7 @@ begin
     3:
       LOutputFile := LOutputFile + '.m4a';
     4:
-      LOutputFile := LOutputFile + '.mp3';
+      LOutputFile := LOutputFile + '.tmp';
   end;
 
   LOutputFile := StringReplace(LOutputFile, '/', '_', [rfReplaceAll]);
@@ -1565,6 +1629,38 @@ begin
         end;
       until (FindNext(Search) <> 0);
       FindClose(Search);
+    end;
+  end;
+end;
+
+function TMainForm.GetRecordedFileType(const FileName: string): string;
+var
+  MediaInfoHandle: Cardinal;
+  LCodec: string;
+begin
+  Result := '.mp3';
+  if (FileExists(FileName)) then
+  begin
+    // New handle for mediainfo
+    MediaInfoHandle := MediaInfo_New();
+    if (MediaInfoHandle <> 0) then
+    begin
+      try
+        // read duration of file
+        MediaInfo_Open(MediaInfoHandle, PWideChar(FileName));
+        MediaInfo_Option(MediaInfoHandle, 'Complete', '1');
+
+        LCodec := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Codec/String', Info_Text, Info_Name);
+        // a workaround for ALAC being reported as "Lossless"
+        if LCodec = 'Lossless' then
+        begin
+          LCodec := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Format', Info_Text, Info_Name);
+        end;
+        Log('Recorded codec format: ' + LCodec);
+        Result := CodecToExtension(LCodec);
+      finally
+        MediaInfo_Close(MediaInfoHandle);
+      end;
     end;
   end;
 end;
@@ -2256,8 +2352,9 @@ end;
 
 procedure TMainForm.Log(s: string);
 begin
-  Exit;
+{$IFDEF WRITEDEBUGLOG}
   LogForm.LogList.Lines.Add(s);
+{$ENDIF}
 end;
 
 procedure TMainForm.LyricListMouseEnter(Sender: TObject);
@@ -2274,6 +2371,8 @@ end;
 
 procedure TMainForm.LyricSearchBtnClick(Sender: TObject);
 begin
+  if not FStopAddFiles then Exit;
+  
   if FPlaybackType = music then
   begin
     if FPlayer.PlayerStatus2 <> psStopped then
@@ -3077,7 +3176,7 @@ begin
       PlayList.Refresh;
       with FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex] do
       begin
-        Self.Caption := Title + ' - ' + Album + ' - ' + Artist + ' - [OooPlayer]';
+        Self.Caption := PlayWindowTitle(Title, Artist, Album);
         TitleLabel.Caption := Title;
         AlbumLabel.Caption := Album;
         ArtistLabel.Caption := Artist;
@@ -3366,6 +3465,36 @@ begin
   PlaybackInfoLabel.Caption := 'Connecting...';
   UpdateOverlayIcon(1);
   RadioThread.Start;
+end;
+
+function TMainForm.PlayWindowTitle(const Song, Artist, Album: string): string;
+begin
+  case SettingsForm.WindowTitleList.ItemIndex of
+    0:
+      begin
+        Result := Song + ' - ' + Album + ' - ' + Artist + ' [OooPlayer]';
+      end;
+    1:
+      begin
+        Result := Album + ' - ' + Song + ' - ' + Artist + ' [OooPlayer]';
+      end;
+    2:
+      begin
+        Result := Artist + ' - ' + Album + ' - ' + Song + ' [OooPlayer]';
+      end;
+    3:
+      begin
+        Result := Song + ' - ' + Artist + ' - ' + Album + ' [OooPlayer]';
+      end;
+    4:
+      begin
+        Result := Album + ' - ' + Artist + ' - ' + Song + ' [OooPlayer]';
+      end;
+    5:
+      begin
+        Result := Artist + ' - ' + Song + ' - ' + Album + ' [OooPlayer]';
+      end;
+  end;
 end;
 
 procedure TMainForm.PositionBarChanged(Sender: TObject);
@@ -4493,6 +4622,13 @@ begin
     if RadioRecordFormatList.ItemIndex = 4 then
     begin
       WriteTagsToRecordFile;
+      // rename file according to file type
+      if FileExists(FRadioRecordingInfo.FileName) then
+      begin
+        RenameFile(FRadioRecordingInfo.FileName, ChangeFileExt(FRadioRecordingInfo.FileName, GetRecordedFileType(FRadioRecordingInfo.FileName)));
+        FRadioRecordingInfo.FileName := ChangeFileExt(FRadioRecordingInfo.FileName, GetRecordedFileType(FRadioRecordingInfo.FileName));
+        WriteTagsToRecordFile;
+      end;
     end;
   end;
 end;
@@ -4659,6 +4795,7 @@ begin
       // seperate file for each song
       if FRecordingRadio then
       begin
+        Log('Recording radio.');
         if RadioRecordModeList.ItemIndex = 0 then
         begin
           StopRadioRecording;
@@ -4673,6 +4810,7 @@ begin
     case Msg.WParam of
       RESET_UI:
         begin
+          Log('Reset ui');
           TitleLabel.Caption := 'Connecting...';
           PlaybackInfoLabel.Caption := '';
           TitleLabel.Caption := '';
@@ -4683,6 +4821,7 @@ begin
         end;
       SHOW_ERROR:
         begin
+          Log('error');
           TitleLabel.Caption := 'Error';
           FRadioLogItem := 'Unable to play radio. Error code: ' + IntToStr(Msg.LParam);
           AddToRadioLog;
@@ -4690,24 +4829,52 @@ begin
           RadioConnectionBar.Style := pbstNormal;
         end;
       UPDATE_PROGRESS:
-        TitleLabel.Caption := Format('Buffering... %d%%', [Msg.LParam]);
+        begin
+          Log('update progress');
+          TitleLabel.Caption := Format('Buffering... %d%%', [Msg.LParam]);
+        end;
       UPDATE_META_NAME:
         begin
+          Log('update meta anme');
           TitleLabel.Caption := String(PAnsiChar(Msg.LParam));
           Self.Caption := String(PAnsiChar(Msg.LParam)) + ' [OooPlayer]';
         end;
       UPDATE_META_BITRATE:
-        AlbumLabel.Caption := String(PAnsiChar(Msg.LParam)) + ' kbps';
+        begin
+          Log('update bitrate');
+          AlbumLabel.Caption := String(PAnsiChar(Msg.LParam)) + ' kbps';
+        end;
       // 5:
       // Label5.Caption := String(PAnsiChar(msg.LParam));
       // 6:
       // Label3.Caption := String(PAnsiChar(msg.LParam));
       UPDATE_META:
         begin
+          Log('update meta');
           ArtistLabel.Caption := String(PAnsiChar(Msg.LParam));
+          if not((LyricTitleEdit.Text = '') and (LyricArtistEdit.Text = '')) then
+          begin
+            SendMessage(WinHandle, WM_INFO_UPDATE, DOWNLOAD_LYRIC, 0);
+          end;
+          // radio recording
+          // seperate file for each song
+          if FRecordingRadio then
+          begin
+            Log('Recording radio.');
+            if RadioRecordModeList.ItemIndex = 0 then
+            begin
+              StopRadioRecording;
+              StartRadioRecording;
+            end
+            else
+            begin
+              // single file so do nothing
+            end;
+          end;
         end;
       STATUS_UPDATE:
         begin
+          Log('status update');
           if (String(PAnsiChar(Msg.LParam)) = 'ICY 200 OK') or (String(PAnsiChar(Msg.LParam)) = 'HTTP/1.0 200 OK') then
           begin
             PlaybackInfoLabel.Caption := 'Playing';
@@ -4721,11 +4888,13 @@ begin
         RadioList.Invalidate;
       STOP_IMG_ANIM:
         begin
+          Log('stop anim');
           RadioConnectionBar.Visible := False;
           RadioConnectionBar.Style := pbstNormal;
         end;
       DOWNLOAD_LYRIC:
         begin
+          Log('download lyric');
           // lyric
           LyricList.Lines.Clear;
           LyricStatusLabel.Caption := '';
@@ -4782,6 +4951,7 @@ begin
         end;
       PLAY_NEXT_SONG:
         begin
+          Log('play next file');
           HandlePlaybackFromBassThread;
         end;
     end;

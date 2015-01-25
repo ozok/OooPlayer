@@ -1,5 +1,10 @@
---2.0.1
+--2.1.0
+-Added: [Music player] An option to specify window title combination during playback
+-Fixed: [Radio player] Lyric downloader didn't function on song change
+-Fixed: [General] Some controls were not skinned
+-Fixed: [General] A few small bugs
 -Updated: Bass to 2.4.11
+
 --2.0
 -Added: Support for multiple playlists
 -Added: Support for skins

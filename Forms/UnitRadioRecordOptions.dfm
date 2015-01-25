@@ -42,16 +42,6 @@ object RadioRecordOptionsForm: TRadioRecordOptionsForm
     Height = 13
     Caption = 'Changes will be effective the next time you start a recording'
   end
-  object RecordSaveEdit: TJvDirectoryEdit
-    Left = 132
-    Top = 8
-    Width = 424
-    Height = 21
-    DialogKind = dkWin32
-    Anchors = [akLeft, akTop, akRight]
-    TabOrder = 0
-    Text = ''
-  end
   object Button1: TsButton
     Left = 562
     Top = 8
@@ -59,7 +49,7 @@ object RadioRecordOptionsForm: TRadioRecordOptionsForm
     Height = 21
     Anchors = [akTop, akRight]
     Caption = 'Open'
-    TabOrder = 1
+    TabOrder = 0
     OnClick = Button1Click
     SkinData.SkinSection = 'BUTTON'
   end
@@ -70,7 +60,7 @@ object RadioRecordOptionsForm: TRadioRecordOptionsForm
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'Close'
-    TabOrder = 2
+    TabOrder = 1
     OnClick = Button2Click
     SkinData.SkinSection = 'BUTTON'
   end
@@ -99,7 +89,7 @@ object RadioRecordOptionsForm: TRadioRecordOptionsForm
     Font.Style = []
     ItemIndex = 4
     ParentFont = False
-    TabOrder = 3
+    TabOrder = 2
     Text = '128'
     Items.Strings = (
       '320'
@@ -114,6 +104,37 @@ object RadioRecordOptionsForm: TRadioRecordOptionsForm
       '56'
       '48'
       '32')
+  end
+  object RecordSaveEdit: TsDirectoryEdit
+    Left = 132
+    Top = 8
+    Width = 424
+    Height = 21
+    AutoSize = False
+    Color = 2038810
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = 13417908
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    MaxLength = 255
+    ParentFont = False
+    TabOrder = 3
+    Text = ''
+    CheckOnExit = True
+    BoundLabel.Indent = 0
+    BoundLabel.Font.Charset = DEFAULT_CHARSET
+    BoundLabel.Font.Color = clWindowText
+    BoundLabel.Font.Height = -11
+    BoundLabel.Font.Name = 'Tahoma'
+    BoundLabel.Font.Style = []
+    BoundLabel.Layout = sclLeft
+    BoundLabel.MaxWidth = 0
+    BoundLabel.UseSkinColor = True
+    SkinData.SkinSection = 'EDIT'
+    GlyphMode.Blend = 0
+    GlyphMode.Grayed = False
+    Root = 'rfDesktop'
   end
   object Info: TJvComputerInfoEx
     Left = 384

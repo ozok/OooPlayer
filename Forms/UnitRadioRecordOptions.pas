@@ -6,11 +6,11 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
   Vcl.Mask, JvExMask, JvToolEdit, Vcl.ComCtrls, IniFiles, JvComponentBase,
-  JvComputerInfoEx, ShellAPI, sComboBox, sButton, sLabel, sSkinProvider;
+  JvComputerInfoEx, ShellAPI, sComboBox, sButton, sLabel, sSkinProvider,
+  sMaskEdit, sCustomComboEdit, sToolEdit;
 
 type
   TRadioRecordOptionsForm = class(TForm)
-    RecordSaveEdit: TJvDirectoryEdit;
     Label1: TsLabel;
     Button1: TsButton;
     Button2: TsButton;
@@ -19,6 +19,7 @@ type
     Info: TJvComputerInfoEx;
     Label3: TsLabel;
     sSkinProvider1: TsSkinProvider;
+    RecordSaveEdit: TsDirectoryEdit;
     procedure Button2Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);

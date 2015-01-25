@@ -37,7 +37,7 @@ type
   private
     FThread: TIdThreadComponent;
     FPageDownloader: TJvHttpUrlGrabber;
-    FSongName: string;
+    FTitle: string;
     FArtist: string;
     FAlbum: string;
     FStatus: TLyricDownloaderStatus;
@@ -64,7 +64,7 @@ type
     procedure AddToLog;
     procedure EnableUIControls;
   public
-    property SongTitle: string read FSongName write FSongName;
+    property SongTitle: string read FTitle write FTitle;
     property Artist: string read FArtist write FArtist;
     property Album: string read FAlbum write FAlbum;
     property Status: TLyricDownloaderStatus read FStatus;
@@ -310,7 +310,7 @@ procedure TLyricDownloader.EnableUIControls;
 begin
   with MainForm do
   begin
-    LyricTitleEdit.Text := FSongName;
+    LyricTitleEdit.Text := FTitle;
     LyricArtistEdit.Text := FArtist;
     FLyricAlbumStr := FAlbum;
     LyricSearchBtn.Enabled := True;
@@ -452,11 +452,11 @@ begin
   FLyricSourceIndex := MainForm.LyricSourceList.ItemIndex;
   case FLyricSourceIndex of
     0:
-      FPageDownloader.Url := 'http://www.azlyrics.com/lyrics/' + URIEncode(FixStrings(FArtist) + '/' + FixStrings(FSongName)) + '.html';
+      FPageDownloader.Url := 'http://www.azlyrics.com/lyrics/' + URIEncode(FixStrings(FArtist) + '/' + FixStrings(FTitle)) + '.html';
     1:
-      FPageDownloader.Url := 'http://batlyrics.net/' + URIEncode(FixStrings(FSongName) + '-lyrics-' + FixStrings(FArtist)) + '.html';
+      FPageDownloader.Url := 'http://batlyrics.net/' + URIEncode(FixStrings(FTitle) + '-lyrics-' + FixStrings(FArtist)) + '.html';
     2:
-      FPageDownloader.Url := 'http://www.metrolyrics.com/' + URIEncode(FixStrings(FSongName) + '-lyrics-' + FixStrings(FArtist)) + '.html';
+      FPageDownloader.Url := 'http://www.metrolyrics.com/' + URIEncode(FixStrings(FTitle) + '-lyrics-' + FixStrings(FArtist)) + '.html';
   end;
   FPageDownloader.Start;
   while FPageDownloader.Status <> gsStopped do
@@ -490,6 +490,9 @@ var
   I: Integer;
 begin
   MainForm.LyricList.Lines.Clear;
+  // if (MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][MainForm.FCurrentRadioIndex].Title = FTitle) and
+  // (MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][MainForm.FCurrentRadioIndex].Artist = FArtist) then
+  // begin
   MainForm.LyricList.Lines.BeginUpdate;
   try
     for I := 0 to FLyricFile.Count - 1 do
@@ -503,6 +506,14 @@ begin
   begin
     MainForm.LyricStatusLabel.Caption := 'Loaded downloaded lyric';
   end;
+  // end
+  // else
+  // begin
+  // if FLyricFile.Count > 1 then
+  // begin
+  // MainForm.LyricStatusLabel.Caption := 'Could not load lyrics';
+  // end;
+  // end;
 end;
 
 end.

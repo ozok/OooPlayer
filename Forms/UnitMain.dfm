@@ -1704,8 +1704,6 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'TRACKBAR'
         BarOffsetV = 0
         BarOffsetH = 0
-        ExplicitTop = 91
-        ExplicitHeight = 13
       end
     end
     object RadioConnectionBar: TsProgressBar
@@ -1858,11 +1856,17 @@ object MainForm: TMainForm
             Width = 100
           end>
         DragMode = dmAutomatic
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 13417908
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
         HideSelection = False
         MultiSelect = True
         OwnerData = True
         ReadOnly = True
         RowSelect = True
+        ParentFont = False
         PopupMenu = PlayListMenu
         ShowColumnHeaders = False
         StateImages = PlayBackImgs
@@ -2007,6 +2011,10 @@ object MainForm: TMainForm
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object RadioCatList: TsComboBox
         Left = 0
         Top = 0
@@ -2092,10 +2100,16 @@ object MainForm: TMainForm
           item
           end>
         ColumnClick = False
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 13417908
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
         HideSelection = False
         OwnerData = True
         ReadOnly = True
         RowSelect = True
+        ParentFont = False
         PopupMenu = RadioListMenu
         ShowColumnHeaders = False
         StateImages = PlayBackImgs
@@ -2191,7 +2205,8 @@ object MainForm: TMainForm
             'Mp3'
             'Ogg Vorbis'
             'Opus'
-            'AAC')
+            'AAC'
+            'Without encode')
         end
         object RadioRecordingOptionsBtn: TsBitBtn
           Left = 470
@@ -2659,6 +2674,7 @@ object MainForm: TMainForm
   object FormStorage: TJvFormStorage
     AppStorage = AppIniFileStorage
     AppStoragePath = '%FORM_NAME%\'
+    Options = [fpSize, fpLocation]
     StoredValues = <>
     Left = 128
     Top = 232
@@ -8035,7 +8051,7 @@ object MainForm: TMainForm
     Left = 360
     Top = 432
     Bitmap = {
-      494C010105000800740016001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101050008008C0016001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

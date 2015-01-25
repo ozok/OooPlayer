@@ -3,8 +3,8 @@ object SettingsForm: TSettingsForm
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Settings'
-  ClientHeight = 186
-  ClientWidth = 288
+  ClientHeight = 325
+  ClientWidth = 560
   Color = 3485741
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -18,27 +18,27 @@ object SettingsForm: TSettingsForm
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
-    288
-    186)
+    560
+    325)
   PixelsPerInch = 96
   TextHeight = 13
   object PageControl1: TsPageControl
     Left = 8
     Top = 8
-    Width = 272
-    Height = 139
+    Width = 544
+    Height = 278
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     SkinData.SkinSection = 'PAGECONTROL'
+    ExplicitWidth = 272
+    ExplicitHeight = 139
     object TabSheet1: TsTabSheet
       Caption = 'General'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 264
+      ExplicitHeight = 111
       object CheckUpdateBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -51,8 +51,8 @@ object SettingsForm: TSettingsForm
         ImgUnchecked = 0
       end
       object Button2: TsButton
-        Left = 151
-        Top = 12
+        Left = 162
+        Top = 13
         Width = 75
         Height = 25
         Caption = 'Check now'
@@ -66,17 +66,8 @@ object SettingsForm: TSettingsForm
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object Label1: TsLabel
-        Left = 16
-        Top = 65
-        Width = 102
-        Height = 13
-        Caption = 'Buffer length (in ms):'
-      end
+      ExplicitWidth = 264
+      ExplicitHeight = 111
       object PlayCursorBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -99,19 +90,75 @@ object SettingsForm: TSettingsForm
         ImgChecked = 0
         ImgUnchecked = 0
       end
-      object BufferEdit: TJvSpinEdit
+      object BufferEdit: TsSpinEdit
         Left = 124
-        Top = 62
+        Top = 64
         Width = 75
         Height = 21
-        CheckOptions = [coCheckOnExit, coCropBeyondLimit]
         Alignment = taCenter
-        ButtonKind = bkClassic
-        MaxValue = 5000.000000000000000000
-        MinValue = 500.000000000000000000
-        Value = 500.000000000000000000
+        Color = 2038810
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 13417908
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        NumbersOnly = True
+        ParentFont = False
         TabOrder = 2
-        OnChange = BufferEditChange
+        Text = '1000'
+        SkinData.SkinSection = 'EDIT'
+        BoundLabel.Active = True
+        BoundLabel.Caption = 'Buffer length in ms:'
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+        MaxValue = 5000
+        MinValue = 500
+        Value = 1000
+      end
+      object WindowTitleList: TsComboBox
+        Left = 124
+        Top = 91
+        Width = 145
+        Height = 21
+        Alignment = taLeftJustify
+        BoundLabel.Active = True
+        BoundLabel.Caption = 'Window title layout:'
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+        SkinData.SkinSection = 'COMBOBOX'
+        VerticalAlignment = taAlignTop
+        Style = csDropDownList
+        Color = 2038810
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 13417908
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ItemIndex = 0
+        ParentFont = False
+        TabOrder = 3
+        Text = 'Song - Album - Artist'
+        Items.Strings = (
+          'Song - Album - Artist'
+          'Album - Song - Artist'
+          'Artist - Album - Song'
+          'Song - Artist - Album'
+          'Album - Artist - Song'
+          'Artist - Song - Album')
       end
     end
     object TabSheet3: TsTabSheet
@@ -119,10 +166,8 @@ object SettingsForm: TSettingsForm
       ImageIndex = 2
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 264
+      ExplicitHeight = 111
       object LoadArtBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -181,10 +226,8 @@ object SettingsForm: TSettingsForm
       ParentFont = False
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 264
+      ExplicitHeight = 111
       object LyricBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -220,12 +263,10 @@ object SettingsForm: TSettingsForm
       Caption = 'Skin'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 264
+      ExplicitHeight = 111
       object SkinsList: TsComboBox
-        Left = 16
+        Left = 46
         Top = 16
         Width = 200
         Height = 21
@@ -238,7 +279,7 @@ object SettingsForm: TSettingsForm
         BoundLabel.Font.Height = -11
         BoundLabel.Font.Name = 'Tahoma'
         BoundLabel.Font.Style = []
-        BoundLabel.Layout = sclTopLeft
+        BoundLabel.Layout = sclLeft
         BoundLabel.MaxWidth = 0
         BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'COMBOBOX'
@@ -258,8 +299,8 @@ object SettingsForm: TSettingsForm
     end
   end
   object Button1: TsButton
-    Left = 205
-    Top = 153
+    Left = 477
+    Top = 292
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -267,6 +308,8 @@ object SettingsForm: TSettingsForm
     TabOrder = 1
     OnClick = Button1Click
     SkinData.SkinSection = 'BUTTON'
+    ExplicitLeft = 205
+    ExplicitTop = 153
   end
   object UpdateChecker: TJvHttpUrlGrabber
     FileName = 'output.txt'
@@ -276,8 +319,8 @@ object SettingsForm: TSettingsForm
     ProxyAddresses = 'proxyserver'
     ProxyIgnoreList = '<local>'
     OnDoneStream = UpdateCheckerDoneStream
-    Left = 212
-    Top = 46
+    Left = 460
+    Top = 78
   end
   object UpdateThread: TJvThread
     Exclusive = True
@@ -285,8 +328,8 @@ object SettingsForm: TSettingsForm
     RunOnCreate = True
     FreeOnTerminate = True
     OnExecute = UpdateThreadExecute
-    Left = 164
-    Top = 86
+    Left = 380
+    Top = 46
   end
   object sSkinProvider1: TsSkinProvider
     AddedTitle.Font.Charset = DEFAULT_CHARSET
@@ -296,7 +339,7 @@ object SettingsForm: TSettingsForm
     AddedTitle.Font.Style = []
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
-    Left = 136
-    Top = 88
+    Left = 368
+    Top = 104
   end
 end

@@ -1302,8 +1302,11 @@ begin
     Stream.Read(LengthOfPictureData, 4);
     LengthOfPictureData := ReverseBytes(LengthOfPictureData);
     SizeOfPictureData := LengthOfPictureData;
-    PictureStream.CopyFrom(Stream, LengthOfPictureData);
-    PictureStream.Seek(0, soBeginning);
+    if Stream.Size > 0 then
+    begin
+      PictureStream.CopyFrom(Stream, LengthOfPictureData);
+      PictureStream.Seek(0, soBeginning);
+    end;
   end;
   Result := True;
 end;

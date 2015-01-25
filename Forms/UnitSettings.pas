@@ -27,7 +27,7 @@ uses
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
   Vcl.ComCtrls, IniFiles, Vcl.Mask, JvExMask, JvSpin, JvThread, JvComponentBase,
   JvUrlListGrabber, JvUrlGrabbers, ShellAPI, sComboBox, sLabel, sButton,
-  sCheckBox, sPageControl, sSkinProvider;
+  sCheckBox, sPageControl, sSkinProvider, sEdit, sSpinEdit;
 
 type
   TSettingsForm = class(TForm)
@@ -44,14 +44,14 @@ type
     TabSheet5: TsTabSheet;
     LyricBtn: TsCheckBox;
     LogLyricFailBtn: TsCheckBox;
-    BufferEdit: TJvSpinEdit;
-    Label1: TsLabel;
     UpdateChecker: TJvHttpUrlGrabber;
     UpdateThread: TJvThread;
     Button2: TsButton;
     sSkinProvider1: TsSkinProvider;
     sTabSheet1: TsTabSheet;
     SkinsList: TsComboBox;
+    BufferEdit: TsSpinEdit;
+    WindowTitleList: TsComboBox;
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LoadArtBtnClick(Sender: TObject);
@@ -138,6 +138,7 @@ begin
       LogLyricFailBtn.Checked := SettingsFile.ReadBool('settings', 'loglyric', False);
       BufferEdit.Text := SettingsFile.ReadString('settings', 'buffer', '500');
       SkinsList.ItemIndex := SettingsFile.ReadInteger('settings', 'skin', 1);
+      WindowTitleList.ItemIndex := SettingsFile.ReadInteger('settings', 'windowtitle', 0);
     end;
   finally
     SettingsFile.Free;
@@ -163,6 +164,7 @@ begin
       SettingsFile.WriteBool('settings', 'loglyric', LogLyricFailBtn.Checked);
       SettingsFile.WriteString('settings', 'buffer', BufferEdit.Text);
       SettingsFile.WriteInteger('settings', 'skin', SkinsList.ItemIndex);
+      SettingsFile.WriteInteger('settings', 'windowtitle', WindowTitleList.ItemIndex);
     end;
   finally
     SettingsFile.Free;
