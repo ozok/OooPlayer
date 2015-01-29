@@ -69,9 +69,9 @@ object MainForm: TMainForm
       127)
     object PauseBtn: TsBitBtn
       Left = 52
-      Top = 0
+      Top = 2
       Width = 50
-      Height = 40
+      Height = 46
       Hint = 'Pause'
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
@@ -212,9 +212,9 @@ object MainForm: TMainForm
     end
     object StopBtn: TsBitBtn
       Left = 102
-      Top = 0
+      Top = 2
       Width = 50
-      Height = 40
+      Height = 46
       Hint = 'Stop'
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
@@ -355,9 +355,9 @@ object MainForm: TMainForm
     end
     object PrevBtn: TsBitBtn
       Left = 152
-      Top = 0
+      Top = 2
       Width = 50
-      Height = 40
+      Height = 46
       Hint = 'Previous'
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
@@ -498,9 +498,9 @@ object MainForm: TMainForm
     end
     object NextBtn: TsBitBtn
       Left = 202
-      Top = 0
+      Top = 2
       Width = 50
-      Height = 40
+      Height = 46
       Hint = 'Next'
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
@@ -641,9 +641,9 @@ object MainForm: TMainForm
     end
     object PlayBtn: TsBitBtn
       Left = 2
-      Top = 0
+      Top = 2
       Width = 50
-      Height = 40
+      Height = 46
       Hint = 'Play'
       Glyph.Data = {
         36100000424D3610000000000000360000002800000020000000200000000100
@@ -784,7 +784,7 @@ object MainForm: TMainForm
     end
     object PlaybackOrderList: TsComboBox
       Left = 786
-      Top = 10
+      Top = 14
       Width = 89
       Height = 21
       Hint = 'Playback order'
@@ -820,66 +820,19 @@ object MainForm: TMainForm
         'Shuffle')
     end
     object InfoPanel: TsPanel
-      Left = 0
-      Top = 40
-      Width = 875
-      Height = 61
+      Left = 3
+      Top = 51
+      Width = 872
+      Height = 50
       Anchors = [akLeft, akRight, akBottom]
       BevelOuter = bvNone
       TabOrder = 7
       SkinData.SkinSection = 'PANEL'
-      object AlbumLabel: TsLabel
-        AlignWithMargins = True
-        Left = 6
-        Top = 31
-        Width = 869
-        Height = 15
-        Hint = 'Album'
-        Margins.Left = 6
-        Margins.Top = 0
-        Margins.Right = 0
-        Margins.Bottom = 0
-        Align = alBottom
-        AutoSize = False
-        ParentFont = False
-        ShowAccelChar = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ExplicitLeft = 0
-        ExplicitTop = 23
-        ExplicitWidth = 513
-      end
-      object ArtistLabel: TsLabel
-        AlignWithMargins = True
-        Left = 6
-        Top = 16
-        Width = 869
-        Height = 15
-        Margins.Left = 6
-        Margins.Top = 0
-        Margins.Right = 0
-        Margins.Bottom = 0
-        Align = alBottom
-        AutoSize = False
-        ParentFont = False
-        ShowAccelChar = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ExplicitLeft = 0
-        ExplicitTop = 25
-        ExplicitWidth = 541
-      end
       object PlaybackInfoLabel: TsLabel
         AlignWithMargins = True
         Left = 6
-        Top = 46
-        Width = 869
+        Top = 35
+        Width = 866
         Height = 15
         Hint = 'Status, Bitrate, Channels, Codec, Sample Rate, Play Count'
         Margins.Left = 6
@@ -901,26 +854,25 @@ object MainForm: TMainForm
       object TitleLabel: TsLabel
         AlignWithMargins = True
         Left = 6
-        Top = 1
-        Width = 869
-        Height = 15
-        Hint = 'Title'
+        Top = 6
+        Width = 860
+        Height = 20
+        Hint = 'Title - Album - Artist'
         Margins.Left = 6
-        Margins.Top = 2
-        Margins.Right = 0
+        Margins.Top = 6
+        Margins.Right = 6
         Margins.Bottom = 0
-        Align = alBottom
+        Align = alTop
         AutoSize = False
         ParentFont = False
         ShowAccelChar = False
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
-        Font.Height = -11
+        Font.Height = -16
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
-        ExplicitLeft = 9
-        ExplicitTop = 0
-        ExplicitWidth = 857
+        ExplicitTop = 2
+        ExplicitWidth = 869
       end
     end
     object CoverPanel: TsPanel
@@ -953,9 +905,9 @@ object MainForm: TMainForm
     end
     object SettingsBtn: TsBitBtn
       Left = 680
-      Top = 0
+      Top = 2
       Width = 50
-      Height = 40
+      Height = 46
       Hint = 'Settings'
       Anchors = [akTop, akRight]
       Glyph.Data = {
@@ -1097,9 +1049,9 @@ object MainForm: TMainForm
     end
     object LogsBtn: TsBitBtn
       Left = 730
-      Top = 0
+      Top = 2
       Width = 50
-      Height = 40
+      Height = 46
       Hint = 'Logs'
       Anchors = [akTop, akRight]
       Glyph.Data = {
@@ -1177,9 +1129,9 @@ object MainForm: TMainForm
     end
     object SearchBtn: TsBitBtn
       Left = 630
-      Top = 0
+      Top = 2
       Width = 50
-      Height = 40
+      Height = 46
       Hint = 'Search'
       Anchors = [akTop, akRight]
       Glyph.Data = {
@@ -1321,19 +1273,19 @@ object MainForm: TMainForm
     end
     object Panel1: TsPanel
       Left = 0
-      Top = 104
+      Top = 103
       Width = 1008
-      Height = 23
+      Height = 24
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 12
       SkinData.SkinSection = 'PANEL'
       object PositionLabel: TsLabel
         AlignWithMargins = True
-        Left = 849
+        Left = 823
         Top = 0
-        Width = 156
-        Height = 23
+        Width = 182
+        Height = 24
         Margins.Left = 0
         Margins.Top = 0
         Margins.Bottom = 0
@@ -1343,20 +1295,21 @@ object MainForm: TMainForm
         Layout = tlCenter
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
-        Font.Height = -11
+        Font.Height = -12
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
-        ExplicitHeight = 13
+        ExplicitHeight = 14
       end
       object PositionBar: TsTrackBar
         Left = 0
         Top = 0
-        Width = 849
-        Height = 23
+        Width = 823
+        Height = 24
         Hint = 'Position'
         Align = alClient
         LineSize = 10
         PageSize = 4
+        ShowSelRange = False
         TabOrder = 0
         TickMarks = tmBoth
         TickStyle = tsNone
@@ -1368,10 +1321,10 @@ object MainForm: TMainForm
     end
     object VolumePnl: TsPanel
       AlignWithMargins = True
-      Left = 984
+      Left = 983
       Top = 0
-      Width = 23
-      Height = 104
+      Width = 24
+      Height = 103
       Margins.Left = 0
       Margins.Top = 0
       Margins.Right = 1
@@ -1383,7 +1336,7 @@ object MainForm: TMainForm
       object VolumeLowImg: TsImage
         Left = 0
         Top = 23
-        Width = 23
+        Width = 24
         Height = 23
         Align = alTop
         Center = True
@@ -1455,11 +1408,12 @@ object MainForm: TMainForm
         Transparent = True
         Visible = False
         SkinData.SkinSection = 'CHECKBOX'
+        ExplicitWidth = 23
       end
       object VolumeMuteImg: TsImage
         Left = 0
         Top = 0
-        Width = 23
+        Width = 24
         Height = 23
         Align = alTop
         Center = True
@@ -1532,11 +1486,12 @@ object MainForm: TMainForm
         Visible = False
         SkinData.SkinSection = 'CHECKBOX'
         ExplicitTop = -6
+        ExplicitWidth = 23
       end
       object VolumeMidImg: TsImage
         Left = 0
         Top = 46
-        Width = 23
+        Width = 24
         Height = 23
         Align = alTop
         Center = True
@@ -1608,11 +1563,12 @@ object MainForm: TMainForm
         Transparent = True
         SkinData.SkinSection = 'CHECKBOX'
         ExplicitTop = 128
+        ExplicitWidth = 23
       end
       object VolumeHighImg: TsImage
         Left = 0
         Top = 69
-        Width = 23
+        Width = 24
         Height = 23
         Align = alTop
         Center = True
@@ -1685,12 +1641,13 @@ object MainForm: TMainForm
         Visible = False
         SkinData.SkinSection = 'CHECKBOX'
         ExplicitTop = 233
+        ExplicitWidth = 23
       end
       object VolumeBar: TsTrackBar
         Left = 0
         Top = 92
-        Width = 23
-        Height = 12
+        Width = 24
+        Height = 11
         Align = alClient
         Max = 100
         Orientation = trVertical
@@ -1708,7 +1665,7 @@ object MainForm: TMainForm
     end
     object RadioConnectionBar: TsProgressBar
       Left = 258
-      Top = 10
+      Top = 14
       Width = 366
       Height = 20
       Anchors = [akLeft, akTop, akRight]
@@ -2532,6 +2489,10 @@ object MainForm: TMainForm
       object S9: TMenuItem
         Caption = 'Hide lyric panel'
         OnClick = S9Click
+      end
+      object H2: TMenuItem
+        Caption = 'Hide queue list'
+        OnClick = H2Click
       end
     end
     object P1: TMenuItem
@@ -7776,12 +7737,16 @@ object MainForm: TMainForm
       Caption = 'Volume Down'
       OnClick = V2Click
     end
+    object E4: TMenuItem
+      Caption = 'Exit'
+      OnClick = E4Click
+    end
   end
   object PositionTimer: TTimer
     Enabled = False
     Interval = 250
     OnTimer = PositionTimerTimer
-    Left = 400
+    Left = 360
     Top = 280
   end
   object RadioThread: TIdThreadComponent
@@ -7835,7 +7800,7 @@ object MainForm: TMainForm
     Enabled = False
     Interval = 500
     OnTimer = ProgressTimerTimer
-    Left = 472
+    Left = 424
     Top = 280
   end
   object Taskbar: TTaskbar
@@ -8051,7 +8016,7 @@ object MainForm: TMainForm
     Left = 360
     Top = 432
     Bitmap = {
-      494C0101050008008C0016001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800980016001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -8559,6 +8524,7 @@ object MainForm: TMainForm
       00000000000000000000000000000000000000000000}
   end
   object sSkinManager1: TsSkinManager
+    AnimEffects.DialogShow.Active = False
     InternalSkins = <
       item
         Name = 'Graphite (internal)'
@@ -47353,9 +47319,96 @@ object MainForm: TMainForm
           787967656E2049636F6E73EC18AEE80000002774455874536F757263655F5552
           4C00687474703A2F2F7777772E6F787967656E2D69636F6E732E6F72672FEF37
           AACB0000000049454E44AE426082}
+      end
+      item
+        ImageFormat = ifPNG
+        ImageName = 'folder-sound'
+        ImgData = {
+          89504E470D0A1A0A0000000D4948445200000020000000200806000000737A7A
+          F400000006624B4744000000000000F943BB7F0000000970485973000049D200
+          0049D201A8458AF8000000097670416700000020000000200087FA9C9D000006
+          CC4944415458C3ED974B88A45715C77FF77EAF7A744F67A61F333D333D217132
+          41B24894280882045C9855C045480C0621E05AB20A6E0577211B772E02229840
+          B2332BE346518C6020884C3299987466A6A7DFDD55D555F5D5BDE79EE3A2AA7A
+          BA4DCF1866A30B2F5CBEAAFBD53DFFFFF9DFF3B805FFE5E1005E79E515440433
+          FBD21B5F7DF5D5FB027CF229387D3AA3D56A5096E598C073CF3DC7FCFC7CA1AA
+          8573CE7D81E591253353551D359B4D7DEDB5D78EFDEEF91F2F114220CB1D8D46
+          9346A345ABD1A46A54E3EF55C9A54BCBBCF0CCAFDDD7BE43BEBC5CBA1CE0E2C5
+          8BEDD9D9D9E79BCDE61353B0BBA9915292C160F0875EAFF70E303AFA6E1487BC
+          FD7A17E79CBFF8D85EF6E08A2F17171EA866665BED56B3355755D599ED9DFDC5
+          9FFEFC5B8B59969DED743AB71DC0CB2FBFFCD0E5CB977FB3B2B2F2CD94122925
+          5415333B7C4E09A9AA6D6C6CFC756D6DED87DD6EF7BA736EF2DED1E3EDC6FCFC
+          FCB7E7E64E7DB5D1682C15457EB62C8BA5BCF00B45919D290A7FAA287CBB285D
+          E569E5AB9FEDFE3E9F1825CBB2CCCCDCC1C10122C2512247C96459E69C730F65
+          59F6F04B2FBD747D737313EF3D210E78E39DB7E656562EFEE4C2C5B9A7B23C94
+          DE937B3F8E3487C3CCA3EAA3A9B7567326ABAA81E50031468931841046D4757D
+          2281E974CE2122A7CDECD937DF7CF394734EC7EA3816DB4F9F6937EB876767CB
+          D66028843A2304BA6AF6590CB61646E9565DD79FC6182F3D7AE5DC0BDE679A03
+          8888C62822921091C3392590523A721C0056B6DBED1F5455F54C5555368E1B47
+          4CA77D9E7D7E6A3428E96C2E21A1CDCD1B37FFDCADAFFD6C30DA58DDDFDFEDFD
+          E5BDCEE0472F3EF97D557D16B34305D258858888307DA6246852924E62420D35
+          85B1C3CD10425353C2798F770EB1000AF540E9EDCD52F833A4D1A8D7BB695775
+          E5F29E5F98E3B1EF2EE1FD6FC7810E3A25A022318A8C810FEA447F042939923A
+          543DAA606A988DF127390128DE399CF31891F68252AAB1DD151CC26E682EDC98
+          F9FAE3DDCED2B633F5497D5DA753339344D323312051440851B8D19FC19FBA40
+          A32C26D13F8674060E3B2470A73A8C8FC0640FCAF7306F84D947A0B8C0CC69BE
+          F178D6F8A5392F80DFDE1B6CED0CAE7CE8C68779478118E3848062798B2B8F3C
+          8CCF72922A4C0B911D433D841E2F3B42BD45A51F90E7C2B90BE7A9DA0F013603
+          7619A0CC3DB7D6F74FDFB85EAEC1C8B07F271085200997E5E01CFB833821F065
+          8AAC238D84766124337AB53070E1480585769513930D1DA133E17D48C0442448
+          1262327C598073E8546CBB37F0E1114C3FDB9D3554496980840E3E04627F8FCA
+          ED348D796FD83105828810C5F0AD7C62E8DEC0668ACA012A1DB0408A5D2C1B61
+          6498814AC0EA8F98F1D738D5EC50E67DCEE6BD736E519E6E348A19534B471588
+          22822423CB8B7BF6038014F7A0BE4A3B5BA55D75C9B39A2489F9B98AC1A84DA8
+          87B8FA2A97E6DEE3CA83155523A3D7DFA537BC55E659F34C90567DD0EF6CE500
+          2184490C448B9ABB322F50BBBBE729EC508577F9CAF22E67175A24ABE9F63F23
+          4A9F56759EAD5DA5DFEB91738BB9F3FB248CDEA0A60E1DD026C361F3607363E3
+          DDF58DB537A6042631902C59E97C9EA3F7F05E47AB2C3FB0CAFC198FB940942E
+          6A09ACCDFABAE7939B4DBA03016BF3C1476DCE6D1F5096259A96D9ED847F0EF6
+          6FBEBE7EEBF3B73EFE64F5E31C603018AA880411B184079F232748302E428666
+          F36CEE2F80DBA1C80748CA39E85F627BBFC5FAEE02BDD13954C1F959D63A4FB0
+          D98F545546AB6A72EDD39DF7FFF6C7CD5F6DFF7DF5F66116D4F570AC80244B64
+          389FA1130266A0662435D4C69550FD325BF23DB6D6D720F51081200DA2B64945
+          49E91366E3C6E5B20C9F15F8B2C2159925AFFBE6E7FB8002E400C3E1D0265960
+          9AE5A8F3445182E831E0A371E0CB25AC584493E09250A444A68226C14C996E70
+          DEE3BCA72C0A3094BCB9DB587CA4CFB88E8F094CEE005192AA6639A28E4148C4
+          A447F4FFC2818C01B29CCC67F8C2C074D22FA6E5DB8DAF73CE51E419A11EA9B9
+          625F9ACB716A2507E8F7FBA69A424AAAEA72620227CA1DFC2FD66063D295DC91
+          A233BE799C58429C3A86A32451B4BB7DFD433D46C0CCB21885A46689829000B1
+          B137D362871DB73A6D02479A1327B4A9E952F2467F14B51E7463BAFA8B0C9029
+          010F3447A3BA1435135710155CB2FF784DBFEBDB93F6290CEB2883BDDB0ACC00
+          3D204D09142124E9C666AAAD811B4524E9C986EE67388748B25EB77BBBBB717D
+          132827B8299F3812B67BE1FDB89FBFA5B2753EDFD93BE1CFC1FD611B28F89452
+          1A763757FFB4F98FDF5D032293349C9ACDF3C6ECCCECB947E77D96CF688A1966
+          C721EF97809A29A8498C839DD55E1AF57AC0C184C431B30EC826D3DF3FE4DD84
+          C018E77E9A7AFFFFF13F31FE0581FAB24A7C369F740000002574455874646174
+          653A63726561746500323031302D30322D31365432303A30393A32312D30373A
+          3030685DC3930000002574455874646174653A6D6F6469667900323031302D30
+          312D31315430393A30303A34392D30373A303028C1A79C00000033744558744C
+          6963656E736500687474703A2F2F6372656174697665636F6D6D6F6E732E6F72
+          672F6C6963656E7365732F62792F332E302F56F7FA1C0000001974455874536F
+          667477617265007777772E696E6B73636170652E6F72679BEE3C1A0000001A74
+          455874536F757263650054616E676F206861726D2D6F6E2D69636F6E73053102
+          B20000004A74455874536F757263655F55524C00687474703A2F2F676E6F6D65
+          2D6C6F6F6B2E6F72672F636F6E74656E742F73686F772E7068702F54616E676F
+          2B6D696E653F636F6E74656E743D37363331368EDA75390000000049454E44AE
+          426082}
       end>
     Left = 264
     Top = 440
     Bitmap = {}
+  end
+  object LabelScrollTimer: TJvThreadTimer
+    Enabled = True
+    Interval = 150
+    KeepAlive = True
+    OnTimer = LabelScrollTimerTimer
+    Priority = tpLowest
+    Left = 584
+    Top = 176
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 496
+    Top = 304
   end
 end

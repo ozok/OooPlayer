@@ -1,6 +1,6 @@
 // ********************************************************************************************************************************
 // *                                                                                                                              *
-// *     MP4 Tag Library 1.0.24.53 © 3delite 2012-2014                                                                           *
+// *     MP4 Tag Library 1.0.27.58 © 3delite 2012-2015                                                                            *
 // *     See MP4 Tag Library ReadMe.txt for details                                                                               *
 // *                                                                                                                              *
 // * Two licenses are available for commercial usage of this component:                                                           *
@@ -65,6 +65,9 @@ interface
 Uses
   SysUtils,
   Classes;
+
+Const
+  MP4TAGLIBRARY_VERSION = $01002758;
 
 Const
   MP4TAGLIBRARY_SUCCESS = 0;
@@ -170,6 +173,7 @@ type
     function GetAsInteger48(var LowDWord: DWord; HighWord: Word): Int64;
     function GetAsInteger64(var LowDWord, HighDWord: DWord): Int64;
     function GetAsBool: Boolean;
+    function GetAsList(List: TStrings): Boolean;
     function SetAsText(Text: String): Boolean;
     function SetAsInteger8(Value: Byte): Boolean;
     function SetAsInteger16(Value: Word): Boolean;
@@ -179,6 +183,7 @@ type
     function SetAsInteger64(Value: Int64): Boolean; overload;
     function SetAsInteger64(LowDWord, HighDWord: DWord): Boolean; overload;
     function SetAsBool(Value: Boolean): Boolean;
+    function SetAsList(List: TStrings): Boolean;
     procedure Clear;
     function Write(MP4Stream: TStream): Boolean;
     function Delete: Boolean;
@@ -207,6 +212,7 @@ type
     function GetAsInteger48(var LowDWord: DWord; HiWord: Word): Int64;
     function GetAsInteger64(var LowDWord, HiDWord: DWord): Int64;
     function GetAsBool: Boolean;
+    function GetAsList(List: TStrings): Boolean;
     function SetAsText(Text: String): Boolean;
     function SetAsInteger8(Value: Byte): Boolean;
     function SetAsInteger16(Value: Word): Boolean;
@@ -216,6 +222,7 @@ type
     function SetAsInteger64(Value: Int64): Boolean; overload;
     function SetAsInteger64(LowDWord, HiDWord: DWord): Boolean; overload;
     function SetAsBool(Value: Boolean): Boolean;
+    function SetAsList(List: TStrings): Boolean;
     function Count: Integer;
     procedure Clear;
     function CalculateAtomSize: Cardinal;
@@ -238,15 +245,17 @@ type
     Version: Byte;
     Flags: DWord;
     PaddingToWrite: Cardinal;
-    // UTF8Encoding: TEncoding;
+    mdatAtomSize: UInt64;
     Constructor Create;
     Destructor Destroy; override;
     function LoadFromFile(MP4FileName: String): Integer;
+    function LoadFromStream(MP4Stream: TStream): Integer;
     function SaveToFile(MP4FileName: String; KeepPadding: Boolean = True): Integer;
+    function SaveToStream(MP4Stream: TStream; KeepPadding: Boolean = True; MP4FileName: String = ''): Integer;
     function AddAtom(AtomName: TAtomName): TMP4Atom; overload;
     function AddAtom(AtomName: String): TMP4Atom; overload;
-    function ReadAtom(MP4Stream: TFileStream; var MP4Atom: TMP4Atom): Boolean;
-    function ReadAtomData(MP4Stream: TFileStream; var MP4AtomData: TMP4AtomData): Boolean;
+    function ReadAtom(MP4Stream: TStream; var MP4Atom: TMP4Atom): Boolean;
+    function ReadAtomData(MP4Stream: TStream; var MP4AtomData: TMP4AtomData): Boolean;
     function Count: Integer;
     function CoverArtCount: Integer;
     procedure Clear;
@@ -273,6 +282,8 @@ type
     function GetInteger64(AtomName: String; var LowDWord, HiDWord: DWord): Int64; overload;
     function GetBool(AtomName: TAtomName): Boolean; overload;
     function GetBool(AtomName: String): Boolean; overload;
+    function GetList(AtomName: TAtomName; List: TStrings): Boolean; overload;
+    function GetList(AtomName: String; List: TStrings): Boolean; overload;
     function SetText(AtomName: TAtomName; Text: String): Boolean; overload;
     function SetText(AtomName: String; Text: String): Boolean; overload;
     function SetInteger8(AtomName: TAtomName; Value: Byte): Boolean; overload;
@@ -291,6 +302,8 @@ type
     function SetInteger64(AtomName: String; LowDWord, HighDWord: DWord): Boolean; overload;
     function SetBool(AtomName: TAtomName; Value: Boolean): Boolean; overload;
     function SetBool(AtomName: String; Value: Boolean): Boolean; overload;
+    function SetList(AtomName: TAtomName; List: TStrings): Boolean; overload;
+    function SetList(AtomName: String; List: TStrings): Boolean; overload;
     function GetMediaType: String;
     function SetMediaType(Media: String): Boolean;
     function GetTrack: Word;
@@ -310,15 +323,17 @@ type
     procedure SetMultipleValues(AtomName: String; List: TStrings); overload;
   end;
 
-function ReadAtomHeader(MP4Stream: TFileStream; var AtomName: TAtomName; var AtomSize: Int64; var Is64BitSize: Boolean; FailOnCurrupt: Boolean = True): Boolean;
-function WriteAtomHeader(MP4Stream: TFileStream; AtomName: TAtomName; AtomSize: Int64): Boolean; overload;
-function WriteAtomHeader(MP4Stream: TFileStream; AtomName: String; AtomSize: Int64): Boolean; overload;
+function ReadAtomHeader(MP4Stream: TStream; var AtomName: TAtomName; var AtomSize: Int64; var Is64BitSize: Boolean; FailOnCurrupt: Boolean = True): Boolean;
+function WriteAtomHeader(MP4Stream: TStream; AtomName: TAtomName; AtomSize: Int64): Boolean; overload;
+function WriteAtomHeader(MP4Stream: TStream; AtomName: String; AtomSize: Int64): Boolean; overload;
 function WritePadding(MP4Stream: TStream; PaddingSize: Integer): Integer;
-function MP4mdatAtomLocation(MP4Stream: TFileStream): Int64;
-function MP4UpdatestcoAtom(MP4Stream: TFileStream; Offset: Integer): Boolean;
-function MP4Updateco64Atom(MP4Stream: TFileStream; Offset: Int64): Boolean;
+function MP4mdatAtomLocation(MP4Stream: TStream): Int64;
+function MP4UpdatestcoAtom(MP4Stream: TStream; Offset: Integer): Boolean;
+function MP4Updateco64Atom(MP4Stream: TStream; Offset: Int64): Boolean;
+function GetmdatAtomSize(MP4Stream: TStream): UInt64;
 
 function RemoveMP4TagFromFile(FileName: String; KeepPadding: Boolean): Integer;
+function RemoveMP4TagFromStream(Stream: TStream; KeepPadding: Boolean): Integer;
 
 function ReverseBytes16(ASmallInt: SmallInt): SmallInt; inline;
 function ReverseBytes32(Value: Cardinal): Cardinal; inline;
@@ -709,6 +724,63 @@ begin
   Data.Seek(0, soBeginning);
 end;
 
+function TMP4AtomData.GetAsList(List: TStrings): Boolean;
+var
+  DataByte: Byte;
+  Bytes: TBytes;
+  name: String;
+  Value: String;
+  ByteCounter: Integer;
+begin
+  Result := False;
+  List.Clear;
+  if DataType <> 1 then
+  begin
+    Exit;
+  end;
+  Data.Seek(0, soBeginning);
+  while Data.Position < Data.Size do
+  begin
+    SetLength(Bytes, 0);
+    ByteCounter := 0;
+    repeat
+      Data.Read(DataByte, 1);
+      if DataByte = $0D then
+      begin
+        Data.Read(DataByte, 1);
+        if DataByte = $0A then
+        begin
+          Break;
+        end;
+      end;
+      SetLength(Bytes, Length(Bytes) + 1);
+      Bytes[ByteCounter] := DataByte;
+      Inc(ByteCounter);
+    until Data.Position >= Data.Size;
+    Name := TEncoding.UTF8.GetString(Bytes);
+    SetLength(Bytes, 0);
+    ByteCounter := 0;
+    repeat
+      Data.Read(DataByte, 1);
+      if DataByte = $0D then
+      begin
+        Data.Read(DataByte, 1);
+        if DataByte = $0A then
+        begin
+          Break;
+        end;
+      end;
+      SetLength(Bytes, Length(Bytes) + 1);
+      Bytes[ByteCounter] := DataByte;
+      Inc(ByteCounter);
+    until Data.Position >= Data.Size;
+    Value := TEncoding.UTF8.GetString(Bytes);
+    List.Append(Name + '=' + Value);
+    Result := True;
+  end;
+  Data.Seek(0, soBeginning);
+end;
+
 function TMP4AtomData.GetAsInteger16: Word;
 begin
   Result := 0;
@@ -814,6 +886,34 @@ begin
   Data.Clear;
   Data.Write(Value, 1);
   Data.Seek(0, soBeginning);
+  Result := True;
+end;
+
+function TMP4AtomData.SetAsList(List: TStrings): Boolean;
+var
+  i: Integer;
+  DataByte: Byte;
+  BytesName: TBytes;
+  BytesValue: TBytes;
+begin
+  Data.Clear;
+  for i := 0 to List.Count - 1 do
+  begin
+    BytesName := TEncoding.UTF8.GetBytes(List.Names[i]);
+    BytesValue := TEncoding.UTF8.GetBytes(List.ValueFromIndex[i]);
+    Data.Write(BytesName[0], Length(BytesName));
+    DataByte := $0D;
+    Data.Write(DataByte, 1);
+    DataByte := $0A;
+    Data.Write(DataByte, 1);
+    Data.Write(BytesValue[0], Length(BytesValue));
+    DataByte := $0D;
+    Data.Write(DataByte, 1);
+    DataByte := $0A;
+    Data.Write(DataByte, 1);
+  end;
+  Data.Seek(0, soBeginning);
+  DataType := 1;
   Result := True;
 end;
 
@@ -989,6 +1089,11 @@ begin
   Result := Datas[0].GetAsInteger8;
 end;
 
+function TMP4Atom.GetAsList(List: TStrings): Boolean;
+begin
+  Result := Datas[0].GetAsList(List);
+end;
+
 function TMP4Atom.GetAsInteger16: Word;
 begin
   Result := Datas[0].GetAsInteger16;
@@ -1030,6 +1135,15 @@ begin
     AddData;
   end;
   Result := Datas[0].SetAsInteger8(Value);
+end;
+
+function TMP4Atom.SetAsList(List: TStrings): Boolean;
+begin
+  if Count = 0 then
+  begin
+    AddData;
+  end;
+  Result := Datas[0].SetAsList(List);
 end;
 
 function TMP4Atom.SetAsInteger16(Value: Word): Boolean;
@@ -1280,13 +1394,6 @@ end;
 function TMP4Tag.LoadFromFile(MP4FileName: String): Integer;
 var
   MP4Stream: TFileStream;
-  AtomName: TAtomName;
-  AtomSize: Int64;
-  ilstAtomSize: Int64;
-  ilstAtomPosition: Int64;
-  NewAtom: TMP4Atom;
-  moovAtomSize: Int64;
-  Is64BitAtomSize: Boolean;
 begin
   Clear;
   Self.Loaded := False;
@@ -1298,104 +1405,128 @@ begin
     Exit;
   end;
   try
-    try
-      Result := MP4TAGLIBRARY_ERROR_NO_TAG_FOUND;
-      ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize);
-      if NOT IsSameAtomName(AtomName, 'ftyp') then
-      begin
-        Result := MP4TAGLIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
-        Exit;
-      end;
-      MP4Stream.Seek(AtomSize - 8, soCurrent);
-      repeat
-        ReadAtomHeader(MP4Stream, AtomName, moovAtomSize, Is64BitAtomSize);
-        if IsSameAtomName(AtomName, 'moov') then
-        begin
-          repeat
-            ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize);
-            if IsSameAtomName(AtomName, 'udta') then
-            begin
-              repeat
-                ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize);
-                if IsSameAtomName(AtomName, 'meta') then
-                begin
-                  MP4Stream.Read(Version, 1);
-                  MP4Stream.Read(Flags, 3);
-                  repeat
-                    ReadAtomHeader(MP4Stream, AtomName, ilstAtomSize, Is64BitAtomSize);
-                    if IsSameAtomName(AtomName, 'ilst') then
-                    begin
-                      ilstAtomPosition := MP4Stream.Position - 8;
-                      while MP4Stream.Position < ilstAtomPosition + ilstAtomSize do
-                      begin
-                        NewAtom := AddAtom('');
-                        ReadAtom(MP4Stream, NewAtom);
-                        Result := MP4TAGLIBRARY_SUCCESS;
-                        Self.Loaded := True;
-                      end;
-                      // Break;
-                      Exit;
-                    end
-                    else
-                    begin
-                      if ilstAtomSize > High(Cardinal) then
-                      begin
-                        MP4Stream.Seek(ilstAtomSize - 16, soCurrent);
-                      end
-                      else
-                      begin
-                        MP4Stream.Seek(ilstAtomSize - 8, soCurrent);
-                      end;
-                    end;
-                  until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position + ilstAtomSize >= MP4Stream.Size);
-                end
-                else
-                begin
-                  if AtomSize > High(Cardinal) then
-                  begin
-                    MP4Stream.Seek(AtomSize - 16, soCurrent);
-                  end
-                  else
-                  begin
-                    MP4Stream.Seek(AtomSize - 8, soCurrent);
-                  end;
-                end;
-              until MP4Stream.Position >= MP4Stream.Size;
-            end
-            else
-            begin
-              if AtomSize > High(Cardinal) then
-              begin
-                MP4Stream.Seek(AtomSize - 16, soCurrent);
-              end
-              else
-              begin
-                MP4Stream.Seek(AtomSize - 8, soCurrent);
-              end;
-            end;
-          until MP4Stream.Position >= MP4Stream.Size;
-        end
-        else
-        begin
-          if moovAtomSize > High(Cardinal) then
-          begin
-            MP4Stream.Seek(moovAtomSize - 16, soCurrent);
-          end
-          else
-          begin
-            MP4Stream.Seek(moovAtomSize - 8, soCurrent);
-          end;
-        end;
-      until (MP4Stream.Position >= MP4Stream.Size) OR (moovAtomSize = 0);
-    except
-      Result := MP4TAGLIBRARY_ERROR_READING_FILE
-    end;
+    Result := LoadFromStream(MP4Stream);
   finally
     FreeAndNil(MP4Stream);
   end;
 end;
 
-function ReadAtomHeader(MP4Stream: TFileStream; var AtomName: TAtomName; var AtomSize: Int64; var Is64BitSize: Boolean; FailOnCurrupt: Boolean = True): Boolean;
+function TMP4Tag.LoadFromStream(MP4Stream: TStream): Integer;
+var
+  // MP4Stream: TFileStream;
+  AtomName: TAtomName;
+  AtomSize: Int64;
+  ilstAtomSize: Int64;
+  ilstAtomPosition: Int64;
+  NewAtom: TMP4Atom;
+  moovAtomSize: Int64;
+  Is64BitAtomSize: Boolean;
+begin
+  Clear;
+  Self.Loaded := False;
+  Self.FileName := '';
+  try
+    Result := MP4TAGLIBRARY_ERROR_NO_TAG_FOUND;
+    try
+      ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize, False);
+    except
+      // * Will except if not an MP4 file and MP4TagLibraryFailOnCorruptFile is True
+    end;
+    if NOT IsSameAtomName(AtomName, 'ftyp') then
+    begin
+      Result := MP4TAGLIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
+      Exit;
+    end;
+    // * Get mdat atom size
+    Self.mdatAtomSize := GetmdatAtomSize(MP4Stream);
+    // * Continue loading
+    MP4Stream.Seek(AtomSize - 8, soCurrent);
+    repeat
+      ReadAtomHeader(MP4Stream, AtomName, moovAtomSize, Is64BitAtomSize);
+      if IsSameAtomName(AtomName, 'moov') then
+      begin
+        repeat
+          ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize);
+          if IsSameAtomName(AtomName, 'udta') then
+          begin
+            repeat
+              ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize);
+              if IsSameAtomName(AtomName, 'meta') then
+              begin
+                MP4Stream.Read(Version, 1);
+                MP4Stream.Read(Flags, 3);
+                repeat
+                  ReadAtomHeader(MP4Stream, AtomName, ilstAtomSize, Is64BitAtomSize);
+                  if IsSameAtomName(AtomName, 'ilst') then
+                  begin
+                    ilstAtomPosition := MP4Stream.Position - 8;
+                    while MP4Stream.Position < ilstAtomPosition + ilstAtomSize do
+                    begin
+                      NewAtom := AddAtom('');
+                      ReadAtom(MP4Stream, NewAtom);
+                      Result := MP4TAGLIBRARY_SUCCESS;
+                      Self.Loaded := True;
+                    end;
+                    // Break;
+                    Exit;
+                  end
+                  else
+                  begin
+                    if ilstAtomSize > High(Cardinal) then
+                    begin
+                      MP4Stream.Seek(ilstAtomSize - 16, soCurrent);
+                    end
+                    else
+                    begin
+                      MP4Stream.Seek(ilstAtomSize - 8, soCurrent);
+                    end;
+                  end;
+                until (MP4Stream.Position >= MP4Stream.Size) OR (MP4Stream.Position + ilstAtomSize >= MP4Stream.Size);
+              end
+              else
+              begin
+                if AtomSize > High(Cardinal) then
+                begin
+                  MP4Stream.Seek(AtomSize - 16, soCurrent);
+                end
+                else
+                begin
+                  MP4Stream.Seek(AtomSize - 8, soCurrent);
+                end;
+              end;
+            until MP4Stream.Position >= MP4Stream.Size;
+          end
+          else
+          begin
+            if AtomSize > High(Cardinal) then
+            begin
+              MP4Stream.Seek(AtomSize - 16, soCurrent);
+            end
+            else
+            begin
+              MP4Stream.Seek(AtomSize - 8, soCurrent);
+            end;
+          end;
+        until MP4Stream.Position >= MP4Stream.Size;
+      end
+      else
+      begin
+        if moovAtomSize > High(Cardinal) then
+        begin
+          MP4Stream.Seek(moovAtomSize - 16, soCurrent);
+        end
+        else
+        begin
+          MP4Stream.Seek(moovAtomSize - 8, soCurrent);
+        end;
+      end;
+    until (MP4Stream.Position >= MP4Stream.Size) OR (moovAtomSize = 0);
+  except
+    Result := MP4TAGLIBRARY_ERROR_READING_FILE
+  end;
+end;
+
+function ReadAtomHeader(MP4Stream: TStream; var AtomName: TAtomName; var AtomSize: Int64; var Is64BitSize: Boolean; FailOnCurrupt: Boolean = True): Boolean;
 begin
   Result := False;
   if MP4Stream.Position >= MP4Stream.Size then
@@ -1425,7 +1556,7 @@ begin
   Result := True;
 end;
 
-function WriteAtomHeader(MP4Stream: TFileStream; AtomName: TAtomName; AtomSize: Int64): Boolean;
+function WriteAtomHeader(MP4Stream: TStream; AtomName: TAtomName; AtomSize: Int64): Boolean;
 var
   AtomSizeLE: DWord;
   AtomSize64: UInt64;
@@ -1457,7 +1588,7 @@ begin
   end;
 end;
 
-function WriteAtomHeader(MP4Stream: TFileStream; AtomName: String; AtomSize: Int64): Boolean;
+function WriteAtomHeader(MP4Stream: TStream; AtomName: String; AtomSize: Int64): Boolean;
 var
   AtomID: TAtomName;
 begin
@@ -1465,7 +1596,7 @@ begin
   Result := WriteAtomHeader(MP4Stream, AtomID, AtomSize);
 end;
 
-function TMP4Tag.ReadAtom(MP4Stream: TFileStream; var MP4Atom: TMP4Atom): Boolean;
+function TMP4Tag.ReadAtom(MP4Stream: TStream; var MP4Atom: TMP4Atom): Boolean;
 var
   AtomSize: DWord;
   AtomName: TAtomName;
@@ -1524,7 +1655,7 @@ begin
   end;
 end;
 
-function TMP4Tag.ReadAtomData(MP4Stream: TFileStream; var MP4AtomData: TMP4AtomData): Boolean;
+function TMP4Tag.ReadAtomData(MP4Stream: TStream; var MP4AtomData: TMP4AtomData): Boolean;
 var
   AtomSize: DWord;
   AtomName: TAtomName;
@@ -1604,6 +1735,7 @@ begin
   Flags := 0;
   Loaded := False;
   Size := 0;
+  mdatAtomSize := 0;
 end;
 
 function TMP4Tag.DeleteAtom(Index: Integer): Boolean;
@@ -1690,6 +1822,30 @@ end;
 function TMP4Tag.SaveToFile(MP4FileName: String; KeepPadding: Boolean = True): Integer;
 var
   MP4Stream: TFileStream;
+begin
+  try
+    if NOT FileExists(MP4FileName) then
+    begin
+      MP4Stream := TFileStream.Create(MP4FileName, fmCreate OR fmShareDenyWrite);
+    end
+    else
+    begin
+      MP4Stream := TFileStream.Create(MP4FileName, fmOpenReadWrite OR fmShareDenyWrite);
+    end;
+    try
+      Result := SaveToStream(MP4Stream, KeepPadding, MP4FileName);
+    finally
+      FreeAndNil(MP4Stream);
+    end;
+  except
+    Result := MP4TAGLIBRARY_ERROR_OPENING_FILE;
+    Exit;
+  end;
+end;
+
+function TMP4Tag.SaveToStream(MP4Stream: TStream; KeepPadding: Boolean = True; MP4FileName: String = ''): Integer;
+var
+  // MP4Stream: TFileStream;
   AtomName: TAtomName;
   AtomSize: Int64;
   moovAtomSize: Int64;
@@ -1701,10 +1857,10 @@ var
   freeAtomSize: Int64;
   i: Integer;
   NewTagSize: UInt64;
-  StreamRest: TFileStream;
-  moovAtomRest: TFileStream;
-  udtaAtomRest: TFileStream;
-  metaAtomRest: TFileStream;
+  StreamRest: TStream;
+  moovAtomRest: TStream;
+  udtaAtomRest: TStream;
+  metaAtomRest: TStream;
   StreamRestFileName: String;
   moovAtomRestFileName: String;
   udtaAtomRestFileName: String;
@@ -1733,29 +1889,32 @@ begin
   AvailableSpace := 0;
   moovIs64BitAtomSize := False;
   try
-    if NOT FileExists(MP4FileName) then
+    // * When creating new file add a fake ftyp
+    MP4Stream.Seek(0, soBeginning);
+    if MP4Stream.Size = 0 then
     begin
-      MP4Stream := TFileStream.Create(MP4FileName, fmCreate OR fmShareDenyWrite);
-      // * When creating new file add a fake ftyp
       WriteAtomHeader(MP4Stream, 'ftyp', 8);
+    end;
+    // * Working with file
+    if FileName <> '' then
+    begin
+      StreamRestFileName := ChangeFileExt(FileName, '.rest.tmp');
+      moovAtomRestFileName := ChangeFileExt(FileName, '.moovAtom.tmp');
+      udtaAtomRestFileName := ChangeFileExt(FileName, '.udtaAtom.tmp');
+      metaAtomRestFileName := ChangeFileExt(FileName, '.metaAtom.tmp');
+      StreamRest := TFileStream.Create(StreamRestFileName, fmCreate);
+      moovAtomRest := TFileStream.Create(moovAtomRestFileName, fmCreate);
+      udtaAtomRest := TFileStream.Create(udtaAtomRestFileName, fmCreate);
+      metaAtomRest := TFileStream.Create(metaAtomRestFileName, fmCreate);
+      // * Working in memory
     end
     else
     begin
-      MP4Stream := TFileStream.Create(MP4FileName, fmOpenReadWrite OR fmShareDenyWrite);
+      StreamRest := TMemoryStream.Create;
+      moovAtomRest := TMemoryStream.Create;
+      udtaAtomRest := TMemoryStream.Create;
+      metaAtomRest := TMemoryStream.Create;
     end;
-  except
-    Result := MP4TAGLIBRARY_ERROR_OPENING_FILE;
-    Exit;
-  end;
-  try
-    StreamRestFileName := ChangeFileExt(FileName, '.rest.tmp');
-    moovAtomRestFileName := ChangeFileExt(FileName, '.moovAtom.tmp');
-    udtaAtomRestFileName := ChangeFileExt(FileName, '.udtaAtom.tmp');
-    metaAtomRestFileName := ChangeFileExt(FileName, '.metaAtom.tmp');
-    StreamRest := TFileStream.Create(StreamRestFileName, fmCreate);
-    moovAtomRest := TFileStream.Create(moovAtomRestFileName, fmCreate);
-    udtaAtomRest := TFileStream.Create(udtaAtomRestFileName, fmCreate);
-    metaAtomRest := TFileStream.Create(metaAtomRestFileName, fmCreate);
     MP4Stream.Seek(0, soBeginning);
     mdatPreviousLocation := MP4mdatAtomLocation(MP4Stream);
     MP4Stream.Seek(0, soBeginning);
@@ -2130,7 +2289,6 @@ begin
     FreeAndNil(moovAtomRest);
     FreeAndNil(udtaAtomRest);
     FreeAndNil(metaAtomRest);
-    FreeAndNil(MP4Stream);
     DeleteFile(StreamRestFileName);
     DeleteFile(moovAtomRestFileName);
     DeleteFile(udtaAtomRestFileName);
@@ -2228,6 +2386,26 @@ var
 begin
   StringToAtomName(AtomName, AtomID);
   Result := GetInteger8(AtomID);
+end;
+
+function TMP4Tag.GetList(AtomName: TAtomName; List: TStrings): Boolean;
+var
+  MP4Atom: TMP4Atom;
+begin
+  Result := False;
+  MP4Atom := FindAtom(AtomName);
+  if Assigned(MP4Atom) then
+  begin
+    Result := MP4Atom.GetAsList(List);
+  end;
+end;
+
+function TMP4Tag.GetList(AtomName: String; List: TStrings): Boolean;
+var
+  AtomID: TAtomName;
+begin
+  StringToAtomName(AtomName, AtomID);
+  Result := GetList(AtomID, List);
 end;
 
 function TMP4Tag.GetInteger16(AtomName: TAtomName): Word;
@@ -2379,6 +2557,26 @@ var
 begin
   StringToAtomName(AtomName, AtomID);
   Result := SetInteger8(AtomID, Value);
+end;
+
+function TMP4Tag.SetList(AtomName: TAtomName; List: TStrings): Boolean;
+var
+  MP4Atom: TMP4Atom;
+begin
+  MP4Atom := FindAtom(AtomName);
+  if NOT Assigned(MP4Atom) then
+  begin
+    MP4Atom := AddAtom(AtomName);
+  end;
+  Result := MP4Atom.SetAsList(List);
+end;
+
+function TMP4Tag.SetList(AtomName: String; List: TStrings): Boolean;
+var
+  AtomID: TAtomName;
+begin
+  StringToAtomName(AtomName, AtomID);
+  Result := SetList(AtomID, List);
 end;
 
 function TMP4Tag.SetInteger16(AtomName: TAtomName; Value: Word): Boolean;
@@ -2775,7 +2973,27 @@ begin
   end;
 end;
 
-function MP4mdatAtomLocation(MP4Stream: TFileStream): Int64;
+function RemoveMP4TagFromStream(Stream: TStream; KeepPadding: Boolean): Integer;
+var
+  MP4Tag: TMP4Tag;
+begin
+  if Stream.Size = 0 then
+  begin
+    Result := MP4TAGLIBRARY_ERROR_OPENING_FILE;
+    Exit;
+  end
+  else
+  begin
+    MP4Tag := TMP4Tag.Create;
+    try
+      Result := MP4Tag.SaveToStream(Stream);
+    finally
+      FreeAndNil(MP4Tag);
+    end;
+  end;
+end;
+
+function MP4mdatAtomLocation(MP4Stream: TStream): Int64;
 var
   AtomName: TAtomName;
   AtomSize: Int64;
@@ -2815,7 +3033,7 @@ begin
   end;
 end;
 
-function MP4UpdatestcoAtom(MP4Stream: TFileStream; Offset: Integer): Boolean;
+function MP4UpdatestcoAtom(MP4Stream: TStream; Offset: Integer): Boolean;
 var
   AtomName: TAtomName;
   // AtomSize: Int64;
@@ -3023,7 +3241,7 @@ begin
   end;
 end;
 
-function MP4Updateco64Atom(MP4Stream: TFileStream; Offset: Int64): Boolean;
+function MP4Updateco64Atom(MP4Stream: TStream; Offset: Int64): Boolean;
 var
   AtomName: TAtomName;
   // AtomSize: Int64;
@@ -3228,6 +3446,53 @@ begin
     until (MP4Stream.Position >= MP4Stream.Size) OR (moovAtomSize = 0);
   except
     Result := False;
+  end;
+end;
+
+function GetmdatAtomSize(MP4Stream: TStream): UInt64;
+var
+  PreviousPosition: Int64;
+  AtomName: TAtomName;
+  AtomSize: Int64;
+  Is64BitAtomSize: Boolean;
+begin
+  Result := 0;
+  try
+    PreviousPosition := MP4Stream.Position;
+    try
+      MP4Stream.Seek(0, soBeginning);
+      repeat
+        ReadAtomHeader(MP4Stream, AtomName, AtomSize, Is64BitAtomSize, False);
+        if Is64BitAtomSize then
+        begin
+          if IsSameAtomName(AtomName, 'mdat') then
+          begin
+            Result := AtomSize;
+            Exit;
+          end
+          else
+          begin
+            MP4Stream.Seek(AtomSize - 16, soCurrent);
+          end;
+        end
+        else
+        begin
+          if IsSameAtomName(AtomName, 'mdat') then
+          begin
+            Result := AtomSize;
+            Exit;
+          end
+          else
+          begin
+            MP4Stream.Seek(AtomSize - 8, soCurrent);
+          end;
+        end;
+      until MP4Stream.Position >= MP4Stream.Size;
+    finally
+      MP4Stream.Seek(PreviousPosition, soBeginning);
+    end;
+  except
+    Result := 0;
   end;
 end;
 

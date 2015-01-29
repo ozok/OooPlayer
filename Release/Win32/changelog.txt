@@ -1,7 +1,17 @@
+--2.1.1
+-Fixed: [General] Title text wasn't reset properly after resizing the window
+-Fixed: [General] A few small bugs
+-Updated: Tag libraries
+
 --2.1.0
--Added: [Music player] An option to specify window title combination during playback
+-Added: [Music player] An option to specify window title combination
+-Added: [Music player] An option to hide queue list
+-Added: [Radio player] Recording radio stations without encoding
+-Added: [General] Title text will scroll if it is too long
+-Added: [General] Some interface changes
 -Fixed: [Radio player] Lyric downloader didn't function on song change
 -Fixed: [General] Some controls were not skinned
+-Fixed: [General] Some interface bugs that appeared if skins were disabled
 -Fixed: [General] A few small bugs
 -Updated: Bass to 2.4.11
 

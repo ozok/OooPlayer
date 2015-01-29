@@ -31,14 +31,14 @@ object SettingsForm: TSettingsForm
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     SkinData.SkinSection = 'PAGECONTROL'
-    ExplicitWidth = 272
-    ExplicitHeight = 139
     object TabSheet1: TsTabSheet
       Caption = 'General'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitWidth = 264
-      ExplicitHeight = 111
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object CheckUpdateBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -66,8 +66,10 @@ object SettingsForm: TSettingsForm
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitWidth = 264
-      ExplicitHeight = 111
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object PlayCursorBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -166,8 +168,10 @@ object SettingsForm: TSettingsForm
       ImageIndex = 2
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitWidth = 264
-      ExplicitHeight = 111
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object LoadArtBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -226,8 +230,10 @@ object SettingsForm: TSettingsForm
       ParentFont = False
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitWidth = 264
-      ExplicitHeight = 111
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object LyricBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -263,8 +269,10 @@ object SettingsForm: TSettingsForm
       Caption = 'Skin'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitWidth = 264
-      ExplicitHeight = 111
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object SkinsList: TsComboBox
         Left = 46
         Top = 16
@@ -308,8 +316,6 @@ object SettingsForm: TSettingsForm
     TabOrder = 1
     OnClick = Button1Click
     SkinData.SkinSection = 'BUTTON'
-    ExplicitLeft = 205
-    ExplicitTop = 153
   end
   object UpdateChecker: TJvHttpUrlGrabber
     FileName = 'output.txt'

@@ -1,6 +1,6 @@
 // ********************************************************************************************************************************
 // *                                                                                                                              *
-// *     Ogg Vorbis and Opus Tag Library 1.0.15.22 © 3delite 2012-2014                                                            *
+// *     Ogg Vorbis and Opus Tag Library 1.0.16.26 © 3delite 2012-2015                                                            *
 // *     See Ogg Vorbis and Opus Tag Library Readme.txt for details                                                               *
 // *                                                                                                                              *
 // * Two licenses are available for commercial usage of this component:                                                           *
@@ -67,7 +67,7 @@ Uses
   Classes;
 
 Const
-  OPUSTAGLIBRARY_VERSION = $01001522;
+  OPUSTAGLIBRARY_VERSION = $01001525;
 
 Const
   OPUSTAGLIBRARY_SUCCESS = 0;
@@ -256,9 +256,9 @@ type
     Destructor Destroy; override;
     procedure FillDefault;
     function LoadFromFile(FileName: String): Integer;
-    function LoadFromStream(TagStream: TStream): Integer;
+    function LoadFromStream(Stream: TStream): Integer;
     function SaveToFile(FileName: String): Integer;
-    // function SaveToStream(var TagStream: TStream): Integer;
+    function SaveToStream(Stream: TStream): Integer;
     function AddFrame(Name: String): TOpusTagFrame;
     function DeleteFrame(FrameIndex: Integer): Boolean;
     procedure DeleteAllFrames;
@@ -294,10 +294,11 @@ type
   end;
 
 function RemoveOpusTagFromFile(FileName: String): Integer;
+function RemoveOpusTagFromStream(Stream: TStream): Integer;
 
 function OpusTagErrorCode2String(ErrorCode: Integer): String;
 
-function RebuildFile(FileName: String; Info: TFileInfo; TagOGGStream: TStream; ReplaceMode: Boolean): Integer;
+function RebuildFile(FileName: String; Info: TFileInfo; TagOGGStream: TStream; ReplaceMode: Boolean; Stream: TStream = nil): Integer;
 
 procedure CalculateCRC(var CRC: Cardinal; const Data; Size: Cardinal);
 function SetCRC(const Destination: TStream; Header: TOggHeader): Boolean;
@@ -1545,7 +1546,7 @@ begin
   SetLength(Frames, 0);
 end;
 
-function TOpusTag.LoadFromStream(TagStream: TStream): Integer;
+function TOpusTag.LoadFromStream(Stream: TStream): Integer;
 var
   PreviousPosition: Int64;
 begin
@@ -1554,11 +1555,12 @@ begin
   Format := ofUnknown;
   Clear;
   try
-    PreviousPosition := TagStream.Position;
+    PreviousPosition := Stream.Position;
     try
-      Loaded := GetInfo(TagStream);
+      Stream.Seek(0, soBeginning);
+      Loaded := GetInfo(Stream);
     finally
-      TagStream.Seek(PreviousPosition, soBeginning);
+      Stream.Seek(PreviousPosition, soBeginning);
     end;
     if Loaded then
     begin
@@ -2550,6 +2552,33 @@ begin
   end;
 end;
 
+function RemoveOpusTagFromStream(Stream: TStream): Integer;
+var
+  OpusTag: TOpusTag;
+  i: Integer;
+begin
+  Result := OPUSTAGLIBRARY_ERROR;
+  OpusTag := TOpusTag.Create;
+  try
+    Stream.Seek(0, soBeginning);
+    OpusTag.LoadFromStream(Stream);
+    if OpusTag.Loaded then
+    begin
+      for i := OpusTag.Count - 1 downto 0 do
+      begin
+        if OpusTag.Frames[i].Name <> 'ENCODER' then
+        begin
+          OpusTag.DeleteFrame(i);
+        end;
+      end;
+      Stream.Seek(0, soBeginning);
+      Result := OpusTag.SaveToStream(Stream);
+    end;
+  finally
+    FreeAndNil(OpusTag);
+  end;
+end;
+
 procedure CalculateCRC(var CRC: Cardinal; const Data; Size: Cardinal);
 var
   Buffer: ^Byte;
@@ -2707,9 +2736,9 @@ begin
   end;
 end;
 
-function RebuildFile(FileName: String; Info: TFileInfo; TagOGGStream: TStream; ReplaceMode: Boolean): Integer;
+function RebuildFile(FileName: String; Info: TFileInfo; TagOGGStream: TStream; ReplaceMode: Boolean; Stream: TStream = nil): Integer;
 var
-  Source, Destination: TFileStream;
+  Source, Destination: TStream;
   BufferName: String;
   NewOGGStream: TOGGStream;
 
@@ -2718,18 +2747,23 @@ begin
   Destination := nil;
   // Rebuild the file with the new Opus tag
   Result := OPUSTAGLIBRARY_ERROR;
-  if (NOT FileExists(FileName))
-{$IFDEF MSWINDOWS}
-    OR (FileSetAttr(FileName, 0) <> 0)
-{$ENDIF}
-  then
+  if NOT Assigned(Stream) then
   begin
-    Result := OPUSTAGLIBRARY_ERROR_OPENING_FILE;
-    Exit;
+    if (NOT FileExists(FileName))
+{$IFDEF MSWINDOWS}
+{$WARN SYMBOL_PLATFORM OFF}
+      OR (FileSetAttr(FileName, 0) <> 0)
+{$WARN SYMBOL_PLATFORM ON}
+{$ENDIF}
+    then
+    begin
+      Result := OPUSTAGLIBRARY_ERROR_OPENING_FILE;
+      Exit;
+    end;
   end;
   try
     // * Check exclusive access
-    if NOT ReplaceMode then
+    if (NOT ReplaceMode) AND (NOT Assigned(Stream)) then
     begin
       try
         Destination := TFileStream.Create(FileName, fmOpenReadWrite);
@@ -2740,20 +2774,37 @@ begin
       FreeAndNil(Destination);
     end;
     // Create file streams
-    try
-      Source := TFileStream.Create(FileName, fmOpenRead OR fmShareDenyNone);
-    except
-      Result := OPUSTAGLIBRARY_ERROR_OPENING_FILE;
-      Exit;
-    end;
-    if ReplaceMode then
+    if NOT Assigned(Stream) then
     begin
-      Destination := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareDenyWrite);
+      try
+        Source := TFileStream.Create(FileName, fmOpenRead OR fmShareDenyNone);
+      except
+        Result := OPUSTAGLIBRARY_ERROR_OPENING_FILE;
+        Exit;
+      end;
+      if ReplaceMode then
+      begin
+        Destination := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareDenyWrite);
+      end
+      else
+      begin
+        BufferName := FileName + '~';
+        Destination := TFileStream.Create(BufferName, fmCreate);
+      end;
     end
     else
     begin
-      BufferName := FileName + '~';
-      Destination := TFileStream.Create(BufferName, fmCreate);
+      Source := Stream;
+      if ReplaceMode then
+      begin
+        Destination := TMemoryStream.Create;
+        Destination.CopyFrom(Stream, 0);
+      end
+      else
+      begin
+        Destination := TMemoryStream.Create;
+      end;
+      Source.Seek(0, soBeginning);
     end;
     try
       // Copy data blocks
@@ -2778,9 +2829,19 @@ begin
       end;
       // end;
     finally
-      if Assigned(Source) then
+      if NOT Assigned(Stream) then
       begin
-        FreeAndNil(Source);
+        if Assigned(Source) then
+        begin
+          FreeAndNil(Source);
+        end;
+      end
+      else
+      begin
+        Stream.Size := 0;
+        Stream.Seek(0, soBeginning);
+        Stream.CopyFrom(Destination, 0);
+        Stream.Seek(0, soBeginning);
       end;
       if Assigned(Destination) then
       begin
@@ -2788,27 +2849,34 @@ begin
       end;
     end;
     // Replace old file and delete temporary file
-
-    if NOT ReplaceMode then
+    if NOT Assigned(Stream) then
     begin
-      if (DeleteFile(PChar(FileName))) and (RenameFile(BufferName, FileName)) then
+      if NOT ReplaceMode then
       begin
-        Result := OPUSTAGLIBRARY_SUCCESS;
+        if (DeleteFile(PChar(FileName))) and (RenameFile(BufferName, FileName)) then
+        begin
+          Result := OPUSTAGLIBRARY_SUCCESS;
+        end
+        else
+        begin
+          raise Exception.Create('');
+        end;
       end
       else
       begin
-        raise Exception.Create('');
+        Result := OPUSTAGLIBRARY_SUCCESS;
       end;
     end
     else
     begin
       Result := OPUSTAGLIBRARY_SUCCESS;
     end;
-
   except
     // Access error
     if FileExists(BufferName) then
-      DeleteFile(PChar(BufferName));
+    begin
+      SysUtils.DeleteFile(BufferName);
+    end;
   end;
 end;
 
@@ -2831,6 +2899,7 @@ begin
   FitsInOldTag := False;
   NewTagSize := 0;
   TagStream := nil;
+  NewOGGStream := nil;
   try
     if NOT FileExists(FileName) then
     begin
@@ -2982,6 +3051,189 @@ begin
       end;
     finally
       FreeAndNil(NewFileOpusTag);
+      if Assigned(NewOGGStream) then
+      begin
+        FreeAndNil(NewOGGStream);
+      end;
+    end;
+  except
+    Result := OPUSTAGLIBRARY_ERROR;
+  end;
+end;
+
+function TOpusTag.SaveToStream(Stream: TStream): Integer;
+var
+  Tag: TMemoryStream;
+  NewFileOpusTag: TOpusTag;
+  NewOGGStream: TOGGStream;
+  NewOGGTagStream: TMemoryStream;
+  OldTagSize: Integer;
+  FitsInOldTag: Boolean;
+  NewPaddingSize: Integer;
+  NewTagSize: Integer;
+  NewWrappedTagSize: Integer;
+  NewFileCreate: Boolean;
+begin
+  // Result := OPUSTAGLIBRARY_ERROR;
+  NewFileCreate := False;
+  FitsInOldTag := False;
+  NewTagSize := 0;
+  NewOGGStream := nil;
+  try
+    if Stream.Size = 0 then
+    begin
+      // * If we have a first page already use that
+      if FirstOGGPage.Size > 0 then
+      begin
+        Stream.CopyFrom(FirstOGGPage, 0);
+        // * If not create one (not valid yet but usefull for exporting an Opus tag because the component can red it back)
+      end
+      else
+      begin
+        try
+          Stream.Seek(0, soBeginning);
+          Stream.Write(Info.FPage, 28);
+          Stream.Write(Info.OpusParameters, 19);
+          Info.TagEndPos := 28 + 19;
+          NewFileCreate := True;
+        except
+          Result := OPUSTAGLIBRARY_ERROR_WRITING_FILE;
+          Exit;
+        end;
+        // FreeAndNil(TagStream);
+      end;
+    end;
+    try
+      Stream.Seek(0, soBeginning);
+      // * To get basic data from OGG stream
+      NewOGGStream := TOGGStream.Create(Stream);
+    except
+      Result := OPUSTAGLIBRARY_ERROR_OPENING_FILE;
+      Exit;
+    end;
+    // FreeAndNil(TagStream);
+    NewFileOpusTag := TOpusTag.Create;
+    try
+      // * Get info about destination
+      NewFileOpusTag.LoadFromStream(Stream);
+      if NewFileCreate then
+      begin
+        NewFileOpusTag.Format := ofOpus;
+      end
+      else
+      begin
+        if NewFileOpusTag.Format = ofUnknown then
+        begin
+          Result := OPUSTAGLIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
+          Exit;
+        end;
+      end;
+      Format := NewFileOpusTag.Format;
+      if NewFileOpusTag.VendorString <> '' then
+      begin
+        Self.VendorString := NewFileOpusTag.VendorString;
+      end
+      else
+      begin
+        if Self.VendorString = '' then
+        begin
+          Self.VendorString := 'Unknown vendor';
+        end;
+      end;
+      VorbisData.Clear;
+      NewFileOpusTag.VorbisData.Seek(0, soBeginning);
+      VorbisData.CopyFrom(NewFileOpusTag.VorbisData, NewFileOpusTag.VorbisData.Size);
+      OldTagSize := NewFileOpusTag.Info.TagEndPos - NewFileOpusTag.Info.SPagePos;
+      // * Check sizes and adjust padding from settings
+      if Format = ofOpus then
+      begin
+        FitsInOldTag := AdjustPadding(OldTagSize);
+      end;
+      if Format = ofVorbis then
+      begin
+        DeleteFrame(FrameExists(OPUSTAGLIBRARY_FRAMENAME_PADDING));
+      end;
+      // * The new tag streams
+      Tag := TMemoryStream.Create;
+      NewOGGTagStream := TMemoryStream.Create;
+      try
+        if Format = ofVorbis then
+        begin
+          BuildTag(Tag, 0);
+          Tag.Seek(0, soEnd);
+          VorbisData.Seek(0, soBeginning);
+          Tag.CopyFrom(VorbisData, VorbisData.Size);
+          // * Wrap it in OGG container
+          Tag.Seek(0, soBeginning);
+          NewOGGStream.CreateTagStream(Tag, NewOGGTagStream);
+          if (NOT WritePadding) OR (PaddingSizeToWrite = 0) then
+          begin
+            FitsInOldTag := OldTagSize = NewOGGTagStream.Size;
+          end
+          else
+          begin
+            FitsInOldTag := OldTagSize >= NewOGGTagStream.Size;
+          end;
+          // *
+        end;
+        // * Create a tag stream
+        Tag.Clear;
+        NewOGGTagStream.Clear;
+        if Format = ofVorbis then
+        begin
+          if FitsInOldTag then
+          begin
+            NewPaddingSize := -1;
+            NewTagSize := CalculateTagSize(False);
+            repeat
+              Inc(NewPaddingSize);
+              NewWrappedTagSize := NewOGGStream.CalculateWrappedStreamSizeVorbis(NewTagSize + NewPaddingSize, NewTagSize + NewPaddingSize + VorbisData.Size);
+            until (NewWrappedTagSize >= OldTagSize) OR (NewPaddingSize >= PaddingSizeToWrite);
+            FitsInOldTag := NewWrappedTagSize = OldTagSize;
+          end;
+          if NOT FitsInOldTag then
+          begin
+            if WritePadding then
+            begin
+              NewPaddingSize := Self.PaddingSizeToWrite;
+              NewOGGStream.CalculateWrappedStreamSizeEx(NewTagSize, VorbisData.Size, NewPaddingSize);
+            end
+            else
+            begin
+              NewPaddingSize := 0;
+            end;
+          end;
+          Tag.Clear;
+          BuildTag(Tag, NewPaddingSize);
+          NewTagSize := Tag.Size;
+          Tag.Seek(0, soEnd);
+          VorbisData.Seek(0, soBeginning);
+          Tag.CopyFrom(VorbisData, VorbisData.Size);
+          Tag.Seek(0, soBeginning);
+          // * Wrap it in OGG container
+          NewOGGStream.FirstOGGHeader.PageNumber := 1;
+          NewFileOpusTag.Info.DataPageNumberStartsFrom := NewOGGStream.CreateTagStreamVorbis(NewTagSize, Tag, NewOGGTagStream);
+          FitsInOldTag := OldTagSize = NewOGGTagStream.Size;
+        end;
+        if Format = ofOpus then
+        begin
+          BuildTag(Tag, 0);
+          // * Wrap it in OGG container
+          NewOGGTagStream.Clear;
+          NewFileOpusTag.Info.DataPageNumberStartsFrom := NewOGGStream.CreateTagStream(Tag, NewOGGTagStream);
+        end;
+        // * Write the tag to destination
+        Result := RebuildFile('', NewFileOpusTag.Info, NewOGGTagStream, FitsInOldTag, Stream);
+      finally
+        FreeAndNil(Tag);
+        FreeAndNil(NewOGGTagStream);
+      end;
+    finally
+      FreeAndNil(NewFileOpusTag);
+      if Assigned(NewOGGStream) then
+      begin
+        FreeAndNil(NewOGGStream);
+      end;
     end;
   except
     Result := OPUSTAGLIBRARY_ERROR;

@@ -3,7 +3,7 @@ object AboutForm: TAboutForm
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'About OooPlayer'
-  ClientHeight = 176
+  ClientHeight = 185
   ClientWidth = 262
   Color = 3485741
   DoubleBuffered = True
@@ -15,9 +15,10 @@ object AboutForm: TAboutForm
   OldCreateOrder = False
   Position = poMainFormCenter
   OnClose = FormClose
+  OnShow = FormShow
   DesignSize = (
     262
-    176)
+    185)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TsLabel
@@ -27,7 +28,7 @@ object AboutForm: TAboutForm
     Height = 13
     Align = alTop
     Alignment = taCenter
-    Caption = 'OooPlayer 2.0.0.2042'
+    Caption = 'OooPlayer 2.1.0.2135'
     ExplicitWidth = 107
   end
   object Image1: TImage
@@ -238,7 +239,7 @@ object AboutForm: TAboutForm
   end
   object Button1: TsButton
     Left = 179
-    Top = 143
+    Top = 152
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -246,10 +247,11 @@ object AboutForm: TAboutForm
     TabOrder = 0
     OnClick = Button1Click
     SkinData.SkinSection = 'BUTTON'
+    ExplicitTop = 143
   end
   object Button2: TsButton
     Left = 8
-    Top = 143
+    Top = 152
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -257,6 +259,7 @@ object AboutForm: TAboutForm
     TabOrder = 1
     OnClick = Button2Click
     SkinData.SkinSection = 'BUTTON'
+    ExplicitTop = 143
   end
   object sSkinProvider1: TsSkinProvider
     AddedTitle.Font.Charset = DEFAULT_CHARSET

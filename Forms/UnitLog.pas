@@ -32,6 +32,7 @@ type
     LogList: TsMemo;
     sSkinProvider1: TsSkinProvider;
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
   public
@@ -49,6 +50,13 @@ procedure TLogForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftStat
 begin
   if Key = VK_ESCAPE then
     Self.Close;
+end;
+
+procedure TLogForm.FormShow(Sender: TObject);
+begin
+  Self.Color := clBtnFace;
+  LogList.Color := clBtnFace;
+  LogList.Font.Color := clBlack;
 end;
 
 end.

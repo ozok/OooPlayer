@@ -351,23 +351,9 @@ begin
           FID3v2Tag.SetUnicodeText('TPOS', DiscTotal);
           FID3v2Tag.SetUnicodeText('TYER', Year);
         end;
+        FID3v2Tag.SaveToFile(FileName);
       end;
-    1: // aac
-      begin
-        with Tags^ do
-        begin
-          FMP4Tag.SetText('©nam', Title);
-          FMP4Tag.SetText('©ART', Artist);
-          FMP4Tag.SetText('©alb', Album);
-          FMP4Tag.SetText('©cmt', Comment);
-          FMP4Tag.SetGenre(Genre);
-          FMP4Tag.SetTrack(StrToInt(Track), StrToInt(TrackTotal));
-          FMP4Tag.SetDisc(StrToInt(Disc), StrToInt(DiscTotal));
-          FMP4Tag.SetText('©day', Year);
-        end;
-        FMP4Tag.SaveToFile(FileName);
-      end;
-    2: // ogg
+    1: // ogg
       begin
         with Tags^ do
         begin
@@ -384,7 +370,7 @@ begin
         end;
         FOPUSTag.SaveToFile(FileName);
       end;
-    3: // opus
+    2: // opus
       begin
         with Tags^ do
         begin
@@ -401,39 +387,7 @@ begin
         end;
         FOPUSTag.SaveToFile(FileName);
       end;
-    4: // wma2
-      begin
-        with Tags^ do
-        begin
-          FWMATag.SetTextFrameText(g_wszWMTitle, Title);
-          FWMATag.SetTextFrameText(g_wszWMAuthor, Artist);
-          FWMATag.SetTextFrameText(g_wszWMAlbumTitle, Album);
-          FWMATag.SetTextFrameText(g_wszWMDescription, Comment);
-          FWMATag.SetTextFrameText(g_wszWMGenre, Genre);
-          FWMATag.SetTextFrameText(g_wszWMTrackNumber, Track);
-          FWMATag.SetTextFrameText(g_wszWMTrack, TrackTotal);
-          FWMATag.SetTextFrameText(g_wszWMYear, Year);
-        end;
-        FWMATag.SaveToFile(FileName);
-      end;
-    5: // flac
-      begin
-        with Tags^ do
-        begin
-          FFLACTag.AddTextTag('TITLE', Title);
-          FFLACTag.AddTextTag('ARTIST', Artist);
-          FFLACTag.AddTextTag('GENRE', Genre);
-          FFLACTag.AddTextTag('DATE', Year);
-          FFLACTag.AddTextTag('ALBUM', Album);
-          FFLACTag.AddTextTag('COMMENT', Comment);
-          FFLACTag.AddTextTag('TOTALTRACKS', TrackTotal);
-          FFLACTag.AddTextTag('DISCNUMBER', Disc);
-          FFLACTag.AddTextTag('DISCTOTAL', DiscTotal);
-          FFLACTag.AddTextTag('TRACKNUMBER', Track);
-        end;
-        FFLACTag.SaveToFile(FileName);
-      end;
-    6: // alac
+    3: // aac
       begin
         with Tags^ do
         begin
@@ -448,39 +402,74 @@ begin
         end;
         FMP4Tag.SaveToFile(FileName);
       end;
-    7: // wavpack
+    4: // format unkown
       begin
-        with Tags^ do
+        if LowerCase(ExtractFileExt(FileName)) = '.mp3' then
         begin
-          FAPETag.AddFrame('Title').SetAsText(Title);
-          FAPETag.AddFrame('Artist').SetAsText(Artist);
-          FAPETag.AddFrame('Album').SetAsText(Album);
-          FAPETag.AddFrame('Comment').SetAsText(Comment);
-          FAPETag.AddFrame('Genre').SetAsText(Genre);
-          FAPETag.AddFrame('Track').SetAsText(Track);
-          FAPETag.AddFrame('TrackTotal').SetAsText(TrackTotal);
-          FAPETag.AddFrame('DISCNUMBER').SetAsText(Disc);
-          FAPETag.AddFrame('DiscTotal').SetAsText(DiscTotal);
-          FAPETag.AddFrame('Year').SetAsText(Year);
-        end;
-        FAPETag.SaveToFile(FileName);
-      end;
-    8: // wav
-      begin
-        with Tags^ do
+          with Tags^ do
+          begin
+            FID3v2Tag.SetUnicodeText('TIT2', Title);
+            FID3v2Tag.SetUnicodeText('TPE1', Artist);
+            FID3v2Tag.SetUnicodeText('TALB', Album);
+            FID3v2Tag.SetUnicodeComment('TCON', Comment, lid, str2);
+            FID3v2Tag.SetUnicodeText('TCON', Genre);
+            FID3v2Tag.SetUnicodeText('TRCK', Track);
+            FID3v2Tag.SetUnicodeText('TALB', TrackTotal);
+            FID3v2Tag.SetUnicodeText('TPOS', Disc);
+            FID3v2Tag.SetUnicodeText('TPOS', DiscTotal);
+            FID3v2Tag.SetUnicodeText('TYER', Year);
+          end;
+          FID3v2Tag.SaveToFile(FileName);
+        end
+        else if LowerCase(ExtractFileExt(FileName)) = '.m4a' then
         begin
-          FWAVTag.AddTextFrame('TITLE', Title);
-          FWAVTag.AddTextFrame('ARTIST', Artist);
-          FWAVTag.AddTextFrame('GENRE', Genre);
-          FWAVTag.AddTextFrame('DATE', Year);
-          FWAVTag.AddTextFrame('ALBUM', Album);
-          FWAVTag.AddTextFrame('COMMENT', Comment);
-          FWAVTag.AddTextFrame('TOTALTRACKS', TrackTotal);
-          FWAVTag.AddTextFrame('DISCNUMBER', Disc);
-          FWAVTag.AddTextFrame('DISCTOTAL', DiscTotal);
-          FWAVTag.AddTextFrame('TRACKNUMBER', Track);
+          with Tags^ do
+          begin
+            FMP4Tag.SetText('©nam', Title);
+            FMP4Tag.SetText('©ART', Artist);
+            FMP4Tag.SetText('©alb', Album);
+            FMP4Tag.SetText('©cmt', Comment);
+            FMP4Tag.SetGenre(Genre);
+            FMP4Tag.SetTrack(StrToInt(Track), StrToInt(TrackTotal));
+            FMP4Tag.SetDisc(StrToInt(Disc), StrToInt(DiscTotal));
+            FMP4Tag.SetText('©day', Year);
+          end;
+          FMP4Tag.SaveToFile(FileName);
+        end
+        else if LowerCase(ExtractFileExt(FileName)) = '.ogg' then
+        begin
+          with Tags^ do
+          begin
+            FOPUSTag.AddTextFrame('TITLE', Title);
+            FOPUSTag.AddTextFrame('ARTIST', Artist);
+            FOPUSTag.AddTextFrame('GENRE', Genre);
+            FOPUSTag.AddTextFrame('DATE', Year);
+            FOPUSTag.AddTextFrame('ALBUM', Album);
+            FOPUSTag.AddTextFrame('COMMENT', Comment);
+            FOPUSTag.AddTextFrame('TOTALTRACKS', TrackTotal);
+            FOPUSTag.AddTextFrame('DISCNUMBER', Disc);
+            FOPUSTag.AddTextFrame('DISCTOTAL', DiscTotal);
+            FOPUSTag.AddTextFrame('TRACKNUMBER', Track);
+          end;
+          FOPUSTag.SaveToFile(FileName);
+        end
+        else if LowerCase(ExtractFileExt(FileName)) = '.opus' then
+        begin
+          with Tags^ do
+          begin
+            FOPUSTag.AddTextFrame('TITLE', Title);
+            FOPUSTag.AddTextFrame('ARTIST', Artist);
+            FOPUSTag.AddTextFrame('GENRE', Genre);
+            FOPUSTag.AddTextFrame('DATE', Year);
+            FOPUSTag.AddTextFrame('ALBUM', Album);
+            FOPUSTag.AddTextFrame('COMMENT', Comment);
+            FOPUSTag.AddTextFrame('TOTALTRACKS', TrackTotal);
+            FOPUSTag.AddTextFrame('DISCNUMBER', Disc);
+            FOPUSTag.AddTextFrame('DISCTOTAL', DiscTotal);
+            FOPUSTag.AddTextFrame('TRACKNUMBER', Track);
+          end;
+          FOPUSTag.SaveToFile(FileName);
         end;
-        FWAVTag.SaveToFile(FileName);
       end;
   end;
 end;

@@ -1,6 +1,6 @@
 //********************************************************************************************************************************
 //*                                                                                                                              *
-//*     ID3v1 Library 2.0.35.85 © 3delite 2010-2014                                                                              *
+//*     ID3v1 Library 2.0.37.90 © 3delite 2010-2015                                                                              *
 //*     See ID3v2 Library 2.0 ReadMe.txt for details                                                                             *
 //*                                                                                                                              *
 //* Two licenses are available for commercial usage of this component:                                                           *
@@ -305,7 +305,8 @@ type
     function ID3GenreDataToString(GenreIndex: Byte): String;
     function ID3GenreStringToData(Genre: String): Byte;
 
-    function ID3v1RemoveTag(FileName: String): Integer;
+    function RemoveID3v1TagFromFile(FileName: String): Integer;
+    function RemoveID3v1TagFromStream(Stream: TStream): Integer;
 
     function ID3v1TagErrorCode2String(ErrorCode: Integer): String;
 
@@ -473,7 +474,7 @@ begin
         end;
         FileStream := TFileStream.Create(FileName, fmOpenRead OR fmShareDenyWrite);
         try
-            FileStream.Seek(-ID3V1TAGSIZE, soEnd);
+            //FileStream.Seek(-ID3V1TAGSIZE, soEnd);
             Result := LoadFromStream(FileStream);
             if Result = ID3V1LIBRARY_SUCCESS then begin
                 Self.FileName := FileName;
@@ -495,6 +496,11 @@ begin
     Loaded := False;
     FillChar(TagData, SizeOf(TID3v1TagData), #0);
     try
+        if TagStream.Size > ID3V1TAGSIZE then begin
+            TagStream.Seek(- ID3V1TAGSIZE, soEnd);
+        end else begin
+            TagStream.Seek(0, soBeginning);
+        end;
         TagStream.Read(TagData, ID3V1TAGSIZE);
         if (TagData.Identifier[0] <> ID3V1TAGID[0])
         OR (TagData.Identifier[1] <> ID3V1TAGID[1])
@@ -533,7 +539,7 @@ begin
     if MemoryAddress <> nil then begin
         DataStream := TMemoryStream.Create;
         try
-            DataStream.Write(MemoryAddress^, 128);
+            DataStream.Write(MemoryAddress^, ID3V1TAGSIZE);
             DataStream.Seek(0, soBeginning);
             Result := LoadFromStream(DataStream);
         finally
@@ -557,7 +563,7 @@ var
     Data: Byte;
 begin
     Result := ID3V1LIBRARY_ERROR;
-    TagStream.Seek(- (128 + 9), soFromEnd);
+    TagStream.Seek(- (ID3V1TAGSIZE + 9), soFromEnd);
     TagStream.Read(LyricsTagIDEnd, SizeOf(TID3LyricsTagIDEnd));
     if (LyricsTagIDEnd[1] = ID3LYRICSTAGIDEND[1])
     AND (LyricsTagIDEnd[2] = ID3LYRICSTAGIDEND[2])
@@ -569,7 +575,7 @@ begin
     AND (LyricsTagIDEnd[8] = ID3LYRICSTAGIDEND[8])
     AND (LyricsTagIDEnd[9] = ID3LYRICSTAGIDEND[9])
     then begin
-        TagStream.Seek(- (128 + 9 + 6), soFromEnd);
+        TagStream.Seek(- (ID3V1TAGSIZE + 9 + 6), soFromEnd);
         TagStream.Read(LyricsTagSize, SizeOf(TID3LyricsTagSize));
         FLyricsTagSize := StrToInt(Char(LyricsTagSize[1])
              + Char(LyricsTagSize[2])
@@ -578,7 +584,7 @@ begin
              + Char(LyricsTagSize[5])
              + Char(LyricsTagSize[6])
              );
-        TagStream.Seek(- (128 + 9 + 6 + FLyricsTagSize), soEnd);
+        TagStream.Seek(- (ID3V1TAGSIZE + 9 + 6 + FLyricsTagSize), soEnd);
         TagStream.Read(LyricsTagIDStart, SizeOf(TID3LyricsTagIDStart));
         if (LyricsTagIDStart[1] = ID3LYRICSTAGIDSTART[1])
         AND (LyricsTagIDStart[2] = ID3LYRICSTAGIDSTART[2])
@@ -627,7 +633,7 @@ begin
                     end;
                 end;
                 Result := ID3V1LIBRARY_SUCCESS;
-            until TagStream.Position >= TagStream.Size - (128 + 9 + 6);
+            until TagStream.Position >= TagStream.Size - (ID3V1TAGSIZE + 9 + 6);
         end;
     end;
 end;
@@ -815,7 +821,7 @@ var
 begin
     try
         if WriteLyricsTag then begin
-            ID3v1RemoveTag(FileName);
+            RemoveID3v1TagFromFile(FileName);
         end;
         if FileExists(FileName) then begin
             FileStream := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareDenyWrite);
@@ -846,6 +852,11 @@ var
 begin
     FillChar(TagData, SizeOf(TID3v1TagData), #0);
     try
+        if TagStream.Size > ID3V1TAGSIZE then begin
+            TagStream.Seek(- ID3V1TAGSIZE, soEnd);
+        end else begin
+            TagStream.Seek(0, soBeginning);
+        end;
         TagStream.Read(TagData, ID3V1TAGSIZE);
     except
         Result := ID3V1LIBRARY_ERROR_READING_FILE;
@@ -905,7 +916,7 @@ begin
     end;
 end;
 
-function ID3v1RemoveTag(FileName: String): Integer;
+function RemoveID3v1TagFromFile(FileName: String): Integer;
 var
     AudioFile: TFileStream;
     DataByte: Byte;
@@ -925,6 +936,9 @@ begin
             Result := ID3V1LIBRARY_ERROR_OPENING_FILE;
             Exit;
         end;
+        if AudioFile.Size < ID3V1TAGSIZE then begin
+            Exit;
+        end;
         AudioFile.Seek(- ID3V1TAGSIZE, soEnd);
         AudioFile.Read(DataByte, 1);
         if DataByte = Ord('T') then begin
@@ -932,7 +946,7 @@ begin
             if DataByte = Ord('A') then begin
                 AudioFile.Read(DataByte, 1);
                 if DataByte = Ord('G') then begin
-                    AudioFile.Seek(- (128 + 9), soFromEnd);
+                    AudioFile.Seek(- (ID3V1TAGSIZE + 9), soFromEnd);
                     AudioFile.Read(LyricsTagIDEnd, SizeOf(TID3LyricsTagIDEnd));
                     if (LyricsTagIDEnd[1] = ID3LYRICSTAGIDEND[1])
                     AND (LyricsTagIDEnd[2] = ID3LYRICSTAGIDEND[2])
@@ -944,7 +958,7 @@ begin
                     AND (LyricsTagIDEnd[8] = ID3LYRICSTAGIDEND[8])
                     AND (LyricsTagIDEnd[9] = ID3LYRICSTAGIDEND[9])
                     then begin
-                        AudioFile.Seek(- (128 + 9 + 6), soFromEnd);
+                        AudioFile.Seek(- (ID3V1TAGSIZE + 9 + 6), soFromEnd);
                         AudioFile.Read(LyricsTagSize, SizeOf(TID3LyricsTagSize));
                         TagSize := StrToInt(Char(LyricsTagSize[1])
                              + Char(LyricsTagSize[2])
@@ -953,7 +967,7 @@ begin
                              + Char(LyricsTagSize[5])
                              + Char(LyricsTagSize[6])
                              );
-                        AudioFile.Seek(- (128 + 9 + 6 + TagSize), soFromEnd);
+                        AudioFile.Seek(- (ID3V1TAGSIZE + 9 + 6 + TagSize), soFromEnd);
                         AudioFile.Read(LyricsTagIDStart, SizeOf(TID3LyricsTagIDStart));
                         if (LyricsTagIDStart[1] = ID3LYRICSTAGIDSTART[1])
                         AND (LyricsTagIDStart[2] = ID3LYRICSTAGIDSTART[2])
@@ -967,7 +981,7 @@ begin
                         AND (LyricsTagIDStart[9] = ID3LYRICSTAGIDSTART[9])
                         AND (LyricsTagIDStart[9] = ID3LYRICSTAGIDSTART[9])
                         then begin
-                            AudioFile.Seek(- (128 + 9 + 6 + TagSize), soFromEnd);
+                            AudioFile.Seek(- (ID3V1TAGSIZE + 9 + 6 + TagSize), soFromEnd);
                             AudioFile.Size := AudioFile.Position;
                         end;
                     end else begin
@@ -980,6 +994,77 @@ begin
         end;
         if AudioFile <> nil then begin
             FreeAndNil(AudioFile);
+        end;
+    except
+        Result := ID3V1LIBRARY_ERROR;
+    end;
+end;
+
+function RemoveID3v1TagFromStream(Stream: TStream): Integer;
+var
+    DataByte: Byte;
+    LyricsTagIDStart: TID3LyricsTagIDStart;
+    LyricsTagIDEnd: TID3LyricsTagIDEnd;
+    LyricsTagSize: TID3LyricsTagSize;
+    TagSize: Integer;
+begin
+    Result := ID3V1LIBRARY_ERROR;
+    try
+        if Stream.Size < ID3V1TAGSIZE then begin
+            Exit;
+        end;
+        Stream.Seek(- ID3V1TAGSIZE, soEnd);
+        Stream.Read(DataByte, 1);
+        if DataByte = Ord('T') then begin
+            Stream.Read(DataByte, 1);
+            if DataByte = Ord('A') then begin
+                Stream.Read(DataByte, 1);
+                if DataByte = Ord('G') then begin
+                    Stream.Seek(- (ID3V1TAGSIZE + 9), soFromEnd);
+                    Stream.Read(LyricsTagIDEnd, SizeOf(TID3LyricsTagIDEnd));
+                    if (LyricsTagIDEnd[1] = ID3LYRICSTAGIDEND[1])
+                    AND (LyricsTagIDEnd[2] = ID3LYRICSTAGIDEND[2])
+                    AND (LyricsTagIDEnd[3] = ID3LYRICSTAGIDEND[3])
+                    AND (LyricsTagIDEnd[4] = ID3LYRICSTAGIDEND[4])
+                    AND (LyricsTagIDEnd[5] = ID3LYRICSTAGIDEND[5])
+                    AND (LyricsTagIDEnd[6] = ID3LYRICSTAGIDEND[6])
+                    AND (LyricsTagIDEnd[7] = ID3LYRICSTAGIDEND[7])
+                    AND (LyricsTagIDEnd[8] = ID3LYRICSTAGIDEND[8])
+                    AND (LyricsTagIDEnd[9] = ID3LYRICSTAGIDEND[9])
+                    then begin
+                        Stream.Seek(- (ID3V1TAGSIZE + 9 + 6), soFromEnd);
+                        Stream.Read(LyricsTagSize, SizeOf(TID3LyricsTagSize));
+                        TagSize := StrToInt(Char(LyricsTagSize[1])
+                             + Char(LyricsTagSize[2])
+                             + Char(LyricsTagSize[3])
+                             + Char(LyricsTagSize[4])
+                             + Char(LyricsTagSize[5])
+                             + Char(LyricsTagSize[6])
+                             );
+                        Stream.Seek(- (ID3V1TAGSIZE + 9 + 6 + TagSize), soFromEnd);
+                        Stream.Read(LyricsTagIDStart, SizeOf(TID3LyricsTagIDStart));
+                        if (LyricsTagIDStart[1] = ID3LYRICSTAGIDSTART[1])
+                        AND (LyricsTagIDStart[2] = ID3LYRICSTAGIDSTART[2])
+                        AND (LyricsTagIDStart[3] = ID3LYRICSTAGIDSTART[3])
+                        AND (LyricsTagIDStart[4] = ID3LYRICSTAGIDSTART[4])
+                        AND (LyricsTagIDStart[5] = ID3LYRICSTAGIDSTART[5])
+                        AND (LyricsTagIDStart[6] = ID3LYRICSTAGIDSTART[6])
+                        AND (LyricsTagIDStart[7] = ID3LYRICSTAGIDSTART[7])
+                        AND (LyricsTagIDStart[8] = ID3LYRICSTAGIDSTART[8])
+                        AND (LyricsTagIDStart[9] = ID3LYRICSTAGIDSTART[9])
+                        AND (LyricsTagIDStart[9] = ID3LYRICSTAGIDSTART[9])
+                        AND (LyricsTagIDStart[9] = ID3LYRICSTAGIDSTART[9])
+                        then begin
+                            Stream.Seek(- (ID3V1TAGSIZE + 9 + 6 + TagSize), soFromEnd);
+                            Stream.Size := Stream.Position;
+                        end;
+                    end else begin
+                        Stream.Seek(- ID3V1TAGSIZE, soEnd);
+                        Stream.Size := Stream.Position;
+                    end;
+                    Result := ID3V1LIBRARY_SUCCESS;
+                end;
+            end;
         end;
     except
         Result := ID3V1LIBRARY_ERROR;

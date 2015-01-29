@@ -1,6 +1,6 @@
 // ********************************************************************************************************************************
 // *                                                                                                                              *
-// *     WAV Tag Library 1.0.8.1 © 3delite 2014                                                                                   *
+// *     WAV Tag Library 1.0.9.4 © 3delite 2014-2015                                                                              *
 // *     See WAV Tag Library Readme.txt for details                                                                               *
 // *                                                                                                                              *
 // * Two licenses are available for commercial usage of this component:                                                           *
@@ -60,7 +60,7 @@ Uses
   Classes;
 
 Const
-  WAVTAGLIBRARY_VERSION = $01000801;
+  WAVTAGLIBRARY_VERSION = $01000904;
 
 Const
   WAVTAGLIBRARY_SUCCESS = 0;
@@ -170,7 +170,7 @@ type
   end;
 
 type
-  TWAVTagFrameFormat = (ffUnknown, ffText, ffwBinary);
+  TWAVTagFrameFormat = (ffUnknown, ffText, ffBinary2);
 
 type
   TWAVTag = class;
@@ -326,7 +326,7 @@ type
     function LoadFromFile(FileName: String): Integer;
     function LoadFromStream(TagStream: TStream): Integer;
     function SaveToFile(FileName: String): Integer;
-    // function SaveToStream(var TagStream: TStream): Integer; //* Please request if you need this functionality
+    function SaveToStream(Stream: TStream): Integer;
     function AddFrame(Name: String): TWAVTagFrame;
     function DeleteFrame(FrameIndex: Integer): Boolean; overload;
     function DeleteFrame(Name: String): Boolean; overload;
@@ -357,6 +357,7 @@ function ValidRIFF(TagStream: TStream): Boolean;
 function ValidRF64(TagStream: TStream): Boolean;
 
 function RemoveWAVTagFromFile(FileName: String): Integer;
+function RemoveWAVTagFromStream(Stream: TStream): Integer;
 
 function RIFFChunkIDToString(ChunkID: TRIFFChunkID): String;
 procedure String2RIFFChunkID(StringFrameID: String; var ChunkID: TRIFFChunkID);
@@ -582,7 +583,7 @@ begin
 {$ENDIF}
 end;
 
-function RIFFUpdateTagChunks(FileName: String; SourceStream, DestinationStream, NewTagChunks: TStream; PreviousTagChunksSize: Cardinal; PaddingToWrite: Cardinal = 0): Integer;
+function RIFFUpdateTagChunks( { FileName: String; } SourceStream, DestinationStream, NewTagChunks: TStream; PreviousTagChunksSize: Cardinal; PaddingToWrite: Cardinal = 0): Integer;
 var
   RIFFChunkSize: DWord;
   RIFFChunkSizeNew: DWord;
@@ -660,7 +661,7 @@ begin
   end;
 end;
 
-function RF64UpdateTagChunks(FileName: String; SourceStream, DestinationStream, NewTagChunks: TStream; PreviousTagChunksSize: Int64; PaddingToWrite: Cardinal = 0): Integer;
+function RF64UpdateTagChunks( { FileName: String; } SourceStream, DestinationStream, NewTagChunks: TStream; PreviousTagChunksSize: Int64; PaddingToWrite: Cardinal = 0): Integer;
 var
   ChunkID: TRIFFChunkID;
   RIFFChunkSize: DWord;
@@ -1742,7 +1743,7 @@ begin
           SourceStream.Seek(SeekPosition, soBeginning);
           CARTChunkSize := SeekRIFFCART(SourceStream);
           SourceStream.Seek(0, soBeginning);
-          RIFFUpdateTagChunks(FileName, SourceStream, DestinationStream, NewILSTINFOBEXTCARTChunkStream, LISTChunkSize + BEXTChunkSize + CARTChunkSize);
+          RIFFUpdateTagChunks( { FileName, } SourceStream, DestinationStream, NewILSTINFOBEXTCARTChunkStream, LISTChunkSize + BEXTChunkSize + CARTChunkSize);
         end
         else
         begin
@@ -1761,7 +1762,7 @@ begin
             SourceStream.Seek(SeekPosition, soBeginning);
             CARTChunkSize := SeekRF64CART(SourceStream);
             SourceStream.Seek(0, soBeginning);
-            RF64UpdateTagChunks(FileName, SourceStream, DestinationStream, NewILSTINFOBEXTCARTChunkStream, LISTChunkSize + BEXTChunkSize + CARTChunkSize);
+            RF64UpdateTagChunks( { FileName, } SourceStream, DestinationStream, NewILSTINFOBEXTCARTChunkStream, LISTChunkSize + BEXTChunkSize + CARTChunkSize);
           end
           else
           begin
@@ -1786,6 +1787,108 @@ begin
       begin
         SysUtils.DeleteFile(FileName);
         SysUtils.RenameFile(ChangeFileExt(FileName, '.tmp'), FileName);
+      end;
+    end;
+  except
+    Result := WAVTAGLIBRARY_ERROR;
+  end;
+end;
+
+function TWAVTag.SaveToStream(Stream: TStream): Integer;
+var
+  DestinationStream: TStream;
+  PreviousPosition, SeekPosition: Int64;
+  LISTChunkSize: Cardinal;
+  BEXTChunkSize: Cardinal;
+  CARTChunkSize: Cardinal;
+  NewILSTINFOBEXTCARTChunkStream: TStream;
+  NewRIFFSizeDWord: DWord;
+  ID3v2Size: Cardinal;
+begin
+  // Result := WAVTAGLIBRARY_ERROR;
+  Stream.Seek(0, soBeginning);
+  DestinationStream := nil;
+  try
+    RemoveEmptyFrames;
+    if Stream.Size = 0 then
+    begin
+      // * Create a new RIFF file with only a LIST INFO chunk
+      Stream.Write(RIFFID[0], SizeOf(TRIFFID));
+      NewRIFFSizeDWord := 4;
+      Stream.Write(NewRIFFSizeDWord, SizeOf(NewRIFFSizeDWord));
+      Stream.Write(RIFFWAVEID[0], SizeOf(TRIFFChunkID));
+      Stream.Seek(0, soBeginning);
+    end;
+    try
+      try
+        DestinationStream := TMemoryStream.Create;
+      except
+        Result := WAVTAGLIBRARY_ERROR_WRITING_FILE;
+        Exit;
+      end;
+      { Copy and seek past the ID3v2 tag, if there is one }
+      ID3v2Size := GetID3v2Size(Stream);
+      Stream.Seek(0, soFromBeginning);
+      if ID3v2Size > 0 then
+      begin
+        DestinationStream.CopyFrom(Stream, ID3v2Size);
+      end;
+      PreviousPosition := Stream.Position;
+      NewILSTINFOBEXTCARTChunkStream := TMemoryStream.Create;
+      try
+        CreateTagChunks(NewILSTINFOBEXTCARTChunkStream);
+        if CheckRIFF(Stream) then
+        begin
+          if NOT ValidRIFF(Stream) then
+          begin
+            Result := WAVTAGLIBRARY_ERROR_CORRUPT;
+            Exit;
+          end;
+          SeekPosition := Stream.Position;
+          LISTChunkSize := SeekRIFF(Stream);
+          Stream.Seek(SeekPosition, soBeginning);
+          BEXTChunkSize := SeekRIFFBEXT(Stream);
+          Stream.Seek(SeekPosition, soBeginning);
+          CARTChunkSize := SeekRIFFCART(Stream);
+          Stream.Seek(0, soBeginning);
+          RIFFUpdateTagChunks( { FileName, } Stream, DestinationStream, NewILSTINFOBEXTCARTChunkStream, LISTChunkSize + BEXTChunkSize + CARTChunkSize);
+        end
+        else
+        begin
+          Stream.Seek(PreviousPosition, soBeginning);
+          if CheckRF64(Stream) then
+          begin
+            if NOT ValidRF64(Stream) then
+            begin
+              Result := WAVTAGLIBRARY_ERROR_CORRUPT;
+              Exit;
+            end;
+            SeekPosition := Stream.Position;
+            LISTChunkSize := SeekRF64(Stream);
+            Stream.Seek(SeekPosition, soBeginning);
+            BEXTChunkSize := SeekRF64BEXT(Stream);
+            Stream.Seek(SeekPosition, soBeginning);
+            CARTChunkSize := SeekRF64CART(Stream);
+            Stream.Seek(0, soBeginning);
+            RF64UpdateTagChunks( { FileName, } Stream, DestinationStream, NewILSTINFOBEXTCARTChunkStream, LISTChunkSize + BEXTChunkSize + CARTChunkSize);
+          end
+          else
+          begin
+            Result := WAVTAGLIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
+            Exit;
+          end;
+        end;
+      finally
+        FreeAndNil(NewILSTINFOBEXTCARTChunkStream);
+      end;
+      Result := WAVTAGLIBRARY_SUCCESS;
+    finally
+      Stream.Size := 0;
+      Stream.CopyFrom(DestinationStream, 0);
+      Stream.Seek(0, soBeginning);
+      if Assigned(DestinationStream) then
+      begin
+        FreeAndNil(DestinationStream);
       end;
     end;
   except
@@ -1856,7 +1959,7 @@ begin
   begin
     PreviousPosition := BinaryStream.Position;
     Stream.CopyFrom(BinaryStream, Size);
-    Format := ffwBinary;
+    Format := ffBinary2;
     BinaryStream.Seek(PreviousPosition, soBeginning);
   end;
 end;
@@ -2015,7 +2118,7 @@ begin
           begin
             SetTextFrameText(Source.Frames[i].Name, Source.Frames[i].GetAsText);
           end;
-        ffwBinary:
+        ffBinary2:
           begin
             Source.Frames[i].Stream.Seek(0, soBeginning);
             AddBinaryFrame(Source.Frames[i].Name, Source.Frames[i].Stream, Source.Frames[i].Stream.Size);
@@ -2041,6 +2144,27 @@ begin
     ClearWAVTag := TWAVTag.Create;
     try
       Result := ClearWAVTag.SaveToFile(FileName);
+    finally
+      FreeAndNil(ClearWAVTag);
+    end;
+  except
+    Result := WAVTAGLIBRARY_ERROR;
+  end;
+end;
+
+function RemoveWAVTagFromStream(Stream: TStream): Integer;
+var
+  ClearWAVTag: TWAVTag;
+begin
+  if Stream.Size = 0 then
+  begin
+    Result := WAVTAGLIBRARY_ERROR_OPENING_FILE;
+    Exit;
+  end;
+  try
+    ClearWAVTag := TWAVTag.Create;
+    try
+      Result := ClearWAVTag.SaveToStream(Stream);
     finally
       FreeAndNil(ClearWAVTag);
     end;

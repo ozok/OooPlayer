@@ -26,6 +26,7 @@ type
     procedure Label4Click(Sender: TObject);
     procedure Label6Click(Sender: TObject);
     procedure Label5Click(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
   public
@@ -55,6 +56,11 @@ procedure TAboutForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   MainForm.Enabled := True;
   MainForm.BringToFront;
+end;
+
+procedure TAboutForm.FormShow(Sender: TObject);
+begin
+  Self.Color := MainForm.Color;
 end;
 
 procedure TAboutForm.Label3Click(Sender: TObject);

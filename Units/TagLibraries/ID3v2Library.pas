@@ -1,6 +1,6 @@
 //********************************************************************************************************************************
 //*                                                                                                                              *
-//*     ID3v2 Library 2.0.35.85 © 3delite 2010-2014                                                                              *
+//*     ID3v2 Library 2.0.37.90 © 3delite 2010-2015                                                                              *
 //*     See ID3v2 Library 2.0 ReadMe.txt for details                                                                             *
 //*                                                                                                                              *
 //* Two licenses are available for commercial usage of this component:                                                           *
@@ -61,7 +61,7 @@ Uses
     Classes;
 
 Const
-    ID3V2LIBRARY_VERSION = $02003585;
+    ID3V2LIBRARY_VERSION = $02003790;
 
 Const
     ID3V2LIBRARY_DEFAULT_PARSE_AUDIO_ATTRBIUTES = True;
@@ -324,6 +324,7 @@ type
         FPosition: Int64;
         FSourceFileType: TSourceFileType;
         FPlayTime: Double;
+        FStrangeTag: Boolean;
         procedure DecodeFlags;
         procedure EncodeFlags;
         procedure DecodeSize;
@@ -381,7 +382,8 @@ type
         function LoadFromStream(TagStream: TStream): Integer;
         function LoadFromMemory(MemoryAddress: Pointer): Integer;
         function SaveToFile(FileName: String): Integer;
-        function SaveToStream(var TagStream: TStream; PaddingSizeToWrite: Integer = 0): Integer;
+        function SaveToStream(Stream: TStream): Integer;
+        function SaveTagToStream(var TagStream: TStream; PaddingSizeToWrite: Integer = 0): Integer;
         function AddFrame(FrameID: TFrameID): Integer; overload;
         function AddFrame(FrameID: String): Integer; overload;
         function InsertFrame(FrameID: TFrameID; Position: Integer): Integer; overload;
@@ -640,7 +642,8 @@ Const
     function ValidRF64(TagStream: TStream): Boolean;
     function ValidDSF(TagStream: TStream): Boolean;
 
-    function ID3v2RemoveTag(FileName: String): Integer;
+    function RemoveID3v2TagFromFile(FileName: String): Integer;
+    function RemoveID3v2TagFromStream(Stream: TStream): Integer;
 
     procedure CalcCRC32(P: Pointer; ByteCount: DWORD; var CRCValue: DWORD);
     function CalculateStreamCRC32(Stream: TStream; var CRCvalue: DWORD): Boolean;
@@ -656,10 +659,14 @@ Const
 
     function WritePadding(var TagStream: TStream; PaddingSize: Integer): Integer;
 
-    function RemoveRIFFID3v2(FileName: String): Integer;
-    function RemoveAIFFID3v2(FileName: String): Integer;
-    function RemoveRF64ID3v2(FileName: String): Integer;
-    function RemoveDSFID3v2(FileName: String): Integer;
+    function RemoveRIFFID3v2FromFile(FileName: String): Integer;
+    function RemoveRIFFID3v2FromStream(Stream: TStream): Integer;
+    function RemoveAIFFID3v2FromFile(FileName: String): Integer;
+    function RemoveAIFFID3v2FromStream(Stream: TStream): Integer;
+    function RemoveRF64ID3v2FromFile(FileName: String): Integer;
+    function RemoveRF64ID3v2FromStream(Stream: TStream): Integer;
+    function RemoveDSFID3v2FromFile(FileName: String): Integer;
+    function RemoveDSFID3v2FromStream(Stream: TStream): Integer;
 
     function ID3v2TagErrorCode2String(ErrorCode: Integer): String;
 
@@ -1287,10 +1294,10 @@ begin
     if CheckMPEG(TagStream) then begin
         FSourceFileType := sftMPEG;
         if ParseAudioAttributes then begin
-            TagStream.Seek(Self.Size, soBeginning);
+            //TagStream.Seek(Self.Size, soBeginning);
             MPEGInfo := MPEGProcessHeader(TagStream);
             Self.BitRate := MPEGInfo.BitRate;
-            TagStream.Seek(Self.Size, soBeginning);
+            //TagStream.Seek(Self.Size, soBeginning);
             GetMPEGHeaderInformation(TagStream);
         end;
     end;
@@ -1540,6 +1547,13 @@ begin
         end else begin
             TagStream.Read(FrameID[0], 4);
             ValidFrame := ValidID3v2FrameID(FrameID);
+            if NOT ValidFrame then begin
+                FillChar(FrameID, SizeOf(FrameID), 0);
+                TagStream.Seek(- 4, soCurrent);
+                TagStream.Read(FrameID[0], 3);
+                ValidFrame := ValidID3v2FrameID2(FrameID);
+                FStrangeTag := True;
+            end;
         end;
         //* Workaround for buggy DataLengthIndicator
         if NOT ValidFrame then begin
@@ -1565,6 +1579,26 @@ var
     DataLengthIndicatorValueCoded: Cardinal;
 begin
     try
+        if FStrangeTag then begin
+            Size := 0;
+            Flags := 0;
+            if Frames[FrameIndex].ID[3] = 0 then begin
+                TagStream.Seek(4, soCurrent);
+            end else begin
+                TagStream.Seek(3, soCurrent);
+            end;
+            TagStream.Read(Size, 3);
+            Frames[FrameIndex].Size := Size;
+            if (Frames[FrameIndex].Size < 1)
+            OR (Frames[FrameIndex].Size > Self.Size)
+            then begin
+                Exit;
+            end;
+            Frames[FrameIndex].Unsynchronised := Unsynchronised;
+            Frames[FrameIndex].Stream.CopyFrom(TagStream, Frames[FrameIndex].Size);
+            Convertv2Tov3(FrameIndex);
+            Exit;
+        end;
         if MajorVersion = 2 then begin
             Size := 0;
             Flags := 0;
@@ -2286,7 +2320,7 @@ begin
     end;
 end;
 
-function TID3v2Tag.SaveToStream(var TagStream: TStream; PaddingSizeToWrite: Integer = 0): Integer;
+function TID3v2Tag.SaveTagToStream(var TagStream: TStream; PaddingSizeToWrite: Integer = 0): Integer;
 begin
     try
         if MajorVersion = 2 then begin
@@ -2331,7 +2365,6 @@ var
     PaddingNeededToWrite: Integer;
     NewFile: Boolean;
     ExclusiveAccess: Boolean;
-
 
     function CheckTag: Boolean;
     var
@@ -2410,13 +2443,13 @@ begin
                                 //* Update size datas
                                 Result := RIFFUpdateID3v2(FileName, TagStream, WriteTagTotalSize, TagSizeInExistingStream, PaddingToWrite);
                                 if Result = ID3V2LIBRARY_SUCCESS then begin
-                                    Result := SaveToStream(TagStream, PaddingToWrite);
+                                    Result := SaveTagToStream(TagStream, PaddingToWrite);
                                 end;
                                 Exit;
                             end else begin
                                 PaddingNeededToWrite := TagSizeInExistingStream - WriteTagTotalSize;
                                 //* Just write it
-                                Result := SaveToStream(TagStream, PaddingNeededToWrite);
+                                Result := SaveTagToStream(TagStream, PaddingNeededToWrite);
                                 Exit;
                             end;
                         //* Need to create new Tag
@@ -2424,7 +2457,7 @@ begin
                             TagStream.Seek(0, soBeginning);
                             Result := RIFFCreateID3v2(FileName, TagStream, WriteTagTotalSize, PaddingToWrite);
                             if Result = ID3V2LIBRARY_SUCCESS then begin
-                                Result := SaveToStream(TagStream, PaddingToWrite);
+                                Result := SaveTagToStream(TagStream, PaddingToWrite);
                             end;
                             Exit;
                         end;
@@ -2433,7 +2466,7 @@ begin
                         TagStream.Seek(0, soBeginning);
                         Result := RIFFCreateID3v2(FileName, TagStream, WriteTagTotalSize, PaddingToWrite);
                         if Result = ID3V2LIBRARY_SUCCESS then begin
-                            Result := SaveToStream(TagStream, PaddingToWrite);
+                            Result := SaveTagToStream(TagStream, PaddingToWrite);
                         end;
                         Exit;
                     end;
@@ -2449,13 +2482,13 @@ begin
                                     //* Update size datas
                                     Result := AIFFUpdateID3v2(FileName, TagStream, WriteTagTotalSize, TagSizeInExistingStream, PaddingToWrite);
                                     if Result = ID3V2LIBRARY_SUCCESS then begin
-                                        Result := SaveToStream(TagStream, PaddingToWrite);
+                                        Result := SaveTagToStream(TagStream, PaddingToWrite);
                                     end;
                                     Exit;
                                 end else begin
                                     PaddingNeededToWrite := TagSizeInExistingStream - WriteTagTotalSize;
                                     //* Just write it
-                                    Result := SaveToStream(TagStream, PaddingNeededToWrite);
+                                    Result := SaveTagToStream(TagStream, PaddingNeededToWrite);
                                     Exit;
                                 end;
                             //* Need to create new Tag
@@ -2463,7 +2496,7 @@ begin
                                 TagStream.Seek(0, soBeginning);
                                 Result := AIFFCreateID3v2(FileName, TagStream, WriteTagTotalSize, PaddingToWrite);
                                 if Result = ID3V2LIBRARY_SUCCESS then begin
-                                    Result := SaveToStream(TagStream, PaddingToWrite);
+                                    Result := SaveTagToStream(TagStream, PaddingToWrite);
                                 end;
                                 Exit;
                             end;
@@ -2471,7 +2504,7 @@ begin
                             TagStream.Seek(0, soBeginning);
                             Result := AIFFCreateID3v2(FileName, TagStream, WriteTagTotalSize, PaddingToWrite);
                             if Result = ID3V2LIBRARY_SUCCESS then begin
-                                Result := SaveToStream(TagStream, PaddingToWrite);
+                                Result := SaveTagToStream(TagStream, PaddingToWrite);
                             end;
                             Exit;
                         end;
@@ -2491,13 +2524,13 @@ begin
                                         //* Update size datas
                                         Result := RF64UpdateID3v2(FileName, TagStream, WriteTagTotalSize, TagSizeInExistingStream, PaddingToWrite);
                                         if Result = ID3V2LIBRARY_SUCCESS then begin
-                                            Result := SaveToStream(TagStream, PaddingToWrite);
+                                            Result := SaveTagToStream(TagStream, PaddingToWrite);
                                         end;
                                         Exit;
                                     end else begin
                                         PaddingNeededToWrite := TagSizeInExistingStream - WriteTagTotalSize;
                                         //* Just write it
-                                        Result := SaveToStream(TagStream, PaddingNeededToWrite);
+                                        Result := SaveTagToStream(TagStream, PaddingNeededToWrite);
                                         Exit;
                                     end;
                                 //* Need to create new Tag
@@ -2505,7 +2538,7 @@ begin
                                     TagStream.Seek(0, soBeginning);
                                     Result := RF64CreateID3v2(FileName, TagStream, WriteTagTotalSize, PaddingToWrite);
                                     if Result = ID3V2LIBRARY_SUCCESS then begin
-                                        Result := SaveToStream(TagStream, PaddingToWrite);
+                                        Result := SaveTagToStream(TagStream, PaddingToWrite);
                                     end;
                                     Exit;
                                 end;
@@ -2513,7 +2546,7 @@ begin
                                 TagStream.Seek(0, soBeginning);
                                 Result := RF64CreateID3v2(FileName, TagStream, WriteTagTotalSize, PaddingToWrite);
                                 if Result = ID3V2LIBRARY_SUCCESS then begin
-                                    Result := SaveToStream(TagStream, PaddingToWrite);
+                                    Result := SaveTagToStream(TagStream, PaddingToWrite);
                                 end;
                                 Exit;
                             end;
@@ -2562,7 +2595,7 @@ begin
                 end;
                 NewTagStream := TFileStream.Create(FileName + '.tmp', fmCreate OR fmShareExclusive);
                 try
-                    Result := SaveToStream(NewTagStream, PaddingNeededToWrite);
+                    Result := SaveTagToStream(NewTagStream, PaddingNeededToWrite);
                     TagStream.Seek(TagSizeInExistingStream, soBeginning);
                     NewTagStream.CopyFrom(TagStream, TagStream.Size - TagSizeInExistingStream);
                     if Assigned(TagStream) then begin
@@ -2586,7 +2619,7 @@ begin
                 end;
             end else begin
                 try
-                    Result := SaveToStream(TagStream, PaddingNeededToWrite);
+                    Result := SaveTagToStream(TagStream, PaddingNeededToWrite);
                 except
                     Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
                     Exit;
@@ -2596,6 +2629,261 @@ begin
             if Assigned(TagStream) then begin
                 FreeAndNil(TagStream);
             end;
+            if Assigned(NewTagStream) then begin
+                FreeAndNil(NewTagStream);
+            end;
+        end;
+    except
+        Result := ID3V2LIBRARY_ERROR;
+    end;
+end;
+
+function TID3v2Tag.SaveToStream(Stream: TStream): Integer;
+var
+    NewTagStream: TStream;
+    TagSizeInExistingStream: Cardinal;
+    TagCodedSizeInExistingStream: Cardinal;
+    WriteTagTotalSize: Cardinal;
+    NeedToCopyExistingStream: Boolean;
+    PaddingNeededToWrite: Integer;
+    NewFile: Boolean;
+    ExclusiveAccess: Boolean;
+    FileName: String;
+
+    function CheckTag: Boolean;
+    var
+        PreviousPosition: Int64;
+    begin
+        PreviousPosition := Stream.Position;
+        if ID3v2ValidTag(Stream) then begin
+            //* Skip version data and flags
+            Stream.Seek(3, soCurrent);
+            Stream.Read(TagCodedSizeInExistingStream, 4);
+            UnSyncSafe(TagCodedSizeInExistingStream, 4, TagSizeInExistingStream);
+            //* Add header size to size
+            TagSizeInExistingStream := TagSizeInExistingStream + 10;
+            if (WriteTagTotalSize > TagSizeInExistingStream)
+            OR (TagSizeInExistingStream - WriteTagTotalSize > PaddingToWrite)
+            then begin
+                NeedToCopyExistingStream := True;
+                NewFile := True;
+            end;
+            Stream.Seek(PreviousPosition, soBeginning);
+            Result := True;
+        end else begin
+            Result := False;
+        end;
+    end;
+
+begin
+    NewTagStream := nil;
+    NewFile := False;
+    ExclusiveAccess := True;
+    FileName := '';
+    try
+        try
+            if FrameCount = 0 then begin
+                Result := ID3V2LIBRARY_ERROR_EMPTY_TAG;
+                Exit;
+            end;
+            if MajorVersion = 2 then begin
+                MajorVersion := 3;
+            end;
+            if CalculateTotalFramesSize = 0 then begin
+                Result := ID3V2LIBRARY_ERROR_EMPTY_FRAMES;
+                Exit;
+            end;
+            Stream.Seek(0, soBeginning);
+            NeedToCopyExistingStream := False;
+            WriteTagTotalSize := CalculateTagSize(0);
+            try
+                if CheckRIFF(Stream) then begin
+                    if NOT ValidRIFF(Stream) then begin
+                        Result := ID3V2LIBRARY_ERROR_CORRUPT;
+                        Exit;
+                    end;
+                    if SeekRIFF(Stream) > 0 then begin
+                        if CheckTag then begin
+                            if (WriteTagTotalSize > TagSizeInExistingStream)
+                            OR (TagSizeInExistingStream - WriteTagTotalSize > PaddingToWrite)
+                            then begin
+                                Stream.Seek(0, soBeginning);
+                                //* Update size datas
+                                Result := RIFFUpdateID3v2('', Stream, WriteTagTotalSize, TagSizeInExistingStream, PaddingToWrite);
+                                if Result = ID3V2LIBRARY_SUCCESS then begin
+                                    Result := SaveTagToStream(Stream, PaddingToWrite);
+                                end;
+                                Exit;
+                            end else begin
+                                PaddingNeededToWrite := TagSizeInExistingStream - WriteTagTotalSize;
+                                //* Just write it
+                                Result := SaveTagToStream(Stream, PaddingNeededToWrite);
+                                Exit;
+                            end;
+                        //* Need to create new Tag
+                        end else begin
+                            Stream.Seek(0, soBeginning);
+                            Result := RIFFCreateID3v2('', Stream, WriteTagTotalSize, PaddingToWrite);
+                            if Result = ID3V2LIBRARY_SUCCESS then begin
+                                Result := SaveTagToStream(Stream, PaddingToWrite);
+                            end;
+                            Exit;
+                        end;
+                    //* Need to create new Tag
+                    end else begin
+                        Stream.Seek(0, soBeginning);
+                        Result := RIFFCreateID3v2('', Stream, WriteTagTotalSize, PaddingToWrite);
+                        if Result = ID3V2LIBRARY_SUCCESS then begin
+                            Result := SaveTagToStream(Stream, PaddingToWrite);
+                        end;
+                        Exit;
+                    end;
+                end else begin
+                    Stream.Seek(0, soBeginning);
+                    if CheckAIFF(Stream) then begin
+                        if SeekAIFF(Stream) > 0 then begin
+                            if CheckTag then begin
+                                if (WriteTagTotalSize > TagSizeInExistingStream)
+                                OR (TagSizeInExistingStream - WriteTagTotalSize > PaddingToWrite)
+                                then begin
+                                    Stream.Seek(0, soBeginning);
+                                    //* Update size datas
+                                    Result := AIFFUpdateID3v2('', Stream, WriteTagTotalSize, TagSizeInExistingStream, PaddingToWrite);
+                                    if Result = ID3V2LIBRARY_SUCCESS then begin
+                                        Result := SaveTagToStream(Stream, PaddingToWrite);
+                                    end;
+                                    Exit;
+                                end else begin
+                                    PaddingNeededToWrite := TagSizeInExistingStream - WriteTagTotalSize;
+                                    //* Just write it
+                                    Result := SaveTagToStream(Stream, PaddingNeededToWrite);
+                                    Exit;
+                                end;
+                            //* Need to create new Tag
+                            end else begin
+                                Stream.Seek(0, soBeginning);
+                                Result := AIFFCreateID3v2('', Stream, WriteTagTotalSize, PaddingToWrite);
+                                if Result = ID3V2LIBRARY_SUCCESS then begin
+                                    Result := SaveTagToStream(Stream, PaddingToWrite);
+                                end;
+                                Exit;
+                            end;
+                        end else begin
+                            Stream.Seek(0, soBeginning);
+                            Result := AIFFCreateID3v2('', Stream, WriteTagTotalSize, PaddingToWrite);
+                            if Result = ID3V2LIBRARY_SUCCESS then begin
+                                Result := SaveTagToStream(Stream, PaddingToWrite);
+                            end;
+                            Exit;
+                        end;
+                    end else begin
+                        Stream.Seek(0, soBeginning);
+                        if CheckRF64(Stream) then begin
+                            if NOT ValidRF64(Stream) then begin
+                                Result := ID3V2LIBRARY_ERROR_CORRUPT;
+                                Exit;
+                            end;
+                            if SeekRF64(Stream) > 0 then begin
+                                if CheckTag then begin
+                                    if (WriteTagTotalSize > TagSizeInExistingStream)
+                                    OR (TagSizeInExistingStream - WriteTagTotalSize > PaddingToWrite)
+                                    then begin
+                                        Stream.Seek(0, soBeginning);
+                                        //* Update size datas
+                                        Result := RF64UpdateID3v2('', Stream, WriteTagTotalSize, TagSizeInExistingStream, PaddingToWrite);
+                                        if Result = ID3V2LIBRARY_SUCCESS then begin
+                                            Result := SaveTagToStream(Stream, PaddingToWrite);
+                                        end;
+                                        Exit;
+                                    end else begin
+                                        PaddingNeededToWrite := TagSizeInExistingStream - WriteTagTotalSize;
+                                        //* Just write it
+                                        Result := SaveTagToStream(Stream, PaddingNeededToWrite);
+                                        Exit;
+                                    end;
+                                //* Need to create new Tag
+                                end else begin
+                                    Stream.Seek(0, soBeginning);
+                                    Result := RF64CreateID3v2('', Stream, WriteTagTotalSize, PaddingToWrite);
+                                    if Result = ID3V2LIBRARY_SUCCESS then begin
+                                        Result := SaveTagToStream(Stream, PaddingToWrite);
+                                    end;
+                                    Exit;
+                                end;
+                            end else begin
+                                Stream.Seek(0, soBeginning);
+                                Result := RF64CreateID3v2('', Stream, WriteTagTotalSize, PaddingToWrite);
+                                if Result = ID3V2LIBRARY_SUCCESS then begin
+                                    Result := SaveTagToStream(Stream, PaddingToWrite);
+                                end;
+                                Exit;
+                            end;
+                        end else begin
+                            Stream.Seek(0, soBeginning);
+                            if CheckDSF(Stream) then begin
+                                if NOT ValidDSF(Stream) then begin
+                                    Result := ID3V2LIBRARY_ERROR_CORRUPT;
+                                    Exit;
+                                end;
+                                Result := SaveDSF(Stream, WriteTagTotalSize);
+                                Exit;
+                            end else begin
+                                //* Normal file (MP3) - tag at start
+                                Stream.Seek(0, soBeginning);
+                                if NOT CheckTag then begin
+                                    TagSizeInExistingStream := 0;
+                                    NeedToCopyExistingStream := True;
+                                    NewFile := True;
+                                end;
+                            end;
+                        end;
+                    end;
+                end;
+            except
+                Result := ID3V2LIBRARY_ERROR_READING_FILE;
+                Exit;
+            end;
+
+            if (TagSizeInExistingStream = 0)
+            OR NewFile
+            then begin
+                PaddingNeededToWrite := PaddingToWrite;
+            end else begin
+                //* Calculate padding here
+                PaddingNeededToWrite := TagSizeInExistingStream - WriteTagTotalSize;
+                if PaddingNeededToWrite < 0 then begin
+                    PaddingNeededToWrite := PaddingToWrite;
+                end;
+            end;
+
+            if NewFile then begin
+                if NOT ExclusiveAccess then begin
+                    Result := ID3V2LIBRARY_ERROR_NEED_EXCLUSIVE_ACCESS;
+                    Exit;
+                end;
+                NewTagStream := TMemoryStream.Create;
+                try
+                    Result := SaveTagToStream(NewTagStream, PaddingNeededToWrite);
+                    Stream.Seek(TagSizeInExistingStream, soBeginning);
+                    NewTagStream.CopyFrom(Stream, Stream.Size - TagSizeInExistingStream);
+                    Stream.Size := 0;
+                    Stream.Seek(0, soBeginning);
+                    Stream.CopyFrom(NewTagStream, 0);
+                    Result := ID3V2LIBRARY_SUCCESS;
+                except
+                    Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
+                    Exit;
+                end;
+            end else begin
+                try
+                    Result := SaveTagToStream(Stream, PaddingNeededToWrite);
+                except
+                    Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
+                    Exit;
+                end;
+            end;
+        finally
+            Stream.Seek(0, soBeginning);
             if Assigned(NewTagStream) then begin
                 FreeAndNil(NewTagStream);
             end;
@@ -4722,27 +5010,35 @@ begin
 end;
 
 function TID3v2Tag.CheckMPEG(MPEGStream: TStream): Boolean;
+Const
+    MPEG_SEARCH_LENGTH = 4096;
 var
+    i: Integer;
     Data: Byte;
 begin
     Result := False;
+    i := 0;
     Data := 0;
-    MPEGStream.Read(Data, 1);
-    if Data = $FF then begin
+    repeat
         MPEGStream.Read(Data, 1);
-        if (Data = $F9)
-        OR (Data = $FA)
-        OR (Data = $FB)
-        OR (Data = $FC)
-        OR (Data = $FD)
-        OR (Data = $F2)
-        OR (Data = $F3)
-        OR (Data = $E3)
-        then begin
-            Result := True;
+        if Data = $FF then begin
+            MPEGStream.Read(Data, 1);
+            if (Data = $F9)
+            OR (Data = $FA)
+            OR (Data = $FB)
+            OR (Data = $FC)
+            OR (Data = $FD)
+            OR (Data = $F2)
+            OR (Data = $F3)
+            OR (Data = $E3)
+            then begin
+                MPEGStream.Seek(- 2, soCurrent);
+                Result := True;
+                Exit;
+            end;
         end;
-    end;
-
+        Inc(i);
+    until i > MPEG_SEARCH_LENGTH;
 end;
 
 function TID3v2Tag.FullFrameSize(FrameIndex: Cardinal): Cardinal;
@@ -4835,6 +5131,7 @@ begin
     FPlayTime := 0;
     SampleCount := 0;
     BitRate := 0;
+    FStrangeTag := False;
 end;
 
 function TID3v2Tag.WriteAllFrames(var TagStream: TStream): Integer;
@@ -5919,7 +6216,7 @@ begin
     end;
 end;
 
-function ID3v2RemoveTag(FileName: String): Integer;
+function RemoveID3v2TagFromFile(FileName: String): Integer;
 var
     AudioFileName: String;
     AudioFile: TFileStream;
@@ -5957,7 +6254,7 @@ begin
                 if CheckRIFF(AudioFile) then begin
                     if SeekRIFF(AudioFile) > 0 then begin
                         FreeAndNil(AudioFile);
-                        Result := RemoveRIFFID3v2(FileName);
+                        Result := RemoveRIFFID3v2FromFile(FileName);
                         Exit;
                     end else begin
                         Exit;
@@ -5967,7 +6264,7 @@ begin
                     if CheckRF64(AudioFile) then begin
                         if SeekRF64(AudioFile) > 0 then begin
                             FreeAndNil(AudioFile);
-                            Result := RemoveRF64ID3v2(FileName);
+                            Result := RemoveRF64ID3v2FromFile(FileName);
                             Exit;
                         end else begin
                             Exit;
@@ -5977,7 +6274,7 @@ begin
                         if CheckAIFF(AudioFile) then begin
                             if SeekAIFF(AudioFile) > 0 then begin
                                 FreeAndNil(AudioFile);
-                                Result := RemoveAIFFID3v2(FileName);
+                                Result := RemoveAIFFID3v2FromFile(FileName);
                                 Exit;
                             end else begin
                                 Exit;
@@ -5987,7 +6284,7 @@ begin
                             if CheckDSF(AudioFile) then begin
                                 if SeekDSF(AudioFile) > 0 then begin
                                     FreeAndNil(AudioFile);
-                                    Result := RemoveDSFID3v2(FileName);
+                                    Result := RemoveDSFID3v2FromFile(FileName);
                                     Exit;
                                 end else begin
                                     Exit;
@@ -6027,6 +6324,100 @@ begin
             end else begin
                 RenameFile(OutputFileName, AudioFileName);
                 Result := ID3V2LIBRARY_SUCCESS;
+            end;
+        end;
+    except
+        Result := ID3V2LIBRARY_ERROR;
+    end;
+end;
+
+function RemoveID3v2TagFromStream(Stream: TStream): Integer;
+var
+    //AudioFileName: String;
+    //AudioFile: TFileStream;
+    //OutputFileName: String;
+    TempStream: TStream;
+    ID3v2Size: Integer;
+    TagCodedSizeInExistingStream: Cardinal;
+    TagSizeInExistingStream: Cardinal;
+begin
+    Result := ID3V2LIBRARY_ERROR;
+    TempStream := nil;
+    if Stream.Size = 0 then begin
+        Exit;
+    end;
+    ID3v2Size := 0;
+    try
+        Result := ID3V2LIBRARY_ERROR_EMPTY_TAG;
+
+        Stream.Seek(0, soBeginning);
+        if ID3v2ValidTag(Stream) then begin
+            //* Skip version data and flags
+            Stream.Seek(3, soCurrent);
+            Stream.Read(TagCodedSizeInExistingStream, 4);
+            UnSyncSafe(TagCodedSizeInExistingStream, 4, TagSizeInExistingStream);
+            //* Add header size to size
+            ID3v2Size := TagSizeInExistingStream + 10;
+        end else begin
+            Stream.Seek(0, soBeginning);
+            if CheckRIFF(Stream) then begin
+                if SeekRIFF(Stream) > 0 then begin
+                    FreeAndNil(Stream);
+                    Result := RemoveRIFFID3v2FromStream(Stream);
+                    Exit;
+                end else begin
+                    Exit;
+                end;
+            end else begin
+                Stream.Seek(0, soBeginning);
+                if CheckRF64(Stream) then begin
+                    if SeekRF64(Stream) > 0 then begin
+                        FreeAndNil(Stream);
+                        Result := RemoveRF64ID3v2FromStream(Stream);
+                        Exit;
+                    end else begin
+                        Exit;
+                    end;
+                end else begin
+                    Stream.Seek(0, soBeginning);
+                    if CheckAIFF(Stream) then begin
+                        if SeekAIFF(Stream) > 0 then begin
+                            FreeAndNil(Stream);
+                            Result := RemoveAIFFID3v2FromStream(Stream);
+                            Exit;
+                        end else begin
+                            Exit;
+                        end;
+                    end else begin
+                        Stream.Seek(0, soBeginning);
+                        if CheckDSF(Stream) then begin
+                            if SeekDSF(Stream) > 0 then begin
+                                FreeAndNil(Stream);
+                                Result := RemoveDSFID3v2FromStream(Stream);
+                                Exit;
+                            end else begin
+                                Exit;
+                            end;
+                        end;
+                    end;
+                end;
+            end;
+        end;
+        if ID3v2Size > 0 then begin
+            TempStream := TMemoryStream.Create;
+            try
+                Stream.Seek(ID3v2Size, soBeginning);
+                try
+                    TempStream.CopyFrom(Stream, Stream.Size - ID3v2Size);
+                except
+                    Exit;
+                end;
+                Stream.Size := 0;
+                Stream.CopyFrom(TempStream, 0);
+                Stream.Seek(0, soBeginning);
+                Result := ID3V2LIBRARY_SUCCESS;
+            finally
+                FreeAndNil(TempStream);
             end;
         end;
     except
@@ -6418,7 +6809,7 @@ var
     ChunkID: TFrameID;
     ChunkSize: DWord;
     PreviousPosition: Int64;
-    TempStream: TFileStream;
+    TempStream: TStream;
     TotalSize: Int64;
 begin
     Result := ID3V2LIBRARY_ERROR;
@@ -6450,11 +6841,15 @@ begin
             end;
             if TagStream.Position < TagStream.Size then begin
                 PreviousPosition := TagStream.Position;
-                try
-                    TempStream := TFileStream.Create(ChangeFileExt(FileName, '.tmp'), fmCreate);
-                except
-                    Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
-                    Exit;
+                if FileName <> '' then begin
+                    try
+                        TempStream := TFileStream.Create(ChangeFileExt(FileName, '.tmp'), fmCreate);
+                    except
+                        Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
+                        Exit;
+                    end;
+                end else begin
+                    TempStream := TMemoryStream.Create;
                 end;
                 TempStream.CopyFrom(TagStream, TagStream.Size - TagStream.Position);
                 TagStream.Seek(PreviousPosition, soBeginning);
@@ -6488,7 +6883,7 @@ var
     ChunkID: TFrameID;
     ChunkSize: DWord;
     PreviousPosition: Int64;
-    TempStream: TFileStream;
+    TempStream: TStream;
     TotalSize: Int64;
 begin
     Result := ID3V2LIBRARY_ERROR;
@@ -6526,11 +6921,15 @@ begin
                     PreviousPosition := TagStream.Position;
                     TagStream.Seek(ChunkSize + 4, soCurrent);
                     if TagStream.Position < TagStream.Size then begin
-                        try
-                            TempStream := TFileStream.Create(ChangeFileExt(FileName, '.tmp'), fmCreate);
-                        except
-                            Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
-                            Exit;
+                        if FileName <> '' then begin
+                            try
+                                TempStream := TFileStream.Create(ChangeFileExt(FileName, '.tmp'), fmCreate);
+                            except
+                                Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
+                                Exit;
+                            end;
+                        end else begin
+                            TempStream := TMemoryStream.Create;
                         end;
                         TempStream.CopyFrom(TagStream, TagStream.Size - TagStream.Position);
                     end;
@@ -6569,7 +6968,7 @@ var
     ChunkSize: DWord;
     ChunkSizeNew: DWord;
     PreviousPosition: Int64;
-    TempStream: TFileStream;
+    TempStream: TStream;
     ZeroByte: Byte;
     TotalSize: Int64;
 begin
@@ -6611,11 +7010,15 @@ begin
             end;
             if TagStream.Position < TagStream.Size then begin
                 PreviousPosition := TagStream.Position;
-                try
-                    TempStream := TFileStream.Create(ChangeFileExt(FileName, '.tmp'), fmCreate);
-                except
-                    Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
-                    Exit;
+                if FileName <> '' then begin
+                    try
+                        TempStream := TFileStream.Create(ChangeFileExt(FileName, '.tmp'), fmCreate);
+                    except
+                        Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
+                        Exit;
+                    end;
+                end else begin
+                    TempStream := TMemoryStream.Create;
                 end;
                 TempStream.CopyFrom(TagStream, TagStream.Size - TagStream.Position);
                 TagStream.Seek(PreviousPosition, soBeginning);
@@ -6655,7 +7058,7 @@ var
     ChunkSize: DWord;
     ChunkSizeNew: DWord;
     PreviousPosition: Int64;
-    TempStream: TFileStream;
+    TempStream: TStream;
     TotalSize: Int64;
 begin
     Result := ID3V2LIBRARY_ERROR;
@@ -6700,11 +7103,15 @@ begin
                     PreviousPosition := TagStream.Position;
                     TagStream.Seek(ChunkSize + 4, soCurrent);
                     if TagStream.Position < TagStream.Size then begin
-                        try
-                            TempStream := TFileStream.Create(ChangeFileExt(FileName, '.tmp'), fmCreate);
-                        except
-                            Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
-                            Exit;
+                        if FileName <> '' then begin
+                            try
+                                TempStream := TFileStream.Create(ChangeFileExt(FileName, '.tmp'), fmCreate);
+                            except
+                                Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
+                                Exit;
+                            end;
+                        end else begin
+                            TempStream := TMemoryStream.Create;
                         end;
                         TempStream.CopyFrom(TagStream, TagStream.Size - TagStream.Position);
                     end;
@@ -6743,7 +7150,7 @@ var
     ChunkID: TFrameID;
     ChunkSize: DWord;
     PreviousPosition: Int64;
-    TempStream: TFileStream;
+    TempStream: TStream;
     TotalSize: Int64;
     Waveds64: TWaveds64;
     Data: DWord;
@@ -6821,11 +7228,15 @@ begin
             end;
             if TagStream.Position < TagStream.Size then begin
                 PreviousPosition := TagStream.Position;
-                try
-                    TempStream := TFileStream.Create(ChangeFileExt(FileName, '.tmp'), fmCreate);
-                except
-                    Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
-                    Exit;
+                if FileName <> '' then begin
+                    try
+                        TempStream := TFileStream.Create(ChangeFileExt(FileName, '.tmp'), fmCreate);
+                    except
+                        Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
+                        Exit;
+                    end;
+                end else begin
+                    TempStream := TMemoryStream.Create;
                 end;
                 TempStream.CopyFrom(TagStream, TagStream.Size - TagStream.Position);
                 TagStream.Seek(PreviousPosition, soBeginning);
@@ -6859,7 +7270,7 @@ var
     ChunkID: TFrameID;
     ChunkSize: DWord;
     PreviousPosition: Int64;
-    TempStream: TFileStream;
+    TempStream: TStream;
     TotalSize: Int64;
     Waveds64: TWaveds64;
     RF64Size: Int64;
@@ -6934,11 +7345,15 @@ begin
                     PreviousPosition := TagStream.Position;
                     TagStream.Seek(ChunkSize + 4, soCurrent);
                     if TagStream.Position < TagStream.Size then begin
-                        try
-                            TempStream := TFileStream.Create(ChangeFileExt(FileName, '.tmp'), fmCreate);
-                        except
-                            Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
-                            Exit;
+                        if FileName <> '' then begin
+                            try
+                                TempStream := TFileStream.Create(ChangeFileExt(FileName, '.tmp'), fmCreate);
+                            except
+                                Result := ID3V2LIBRARY_ERROR_WRITING_FILE;
+                                Exit;
+                            end;
+                        end else begin
+                            TempStream := TMemoryStream.Create;
                         end;
                         TempStream.CopyFrom(TagStream, TagStream.Size - TagStream.Position);
                     end;
@@ -6978,7 +7393,7 @@ begin
     end;
 end;
 
-function RemoveRIFFID3v2(FileName: String): Integer;
+function RemoveRIFFID3v2FromFile(FileName: String): Integer;
 var
     RIFFChunkSize: DWord;
     RIFFChunkSizeNew: DWord;
@@ -7066,7 +7481,85 @@ begin
     end;
 end;
 
-function RemoveAIFFID3v2(FileName: String): Integer;
+function RemoveRIFFID3v2FromStream(Stream: TStream): Integer;
+var
+    RIFFChunkSize: DWord;
+    RIFFChunkSizeNew: DWord;
+    ChunkID: TFrameID;
+    ChunkSize: DWord;
+    PreviousPosition: Int64;
+    TempStream: TStream;
+    TagSize: DWord;
+begin
+    Result := ID3V2LIBRARY_ERROR;
+    TempStream := nil;
+    if Stream.Size = 0 then begin
+        Exit;
+    end;
+    try
+        Stream.Seek(0, soBeginning);
+        if CheckRIFF(Stream) then begin
+            TagSize := SeekRIFF(Stream);
+            if TagSize = 0 then begin
+                Result := ID3V2LIBRARY_ERROR_NO_TAG_FOUND;
+                Exit;
+            end;
+        end else begin
+            Result := ID3V2LIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
+            Exit;
+        end;
+        Stream.Seek(4, soBeginning);
+        Stream.Read(RIFFChunkSize, 4);
+        Stream.Seek(- 4, soCurrent);
+        RIFFChunkSizeNew := RIFFChunkSize - TagSize - 8;
+        Stream.Write(RIFFChunkSizeNew, 4);
+        Stream.Read(ChunkID, 4);
+        if (ChunkID[0] = RIFFWAVEID[0])
+        AND (ChunkID[1] = RIFFWAVEID[1])
+        AND (ChunkID[2] = RIFFWAVEID[2])
+        AND (ChunkID[3] = RIFFWAVEID[3])
+        then begin
+            ChunkSize := 0;
+            while Stream.Position + 8 < Stream.Size do begin
+                Stream.Read(ChunkID, 4);
+                Stream.Read(ChunkSize, 4);
+                if (ChunkID[0] = RIFFID3v2ID[0])
+                AND (ChunkID[1] = RIFFID3v2ID[1])
+                AND (ChunkID[2] = RIFFID3v2ID[2])
+                AND (ChunkID[3] = RIFFID3v2ID[3])
+                then begin
+                    Stream.Seek(- 8, soCurrent);
+                    PreviousPosition := Stream.Position;
+                    Stream.Seek(ChunkSize + 8, soCurrent);
+                    if Stream.Position + 8 + ChunkSize < Stream.Size then begin
+                        TempStream := TMemoryStream.Create;
+                        try
+                            TempStream.CopyFrom(Stream, Stream.Size - Stream.Position);
+                        except
+                            FreeAndNil(TempStream);
+                            Exit;
+                        end;
+                    end;
+                    Stream.Seek(PreviousPosition, soBeginning);
+                    Stream.Size := Stream.Position;
+                    if Assigned(TempStream) then begin
+                        TempStream.Seek(0, soBeginning);
+                        Stream.CopyFrom(TempStream, TempStream.Size);
+                        FreeAndNil(TempStream);
+                    end;
+                    Result := ID3V2LIBRARY_SUCCESS;
+                    Exit;
+                end else begin
+                    Stream.Seek(ChunkSize, soCurrent);
+                end;
+            end;
+        end;
+    except
+        Result := ID3V2LIBRARY_ERROR;
+    end;
+end;
+
+function RemoveAIFFID3v2FromFile(FileName: String): Integer;
 var
     AIFFChunkSize: DWord;
     AIFFChunkSizeNew: DWord;
@@ -7161,7 +7654,92 @@ begin
     end;
 end;
 
-function RemoveRF64ID3v2(FileName: String): Integer;
+function RemoveAIFFID3v2FromStream(Stream: TStream): Integer;
+var
+    AIFFChunkSize: DWord;
+    AIFFChunkSizeNew: DWord;
+    ChunkID: TFrameID;
+    ChunkSize: DWord;
+    PreviousPosition: Int64;
+    TempStream: TStream;
+    TagSize: DWord;
+begin
+    Result := ID3V2LIBRARY_ERROR;
+    TempStream := nil;
+    if Stream.Size = 0 then begin
+        Exit;
+    end;
+    try
+        Stream.Seek(0, soBeginning);
+        if CheckAIFF(Stream) then begin
+            TagSize := SeekAIFF(Stream);
+            if TagSize = 0 then begin
+                Result := ID3V2LIBRARY_ERROR_NO_TAG_FOUND;
+                Exit;
+            end;
+        end else begin
+            Result := ID3V2LIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
+            Exit;
+        end;
+        Stream.Seek(4, soBeginning);
+        Stream.Read(AIFFChunkSize, 4);
+        AIFFChunkSize := ReverseBytes(AIFFChunkSize);
+        Stream.Seek(- 4, soCurrent);
+        AIFFChunkSizeNew := AIFFChunkSize - TagSize - 8;
+        AIFFChunkSizeNew := ReverseBytes(AIFFChunkSizeNew);
+        Stream.Write(AIFFChunkSizeNew, 4);
+        Stream.Read(ChunkID, 4);
+        if ((ChunkID[0] = AIFFChunkID[0])
+        AND (ChunkID[1] = AIFFChunkID[1])
+        AND (ChunkID[2] = AIFFChunkID[2])
+        AND (ChunkID[3] = AIFFChunkID[3]))
+        OR ((ChunkID[0] = AIFCChunkID[0])
+        AND (ChunkID[1] = AIFCChunkID[1])
+        AND (ChunkID[2] = AIFCChunkID[2])
+        AND (ChunkID[3] = AIFCChunkID[3]))
+        then begin
+            ChunkSize := 0;
+            while Stream.Position + 8 < Stream.Size do begin
+                Stream.Read(ChunkID, 4);
+                Stream.Read(ChunkSize, 4);
+                ChunkSize := ReverseBytes(ChunkSize);
+                if (ChunkID[0] = AIFFID3v2ID[0])
+                AND (ChunkID[1] = AIFFID3v2ID[1])
+                AND (ChunkID[2] = AIFFID3v2ID[2])
+                AND (ChunkID[3] = AIFFID3v2ID[3])
+                then begin
+                    Stream.Seek(- 8, soCurrent);
+                    PreviousPosition := Stream.Position;
+                    Stream.Seek(ChunkSize + 8, soCurrent);
+                    if Stream.Position + 8 + ChunkSize < Stream.Size then begin
+                        TempStream := TMemoryStream.Create;
+                        try
+                            TempStream.CopyFrom(Stream, Stream.Size - Stream.Position);
+                        except
+                            FreeAndNil(TempStream);
+                            Exit;
+                        end;
+                    end;
+                    Stream.Seek(PreviousPosition, soBeginning);
+                    Stream.Size := Stream.Position;
+                    if Assigned(TempStream) then begin
+                        TempStream.Seek(0, soBeginning);
+                        Stream.CopyFrom(TempStream, TempStream.Size);
+                        FreeAndNil(TempStream);
+                    end;
+                    Result := ID3V2LIBRARY_SUCCESS;
+                    Exit;
+                end else begin
+                    Stream.Seek(ChunkSize, soCurrent);
+                end;
+            end;
+        end;
+    except
+        Result := ID3V2LIBRARY_ERROR;
+    end;
+end;
+
+function RemoveRF64ID3v2FromFile(FileName: String): Integer;
 var
     RIFFChunkSize: DWord;
     RIFFChunkSizeNew: DWord;
@@ -7306,7 +7884,143 @@ begin
     end;
 end;
 
-function RemoveDSFID3v2(FileName: String): Integer;
+function RemoveRF64ID3v2FromStream(Stream: TStream): Integer;
+var
+    RIFFChunkSize: DWord;
+    RIFFChunkSizeNew: DWord;
+    ChunkID: TFrameID;
+    ChunkSize: DWord;
+    PreviousPosition: Int64;
+    TempStream: TStream;
+    TagSize: DWord;
+    Waveds64: TWaveds64;
+    RF64Size: Int64;
+    Data: DWord;
+    TotalSize: Int64;
+begin
+    Result := ID3V2LIBRARY_ERROR;
+    TempStream := nil;
+    if Stream.Size = 0 then begin
+        Exit;
+    end;
+
+    try
+        Stream.Seek(0, soBeginning);
+        if CheckRF64(Stream) then begin
+            TagSize := SeekRF64(Stream);
+            if TagSize = 0 then begin
+                Result := ID3V2LIBRARY_ERROR_NO_TAG_FOUND;
+                Exit;
+            end;
+        end else begin
+            Result := ID3V2LIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
+            Exit;
+        end;
+        Stream.Seek(4, soBeginning);
+        Stream.Read(RIFFChunkSize, 4);
+        if RIFFChunkSize = $FFFFFFFF then begin
+            Stream.Read(ChunkID, 4);
+            if (ChunkID[0] <> Ord('W'))
+            OR (ChunkID[1] <> Ord('A'))
+            OR (ChunkID[2] <> Ord('V'))
+            OR (ChunkID[3] <> Ord('E'))
+            then begin
+                Result := ID3V2LIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
+                Exit;
+            end;
+            Stream.Read(ChunkID, 4);
+            if (ChunkID[0] = Ord('d'))
+            AND (ChunkID[1] = Ord('s'))
+            AND (ChunkID[2] = Ord('6'))
+            AND (ChunkID[3] = Ord('4'))
+            then begin
+                Stream.Read(Waveds64, SizeOf(TWaveds64));
+                RF64Size := MakeInt64(Waveds64.RIFFSizeLow, Waveds64.RIFFSizeHigh);
+                TotalSize := RF64Size - TagSize - 8;
+                if Odd(TotalSize) then begin
+                    Inc(TotalSize);
+                end;
+                //* Set new RF64 size
+                Stream.Position := 20;
+                Data := LowDWordOfInt64(TotalSize);
+                Stream.write(Data, 4);
+                Data := HighDWordOfInt64(TotalSize);
+                Stream.write(Data, 4);
+                Stream.Seek(8, soBeginning);
+            end;
+        end else begin
+            RF64Size := RIFFChunkSize;
+            Stream.Seek(- 4, soCurrent);
+            TotalSize := RF64Size - TagSize - 8;
+            //* Should not happen
+            {
+            if Odd(TotalSize) then begin
+                Inc(TotalSize);
+            end;
+            }
+            if TotalSize > $FFFFFFFF then begin
+                Result := ID3V2LIBRARY_ERROR_DOESNT_FIT;
+                Exit;
+            end;
+            RIFFChunkSizeNew := TotalSize;
+            Stream.Write(RIFFChunkSizeNew, 4);
+        end;
+        Stream.Read(ChunkID, 4);
+        if (ChunkID[0] = RIFFWAVEID[0])
+        AND (ChunkID[1] = RIFFWAVEID[1])
+        AND (ChunkID[2] = RIFFWAVEID[2])
+        AND (ChunkID[3] = RIFFWAVEID[3])
+        then begin
+            ChunkSize := 0;
+            while Stream.Position + 8 < Stream.Size do begin
+                Stream.Read(ChunkID, 4);
+                Stream.Read(ChunkSize, 4);
+                if (ChunkID[0] = RIFFID3v2ID[0])
+                AND (ChunkID[1] = RIFFID3v2ID[1])
+                AND (ChunkID[2] = RIFFID3v2ID[2])
+                AND (ChunkID[3] = RIFFID3v2ID[3])
+                then begin
+                    Stream.Seek(- 8, soCurrent);
+                    PreviousPosition := Stream.Position;
+                    Stream.Seek(ChunkSize + 8, soCurrent);
+                    if Stream.Position + 8 + ChunkSize < Stream.Size then begin
+                        TempStream := TMemoryStream.Create;
+                        try
+                            TempStream.CopyFrom(Stream, Stream.Size - Stream.Position);
+                        except
+                            FreeAndNil(TempStream);
+                            Exit;
+                        end;
+                    end;
+                    Stream.Seek(PreviousPosition, soBeginning);
+                    THandleStream(Stream).Size := Stream.Position;
+                    if Assigned(TempStream) then begin
+                        TempStream.Seek(0, soBeginning);
+                        Stream.CopyFrom(TempStream, TempStream.Size);
+                        FreeAndNil(TempStream);
+                    end;
+                    Result := ID3V2LIBRARY_SUCCESS;
+                    Exit;
+                end else begin
+                    if (ChunkID[0] = Ord('d'))
+                    AND (ChunkID[1] = Ord('a'))
+                    AND (ChunkID[2] = Ord('t'))
+                    AND (ChunkID[3] = Ord('a'))
+                    AND (ChunkSize = $FFFFFFFF)
+                    then begin
+                        Stream.Seek(MakeInt64(Waveds64.DataSizeLow, Waveds64.DataSizeHigh), soCurrent);
+                    end else begin
+                        Stream.Seek(ChunkSize, soCurrent);
+                    end;
+                end;
+            end;
+        end;
+    except
+        Result := ID3V2LIBRARY_ERROR;
+    end;
+end;
+
+function RemoveDSFID3v2FromFile(FileName: String): Integer;
 var
     TempStream: TFileStream;
     TagStream: TFileStream;
@@ -7373,6 +8087,69 @@ begin
                 FreeAndNil(TagStream);
             end;
         end;
+    except
+        Result := ID3V2LIBRARY_ERROR;
+    end;
+end;
+
+function RemoveDSFID3v2FromStream(Stream: TStream): Integer;
+var
+    TempStream: TStream;
+    TagSize: DWord;
+    ID3v2Pointer: UInt64;
+    DSFFileSize: UInt64;
+    Zero64: UInt64;
+begin
+    Result := ID3V2LIBRARY_ERROR;
+    Zero64 := 0;
+    TempStream := nil;
+    if Stream.Size = 0 then begin
+        Exit;
+    end;
+    try
+        Stream.Seek(0, soBeginning);
+        if CheckDSF(Stream) then begin
+            TagSize := SeekDSF(Stream);
+            if TagSize = 0 then begin
+                Result := ID3V2LIBRARY_ERROR_NO_TAG_FOUND;
+                Exit;
+            end;
+        end else begin
+            Result := ID3V2LIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
+            Exit;
+        end;
+        //* Update DSF file size
+        Stream.Seek(12, soBeginning);
+        Stream.Read(DSFFileSize, 8);
+        Dec(DSFFileSize, TagSize);
+        Stream.Seek(- 8, soCurrent);
+        Stream.Write(DSFFileSize, 8);
+        //* Update ID3v2 pointer
+        Stream.Read(ID3v2Pointer, 8);
+        Stream.Seek(- 8, soCurrent);
+        Stream.Write(Zero64, 8);
+        //* Check if there is tail data
+        Stream.Seek(ID3v2Pointer, soBeginning);
+        if Stream.Position + TagSize < Stream.Size then begin
+            TempStream := TMemoryStream.Create;
+            try
+                Stream.Seek(ID3v2Pointer + TagSize, soBeginning);
+                TempStream.CopyFrom(Stream, Stream.Size - Stream.Position);
+            except
+                FreeAndNil(TempStream);
+                Exit;
+            end;
+        end;
+        //* Truncate file at ID3v2 pointer
+        Stream.Seek(ID3v2Pointer, soBeginning);
+        Stream.Size := Stream.Position;
+        //* Copy remaining data if have it
+        if Assigned(TempStream) then begin
+            TempStream.Seek(0, soBeginning);
+            Stream.CopyFrom(TempStream, TempStream.Size);
+            FreeAndNil(TempStream);
+        end;
+        Result := ID3V2LIBRARY_SUCCESS;
     except
         Result := ID3V2LIBRARY_ERROR;
     end;
@@ -8877,7 +9654,7 @@ begin
         //* Save ID3v2 tag at ID3v2 pointer
         TagStream.Seek(ID3v2Pointer, soBeginning);
         //* Save the ID3v2 tag
-        SaveToStream(TagStream, 0);
+        SaveTagToStream(TagStream, 0);
         //* Set end of file
         TagStream.Size := TagStream.Position;
         //* Copy remaining data if have it
@@ -9041,236 +9818,242 @@ var
     Header: Longword;
     TmpHdr: Longword;
     Padding: Byte;
+    PreviousPosition: Int64;
 begin
-    Result.Position := MPEGStream.Position;
-    MPEGStream.Read(Data, 1);
-    Header := Data;
-    MPEGStream.Read(Data, 1);
-    Header := (Header SHL 8) OR Data;
-    MPEGStream.Read(Data, 1);
-    Header := (Header SHL 8) OR Data;
-    MPEGStream.Read(Data, 1);
-    Header := (Header SHL 8) OR Data;
-
-    Result.Header := Header;
-
-    TmpHdr := ((Header shl 11) shr 30);
-    case TmpHdr of
-        $0 : Result.Version := tmpegv25;
-        $1 : Result.Version := tmpegvUnknown;           // Reserved
-        $2 : Result.Version := tmpegv2;
-        $3 : Result.Version := tmpegv1;
-    end;
-    TmpHdr := ((Header shl 13) shr 30);
-    case TmpHdr of
-        $0 : Result.Layer := tmpeglUnknown;             // Reserved
-        $1 : Result.Layer := tmpegl3;
-        $2 : Result.Layer := tmpegl2;
-        $3 : Result.Layer := tmpegl1;
-    end;
-    TmpHdr := ((Header shl 15) shr 31);
-    case TmpHdr of
-        $0 : Result.CRC := True;
-        $1 : Result.CRC := False;
-    end;
-    TmpHdr := ((Header shl 16) shr 28);
-    if Result.Version = tmpegv1 then begin
-        if Result.Layer = tmpegl3 then begin
-            case TmpHdr of
-                $0 : Result.BitRate := 65535;           // Free bitrate
-                $1 : Result.BitRate := 32;
-                $2 : Result.BitRate := 40;
-                $3 : Result.BitRate := 48;
-                $4 : Result.BitRate := 56;
-                $5 : Result.BitRate := 64;
-                $6 : Result.BitRate := 80;
-                $7 : Result.BitRate := 96;
-                $8 : Result.BitRate := 112;
-                $9 : Result.BitRate := 128;
-                $A : Result.BitRate := 160;
-                $B : Result.BitRate := 192;
-                $C : Result.BitRate := 224;
-                $D : Result.BitRate := 256;
-                $E : Result.BitRate := 320;
-                $F : Result.BitRate := 0;               // Bad bitrate
-            end;
-        end;
-        if Result.Layer = tmpegl2 then begin
-            case TmpHdr of
-                $0 : Result.BitRate := 65535;           // Free bitrate
-                $1 : Result.BitRate := 32;
-                $2 : Result.BitRate := 48;
-                $3 : Result.BitRate := 56;
-                $4 : Result.BitRate := 64;
-                $5 : Result.BitRate := 80;
-                $6 : Result.BitRate := 96;
-                $7 : Result.BitRate := 112;
-                $8 : Result.BitRate := 128;
-                $9 : Result.BitRate := 160;
-                $A : Result.BitRate := 192;
-                $B : Result.BitRate := 224;
-                $C : Result.BitRate := 256;
-                $D : Result.BitRate := 320;
-                $E : Result.BitRate := 384;
-                $F : Result.BitRate := 0;               // Bad bitrate
-            end;
-        end;
-        if Result.Layer = tmpegl1 then begin
-            case TmpHdr of
-                $0 : Result.BitRate := 65535;           // Free bitrate
-                $1 : Result.BitRate := 32;
-                $2 : Result.BitRate := 64;
-                $3 : Result.BitRate := 96;
-                $4 : Result.BitRate := 128;
-                $5 : Result.BitRate := 160;
-                $6 : Result.BitRate := 192;
-                $7 : Result.BitRate := 224;
-                $8 : Result.BitRate := 256;
-                $9 : Result.BitRate := 288;
-                $A : Result.BitRate := 320;
-                $B : Result.BitRate := 352;
-                $C : Result.BitRate := 384;
-                $D : Result.BitRate := 416;
-                $E : Result.BitRate := 448;
-                $F : Result.BitRate := 0;               // Bad bitrate
-            end;
-        end;
-        TmpHdr := ((Header shl 20) shr 30);
-        case TmpHdr of
-            $0 : Result.SampleRate := 44100;
-            $1 : Result.SampleRate := 48000;
-            $2 : Result.SampleRate := 32000;
-            $3 : Result.SampleRate := 0;                // Reserved
-        end;
-    end;
-    if (Result.Version = tmpegv2) OR (Result.Version = tmpegv25) then begin
-        if (Result.Layer = tmpegl3) OR (Result.Layer = tmpegl2) then begin
-            case TmpHdr of
-                $0: Result.BitRate := 65535;            // Free bitrate
-                $1: Result.BitRate := 8;
-                $2: Result.BitRate := 16;
-                $3: Result.BitRate := 24;
-                $4: Result.BitRate := 32;
-                $5: Result.BitRate := 40;
-                $6: Result.BitRate := 48;
-                $7: Result.BitRate := 56;
-                $8: Result.BitRate := 64;
-                $9: Result.BitRate := 80;
-                $A: Result.BitRate := 96;
-                $B: Result.BitRate := 112;
-                $C: Result.BitRate := 128;
-                $D: Result.BitRate := 144;
-                $E: Result.BitRate := 160;
-                $F: Result.BitRate := 0;                // Bad bitrate
-            end;
-        end;
-        if Result.Layer = tmpegl1 then begin
-            case TmpHdr of
-                $0: Result.BitRate := 65535;            // Free bitrate
-                $1: Result.BitRate := 32;
-                $2: Result.BitRate := 48;
-                $3: Result.BitRate := 56;
-                $4: Result.BitRate := 64;
-                $5: Result.BitRate := 80;
-                $6: Result.BitRate := 96;
-                $7: Result.BitRate := 112;
-                $8: Result.BitRate := 128;
-                $9: Result.BitRate := 144;
-                $A: Result.BitRate := 160;
-                $B: Result.BitRate := 176;
-                $C: Result.BitRate := 192;
-                $D: Result.BitRate := 224;
-                $E: Result.BitRate := 256;
-                $F: Result.BitRate := 0;                // Bad bitrate
-            end;
-        end;
-        TmpHdr := ((Header shl 20) shr 30);
-        if (Result.Version = tmpegv2) then begin
-            case TmpHdr of
-                $0: Result.SampleRate := 22050;
-                $1: Result.SampleRate := 24000;
-                $2: Result.SampleRate := 16000;
-                $3: Result.SampleRate := 0;             // Reserved
-            end;
-        end;
-        if (Result.Version = tmpegv25) then begin
-            case TmpHdr of
-                $0: Result.SampleRate := 32000;
-                $1: Result.SampleRate := 16000;
-                $2: Result.SampleRate := 8000;
-                $3: Result.SampleRate := 0;             // Reserved
-            end;
-        end;
-    end;
-    TmpHdr := ((Header shl 22) shr 31);
-    case TmpHdr of
-        $0 : Result.Padding := False;
-        $1 : Result.Padding := True;
-    end;
-    TmpHdr := ((Header shl 23) shr 31);
-    case TmpHdr of
-        $0 : Result._Private := False;
-        $1 : Result._Private := True;
-    end;
-    TmpHdr := ((Header shl 24) shr 30);
-    case TmpHdr of
-        $0 : Result.ChannelMode := tmpegcmStereo;
-        $1 : begin
-            Result.ChannelMode := tmpegcmJointStereo;
-            TmpHdr := ((Header shl 26) shr 30);
-            case TmpHdr of
-                $0 : Result.ModeExtension := tmpegmeNone;
-                $1 : Result.ModeExtension := tmpegmeIntensity;
-                $2 : Result.ModeExtension := tmpegmeMS;
-                $3 : Result.ModeExtension := tmpegmeIntensityMS;
-            end;
-        end;
-        $2 : Result.ChannelMode := tmpegcmDualChannel;
-        $3 : Result.ChannelMode := tmpegcmMono;
-    end;
-    TmpHdr := ((Header shl 28) shr 31);
-    case TmpHdr of
-        $0 : Result.Copyrighted := False;
-        $1 : Result.Copyrighted := True;
-    end;
-    TmpHdr := ((Header shl 29) shr 31);
-    case TmpHdr of
-        $0 : Result.Original := False;
-        $1 : Result.Original := True;
-    end;
-    TmpHdr := ((Header shl 30) shr 30);
-    case TmpHdr of
-        $0 : Result.Emphasis := tmpegeNo;
-        $1 : Result.Emphasis := tmpege5015;
-        $2 : Result.Emphasis := tmpegeUnknown;
-        $3 : Result.Emphasis := tmpegeCCITJ17;
-    end;
-    if Result.Padding
-        then Padding := 1
-        else Padding := 0;
+    PreviousPosition := MPEGStream.Position;
     try
-        if (Result.Version = tmpegv1) then begin
-            if Result.SampleRate <> 0 then begin
-                if Result.Layer = tmpegl1
-                    then Result.FrameSize := Trunc((24000 * Result.BitRate / Result.SampleRate) + Padding);
-        	    if (Result.Layer = tmpegl2)
-                OR (Result.Layer = tmpegl3)
-                    then Result.FrameSize := Trunc((144000 * Result.BitRate / Result.SampleRate ) + Padding);
-            end else Result.FrameSize := 0;
+        Result.Position := MPEGStream.Position;
+        MPEGStream.Read(Data, 1);
+        Header := Data;
+        MPEGStream.Read(Data, 1);
+        Header := (Header SHL 8) OR Data;
+        MPEGStream.Read(Data, 1);
+        Header := (Header SHL 8) OR Data;
+        MPEGStream.Read(Data, 1);
+        Header := (Header SHL 8) OR Data;
+
+        Result.Header := Header;
+
+        TmpHdr := ((Header shl 11) shr 30);
+        case TmpHdr of
+            $0 : Result.Version := tmpegv25;
+            $1 : Result.Version := tmpegvUnknown;           // Reserved
+            $2 : Result.Version := tmpegv2;
+            $3 : Result.Version := tmpegv1;
         end;
-        if (Result.Version = tmpegv2)
-        OR (Result.Version = tmpegv25)
-        then begin
-            if Result.SampleRate <> 0 then begin
-                if Result.Layer = tmpegl1
-                    then Result.FrameSize := Trunc((24000 * Result.BitRate / Result.SampleRate) + Padding);
-        	    if (Result.Layer = tmpegl2)
-                OR (Result.Layer = tmpegl3)
-                    then Result.FrameSize := Trunc((72000 * Result.BitRate / Result.SampleRate) + Padding);
-            end else Result.FrameSize := 0;
+        TmpHdr := ((Header shl 13) shr 30);
+        case TmpHdr of
+            $0 : Result.Layer := tmpeglUnknown;             // Reserved
+            $1 : Result.Layer := tmpegl3;
+            $2 : Result.Layer := tmpegl2;
+            $3 : Result.Layer := tmpegl1;
         end;
-    except
-        //* Devide by zero possible
+        TmpHdr := ((Header shl 15) shr 31);
+        case TmpHdr of
+            $0 : Result.CRC := True;
+            $1 : Result.CRC := False;
+        end;
+        TmpHdr := ((Header shl 16) shr 28);
+        if Result.Version = tmpegv1 then begin
+            if Result.Layer = tmpegl3 then begin
+                case TmpHdr of
+                    $0 : Result.BitRate := 65535;           // Free bitrate
+                    $1 : Result.BitRate := 32;
+                    $2 : Result.BitRate := 40;
+                    $3 : Result.BitRate := 48;
+                    $4 : Result.BitRate := 56;
+                    $5 : Result.BitRate := 64;
+                    $6 : Result.BitRate := 80;
+                    $7 : Result.BitRate := 96;
+                    $8 : Result.BitRate := 112;
+                    $9 : Result.BitRate := 128;
+                    $A : Result.BitRate := 160;
+                    $B : Result.BitRate := 192;
+                    $C : Result.BitRate := 224;
+                    $D : Result.BitRate := 256;
+                    $E : Result.BitRate := 320;
+                    $F : Result.BitRate := 0;               // Bad bitrate
+                end;
+            end;
+            if Result.Layer = tmpegl2 then begin
+                case TmpHdr of
+                    $0 : Result.BitRate := 65535;           // Free bitrate
+                    $1 : Result.BitRate := 32;
+                    $2 : Result.BitRate := 48;
+                    $3 : Result.BitRate := 56;
+                    $4 : Result.BitRate := 64;
+                    $5 : Result.BitRate := 80;
+                    $6 : Result.BitRate := 96;
+                    $7 : Result.BitRate := 112;
+                    $8 : Result.BitRate := 128;
+                    $9 : Result.BitRate := 160;
+                    $A : Result.BitRate := 192;
+                    $B : Result.BitRate := 224;
+                    $C : Result.BitRate := 256;
+                    $D : Result.BitRate := 320;
+                    $E : Result.BitRate := 384;
+                    $F : Result.BitRate := 0;               // Bad bitrate
+                end;
+            end;
+            if Result.Layer = tmpegl1 then begin
+                case TmpHdr of
+                    $0 : Result.BitRate := 65535;           // Free bitrate
+                    $1 : Result.BitRate := 32;
+                    $2 : Result.BitRate := 64;
+                    $3 : Result.BitRate := 96;
+                    $4 : Result.BitRate := 128;
+                    $5 : Result.BitRate := 160;
+                    $6 : Result.BitRate := 192;
+                    $7 : Result.BitRate := 224;
+                    $8 : Result.BitRate := 256;
+                    $9 : Result.BitRate := 288;
+                    $A : Result.BitRate := 320;
+                    $B : Result.BitRate := 352;
+                    $C : Result.BitRate := 384;
+                    $D : Result.BitRate := 416;
+                    $E : Result.BitRate := 448;
+                    $F : Result.BitRate := 0;               // Bad bitrate
+                end;
+            end;
+            TmpHdr := ((Header shl 20) shr 30);
+            case TmpHdr of
+                $0 : Result.SampleRate := 44100;
+                $1 : Result.SampleRate := 48000;
+                $2 : Result.SampleRate := 32000;
+                $3 : Result.SampleRate := 0;                // Reserved
+            end;
+        end;
+        if (Result.Version = tmpegv2) OR (Result.Version = tmpegv25) then begin
+            if (Result.Layer = tmpegl3) OR (Result.Layer = tmpegl2) then begin
+                case TmpHdr of
+                    $0: Result.BitRate := 65535;            // Free bitrate
+                    $1: Result.BitRate := 8;
+                    $2: Result.BitRate := 16;
+                    $3: Result.BitRate := 24;
+                    $4: Result.BitRate := 32;
+                    $5: Result.BitRate := 40;
+                    $6: Result.BitRate := 48;
+                    $7: Result.BitRate := 56;
+                    $8: Result.BitRate := 64;
+                    $9: Result.BitRate := 80;
+                    $A: Result.BitRate := 96;
+                    $B: Result.BitRate := 112;
+                    $C: Result.BitRate := 128;
+                    $D: Result.BitRate := 144;
+                    $E: Result.BitRate := 160;
+                    $F: Result.BitRate := 0;                // Bad bitrate
+                end;
+            end;
+            if Result.Layer = tmpegl1 then begin
+                case TmpHdr of
+                    $0: Result.BitRate := 65535;            // Free bitrate
+                    $1: Result.BitRate := 32;
+                    $2: Result.BitRate := 48;
+                    $3: Result.BitRate := 56;
+                    $4: Result.BitRate := 64;
+                    $5: Result.BitRate := 80;
+                    $6: Result.BitRate := 96;
+                    $7: Result.BitRate := 112;
+                    $8: Result.BitRate := 128;
+                    $9: Result.BitRate := 144;
+                    $A: Result.BitRate := 160;
+                    $B: Result.BitRate := 176;
+                    $C: Result.BitRate := 192;
+                    $D: Result.BitRate := 224;
+                    $E: Result.BitRate := 256;
+                    $F: Result.BitRate := 0;                // Bad bitrate
+                end;
+            end;
+            TmpHdr := ((Header shl 20) shr 30);
+            if (Result.Version = tmpegv2) then begin
+                case TmpHdr of
+                    $0: Result.SampleRate := 22050;
+                    $1: Result.SampleRate := 24000;
+                    $2: Result.SampleRate := 16000;
+                    $3: Result.SampleRate := 0;             // Reserved
+                end;
+            end;
+            if (Result.Version = tmpegv25) then begin
+                case TmpHdr of
+                    $0: Result.SampleRate := 32000;
+                    $1: Result.SampleRate := 16000;
+                    $2: Result.SampleRate := 8000;
+                    $3: Result.SampleRate := 0;             // Reserved
+                end;
+            end;
+        end;
+        TmpHdr := ((Header shl 22) shr 31);
+        case TmpHdr of
+            $0 : Result.Padding := False;
+            $1 : Result.Padding := True;
+        end;
+        TmpHdr := ((Header shl 23) shr 31);
+        case TmpHdr of
+            $0 : Result._Private := False;
+            $1 : Result._Private := True;
+        end;
+        TmpHdr := ((Header shl 24) shr 30);
+        case TmpHdr of
+            $0 : Result.ChannelMode := tmpegcmStereo;
+            $1 : begin
+                Result.ChannelMode := tmpegcmJointStereo;
+                TmpHdr := ((Header shl 26) shr 30);
+                case TmpHdr of
+                    $0 : Result.ModeExtension := tmpegmeNone;
+                    $1 : Result.ModeExtension := tmpegmeIntensity;
+                    $2 : Result.ModeExtension := tmpegmeMS;
+                    $3 : Result.ModeExtension := tmpegmeIntensityMS;
+                end;
+            end;
+            $2 : Result.ChannelMode := tmpegcmDualChannel;
+            $3 : Result.ChannelMode := tmpegcmMono;
+        end;
+        TmpHdr := ((Header shl 28) shr 31);
+        case TmpHdr of
+            $0 : Result.Copyrighted := False;
+            $1 : Result.Copyrighted := True;
+        end;
+        TmpHdr := ((Header shl 29) shr 31);
+        case TmpHdr of
+            $0 : Result.Original := False;
+            $1 : Result.Original := True;
+        end;
+        TmpHdr := ((Header shl 30) shr 30);
+        case TmpHdr of
+            $0 : Result.Emphasis := tmpegeNo;
+            $1 : Result.Emphasis := tmpege5015;
+            $2 : Result.Emphasis := tmpegeUnknown;
+            $3 : Result.Emphasis := tmpegeCCITJ17;
+        end;
+        if Result.Padding
+            then Padding := 1
+            else Padding := 0;
+        try
+            if (Result.Version = tmpegv1) then begin
+                if Result.SampleRate <> 0 then begin
+                    if Result.Layer = tmpegl1
+                        then Result.FrameSize := Trunc((24000 * Result.BitRate / Result.SampleRate) + Padding);
+                    if (Result.Layer = tmpegl2)
+                    OR (Result.Layer = tmpegl3)
+                        then Result.FrameSize := Trunc((144000 * Result.BitRate / Result.SampleRate ) + Padding);
+                end else Result.FrameSize := 0;
+            end;
+            if (Result.Version = tmpegv2)
+            OR (Result.Version = tmpegv25)
+            then begin
+                if Result.SampleRate <> 0 then begin
+                    if Result.Layer = tmpegl1
+                        then Result.FrameSize := Trunc((24000 * Result.BitRate / Result.SampleRate) + Padding);
+                    if (Result.Layer = tmpegl2)
+                    OR (Result.Layer = tmpegl3)
+                        then Result.FrameSize := Trunc((72000 * Result.BitRate / Result.SampleRate) + Padding);
+                end else Result.FrameSize := 0;
+            end;
+        except
+            //* Devide by zero possible
+        end;
+    finally
+        MPEGStream.Seek(PreviousPosition, soBeginning);
     end;
 end;
 

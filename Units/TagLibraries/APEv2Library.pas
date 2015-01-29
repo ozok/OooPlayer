@@ -1,6 +1,6 @@
 // ********************************************************************************************************************************
 // *                                                                                                                              *
-// *     APEv2 Library 1.0.5.6 © 3delite 2012-2014                                                                                *
+// *     APEv2 Library 1.0.6.8 © 3delite 2012-2015                                                                                *
 // *     See APEv2 Library Readme.txt for details                                                                                 *
 // *                                                                                                                              *
 // * Two licenses are available for commercial usage of this component:                                                           *
@@ -56,7 +56,7 @@ Uses
   Classes;
 
 Const
-  APEv2LIBRARY_VERSION = $01000506;
+  APEv2LIBRARY_VERSION = $01000608;
 
 Const
   APEV2LIBRARY_SUCCESS = 0;
@@ -130,7 +130,7 @@ type
     function LoadFromFile(FileName: String): Integer;
     function LoadFromStream(TagStream: TStream): Integer;
     function SaveToFile(FileName: String): Integer;
-    // function SaveToStream(var TagStream: TStream): Integer;
+    function SaveToStream(Stream: TStream): Integer;
     function AddFrame(Name: String): TAPEv2Frame;
     function DeleteFrame(FrameIndex: Integer): Boolean;
     procedure DeleteAllFrames;
@@ -159,7 +159,9 @@ type
   end;
 
 function APEv2ValidTag(TagStream: TStream): Boolean;
+
 function RemoveAPEv2FromFile(FileName: String): Integer;
+function RemoveAPEv2FromStream(Stream: TStream): Integer;
 
 function APEv2TagErrorCode2String(ErrorCode: Integer): String;
 
@@ -914,18 +916,8 @@ end;
 function TAPEv2Tag.SaveToFile(FileName: String): Integer;
 var
   TagStream: TStream;
-  ReadID3v1ID: TID3v1ID;
-  APEv2Header: TAPEv2Header;
-  ID3v1Stream: TMemoryStream;
-  APEv2TagExists: Boolean;
-  i: Integer;
-  Bytes: TBytes;
-  FrameSize: Cardinal;
-  FrameFlags: Cardinal;
-  Data: Byte;
 begin
   // Result := APEV2LIBRARY_ERROR;
-  APEv2TagExists := False;
   TagStream := nil;
   try
     try
@@ -948,21 +940,65 @@ begin
       begin
         TagStream := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareDenyWrite);
       end;
+      Result := SaveToStream(TagStream);
+    finally
+      if Assigned(TagStream) then
+      begin
+        FreeAndNil(TagStream);
+      end;
+    end;
+  except
+    Result := APEV2LIBRARY_ERROR;
+  end;
+end;
+
+function TAPEv2Tag.SaveToStream(Stream: TStream): Integer;
+var
+  // TagStream: TStream;
+  ReadID3v1ID: TID3v1ID;
+  APEv2Header: TAPEv2Header;
+  ID3v1Stream: TMemoryStream;
+  APEv2TagExists: Boolean;
+  i: Integer;
+  Bytes: TBytes;
+  FrameSize: Cardinal;
+  FrameFlags: Cardinal;
+  Data: Byte;
+begin
+  // Result := APEV2LIBRARY_ERROR;
+  APEv2TagExists := False;
+  // Stream := nil;
+  try
+    try
+      RemoveEmptyFrames;
+      if Length(Frames) = 0 then
+      begin
+        Result := APEV2LIBRARY_ERROR_EMPTY_TAG;
+        Exit;
+      end;
+      if CalculateTotalFramesSize = 0 then
+      begin
+        Result := APEV2LIBRARY_ERROR_EMPTY_FRAMES;
+        Exit;
+      end;
       ID3v1Stream := TMemoryStream.Create;
-      TagStream.Seek(-128, soEnd);
-      TagStream.Read(ReadID3v1ID, 3);
+      if Stream.Size >= 128 then
+      begin
+        Stream.Seek(-128, soEnd);
+        Stream.Read(ReadID3v1ID, 3);
+      end;
       if (ReadID3v1ID[0] = ID3v1ID[0]) AND (ReadID3v1ID[1] = ID3v1ID[1]) AND (ReadID3v1ID[2] = ID3v1ID[2]) then
       begin
-        TagStream.Seek(-128, soEnd);
-        ID3v1Stream.CopyFrom(TagStream, 128);
+        Stream.Seek(-128, soEnd);
+        ID3v1Stream.CopyFrom(Stream, 128);
         ID3v1Stream.Seek(0, soBeginning);
-        TagStream.Seek(-32 - 128, soEnd);
+        Stream.Seek(-32 - 128, soEnd);
       end
       else
       begin
-        TagStream.Seek(-32, soEnd);
+        Stream.Seek(-32, soEnd);
       end;
-      if APEv2ValidTag(TagStream) then
+      if APEv2ValidTag(Stream) then
       begin
         APEv2TagExists := True;
       end;
@@ -970,24 +1006,24 @@ begin
       begin
         if ID3v1Stream.Size <> 0 then
         begin
-          TagStream.Seek(-128, soEnd);
+          Stream.Seek(-128, soEnd);
         end
         else
         begin
-          TagStream.Seek(0, soEnd);
+          Stream.Seek(0, soEnd);
         end;
       end
       else
       begin
         if ID3v1Stream.Size <> 0 then
         begin
-          TagStream.Seek(-24 - 128, soEnd);
+          Stream.Seek(-24 - 128, soEnd);
         end
         else
         begin
-          TagStream.Seek(-24, soEnd);
+          Stream.Seek(-24, soEnd);
         end;
-        if TagStream.Read(APEv2Header, SizeOf(TAPEv2Header)) <> SizeOf(TAPEv2Header) then
+        if Stream.Read(APEv2Header, SizeOf(TAPEv2Header)) <> SizeOf(TAPEv2Header) then
         begin
           Result := APEV2LIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
           Exit;
@@ -1010,8 +1046,8 @@ begin
           Result := APEV2LIBRARY_ERROR_CORRUPT;
           Exit;
         end;
-        TagStream.Seek(-APEv2Header.TagSize, soCurrent);
-        TagStream.Seek(-32, soCurrent);
+        Stream.Seek(-APEv2Header.TagSize, soCurrent);
+        Stream.Seek(-32, soCurrent);
       end;
       // * Do the write
       APEv2Header.Version := 2000;
@@ -1019,8 +1055,8 @@ begin
       APEv2Header.ItemCount := Length(Frames);
       APEv2Header.Flags := $A0000000;
       APEv2Header.Reserved := 0;
-      TagStream.Write(APEv2ID, 8);
-      TagStream.Write(APEv2Header, SizeOf(TAPEv2Header));
+      Stream.Write(APEv2ID, 8);
+      Stream.Write(APEv2Header, SizeOf(TAPEv2Header));
       for i := 0 to Length(Frames) - 1 do
       begin
         if UpperCaseFieldNamesToWrite then
@@ -1050,25 +1086,21 @@ begin
             end;
         end;
         FrameSize := Frames[i].Stream.Size;
-        TagStream.Write(FrameSize, 4);
-        TagStream.Write(FrameFlags, 4);
-        TagStream.Write(Bytes[0], Length(Bytes));
+        Stream.Write(FrameSize, 4);
+        Stream.Write(FrameFlags, 4);
+        Stream.Write(Bytes[0], Length(Bytes));
         Data := $0;
-        TagStream.Write(Data, 1);
+        Stream.Write(Data, 1);
         Frames[i].Stream.Seek(0, soBeginning);
-        TagStream.CopyFrom(Frames[i].Stream, Frames[i].Stream.Size);
+        Stream.CopyFrom(Frames[i].Stream, Frames[i].Stream.Size);
       end;
-      TagStream.Write(APEv2ID, 8);
+      Stream.Write(APEv2ID, 8);
       APEv2Header.Flags := $A0000000 AND NOT $20000000;
-      TagStream.Write(APEv2Header, SizeOf(TAPEv2Header));
-      TagStream.CopyFrom(ID3v1Stream, ID3v1Stream.Size);
-      TFileStream(TagStream).Size := TagStream.Position;
+      Stream.Write(APEv2Header, SizeOf(TAPEv2Header));
+      Stream.CopyFrom(ID3v1Stream, ID3v1Stream.Size);
+      TFileStream(Stream).Size := Stream.Position;
       Result := APEV2LIBRARY_SUCCESS;
     finally
-      if Assigned(TagStream) then
-      begin
-        FreeAndNil(TagStream);
-      end;
       if Assigned(ID3v1Stream) then
       begin
         FreeAndNil(ID3v1Stream);
@@ -1810,8 +1842,11 @@ begin
         TagStream := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareDenyWrite);
       end;
       ID3v1Stream := TMemoryStream.Create;
-      TagStream.Seek(-128, soEnd);
-      TagStream.Read(ReadID3v1ID, 3);
+      if TagStream.Size >= 128 then
+      begin
+        TagStream.Seek(-128, soEnd);
+        TagStream.Read(ReadID3v1ID, 3);
+      end;
       if (ReadID3v1ID[0] = ID3v1ID[0]) AND (ReadID3v1ID[1] = ID3v1ID[1]) AND (ReadID3v1ID[2] = ID3v1ID[2]) then
       begin
         TagStream.Seek(-128, soEnd);
@@ -1869,6 +1904,90 @@ begin
       begin
         FreeAndNil(TagStream);
       end;
+      if Assigned(ID3v1Stream) then
+      begin
+        FreeAndNil(ID3v1Stream);
+      end;
+    end;
+  except
+    Result := APEV2LIBRARY_ERROR;
+  end;
+end;
+
+function RemoveAPEv2FromStream(Stream: TStream): Integer;
+var
+  ReadID3v1ID: TID3v1ID;
+  APEv2Header: TAPEv2Header;
+  ID3v1Stream: TMemoryStream;
+begin
+  // Result := APEV2LIBRARY_ERROR;
+  if Stream.Size = 0 then
+  begin
+    Result := APEV2LIBRARY_SUCCESS;
+    Exit;
+  end;
+  try
+    try
+      ID3v1Stream := TMemoryStream.Create;
+      if Stream.Size >= 128 then
+      begin
+        Stream.Seek(-128, soEnd);
+        Stream.Read(ReadID3v1ID, 3);
+      end;
+      if (ReadID3v1ID[0] = ID3v1ID[0]) AND (ReadID3v1ID[1] = ID3v1ID[1]) AND (ReadID3v1ID[2] = ID3v1ID[2]) then
+      begin
+        Stream.Seek(-128, soEnd);
+        ID3v1Stream.CopyFrom(Stream, 128);
+        ID3v1Stream.Seek(0, soBeginning);
+        Stream.Seek(-32 - 128, soEnd);
+      end
+      else
+      begin
+        Stream.Seek(-32, soEnd);
+      end;
+      if NOT APEv2ValidTag(Stream) then
+      begin
+        Result := APEV2LIBRARY_ERROR_NO_TAG_FOUND;
+        Exit;
+      end;
+      if ID3v1Stream.Size <> 0 then
+      begin
+        Stream.Seek(-24 - 128, soEnd);
+      end
+      else
+      begin
+        Stream.Seek(-24, soEnd);
+      end;
+      if Stream.Read(APEv2Header, SizeOf(TAPEv2Header)) <> SizeOf(TAPEv2Header) then
+      begin
+        Result := APEV2LIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
+        Exit;
+      end;
+      if APEv2Header.Reserved <> 0 then
+      begin
+        Result := APEV2LIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
+        Exit;
+      end;
+      if (APEv2Header.Version <> 2000) then
+      begin
+        if (APEv2Header.Version <> 1000) then
+        begin
+          Result := APEV2LIBRARY_ERROR_NOT_SUPPORTED_VERSION;
+          Exit;
+        end;
+      end;
+      if APEv2Header.Flags AND NOT $80000001 <> 0 then
+      begin
+        Result := APEV2LIBRARY_ERROR_CORRUPT;
+        Exit;
+      end;
+      Stream.Seek(-APEv2Header.TagSize, soCurrent);
+      Stream.Seek(-32, soCurrent);
+      Stream.Size := Stream.Position;
+      Stream.CopyFrom(ID3v1Stream, ID3v1Stream.Size);
+      Stream.Seek(0, soBeginning);
+      Result := APEV2LIBRARY_SUCCESS;
+    finally
       if Assigned(ID3v1Stream) then
       begin
         FreeAndNil(ID3v1Stream);

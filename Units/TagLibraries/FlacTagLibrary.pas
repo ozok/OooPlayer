@@ -1,6 +1,6 @@
 // ********************************************************************************************************************************
 // *                                                                                                                              *
-// *     Flac Tag Library 2.0.11.32 © 3delite 2013-2014                                                                           *
+// *     Flac Tag Library 2.0.14.38 © 3delite 2013-2015                                                                           *
 // *     See Flac Tag Library Readme.txt for details                                                                              *
 // *                                                                                                                              *
 // * This unit is based on ATL's FlacFile class but many new features were added, specially full support for managing cover arts, *
@@ -266,13 +266,14 @@ type
     FExists: Boolean;
     procedure FResetData(const HeaderInfo, TagFields: Boolean);
     function FIsValid: Boolean;
-    function FGetDuration: Double;
+    function FGetPlayTime: Double;
     function FGetRatio: Double;
     function FGetChannelMode: String;
-    function GetInfo(FileName: String; SetTags: Boolean): Integer;
+    function GetInfo(Stream: TStream; SetTags: Boolean): Integer;
     procedure ReadTag(Source: TStream; SetTagFields: Boolean);
-    function RebuildFile(const FileName: String; VorbisBlock: TStream): Integer;
-    function RebuildOggFile(const FileName: String; VorbisBlock: TStream): Integer;
+    function ConstructVorbisBlock(VorbisBlock: TStream): Boolean;
+    function RebuildFile(const FileName: String; VorbisBlock: TStream; Stream: TStream = nil): Integer;
+    function RebuildOggFile(const FileName: String; VorbisBlock: TStream; Stream: TStream = nil): Integer;
   public
     FileName: String;
     Tags: Array of TVorbisComment;
@@ -289,7 +290,9 @@ type
     constructor Create;
     destructor Destroy; override;
     function LoadFromFile(const FileName: String): Integer;
+    function LoadFromStream(Stream: TStream): Integer;
     function SaveToFile(const FileName: String): Integer;
+    function SaveToStream(Stream: TStream): Integer;
     function AddMetaDataCoverArt(Stream: TStream; const Blocklength: Integer): Integer;
     function AddMetaDataOther(aMetaHeader: array of Byte; Stream: TStream; const Blocklength: Integer; BlockType: Integer): Integer;
     procedure Clear;
@@ -306,7 +309,7 @@ type
     procedure SetTextFrameText(Name: String; Text: String);
     procedure SetListFrameText(Name: String; List: TStrings);
     function DeleteFrameByName(Name: String): Boolean;
-    function GetCoverArt(Index: Integer; var PictureStream: TStream; var FlacTagCoverArtInfo: TFlacTagCoverArtInfo): Boolean;
+    function GetCoverArt(Index: Integer; PictureStream: TStream; var FlacTagCoverArtInfo: TFlacTagCoverArtInfo): Boolean;
     function GetCoverArtInfo(Index: Integer; var FlacTagCoverArtInfo: TFlacTagCoverArtInfo): Boolean;
     function GetCoverArtInfoPointer(Index: Integer; var FlacTagCoverArtInfo: TFlacTagCoverArtInfo): Boolean;
     function SetCoverArt(Index: Integer; PictureStream: TStream; FlacTagCoverArtInfo: TFlacTagCoverArtInfo): Boolean;
@@ -321,9 +324,9 @@ type
     property SampleRate: Integer read FSampleRate; // Sample rate (hz)
     property BitsPerSample: Byte read FBitsPerSample; // Bits per sample
     property FileLength: integer read FFileLength; // File length (bytes)
-    property Samples: Int64 read FSamples; // Number of samples
+    property SampleCount: Int64 read FSamples; // Number of samples
     property Valid: Boolean read FIsValid; // True if header valid
-    property Duration: Double read FGetDuration; // Duration (seconds)
+    property Playtime: Double read FGetPlayTime; // Duration (seconds)
     property Ratio: Double read FGetRatio; // Compression ratio (%)
     property Bitrate: integer read FBitrate;
     property ChannelMode: String read FGetChannelMode;
@@ -333,6 +336,8 @@ type
   end;
 
 function RemoveFlacTagFromFile(const FileName: String): Integer;
+function RemoveFlacTagFromStream(Stream: TStream): Integer;
+
 function FlacTagErrorCode2String(ErrorCode: Integer): String;
 
 Const
@@ -360,6 +365,11 @@ var
 
 implementation
 
+{$IFDEF MSWINDOWS}
+
+Uses
+  Winapi.Windows;
+{$ENDIF}
 {$IFDEF POSIX}
 
 Uses
@@ -1058,7 +1068,7 @@ begin
   end;
 end;
 
-function TFlacTag.FGetDuration: Double;
+function TFlacTag.FGetPlayTime: Double;
 begin
   if (FIsValid) and (FSampleRate > 0) then
   begin
@@ -1231,12 +1241,39 @@ begin
 end;
 
 function TFlacTag.LoadFromFile(const FileName: String): Integer;
+var
+  Stream: TStream;
 begin
   Clear;
-  Result := GetInfo(FileName, True);
+  if NOT FileExists(FileName) then
+  begin
+    Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
+    Exit;
+  end;
+  try
+    Stream := TFileStream.Create(FileName, fmOpenRead OR fmShareDenyWrite);
+  except
+    Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
+    Exit;
+  end;
+  try
+    Result := GetInfo(Stream, True);
+  finally
+    FreeAndNil(Stream);
+  end;
 end;
 
-function TFlacTag.GetCoverArt(Index: Integer; var PictureStream: TStream; var FlacTagCoverArtInfo: TFlacTagCoverArtInfo): Boolean;
+function TFlacTag.LoadFromStream(Stream: TStream): Integer;
+begin
+  Clear;
+  try
+    Result := GetInfo(Stream, True);
+  except
+    Result := FLACTAGLIBRARY_ERROR;
+  end;
+end;
+
+function TFlacTag.GetCoverArt(Index: Integer; PictureStream: TStream; var FlacTagCoverArtInfo: TFlacTagCoverArtInfo): Boolean;
 var
   i: Integer;
   Stream: TStream;
@@ -1302,11 +1339,8 @@ begin
     Stream.Read(LengthOfPictureData, 4);
     LengthOfPictureData := ReverseBytes(LengthOfPictureData);
     SizeOfPictureData := LengthOfPictureData;
-    if Stream.Size > 0 then
-    begin
-      PictureStream.CopyFrom(Stream, LengthOfPictureData);
-      PictureStream.Seek(0, soBeginning);
-    end;
+    PictureStream.CopyFrom(Stream, LengthOfPictureData);
+    PictureStream.Seek(0, soBeginning);
   end;
   Result := True;
 end;
@@ -1538,9 +1572,9 @@ begin
   Result := True;
 end;
 
-function TFlacTag.GetInfo(FileName: String; SetTags: Boolean): Integer;
+function TFlacTag.GetInfo(Stream: TStream; SetTags: Boolean): Integer;
 var
-  SourceFile: TFileStream;
+  // SourceFile: TFileStream;
   aMetaDataBlockHeader: array [1 .. 4] of Byte;
   iBlockLength, iMetaType, iIndex: Integer;
   bPaddingFound: Boolean;
@@ -1552,25 +1586,24 @@ var
   CoverArtIndex: Integer;
 begin
   Result := FLACTAGLIBRARY_ERROR;
-  SourceFile := nil;
+  // SourceFile := nil;
   bPaddingFound := False;
   FResetData(True, False);
   try
     // Set read-access and open file
-    try
-      SourceFile := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
-    except
+    if Stream.Size = 0 then
+    begin
       Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
       Exit;
     end;
-    FFileLength := SourceFile.Size;
+    FFileLength := Stream.Size;
     FileName := FileName;
     { Seek past the ID3v2 tag, if there is one }
-    ID3v2Size := GetID3v2Size(SourceFile);
-    SourceFile.Seek(ID3v2Size, soFromBeginning);
+    ID3v2Size := GetID3v2Size(Stream);
+    Stream.Seek(ID3v2Size, soFromBeginning);
     // Read header data
     FillChar(FHeader, SizeOf(FHeader), 0);
-    SourceFile.Read(FHeader, SizeOf(FHeader));
+    Stream.Read(FHeader, SizeOf(FHeader));
     // Process data if loaded and header valid
     if ((FHeader.StreamMarker[1] = Ord('f')) AND (FHeader.StreamMarker[2] = Ord('L')) AND (FHeader.StreamMarker[3] = Ord('a')) AND (FHeader.StreamMarker[4] = Ord('C'))) then
     begin
@@ -1589,7 +1622,7 @@ begin
       end;
       iIndex := 0;
       repeat // read more metadata blocks if available
-        SourceFile.Read(aMetaDataBlockHeader, 4);
+        Stream.Read(aMetaDataBlockHeader, 4);
         Inc(iIndex); // metadatablock index
         iBlockLength := (aMetaDataBlockHeader[2] shl 16 or aMetaDataBlockHeader[3] shl 8 or aMetaDataBlockHeader[4]); // decode length
         if iBlockLength <= 0 then
@@ -1600,10 +1633,10 @@ begin
         iMetaType := (aMetaDataBlockHeader[1] and $7F); // decode metablock type
         if iMetaType = META_VORBIS_COMMENT then
         begin // read vorbis block
-          FVCOffset := SourceFile.Position;
+          FVCOffset := Stream.Position;
           FTagSize := iBlockLength;
           FVorbisIndex := iIndex;
-          ReadTag(SourceFile, SetTags); // set up fields
+          ReadTag(Stream, SetTags); // set up fields
         end
         else if (iMetaType = META_PADDING) and not bPaddingFound then
         begin // we have padding block
@@ -1611,7 +1644,7 @@ begin
           FPaddingLast := ((aMetaDataBlockHeader[1] and $80) <> 0);
           FPaddingIndex := iIndex;
           bPaddingFound := True;
-          SourceFile.Seek(FPadding, soCurrent); // advance into file till next block or audio data start
+          Stream.Seek(FPadding, soCurrent); // advance into file till next block or audio data start
         end
         else
         begin // all other
@@ -1625,17 +1658,17 @@ begin
             begin
               if SetTags then
               begin
-                CoverArtIndex := AddMetaDataCoverArt( { aMetaDataBlockHeader, } SourceFile, iBlockLength { , iIndex } );
+                CoverArtIndex := AddMetaDataCoverArt( { aMetaDataBlockHeader, } Stream, iBlockLength { , iIndex } );
                 GetCoverArtInfoPointer(CoverArtIndex, Self.MetaBlocksCoverArts[CoverArtIndex].CoverArtInfo);
               end
               else
               begin
-                SourceFile.Seek(iBlockLength, soCurrent);
+                Stream.Seek(iBlockLength, soCurrent);
               end;
             end
             else
             begin
-              AddMetaDataOther(aMetaDataBlockHeader, SourceFile, iBlockLength, iMetaType);
+              AddMetaDataOther(aMetaDataBlockHeader, Stream, iBlockLength, iMetaType);
             end;
             FMetaBlocksSize := FMetaBlocksSize + iBlockLength + 4;
           end
@@ -1653,12 +1686,12 @@ begin
     else
     begin
       FillChar(OggHeader, SizeOf(TOggHeader), #0);
-      SourceFile.Seek(ID3v2Size, soFromBeginning);
-      SourceFile.Read(OggHeader, SizeOf(TOggHeader));
+      Stream.Seek(ID3v2Size, soFromBeginning);
+      Stream.Read(OggHeader, SizeOf(TOggHeader));
       if (OggHeader.ID[1] = Ord('O')) AND (OggHeader.ID[2] = Ord('g')) AND (OggHeader.ID[3] = Ord('g')) AND (OggHeader.ID[4] = Ord('S')) then
       begin
-        SourceFile.Seek(ID3v2Size + $1C, soFromBeginning);
-        SourceFile.Read(FOggFlacHeader, SizeOf(TOggFlacHeader));
+        Stream.Seek(ID3v2Size + $1C, soFromBeginning);
+        Stream.Read(FOggFlacHeader, SizeOf(TOggFlacHeader));
         if (FOggFlacHeader.PacketType = $7F) AND ((FOggFlacHeader.Signature[1] = Ord('F')) AND (FOggFlacHeader.Signature[2] = Ord('L')) AND (FOggFlacHeader.Signature[3] = Ord('A')) AND
           (FOggFlacHeader.Signature[4] = Ord('C'))) AND (FOggFlacHeader.MajorVersion = 1) AND
           ((FOggFlacHeader.StreamInfo.StreamMarker[1] = Ord('f')) AND (FOggFlacHeader.StreamInfo.StreamMarker[2] = Ord('L')) AND (FOggFlacHeader.StreamInfo.StreamMarker[3] = Ord('a')) AND
@@ -1677,7 +1710,7 @@ begin
             Result := FLACTAGLIBRARY_ERROR_NO_TAG_FOUND;
             Exit; // no metadata blocks exist
           end;
-          OGGStream := TOGGStream.Create(SourceFile);
+          OGGStream := TOGGStream.Create(Stream);
           Data := TMemoryStream.Create;
           try
             OGGStream.GetNextPageData(Data);
@@ -1803,8 +1836,8 @@ begin
   finally
     if FIsValid then
     begin
-      FAudioOffset := SourceFile.Position; // we need that to rebuild the file if nedeed
-      FBitrate := Round(((FFileLength - FAudioOffset) / 1000) * 8 / FGetDuration); // time to calculate average bitrate
+      FAudioOffset := Stream.Position; // we need that to rebuild the file if nedeed
+      FBitrate := Round(((FFileLength - FAudioOffset) / 1000) * 8 / FGetPlayTime); // time to calculate average bitrate
     end
     else
     begin
@@ -1812,10 +1845,6 @@ begin
       begin
         Result := FLACTAGLIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
       end;
-    end;
-    if Assigned(SourceFile) then
-    begin
-      FreeAndNil(SourceFile);
     end;
   end;
 end;
@@ -1991,10 +2020,10 @@ begin
   end;
 end;
 
-function TFlacTag.SaveToFile(const FileName: String): Integer;
+function TFlacTag.ConstructVorbisBlock(VorbisBlock: TStream): Boolean;
 var
   i, iFieldCount, iSize: Integer;
-  VorbisBlock, Tag: TStream;
+  Tag: TStream;
   Bytes: TBytes;
 
   procedure _WriteTagBuff(sID: String; sData: string);
@@ -2013,15 +2042,11 @@ var
   end;
 
 begin
-
   try
-    Result := FLACTAGLIBRARY_ERROR;
+    Result := False;
+    // * TODO: remove 'Tag' and write directly to 'VorbisBlock'
     Tag := TMemoryStream.Create;
-    VorbisBlock := TMemoryStream.Create;
-    if GetInfo(FileName, False) <> FLACTAGLIBRARY_SUCCESS then
-    begin
-      Exit; // reload all except tag fields
-    end;
+    // VorbisBlock := TMemoryStream.Create;
     iFieldCount := 0;
     for i := 0 to Length(Tags) - 1 do
     begin
@@ -2048,8 +2073,40 @@ begin
       Write(iFieldCount, SizeOf(iFieldCount));
     end;
     VorbisBlock.CopyFrom(Tag, 0); // All tag data is here now
-    VorbisBlock.Position := 0;
+    VorbisBlock.Seek(0, soBeginning);
+    Result := True;
+  finally
+    FreeAndNil(Tag);
+  end;
+end;
 
+function TFlacTag.SaveToFile(const FileName: String): Integer;
+var
+  VorbisBlock: TStream;
+  FileStream: TStream;
+begin
+  Result := FLACTAGLIBRARY_ERROR;
+  try
+    FileStream := TFileStream.Create(FileName, fmOpenRead OR fmShareDenyWrite);
+  except
+    Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
+    Exit;
+  end;
+  try
+    // reload all except tag fields
+    if GetInfo(FileStream, False) <> FLACTAGLIBRARY_SUCCESS then
+    begin
+      Exit;
+    end;
+  finally
+    FreeAndNil(FileStream);
+  end;
+  VorbisBlock := TMemoryStream.Create;
+  try
+    if NOT ConstructVorbisBlock(VorbisBlock) then
+    begin
+      Exit;
+    end;
     if StreamType = fstNativeFlac then
     begin
       Result := RebuildFile(FileName, VorbisBlock);
@@ -2058,10 +2115,43 @@ begin
     begin
       Result := RebuildOggFile(FileName, VorbisBlock);
     end;
-
-    FExists := (Result = FLACTAGLIBRARY_SUCCESS) AND (Tag.Size > 0);
+    FExists := Result = FLACTAGLIBRARY_SUCCESS { ) AND (VorbisBlock.Size > 0) };
   finally
-    FreeAndNil(Tag);
+    FreeAndNil(VorbisBlock);
+  end;
+end;
+
+function TFlacTag.SaveToStream(Stream: TStream): Integer;
+var
+  VorbisBlock: TStream;
+begin
+  Result := FLACTAGLIBRARY_ERROR;
+  try
+    Stream.Seek(0, soBeginning);
+    // reload all except tag fields
+    if GetInfo(Stream, False) <> FLACTAGLIBRARY_SUCCESS then
+    begin
+      Exit;
+    end;
+  except
+    Exit;
+  end;
+  VorbisBlock := TMemoryStream.Create;
+  try
+    if NOT ConstructVorbisBlock(VorbisBlock) then
+    begin
+      Exit;
+    end;
+    if StreamType = fstNativeFlac then
+    begin
+      Result := RebuildFile('', VorbisBlock, Stream);
+    end;
+    if StreamType = fstOggFlac then
+    begin
+      Result := RebuildOggFile('', VorbisBlock, Stream);
+    end;
+    FExists := Result = FLACTAGLIBRARY_SUCCESS { ) AND (VorbisBlock.Size > 0) };
+  finally
     FreeAndNil(VorbisBlock);
   end;
 end;
@@ -2161,9 +2251,9 @@ begin
   Result := True;
 end;
 
-function TFlacTag.RebuildFile(const FileName: String; VorbisBlock: TStream): Integer;
+function TFlacTag.RebuildFile(const FileName: String; VorbisBlock: TStream; Stream: TStream = nil): Integer;
 var
-  Source, Destination: TFileStream;
+  Source, Destination: TStream;
   i, k, iNewPadding, iMetaCount, iExtraPadding: Integer;
   // iFileAge: Integer;
   BufferName: string;
@@ -2178,24 +2268,34 @@ var
   FileDateTime: TDateTime;
 begin
   Result := FLACTAGLIBRARY_ERROR;
+  Source := nil;
+  Destination := nil;
+  MetaBlocks := nil;
   bRearange := False;
   iExtraPadding := 0;
-  if (NOT FileExists(FileName))
-{$IFDEF MSWINDOWS}
-    OR (FileSetAttr(FileName, 0) <> 0)
-{$ENDIF}
-  then
+  if NOT Assigned(Stream) then
   begin
-    Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
-    Exit;
+    if (NOT FileExists(FileName))
+{$IFDEF MSWINDOWS}
+{$WARN SYMBOL_PLATFORM OFF}
+      OR (FileSetAttr(FileName, 0) <> 0)
+{$WARN SYMBOL_PLATFORM ON}
+{$ENDIF}
+    then
+    begin
+      Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
+      Exit;
+    end;
   end;
   try
     FileDateTime := 0;
-    // iFileAge := 0;
-    if bTAG_PreserveDate then
+    if NOT Assigned(Stream) then
     begin
-      // iFileAge := FileAge(FileName);
-      FileAge(FileName, FileDateTime);
+      if bTAG_PreserveDate then
+      begin
+        // iFileAge := FileAge(FileName);
+        FileAge(FileName, FileDateTime);
+      end;
     end;
 
     NewMetaBlocksSize := CalculateMetaBlocksSize(True);
@@ -2246,29 +2346,41 @@ begin
     if (FPadding <= VorbisBlock.Size - FTagSize) OR (FMetaBlocksSize <> NewMetaBlocksSize) OR ForceReWrite then
     begin // no room rebuild the file from scratch
       bRebuild := True;
-      BufferName := FileName + '~';
-      try
+      // * Working with files
+      if NOT Assigned(Stream) then
+      begin
+        BufferName := FileName + '~';
         try
-          Source := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareExclusive);
+          try
+            Source := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareExclusive);
+          except
+            Result := FLACTAGLIBRARY_ERROR_NEED_EXCLUSIVE_ACCESS;
+            Exit;
+          end;
+        finally
+          FreeAndNil(Source);
+        end;
+        try
+          Source := TFileStream.Create(FileName, fmOpenRead); // Set read-only and open old file, and create new
         except
-          Result := FLACTAGLIBRARY_ERROR_NEED_EXCLUSIVE_ACCESS;
+          Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
           Exit;
         end;
-      finally
-        FreeAndNil(Source);
+        try
+          Destination := TFileStream.Create(BufferName, fmCreate);
+        except
+          Result := FLACTAGLIBRARY_ERROR_WRITING_FILE;
+          Exit;
+        end;
+        // * Working in memory
+      end
+      else
+      begin
+        Source := Stream;
+        Source.Seek(0, soBeginning);
+        Destination := TMemoryStream.Create;
       end;
-      try
-        Source := TFileStream.Create(FileName, fmOpenRead); // Set read-only and open old file, and create new
-      except
-        Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
-        Exit;
-      end;
-      try
-        Destination := TFileStream.Create(BufferName, fmCreate);
-      except
-        Result := FLACTAGLIBRARY_ERROR_WRITING_FILE;
-        Exit;
-      end;
+
       ID3v2Size := GetID3v2Size(Source);
       Source.Seek(0, soFromBeginning);
       if ID3v2Size > 0 then
@@ -2283,12 +2395,20 @@ begin
     else
     begin
       bRebuild := False;
-      Source := nil;
-      try
-        Destination := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareDenyWrite); // Set write-access and open file
-      except
-        Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
-        Exit;
+      if NOT Assigned(Stream) then
+      begin
+        // Source := nil;
+        try
+          Destination := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareDenyWrite); // Set write-access and open file
+        except
+          Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
+          Exit;
+        end;
+      end
+      else
+      begin
+        Destination := Stream;
+        Destination.Seek(0, soBeginning);
       end;
       if bRearange then
       begin
@@ -2351,44 +2471,68 @@ begin
     begin // time to put back the audio data...
       Source.Seek(FAudioOffset, soFromBeginning);
       Destination.CopyFrom(Source, Source.Size - FAudioOffset);
-      Source.Free;
-      Destination.Free;
-      if (DeleteFile(FileName)) AND (RenameFile(BufferName, FileName)) then
-      begin // Replace old file and delete temporary file
-        Result := FLACTAGLIBRARY_SUCCESS;
+      if NOT Assigned(Stream) then
+      begin
+        FreeAndNil(Source);
+        FreeAndNil(Destination);
+        if (SysUtils.DeleteFile(FileName)) AND (RenameFile(BufferName, FileName)) then
+        begin // Replace old file and delete temporary file
+          Result := FLACTAGLIBRARY_SUCCESS;
+        end
+        else
+        begin
+          Result := FLACTAGLIBRARY_SUCCESS;
+          raise Exception.Create('');
+        end;
       end
       else
       begin
         Result := FLACTAGLIBRARY_SUCCESS;
-        raise Exception.Create('');
       end;
     end
     else
     begin
       Result := FLACTAGLIBRARY_SUCCESS;
-      Destination.Free;
+      if NOT Assigned(Stream) then
+      begin
+        FreeAndNil(Destination);
+      end;
     end;
-    // post save tasks
-    if bTAG_PreserveDate then
-    begin
-      FileSetDate(FileName, DateTimeToFileDate(FileDateTime));
-    end;
-    if bRearange then
+    if Assigned(MetaBlocks) then
     begin
       FreeAndNil(MetaBlocks);
+    end;
+    // post save tasks
+    if NOT Assigned(Stream) then
+    begin
+      if bTAG_PreserveDate then
+      begin
+        FileSetDate(FileName, DateTimeToFileDate(FileDateTime));
+      end;
+    end
+    else
+    begin
+      if Destination <> Stream then
+      begin
+        Stream.Size := 0;
+        Stream.Seek(0, soBeginning);
+        Stream.CopyFrom(Destination, 0);
+        FreeAndNil(Destination);
+      end;
+      Stream.Seek(0, soBeginning);
     end;
   except
     // Access error
     if FileExists(BufferName) then
     begin
-      DeleteFile(BufferName);
+      SysUtils.DeleteFile(BufferName);
     end;
   end;
 end;
 
-function TFlacTag.RebuildOggFile(const FileName: String; VorbisBlock: TStream): Integer;
+function TFlacTag.RebuildOggFile(const FileName: String; VorbisBlock: TStream; Stream: TStream = nil): Integer;
 var
-  Source, Destination: TFileStream;
+  Source, Destination: TStream;
   i, iMetaCount: Integer;
   // iFileAge: Integer;
   iNewPadding: Cardinal;
@@ -2437,37 +2581,59 @@ var
 
 begin
   Result := FLACTAGLIBRARY_ERROR;
+  Source := nil;
+  Destination := nil;
   Rebuild := ForceReWrite;
   OggPageCount := 0;
-  if (NOT FileExists(FileName))
-{$IFDEF MSWINDOWS}
-    OR (FileSetAttr(FileName, 0) <> 0)
-{$ENDIF}
-  then
+  if NOT Assigned(Stream) then
   begin
-    Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
-    Exit;
+    if (NOT FileExists(FileName))
+{$IFDEF MSWINDOWS}
+{$WARN SYMBOL_PLATFORM OFF}
+      OR (FileSetAttr(FileName, 0) <> 0)
+{$WARN SYMBOL_PLATFORM ON}
+{$ENDIF}
+    then
+    begin
+      Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
+      Exit;
+    end;
   end;
   try
     FileDateTime := 0;
-    // iFileAge := 0;
-    if bTAG_PreserveDate then
+    if NOT Assigned(Stream) then
     begin
-      // iFileAge := FileAge(FileName);
-      FileAge(FileName, FileDateTime);
+      if bTAG_PreserveDate then
+      begin
+        // iFileAge := FileAge(FileName);
+        FileAge(FileName, FileDateTime);
+      end;
     end;
     // NewMetaBlocksSize := CalculateMetaBlocksSize(True);
 
     AvailableSpace := FAudioOffset - $4F;
 
     // * Create an Ogg wrapper class with the Ogg stream infos from the source file
-    try
-      SourceOggStream := TFileStream.Create(FileName, fmOpenRead OR fmShareDenyWrite);
-      OGGStream := TOGGStream.Create(SourceOggStream);
-      FreeAndNil(SourceOggStream);
-    except
-      Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
-      Exit;
+    if NOT Assigned(Stream) then
+    begin
+      try
+        SourceOggStream := TFileStream.Create(FileName, fmOpenRead OR fmShareDenyWrite);
+        OGGStream := TOGGStream.Create(SourceOggStream);
+        FreeAndNil(SourceOggStream);
+      except
+        Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
+        Exit;
+      end;
+    end
+    else
+    begin
+      try
+        Stream.Seek(0, soBeginning);
+        OGGStream := TOGGStream.Create(Stream);
+      except
+        Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
+        Exit;
+      end;
     end;
 
     WrappedBlocks := TMemoryStream.Create;
@@ -2566,31 +2732,42 @@ begin
       begin
         // * Create a new padding with default size
         AddPadding(PaddingSizeToWrite);
-        // * Check if the existing file can be deleted
-        BufferName := FileName + '~';
-        try
+        // * Working with files
+        if NOT Assigned(Stream) then
+        begin
+          // * Check if the existing file can be deleted
+          BufferName := FileName + '~';
           try
-            Source := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareExclusive);
+            try
+              Source := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareExclusive);
+            except
+              Result := FLACTAGLIBRARY_ERROR_NEED_EXCLUSIVE_ACCESS;
+              Exit;
+            end;
+          finally
+            FreeAndNil(Source);
+          end;
+          // * Open source file
+          try
+            Source := TFileStream.Create(FileName, fmOpenRead); // Set read-only and open old file, and create new
           except
-            Result := FLACTAGLIBRARY_ERROR_NEED_EXCLUSIVE_ACCESS;
+            Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
             Exit;
           end;
-        finally
-          FreeAndNil(Source);
-        end;
-        // * Open source file
-        try
-          Source := TFileStream.Create(FileName, fmOpenRead); // Set read-only and open old file, and create new
-        except
-          Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
-          Exit;
-        end;
-        // * Create new destination file
-        try
-          Destination := TFileStream.Create(BufferName, fmCreate);
-        except
-          Result := FLACTAGLIBRARY_ERROR_WRITING_FILE;
-          Exit;
+          // * Create new destination file
+          try
+            Destination := TFileStream.Create(BufferName, fmCreate);
+          except
+            Result := FLACTAGLIBRARY_ERROR_WRITING_FILE;
+            Exit;
+          end;
+          // * Working in memory
+        end
+        else
+        begin
+          Source := Stream;
+          Source.Seek(0, soBeginning);
+          Destination := TMemoryStream.Create;
         end;
         // * Copy ID3v2 if theres one
         ID3v2Size := GetID3v2Size(Source);
@@ -2606,16 +2783,21 @@ begin
       end
       else
       begin
-
-        Source := nil;
-        try
-          Destination := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareDenyWrite); // Set write-access and open file
-        except
-          Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
-          Exit;
+        if NOT Assigned(Stream) then
+        begin
+          try
+            Destination := TFileStream.Create(FileName, fmOpenReadWrite OR fmShareDenyWrite); // Set write-access and open file
+          except
+            Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
+            Exit;
+          end;
+        end
+        else
+        begin
+          Destination := Stream;
+          Destination.Seek(0, soBeginning);
         end;
         ID3v2Size := GetID3v2Size(Destination);
-
       end;
 
       // * Set STREAMINFO block
@@ -2657,13 +2839,16 @@ begin
         NewOGGStream.Free;
       end;
 
-      if Assigned(Source) then
+      if NOT Assigned(Stream) then
       begin
-        FreeAndNil(Source);
-      end;
-      if Assigned(Destination) then
-      begin
-        FreeAndNil(Destination);
+        if Assigned(Source) then
+        begin
+          FreeAndNil(Source);
+        end;
+        if Assigned(Destination) then
+        begin
+          FreeAndNil(Destination);
+        end;
       end;
 
       Result := FLACTAGLIBRARY_SUCCESS;
@@ -2675,24 +2860,41 @@ begin
 
     if Rebuild then
     begin
-      if NOT DeleteFile(FileName) then
+      if NOT Assigned(Stream) then
       begin
-        // Replace old file and delete temporary file
-        raise Exception.Create('Error deleting existing file: ' + FileName);
+        if NOT SysUtils.DeleteFile(FileName) then
+        begin
+          // Replace old file and delete temporary file
+          raise Exception.Create('Error deleting existing file: ' + FileName);
+        end;
+        RenameFile(BufferName, FileName);
       end;
-      RenameFile(BufferName, FileName);
     end;
 
     // post save tasks
-    if bTAG_PreserveDate then
+    if NOT Assigned(Stream) then
     begin
-      FileSetDate(FileName, DateTimeToFileDate(FileDateTime));
+      if bTAG_PreserveDate then
+      begin
+        FileSetDate(FileName, DateTimeToFileDate(FileDateTime));
+      end;
+    end
+    else
+    begin
+      if Destination <> Stream then
+      begin
+        Stream.Size := 0;
+        Stream.Seek(0, soBeginning);
+        Stream.CopyFrom(Destination, 0);
+        FreeAndNil(Destination);
+      end;
+      Stream.Seek(0, soBeginning);
     end;
   except
     // Access error
     if FileExists(BufferName) then
     begin
-      DeleteFile(BufferName);
+      SysUtils.DeleteFile(BufferName);
     end;
   end;
 end;
@@ -2817,6 +3019,20 @@ begin
   try
     FlacTag.FResetData(False, True);
     Result := FlacTag.SaveToFile(FileName);
+  finally
+    FreeAndNil(FlacTag);
+  end;
+end;
+
+function RemoveFlacTagFromStream(Stream: TStream): Integer;
+var
+  FlacTag: TFlacTag;
+begin
+  FlacTag := TFlacTag.Create;
+  try
+    FlacTag.FResetData(False, True);
+    Stream.Seek(0, soBeginning);
+    Result := FlacTag.SaveToStream(Stream);
   finally
     FreeAndNil(FlacTag);
   end;

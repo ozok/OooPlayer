@@ -77,7 +77,7 @@ implementation
 
 {$R *.dfm}
 
-uses UnitMain;
+uses UnitMain, UnitAbout, UnitLog;
 
 procedure TSettingsForm.BufferEditChange(Sender: TObject);
 begin
@@ -181,6 +181,9 @@ begin
   else
   begin
     MainForm.sSkinManager1.Active := False;
+    MainForm.PlayList.Font.Color := clBlack;
+    MainForm.RadioList.Font.Color := clBlack;
+    MainForm.QueueList.Font.Color := clBlack;
   end;
 end;
 
