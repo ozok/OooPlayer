@@ -136,7 +136,8 @@ const
   END_STR_BAT = '<pre id="to_pre" style="display';
   BAT_SPAN = '<span style="font-size';
   METRO_START = '<div id="lyrics-body-text">';
-  METRO_END = '<div id="selected-song-meaning-open" unselectable="on" style="display:none;">';
+  //METRO_END = '<div id="selected-song-meaning-open" unselectable="on" style="display:none;">';
+  METRO_END = '<p class="writers"><strong>Songwriters</strong>';
 var
   LSR: TStreamReader;
   LLine: string;
@@ -235,7 +236,7 @@ begin
                 begin
                   LAddToLyricFile := True;
                 end
-                else if LLine = METRO_END then
+                else if LLine.StartsWith(METRO_END) then
                 begin
                   Break;
                 end;
@@ -347,6 +348,7 @@ begin
   Result := Trim(StringReplace(Result, '</p>	</div>', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<br />', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<i>', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '</div>', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '</i>', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<!-- start of lyrics -->', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<pre id="from_pre">', '', [rfReplaceAll]));

@@ -28,7 +28,7 @@ object AboutForm: TAboutForm
     Height = 13
     Align = alTop
     Alignment = taCenter
-    Caption = 'OooPlayer 2.1.0.2135'
+    Caption = 'OooPlayer 2.1.1.2147'
     ExplicitWidth = 107
   end
   object Image1: TImage
@@ -247,7 +247,6 @@ object AboutForm: TAboutForm
     TabOrder = 0
     OnClick = Button1Click
     SkinData.SkinSection = 'BUTTON'
-    ExplicitTop = 143
   end
   object Button2: TsButton
     Left = 8
@@ -259,7 +258,6 @@ object AboutForm: TAboutForm
     TabOrder = 1
     OnClick = Button2Click
     SkinData.SkinSection = 'BUTTON'
-    ExplicitTop = 143
   end
   object sSkinProvider1: TsSkinProvider
     AddedTitle.Font.Charset = DEFAULT_CHARSET

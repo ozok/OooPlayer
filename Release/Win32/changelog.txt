@@ -1,5 +1,6 @@
 --2.1.1
 -Fixed: [General] Title text wasn't reset properly after resizing the window
+-Fixed: [Lyric Downloader] Extra text was displayed when downloaded from metrolyrics.com
 -Fixed: [General] A few small bugs
 -Updated: Tag libraries
 
