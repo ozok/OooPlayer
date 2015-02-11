@@ -34,7 +34,7 @@ To-Do
 
 Version and download location
 ---
-* Latest version of OooPlayer is 2.1.0
+* Latest version of OooPlayer is 2.1.1
 * You can download OooPlayer from http://www.fosshub.com/OooPlayer.html
 
 Licence
