@@ -1,6 +1,6 @@
 // ********************************************************************************************************************************
 // *                                                                                                                              *
-// *     WMA Tag Library 1.0.8.11 © 3delite 2013-2014                                                                             *
+// *     WMA Tag Library 1.0.9.12 © 3delite 2013-2015                                                                             *
 // *     See WMA Tag Library ReadMe.txt for details                                                                               *
 // *                                                                                                                              *
 // * Two licenses are available for commercial usage of this component:                                                           *
@@ -570,35 +570,42 @@ var
   ValueDWord: DWord;
   ValueQWord: UInt64;
 begin
+  Result := False;
   Stream.Clear;
   case Format of
     WMT_TYPE_BOOL:
       begin
         ValueBool := Value;
-        Stream.Read(ValueBool, 4);
+        Stream.Write(ValueBool, 4);
+        Self.Format := Format;
+        Result := True;
       end;
     WMT_TYPE_DWORD:
       begin
         ValueDWord := Value;
         Stream.Write(ValueDWord, 4);
+        Self.Format := Format;
+        Result := True;
       end;
     WMT_TYPE_WORD:
       begin
         ValueWord := Value;
         Stream.Write(ValueWord, 2);
+        Self.Format := Format;
+        Result := True;
       end;
     WMT_TYPE_QWORD:
       begin
         ValueQWord := Value;
         Stream.Write(ValueQWord, 8);
+        Self.Format := Format;
+        Result := True;
       end;
     // WMT_TYPE_STRING: Stream.Read(Value, 4);
     // WMT_TYPE_BINARY: Stream.Read(Value, 4);
     // WMT_TYPE_GUID: Stream.Read(Value, 4);
     // WMT_TYPE_UNKNOWN
   end;
-  Self.Format := Format;
-  Result := True;
 end;
 
 function TWMATagFrame.SetAsList(List: TStrings): Boolean;
@@ -1315,10 +1322,10 @@ begin
       pType := WMT_TYPE_DWORD;
       pwLangIndex := 0;
       pdwDataLength := 0;
-      ppHeaderInfo3.GetAttributeByIndexEx(65535, wIndex, nil, pwNameLen, pType, pwLangIndex, nil, pdwDataLength);
+      ppHeaderInfo3.GetAttributeByIndexEx( { 65535 } 0, wIndex, nil, pwNameLen, pType, pwLangIndex, nil, pdwDataLength);
       pwszName := AllocMem(pwNameLen * 2);
       pValue := AllocMem(pdwDataLength);
-      ppHeaderInfo3.GetAttributeByIndexEx(65535, wIndex, pwszName, pwNameLen, pType, pwLangIndex, pValue, pdwDataLength);
+      ppHeaderInfo3.GetAttributeByIndexEx( { 65535 } 0, wIndex, pwszName, pwNameLen, pType, pwLangIndex, pValue, pdwDataLength);
       // * 3delite
       if pValue = nil then
       begin
@@ -1401,7 +1408,7 @@ begin
     }
 
     // * Delete all existing attributes
-    ppHeaderInfo3.GetAttributeCountEx(65535, AttributeCount);
+    ppHeaderInfo3.GetAttributeCountEx( { 65535 } 0, AttributeCount);
     DeleteAttributeCount := AttributeCount;
     for i := DeleteAttributeCount - 1 downto 0 do
     begin

@@ -1,6 +1,6 @@
 // ********************************************************************************************************************************
 // *                                                                                                                              *
-// *     Ogg Vorbis and Opus Tag Library 1.0.16.26 © 3delite 2012-2015                                                            *
+// *     Ogg Vorbis and Opus Tag Library 1.0.17.32 © 3delite 2012-2015                                                            *
 // *     See Ogg Vorbis and Opus Tag Library Readme.txt for details                                                               *
 // *                                                                                                                              *
 // * Two licenses are available for commercial usage of this component:                                                           *
@@ -64,10 +64,11 @@ interface
 
 Uses
   SysUtils,
+  // Dialogs,
   Classes;
 
 Const
-  OPUSTAGLIBRARY_VERSION = $01001525;
+  OPUSTAGLIBRARY_VERSION = $01001732;
 
 Const
   OPUSTAGLIBRARY_SUCCESS = 0;
@@ -94,6 +95,9 @@ Const
   // * Vorbis
   VORBIS_PARAMETERS_ID = #1 + 'vorbis';
   VORBIS_TAG_ID = #3 + 'vorbis';
+  // * Theora
+  THEORA_ID = #80 + 'theora';
+  THEORA_TAG_ID = Char($81) + 'theora';
 
 Const
   OGG_PAGE_SEGMENT_SIZE = 17;
@@ -146,6 +150,12 @@ type
     StopFlag: Byte; { Always 1 }
   end;
 
+  // Theora parameter header
+  TTheoraHeader = packed record
+    ID: array [1 .. 7] of Byte; { Always #1 + "vorbis" }
+    HeaderData: array [1 .. 35] of Byte; { Bitstream version number }
+  end;
+
   { Vorbis tag data }
   TVorbisTag = record
     ID: array [1 .. 7] of Byte; { Always #3 + "vorbis" }
@@ -161,6 +171,7 @@ type
     VorbisParameters: TVorbisHeader;
     VorbisTag: TVorbisTag;
     ChannelMapping: Array [0 .. 7] of Byte;
+    TheoraHeader: TTheoraHeader;
     FileSize: Integer; { File size (bytes) }
     ID3v2Size: Integer; { ID3v2 tag size (bytes) }
     SPagePos: Integer; { Position of second Ogg page }
@@ -184,16 +195,18 @@ type
     function GetPageData(PageNumber: Int64; Stream: TStream): Boolean;
     function GetNextPage(Stream: TStream): Boolean;
     function GetNextPageData(Stream: TStream): Boolean;
-    function CreateTagStream(TagStream: TStream; OutputOGGStream: TStream): Integer;
+    function CreateTagStream(TagStream: TStream; OutputOGGStream: TStream; StartPageNumber: Cardinal = 1): Integer;
     function CreateTagStreamVorbis(TagSize: Integer; TagStream: TStream; OutputOGGStream: TStream): Integer;
+    function CreateTagStreamTheora(TagSize: Integer; TagStream: TStream; OutputOGGStream: TStream): Integer;
     function CalculateWrappedStreamSize(InputDataSize: Integer): Integer;
     function CalculateWrappedStreamSizeVorbis(TagSize: Integer; InputDataSize: Integer): Integer;
     function CalculateWrappedStreamSizeEx(InputDataSize: Integer; MustFitSize: Integer; var PaddingNeeded: Integer): Integer;
     function ReNumberPages(PageNumberStartsFrom: Int64; Source, Destination: TStream): Boolean;
+    function ReNumberPagesTheora(PageNumberStartsFrom: Int64; Source, Destination: TStream): Boolean;
   end;
 
 type
-  TOggFormat = (ofUnknown, ofVorbis, ofOpus);
+  TOggFormat = (ofUnknown, ofVorbis, ofOpus, ofTheora);
 
 type
   TOpusVorbisCoverArtInfo = record
@@ -298,7 +311,7 @@ function RemoveOpusTagFromStream(Stream: TStream): Integer;
 
 function OpusTagErrorCode2String(ErrorCode: Integer): String;
 
-function RebuildFile(FileName: String; Info: TFileInfo; TagOGGStream: TStream; ReplaceMode: Boolean; Stream: TStream = nil): Integer;
+function RebuildFile(FileName: String; Info: TFileInfo; TagOGGStream: TStream; ReplaceMode: Boolean; Format: TOggFormat; Stream: TStream = nil): Integer;
 
 procedure CalculateCRC(var CRC: Cardinal; const Data; Size: Cardinal);
 function SetCRC(const Destination: TStream; Header: TOggHeader): Boolean;
@@ -792,7 +805,7 @@ begin
   end;
 end;
 
-function TOGGStream.CreateTagStream(TagStream: TStream; OutputOGGStream: TStream): Integer;
+function TOGGStream.CreateTagStream(TagStream: TStream; OutputOGGStream: TStream; StartPageNumber: Cardinal = 1): Integer;
 var
   Header: TOggHeader;
   DataSize: Integer;
@@ -804,7 +817,7 @@ begin
     Header := FirstOGGHeader;
     Header.TypeFlag := 0;
     Header.AbsolutePosition := 0 { - 1 };
-    Header.PageNumber := 1;
+    Header.PageNumber := StartPageNumber;
     Header.Checksum := 0;
     OGGPage := TMemoryStream.Create;
     try
@@ -862,6 +875,133 @@ begin
 end;
 
 function TOGGStream.CreateTagStreamVorbis(TagSize: Integer; TagStream: TStream; OutputOGGStream: TStream): Integer;
+var
+  Header: TOggHeader;
+  DataSize: Integer;
+  i: Integer;
+  OGGPage: TMemoryStream;
+  TagSegments: Integer;
+  TagDataSize: Integer;
+begin
+  try
+    Result := 0;
+    Header := FirstOGGHeader;
+    Header.TypeFlag := 0;
+    Header.AbsolutePosition := 0 { - 1 };
+    // Header.PageNumber := 1;
+    Header.Checksum := 0;
+    OGGPage := TMemoryStream.Create;
+    try
+      while TagStream.Position < TagStream.Size do
+      begin
+        FillChar(Header.LacingValues, SizeOf(Header.LacingValues), 0);
+        if TagSize > 0 then
+        begin
+          if TagSize > OGG_PAGE_SEGMENT_SIZE * High(Byte) then
+          begin
+            DataSize := OGG_PAGE_SEGMENT_SIZE * High(Byte);
+            Header.Segments := OGG_PAGE_SEGMENT_SIZE;
+            for i := 1 to High(Header.LacingValues) do
+            begin
+              Header.LacingValues[i] := $FF;
+            end;
+            Dec(TagSize, DataSize);
+          end
+          else
+          begin
+            DataSize := TagSize;
+            Dec(TagSize, DataSize);
+            if DataSize MOD $FF = 0 then
+            begin
+              Header.Segments := DataSize div $FF;
+            end
+            else
+            begin
+              Header.Segments := (DataSize div $FF) + 1;
+            end;
+            TagSegments := Header.Segments;
+            TagDataSize := DataSize;
+            for i := 1 to Header.Segments do
+            begin
+              Header.LacingValues[i] := $FF;
+            end;
+            if DataSize mod $FF <> 0 then
+            begin
+              Header.LacingValues[Header.Segments] := (DataSize mod $FF);
+            end;
+            DataSize := TagStream.Size - TagStream.Position;
+            if (DataSize - TagDataSize) MOD $FF = 0 then
+            begin
+              Header.Segments := Header.Segments + ((DataSize - TagDataSize) div $FF);
+            end
+            else
+            begin
+              Header.Segments := Header.Segments + ((DataSize - TagDataSize) div $FF) + 1;
+            end;
+            for i := TagSegments + 1 to Header.Segments do
+            begin
+              Header.LacingValues[i] := $FF;
+            end;
+            if ((DataSize - TagDataSize) mod $FF) <> 0 then
+            begin
+              Header.LacingValues[Header.Segments] := ((DataSize - TagDataSize) mod $FF);
+            end;
+          end;
+        end
+        else
+        begin
+          if TagStream.Size - TagStream.Position > OGG_PAGE_SEGMENT_SIZE * High(Byte) then
+          begin
+            DataSize := OGG_PAGE_SEGMENT_SIZE * High(Byte);
+            Header.Segments := OGG_PAGE_SEGMENT_SIZE;
+            for i := 1 to High(Header.LacingValues) do
+            begin
+              Header.LacingValues[i] := $FF;
+            end;
+          end
+          else
+          begin
+            DataSize := TagStream.Size - TagStream.Position;
+            if DataSize MOD $FF = 0 then
+            begin
+              Header.Segments := DataSize div $FF;
+            end
+            else
+            begin
+              Header.Segments := (DataSize div $FF) + 1;
+            end;
+            for i := 1 to Header.Segments do
+            begin
+              Header.LacingValues[i] := $FF;
+            end;
+            if DataSize mod $FF <> 0 then
+            begin
+              Header.LacingValues[Header.Segments] := (DataSize mod $FF);
+            end;
+          end;
+        end;
+        OGGPage.Clear;
+        OGGPage.Write(Header, SizeOf(TOggHeader) - SizeOf(Header.LacingValues));
+        OGGPage.Write(Header.LacingValues, Header.Segments);
+        OGGPage.CopyFrom(TagStream, DataSize);
+        OGGPage.Seek(0, soBeginning);
+        SetCRC(OGGPage, Header);
+        OGGPage.Seek(0, soBeginning);
+        OutputOGGStream.CopyFrom(OGGPage, OGGPage.Size);
+        Header.TypeFlag := 1;
+        Header.Checksum := 0;
+        Inc(Header.PageNumber);
+        Inc(Result);
+      end;
+    finally
+      FreeAndNil(OGGPage);
+    end;
+  except
+    Result := 0;
+  end;
+end;
+
+function TOGGStream.CreateTagStreamTheora(TagSize: Integer; TagStream: TStream; OutputOGGStream: TStream): Integer;
 var
   Header: TOggHeader;
   DataSize: Integer;
@@ -1189,7 +1329,7 @@ begin
         OGGPage.Read(Header, SizeOf(TOggHeader) - SizeOf(Header.LacingValues));
         OGGPage.Read(Header.LacingValues, Header.Segments);
         OGGPage.Seek(0, soBeginning);
-        Header.PageNumber := PageCounter;
+        Header.PageNumber := { Header.PageNumber + } PageCounter;
         Header.Checksum := 0;
         OGGPage.Write(Header, SizeOf(TOggHeader) - SizeOf(Header.LacingValues));
         OGGPage.Seek(0, soBeginning);
@@ -1197,6 +1337,43 @@ begin
         OGGPage.Seek(0, soBeginning);
         Destination.CopyFrom(OGGPage, OGGPage.Size);
         Inc(PageCounter);
+      end;
+      Result := True;
+    finally
+      FreeAndNil(OGGPage);
+    end;
+  except
+    Result := False;
+  end;
+end;
+
+function TOGGStream.ReNumberPagesTheora(PageNumberStartsFrom: Int64; Source, Destination: TStream): Boolean;
+var
+  Header: TOggHeader;
+  OGGPage: TMemoryStream;
+begin
+  try
+    FillChar(Header, SizeOf(TOggHeader), 0);
+    OGGPage := TMemoryStream.Create;
+    try
+      while Source.Position < Source.Size do
+      begin
+        OGGPage.Clear;
+        GetNextPage(OGGPage);
+        OGGPage.Seek(0, soBeginning);
+        OGGPage.Read(Header, SizeOf(TOggHeader) - SizeOf(Header.LacingValues));
+        OGGPage.Read(Header.LacingValues, Header.Segments);
+        if FirstOGGHeader.Serial = Header.Serial then
+        begin
+          OGGPage.Seek(0, soBeginning);
+          Header.PageNumber := Header.PageNumber + PageNumberStartsFrom;
+          Header.Checksum := 0;
+          OGGPage.Write(Header, SizeOf(TOggHeader) - SizeOf(Header.LacingValues));
+          OGGPage.Seek(0, soBeginning);
+          SetCRC(OGGPage, Header);
+        end;
+        OGGPage.Seek(0, soBeginning);
+        Destination.CopyFrom(OGGPage, OGGPage.Size);
       end;
       Result := True;
     finally
@@ -1505,6 +1682,23 @@ begin
   Info.VorbisTag.ID[6] := Ord(VORBIS_TAG_ID[6]);
   Info.VorbisTag.ID[7] := Ord(VORBIS_TAG_ID[7]);
 {$ENDIF}
+{$IFDEF OVAOTL_MOBILE}
+  Info.TheoraHeader.ID[1] := Ord(THEORA_TAG_ID[0]);
+  Info.TheoraHeader.ID[2] := Ord(THEORA_TAG_ID[1]);
+  Info.TheoraHeader.ID[3] := Ord(THEORA_TAG_ID[2]);
+  Info.TheoraHeader.ID[4] := Ord(THEORA_TAG_ID[3]);
+  Info.TheoraHeader.ID[5] := Ord(THEORA_TAG_ID[4]);
+  Info.TheoraHeader.ID[6] := Ord(THEORA_TAG_ID[5]);
+  Info.TheoraHeader.ID[7] := Ord(THEORA_TAG_ID[6]);
+{$ELSE}
+  Info.TheoraHeader.ID[1] := Ord(THEORA_TAG_ID[1]);
+  Info.TheoraHeader.ID[2] := Ord(THEORA_TAG_ID[2]);
+  Info.TheoraHeader.ID[3] := Ord(THEORA_TAG_ID[3]);
+  Info.TheoraHeader.ID[4] := Ord(THEORA_TAG_ID[4]);
+  Info.TheoraHeader.ID[5] := Ord(THEORA_TAG_ID[5]);
+  Info.TheoraHeader.ID[6] := Ord(THEORA_TAG_ID[6]);
+  Info.TheoraHeader.ID[7] := Ord(THEORA_TAG_ID[7]);
+{$ENDIF}
   Info.SPagePos := 47;
 end;
 
@@ -1687,6 +1881,10 @@ begin
   if Format = ofVorbis then
   begin
     Stream.Write(Info.VorbisTag.ID, SizeOf(Info.VorbisTag.ID));
+  end;
+  if Format = ofTheora then
+  begin
+    Stream.Write(Info.TheoraHeader.ID, SizeOf(Info.TheoraHeader.ID));
   end;
   Bytes := TEncoding.UTF8.GetBytes(VendorString);
   Size := Length(Bytes);
@@ -2354,7 +2552,7 @@ begin
       FreeAndNil(DataStream);
     end;
   end;
-  if Format = ofVorbis then
+  if (Format = ofVorbis) then
   begin
     Source.Seek(1, soFromCurrent);
     repeat
@@ -2364,6 +2562,23 @@ begin
     if Source.Size - Source.Position > 0 then
     begin
       Source.Seek(-1, soFromCurrent);
+      VorbisData.CopyFrom(Source, Source.Size - Source.Position);
+    end;
+  end;
+  if (Format = ofTheora) then
+  begin
+    {
+      Source.Seek(1, soFromCurrent);
+      repeat
+      Source.Read(DataByte, 1);
+      until (DataByte <> 0)
+      OR (DataByte = 5)
+      OR (Source.Size <= Source.Position);
+    }
+    VorbisData.Clear;
+    if Source.Size - Source.Position > 0 then
+    begin
+      // Source.Seek(- 1, soFromCurrent);
       VorbisData.CopyFrom(Source, Source.Size - Source.Position);
     end;
   end;
@@ -2418,6 +2633,9 @@ var
   Data: TMemoryStream;
   OpusTags: TOpusTags;
   VorbisHeader: TVorbisHeader;
+  // TheoraHeader: TTheoraHeader;
+  TheoraTagID: Array [1 .. 7] of Byte;
+  TheoraPageCounter: Integer;
 begin
   Result := False;
   Info.ID3v2Size := GetID3v2Size(SourceFile);
@@ -2445,8 +2663,8 @@ begin
     Data := TMemoryStream.Create;
     try
       OGGStream.GetNextPageData(Data);
-      Data.Seek(0, soBeginning);
       // * Check if Opus
+      Data.Seek(0, soBeginning);
       Data.Read(OpusTags.ID, SizeOf(OpusTags.ID));
       if
 {$IFDEF OVAOTL_MOBILE}
@@ -2462,31 +2680,90 @@ begin
         ReadOpusAudioAttributes(SourceFile);
         ReadTag(Data, OGGStream);
         Result := True;
-      end;
-      Data.Seek(0, soBeginning);
-      // * Check if Vorbis
-      Data.Read(VorbisHeader.ID, SizeOf(VorbisHeader.ID));
-      if
-{$IFDEF OVAOTL_MOBILE}
-        (VorbisHeader.ID[1] = Ord(VORBIS_TAG_ID[0])) AND (VorbisHeader.ID[2] = Ord(VORBIS_TAG_ID[1])) AND (VorbisHeader.ID[3] = Ord(VORBIS_TAG_ID[2])) AND (VorbisHeader.ID[4] = Ord(VORBIS_TAG_ID[3]))
-        AND (VorbisHeader.ID[5] = Ord(VORBIS_TAG_ID[4])) AND (VorbisHeader.ID[6] = Ord(VORBIS_TAG_ID[5])) AND (VorbisHeader.ID[7] = Ord(VORBIS_TAG_ID[6]))
-{$ELSE}
-      (VorbisHeader.ID[1] = Ord(VORBIS_TAG_ID[1])) AND (VorbisHeader.ID[2] = Ord(VORBIS_TAG_ID[2])) AND (VorbisHeader.ID[3] = Ord(VORBIS_TAG_ID[3])) AND (VorbisHeader.ID[4] = Ord(VORBIS_TAG_ID[4]))
-        AND (VorbisHeader.ID[5] = Ord(VORBIS_TAG_ID[5])) AND (VorbisHeader.ID[6] = Ord(VORBIS_TAG_ID[6])) AND (VorbisHeader.ID[7] = Ord(VORBIS_TAG_ID[7]))
-{$ENDIF}
-      then
+      end
+      else
       begin
-        Format := ofVorbis;
-        ReadVorbisAudioAttributes(SourceFile);
-        ReadTag(Data, OGGStream);
-        Result := True;
+        // * Check if Vorbis
+        Data.Seek(0, soBeginning);
+        Data.Read(VorbisHeader.ID, SizeOf(VorbisHeader.ID));
+        if
+{$IFDEF OVAOTL_MOBILE}
+          (VorbisHeader.ID[1] = Ord(VORBIS_TAG_ID[0])) AND (VorbisHeader.ID[2] = Ord(VORBIS_TAG_ID[1])) AND (VorbisHeader.ID[3] = Ord(VORBIS_TAG_ID[2])) AND (VorbisHeader.ID[4] = Ord(VORBIS_TAG_ID[3])
+          ) AND (VorbisHeader.ID[5] = Ord(VORBIS_TAG_ID[4])) AND (VorbisHeader.ID[6] = Ord(VORBIS_TAG_ID[5])) AND (VorbisHeader.ID[7] = Ord(VORBIS_TAG_ID[6]))
+{$ELSE}
+        (VorbisHeader.ID[1] = Ord(VORBIS_TAG_ID[1])) AND (VorbisHeader.ID[2] = Ord(VORBIS_TAG_ID[2])) AND (VorbisHeader.ID[3] = Ord(VORBIS_TAG_ID[3])) AND (VorbisHeader.ID[4] = Ord(VORBIS_TAG_ID[4]))
+          AND (VorbisHeader.ID[5] = Ord(VORBIS_TAG_ID[5])) AND (VorbisHeader.ID[6] = Ord(VORBIS_TAG_ID[6])) AND (VorbisHeader.ID[7] = Ord(VORBIS_TAG_ID[7]))
+{$ENDIF}
+        then
+        begin
+          Format := ofVorbis;
+          ReadVorbisAudioAttributes(SourceFile);
+          ReadTag(Data, OGGStream);
+          Result := True;
+        end
+        else
+        begin
+          // * Check if theora
+          (*
+            Data.Seek(0, soBeginning);
+            Data.Read(TheoraHeader.ID, SizeOf(TTheoraHeader));
+            if
+            {$IFDEF OVAOTL_MOBILE}
+            (TheoraHeader.ID[1] = Ord(THEORA_ID[0]))
+            AND (TheoraHeader.ID[2] = Ord(THEORA_ID[1]))
+            AND (TheoraHeader.ID[3] = Ord(THEORA_ID[2]))
+            AND (TheoraHeader.ID[4] = Ord(THEORA_ID[3]))
+            AND (TheoraHeader.ID[5] = Ord(THEORA_ID[4]))
+            AND (TheoraHeader.ID[6] = Ord(THEORA_ID[5]))
+            AND (TheoraHeader.ID[7] = Ord(THEORA_ID[6]))
+            {$ELSE}
+            (TheoraHeader.ID[1] = Ord(THEORA_ID[1]))
+            AND (TheoraHeader.ID[2] = Ord(THEORA_ID[2]))
+            AND (TheoraHeader.ID[3] = Ord(THEORA_ID[3]))
+            AND (TheoraHeader.ID[4] = Ord(THEORA_ID[4]))
+            AND (TheoraHeader.ID[5] = Ord(THEORA_ID[5]))
+            AND (TheoraHeader.ID[6] = Ord(THEORA_ID[6]))
+            AND (TheoraHeader.ID[7] = Ord(THEORA_ID[7]))
+            {$ENDIF}
+            then begin
+            Format := ofTheora;
+            //ReadTheoraAttributes(SourceFile);
+          *)
+          TheoraPageCounter := 0;
+          repeat
+            Info.SPagePos := OGGStream.FStream.Position;
+            Data.Clear;
+            OGGStream.GetNextPageData(Data);
+            Data.Seek(0, soBeginning);
+            Data.Read(TheoraTagID, SizeOf(TheoraTagID));
+            if
+{$IFDEF OVAOTL_MOBILE}
+              (TheoraTagID[1] = Ord(THEORA_TAG_ID[0])) AND (TheoraTagID[2] = Ord(THEORA_TAG_ID[1])) AND (TheoraTagID[3] = Ord(THEORA_TAG_ID[2])) AND (TheoraTagID[4] = Ord(THEORA_TAG_ID[3])) AND
+              (TheoraTagID[5] = Ord(THEORA_TAG_ID[4])) AND (TheoraTagID[6] = Ord(THEORA_TAG_ID[5])) AND (TheoraTagID[7] = Ord(THEORA_TAG_ID[6]))
+{$ELSE}
+            (TheoraTagID[1] = Ord(THEORA_TAG_ID[1])) AND (TheoraTagID[2] = Ord(THEORA_TAG_ID[2])) AND (TheoraTagID[3] = Ord(THEORA_TAG_ID[3])) AND (TheoraTagID[4] = Ord(THEORA_TAG_ID[4])) AND
+              (TheoraTagID[5] = Ord(THEORA_TAG_ID[5])) AND (TheoraTagID[6] = Ord(THEORA_TAG_ID[6])) AND (TheoraTagID[7] = Ord(THEORA_TAG_ID[7]))
+{$ENDIF}
+            then
+            begin
+              Format := ofTheora;
+              ReadTag(Data, OGGStream);
+              Result := True;
+              Break;
+            end;
+            Inc(TheoraPageCounter);
+          until TheoraPageCounter > 16;
+        end;
       end;
       Info.HeaderOggPageCount := OGGStream.LastPageQueried;
       if ParsePlayTime then
       begin
-        Info.SampleCount := GetSamples(SourceFile);
-        Info.PlayTime := GetPlayTime;
-        Info.BitRate := Trunc((Info.FileSize - CalculateTagSize(True)) / Info.PlayTime / 125);
+        if (Format = ofVorbis) OR (Format = ofOpus) then
+        begin
+          Info.SampleCount := GetSamples(SourceFile);
+          Info.PlayTime := GetPlayTime;
+          Info.BitRate := Trunc((Info.FileSize - CalculateTagSize(True)) / Info.PlayTime / 125);
+        end;
       end;
     finally
       FreeAndNil(Data);
@@ -2736,7 +3013,7 @@ begin
   end;
 end;
 
-function RebuildFile(FileName: String; Info: TFileInfo; TagOGGStream: TStream; ReplaceMode: Boolean; Stream: TStream = nil): Integer;
+function RebuildFile(FileName: String; Info: TFileInfo; TagOGGStream: TStream; ReplaceMode: Boolean; Format: TOggFormat; Stream: TStream = nil): Integer;
 var
   Source, Destination: TStream;
   BufferName: String;
@@ -2824,7 +3101,14 @@ begin
       if Source.Size - Info.TagEndPos > 0 then
       begin
         NewOGGStream := TOGGStream.Create(Source);
-        NewOGGStream.ReNumberPages(Info.DataPageNumberStartsFrom + 1, Source, Destination);
+        if Format = ofTheora then
+        begin
+          NewOGGStream.ReNumberPagesTheora(Info.DataPageNumberStartsFrom + 1, Source, Destination);
+        end
+        else
+        begin
+          NewOGGStream.ReNumberPages(Info.DataPageNumberStartsFrom + 1, Source, Destination);
+        end;
         FreeAndNil(NewOGGStream);
       end;
       // end;
@@ -2893,6 +3177,7 @@ var
   NewTagSize: Integer;
   NewWrappedTagSize: Integer;
   NewFileCreate: Boolean;
+  TheoraTagsSize: Integer;
 begin
   // Result := OPUSTAGLIBRARY_ERROR;
   NewFileCreate := False;
@@ -2907,7 +3192,7 @@ begin
       if FirstOGGPage.Size > 0 then
       begin
         FirstOGGPage.SaveToFile(FileName);
-        // * If not create one (not valid yet but usefull for exporting an Opus tag becouse the component can red it back)
+        // * If not create one (not valid yet but usefull for exporting an Opus tag because the library can red it back)
       end
       else
       begin
@@ -2943,7 +3228,9 @@ begin
       end
       else
       begin
-        if NewFileOpusTag.Format = ofUnknown then
+        if (NewFileOpusTag.Format = ofUnknown)
+        // OR (NewFileOpusTag.Format = ofTheora)
+        then
         begin
           Result := OPUSTAGLIBRARY_ERROR_NOT_SUPPORTED_FORMAT;
           Exit;
@@ -3043,8 +3330,31 @@ begin
           NewOGGTagStream.Clear;
           NewFileOpusTag.Info.DataPageNumberStartsFrom := NewOGGStream.CreateTagStream(Tag, NewOGGTagStream);
         end;
+        if Format = ofTheora then
+        begin
+          BuildTag(Tag, 0);
+          TheoraTagsSize := Tag.Size;
+          Tag.Seek(0, soEnd);
+          VorbisData.Seek(0, soBeginning);
+          Tag.CopyFrom(VorbisData, VorbisData.Size);
+          Tag.Seek(0, soBeginning);
+          // * Wrap it in OGG container
+          NewOGGTagStream.Clear;
+          try
+            NewOGGStream.Free;
+            TagStream := TFileStream.Create(FileName, fmOpenRead OR fmShareDenyWrite);
+            // * To get basic data from OGG stream
+            TagStream.Seek(NewFileOpusTag.Info.SPagePos, soBeginning);
+            NewOGGStream := TOGGStream.Create(TagStream);
+          except
+            Result := OPUSTAGLIBRARY_ERROR_OPENING_FILE;
+            Exit;
+          end;
+          FreeAndNil(TagStream);
+          NewFileOpusTag.Info.DataPageNumberStartsFrom := NewOGGStream.CreateTagStreamTheora(TheoraTagsSize, Tag, NewOGGTagStream) - 2;
+        end;
         // * Write the tag to destination
-        Result := RebuildFile(FileName, NewFileOpusTag.Info, NewOGGTagStream, FitsInOldTag);
+        Result := RebuildFile(FileName, NewFileOpusTag.Info, NewOGGTagStream, FitsInOldTag, Format);
       finally
         FreeAndNil(Tag);
         FreeAndNil(NewOGGTagStream);
@@ -3073,6 +3383,7 @@ var
   NewTagSize: Integer;
   NewWrappedTagSize: Integer;
   NewFileCreate: Boolean;
+  TheoraTagsSize: Integer;
 begin
   // Result := OPUSTAGLIBRARY_ERROR;
   NewFileCreate := False;
@@ -3222,8 +3533,29 @@ begin
           NewOGGTagStream.Clear;
           NewFileOpusTag.Info.DataPageNumberStartsFrom := NewOGGStream.CreateTagStream(Tag, NewOGGTagStream);
         end;
+        if Format = ofTheora then
+        begin
+          BuildTag(Tag, 0);
+          TheoraTagsSize := Tag.Size;
+          Tag.Seek(0, soEnd);
+          VorbisData.Seek(0, soBeginning);
+          Tag.CopyFrom(VorbisData, VorbisData.Size);
+          Tag.Seek(0, soBeginning);
+          // * Wrap it in OGG container
+          NewOGGTagStream.Clear;
+          try
+            NewOGGStream.Free;
+            // * To get basic data from OGG stream
+            Stream.Seek(NewFileOpusTag.Info.SPagePos, soBeginning);
+            NewOGGStream := TOGGStream.Create(Stream);
+          except
+            Result := OPUSTAGLIBRARY_ERROR_OPENING_FILE;
+            Exit;
+          end;
+          NewFileOpusTag.Info.DataPageNumberStartsFrom := NewOGGStream.CreateTagStreamTheora(TheoraTagsSize, Tag, NewOGGTagStream) - 2;
+        end;
         // * Write the tag to destination
-        Result := RebuildFile('', NewFileOpusTag.Info, NewOGGTagStream, FitsInOldTag, Stream);
+        Result := RebuildFile('', NewFileOpusTag.Info, NewOGGTagStream, FitsInOldTag, Format, Stream);
       finally
         FreeAndNil(Tag);
         FreeAndNil(NewOGGTagStream);

@@ -117,7 +117,6 @@ UNIT uTExtendedX87;
 // This unit uses the FPU and therefore cannot run on non x86 CPU architectures
 {$MESSAGE FATAL 'This unit is only for x86/x86-64 CPUs'}
 {$IFEND}
-
 // **** Defines to be set by the user ****
 {$DEFINE SetWin32Default8087Cw}      // Enable this define if you wish the FPU's settings to be as on Win32 (Delphi's Win32 Default)
 {$DEFINE DontUseSystemUnitOn32bit}   // Enable this define if you with to replace System.pas standard rountines with this unit's on 32-bit
@@ -134,8 +133,6 @@ UNIT uTExtendedX87;
 {$DEFINE EnableFWAIT_Division}
 {$DEFINE EnableFWAIT_Transcendental}
 {$ENDIF}
-
-
 // *************************************************************
 (* Changes and Revision History
   Number format = [TExtendedX87Version].[TExtendedX87Revision]

@@ -1,3 +1,7 @@
+--2.1.2
+-Added: [Music player] Small buttons below the playlist for easier access to some func.
+-Updated: Tag libraries
+
 --2.1.1
 -Fixed: [General] Title text wasn't reset properly after resizing the window
 -Fixed: [Lyric Downloader] Extra text was displayed when downloaded from metrolyrics.com

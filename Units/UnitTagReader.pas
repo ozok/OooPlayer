@@ -1,5 +1,5 @@
 { *
-  * Copyright (C) 2014 ozok <ozok26@gmail.com>
+  * Copyright (C) 2014-2015 ozok <ozok26@gmail.com>
   *
   * This file is part of OooPlayer.
   *

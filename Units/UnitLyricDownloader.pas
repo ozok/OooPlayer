@@ -1,5 +1,5 @@
 ﻿{ *
-  * Copyright (C) 2014 ozok <ozok26@gmail.com>
+  * Copyright (C) 2014-2015 ozok <ozok26@gmail.com>
   *
   * This file is part of OooPlayer.
   *
@@ -136,7 +136,7 @@ const
   END_STR_BAT = '<pre id="to_pre" style="display';
   BAT_SPAN = '<span style="font-size';
   METRO_START = '<div id="lyrics-body-text">';
-  //METRO_END = '<div id="selected-song-meaning-open" unselectable="on" style="display:none;">';
+  // METRO_END = '<div id="selected-song-meaning-open" unselectable="on" style="display:none;">';
   METRO_END = '<p class="writers"><strong>Songwriters</strong>';
 var
   LSR: TStreamReader;

@@ -1,5 +1,5 @@
 { *
-  * Copyright (C) 2014 ozok <ozok26@gmail.com>
+  * Copyright (C) 2014-2015 ozok <ozok26@gmail.com>
   *
   * This file is part of OooPlayer.
   *
@@ -231,8 +231,21 @@ type
     RenamePlaylistBtn: TsButton;
     LabelScrollTimer: TJvThreadTimer;
     E4: TMenuItem;
-    PopupMenu1: TPopupMenu;
+    AddMenu: TPopupMenu;
     H2: TMenuItem;
+    ShortcutPanel: TsPanel;
+    AddMenuBtn: TsBitBtn;
+    RemoveMenuBtn: TsBitBtn;
+    SearchMenuBtn: TsBitBtn;
+    PlaylistMenuBtn: TsBitBtn;
+    A7: TMenuItem;
+    A8: TMenuItem;
+    RemoveMenu: TPopupMenu;
+    D3: TMenuItem;
+    D4: TMenuItem;
+    Playlist2Menu: TPopupMenu;
+    S10: TMenuItem;
+    L3: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -340,6 +353,9 @@ type
     procedure LabelScrollTimerTimer(Sender: TObject);
     procedure E4Click(Sender: TObject);
     procedure H2Click(Sender: TObject);
+    procedure AddMenuBtnClick(Sender: TObject);
+    procedure RemoveMenuBtnClick(Sender: TObject);
+    procedure PlaylistMenuBtnClick(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -584,6 +600,7 @@ begin
     FStopAddFiles := False;
     PlayList.Items.BeginUpdate;
     PlaylistListPanel.Enabled := False;
+    ShortcutPanel.Enabled := False;
     ProgressPanel.Visible := True;
     try
       for I := 0 to OpenDialog.Files.Count - 1 do
@@ -603,6 +620,7 @@ begin
       ProgressPanel.Visible := False;
       PlayList.Items.EndUpdate;
       PlaylistListPanel.Enabled := True;
+      ShortcutPanel.Enabled := True;
       SavePlayList;
       FLastDir := OpenFolder.Directory;
       Self.Width := Self.Width + 1;
@@ -625,6 +643,7 @@ begin
   begin
     PlayList.Items.BeginUpdate;
     PlaylistListPanel.Enabled := False;
+    ShortcutPanel.Enabled := False;
     ProgressPanel.Visible := True;
     try
       MusicSearch.RecurseDepth := MaxInt;
@@ -634,6 +653,7 @@ begin
       ProgressPanel.Visible := False;
       PlayList.Items.EndUpdate;
       PlaylistListPanel.Enabled := True;
+      ShortcutPanel.Enabled := True;
       SavePlayList;
       FLastDir := OpenFolder.Directory;
       Self.Width := Self.Width + 1;
@@ -700,6 +720,7 @@ begin
     ProgressPanel.Visible := False;
     PlayList.Items.EndUpdate;
     PlaylistListPanel.Enabled := True;
+    ShortcutPanel.Enabled := True;
     SavePlayList;
     FLastDir := OpenFolder.Directory;
     Self.Width := Self.Width + 1;
@@ -824,6 +845,14 @@ begin
       end;
     end;
   end;
+end;
+
+procedure TMainForm.AddMenuBtnClick(Sender: TObject);
+var
+  P: TPoint;
+begin
+  P := AddMenuBtn.ClientToScreen(Point(0, 0));
+  AddMenu.Popup(P.X, P.Y + AddMenuBtn.Height)
 end;
 
 procedure TMainForm.AddPlaylistBtnClick(Sender: TObject);
@@ -1282,6 +1311,7 @@ begin
   FStopAddFiles := False;
   PlayList.Items.BeginUpdate;
   PlaylistListPanel.Enabled := False;
+  ShortcutPanel.Enabled := False;
   ProgressPanel.Visible := True;
   DirectoriesToSearch := TStringList.Create;
   try
@@ -1330,6 +1360,7 @@ begin
     ProgressPanel.Visible := False;
     PlayList.Items.EndUpdate;
     PlaylistListPanel.Enabled := True;
+    ShortcutPanel.Enabled := True;
     SavePlayList;
     FLastDir := OpenFolder.Directory;
     Self.Width := Self.Width + 1;
@@ -1928,6 +1959,7 @@ var
 begin
   PlayList.Items.BeginUpdate;
   PlaylistListPanel.Enabled := False;
+  ShortcutPanel.Enabled := True;
   LOpenDlg := TOpenDialog.Create(Self);
   try
     LOpenDlg.Filter := 'Supported|*.m3u;*.m3u8;*.ppf';
@@ -1954,6 +1986,7 @@ begin
     Self.Width := Self.Width - 1;
     PlayList.Items.EndUpdate;
     PlaylistListPanel.Enabled := True;
+    ShortcutPanel.Enabled := False;
   end;
 end;
 
@@ -3473,6 +3506,14 @@ begin
   end;
 end;
 
+procedure TMainForm.PlaylistMenuBtnClick(Sender: TObject);
+var
+  P: TPoint;
+begin
+  P := PlaylistMenuBtn.ClientToScreen(Point(0, 0));
+  Playlist2Menu.Popup(P.X, P.Y + PlaylistMenuBtn.Height)
+end;
+
 procedure TMainForm.PlayListMouseEnter(Sender: TObject);
 begin
   if Self.Enabled and Self.Visible then
@@ -4137,6 +4178,14 @@ begin
     end;
   end;
   Result := Tmp;
+end;
+
+procedure TMainForm.RemoveMenuBtnClick(Sender: TObject);
+var
+  P: TPoint;
+begin
+  P := RemoveMenuBtn.ClientToScreen(Point(0, 0));
+  RemoveMenu.Popup(P.X, P.Y + RemoveMenuBtn.Height)
 end;
 
 procedure TMainForm.RemovePlaylistBtnClick(Sender: TObject);

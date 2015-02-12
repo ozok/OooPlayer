@@ -35,10 +35,6 @@ object SettingsForm: TSettingsForm
       Caption = 'General'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object CheckUpdateBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -66,10 +62,6 @@ object SettingsForm: TSettingsForm
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object PlayCursorBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -168,10 +160,6 @@ object SettingsForm: TSettingsForm
       ImageIndex = 2
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LoadArtBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -230,16 +218,12 @@ object SettingsForm: TSettingsForm
       ParentFont = False
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LyricBtn: TsCheckBox
         Left = 16
         Top = 16
-        Width = 102
+        Width = 132
         Height = 19
-        Caption = 'Download lyrics'
+        Caption = 'Download/Show lyrics'
         Checked = True
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -269,10 +253,6 @@ object SettingsForm: TSettingsForm
       Caption = 'Skin'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object SkinsList: TsComboBox
         Left = 46
         Top = 16
