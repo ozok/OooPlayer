@@ -3,8 +3,8 @@ object AboutForm: TAboutForm
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'About OooPlayer'
-  ClientHeight = 185
-  ClientWidth = 262
+  ClientHeight = 192
+  ClientWidth = 304
   Color = 3485741
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -17,24 +17,24 @@ object AboutForm: TAboutForm
   OnClose = FormClose
   OnShow = FormShow
   DesignSize = (
-    262
-    185)
+    304
+    192)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TsLabel
     Left = 0
     Top = 50
-    Width = 262
+    Width = 304
     Height = 13
     Align = alTop
     Alignment = taCenter
-    Caption = 'OooPlayer 2.1.1.2147'
+    Caption = 'OooPlayer 2.1.2.2212'
     ExplicitWidth = 107
   end
   object Image1: TImage
     Left = 0
     Top = 0
-    Width = 262
+    Width = 304
     Height = 50
     Align = alTop
     Center = True
@@ -151,17 +151,17 @@ object AboutForm: TAboutForm
   object Label2: TsLabel
     Left = 0
     Top = 63
-    Width = 262
+    Width = 304
     Height = 13
     Align = alTop
     Alignment = taCenter
-    Caption = '2014 (C) ozok - ozok26@gmail.com GPLv2'
-    ExplicitWidth = 201
+    Caption = '2014-2015 (C) ozok - ozok26@gmail.com GPLv2'
+    ExplicitWidth = 229
   end
   object Label3: TsLabel
     Left = 0
     Top = 76
-    Width = 262
+    Width = 304
     Height = 15
     Cursor = crHandPoint
     Align = alTop
@@ -176,11 +176,12 @@ object AboutForm: TAboutForm
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
+    ExplicitWidth = 262
   end
   object Label4: TsLabel
     Left = 0
     Top = 91
-    Width = 262
+    Width = 304
     Height = 15
     Cursor = crHandPoint
     Align = alTop
@@ -196,11 +197,12 @@ object AboutForm: TAboutForm
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
     ExplicitTop = 97
+    ExplicitWidth = 262
   end
   object Label5: TsLabel
     Left = 0
     Top = 119
-    Width = 262
+    Width = 304
     Height = 15
     Cursor = crHandPoint
     Align = alTop
@@ -216,11 +218,12 @@ object AboutForm: TAboutForm
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
     ExplicitTop = 106
+    ExplicitWidth = 262
   end
   object Label6: TsLabel
     Left = 0
     Top = 106
-    Width = 262
+    Width = 304
     Height = 13
     Cursor = crHandPoint
     Align = alTop
@@ -236,10 +239,24 @@ object AboutForm: TAboutForm
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
     ExplicitTop = 100
+    ExplicitWidth = 262
+  end
+  object sLabelFX1: TsLabelFX
+    Left = 0
+    Top = 134
+    Width = 304
+    Height = 19
+    Align = alTop
+    Alignment = taCenter
+    Caption = 'Thanks to my friend Alptekin for bug reports and suggestions'
+    Angle = 0
+    Shadow.OffsetKeeper.LeftTop = -2
+    Shadow.OffsetKeeper.RightBottom = 4
+    ExplicitWidth = 299
   end
   object Button1: TsButton
-    Left = 179
-    Top = 152
+    Left = 221
+    Top = 159
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -247,10 +264,11 @@ object AboutForm: TAboutForm
     TabOrder = 0
     OnClick = Button1Click
     SkinData.SkinSection = 'BUTTON'
+    ExplicitLeft = 212
   end
   object Button2: TsButton
     Left = 8
-    Top = 152
+    Top = 159
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]

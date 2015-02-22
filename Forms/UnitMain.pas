@@ -38,7 +38,7 @@ uses
   sPageControl, sStatusBar, sLabel, sComboBox, sBitBtn, sPanel, sBevel,
   sSplitter, sSkinProvider, acProgressBar, sTrackBar, acImage, acPNG,
   acAlphaHints, acAlphaImageList, sButton, Vcl.AppEvnts, sHintManager,
-  acShellCtrls, sComboBoxes, sTreeView;
+  acShellCtrls, sComboBoxes, sTreeView, sListBox, sGauge;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -195,7 +195,7 @@ type
     Splitter2: TsSplitter;
     Bevel3: TsBevel;
     Bevel4: TsBevel;
-    LyricList: TsMemo;
+    LyricList: TsListBox;
     VolumeBar: TsTrackBar;
     SettingsBtn: TsBitBtn;
     LogsBtn: TsBitBtn;
@@ -225,7 +225,6 @@ type
     S9: TMenuItem;
     sSkinManager1: TsSkinManager;
     sSkinProvider1: TsSkinProvider;
-    RadioConnectionBar: TsProgressBar;
     sAlphaHints1: TsAlphaHints;
     CategoryList: TsAlphaImageList;
     RenamePlaylistBtn: TsButton;
@@ -246,6 +245,8 @@ type
     Playlist2Menu: TPopupMenu;
     S10: TMenuItem;
     L3: TMenuItem;
+    RadioConnectionBar: TsProgressBar;
+    sPanel1: TsPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -378,6 +379,7 @@ type
 
     procedure LoadPlayList;
     procedure SavePlayList;
+    function GeneratePlaylistFileName: string;
 
     procedure LoadSettings;
     procedure SaveSettings;
@@ -397,6 +399,8 @@ type
     procedure WriteTagsToRecordFile;
 
     procedure UpdateOverlayIcon(const Index: integer);
+
+    procedure ChangeSkin(const SkinIndex: integer);
   public
     { Public declarations }
     // encoder paths
@@ -481,7 +485,7 @@ var
 
 const
   // {$DEFINE WRITEDEBUGLOG}
-  BuildInt = 2147;
+  BuildInt = 2212;
   Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
@@ -496,6 +500,7 @@ const
   DOWNLOAD_LYRIC = 11;
   START_RECORDING = 12;
   PLAY_NEXT_SONG = 13;
+  LEVEL_MAX = 32768;
 
 implementation
 
@@ -849,10 +854,10 @@ end;
 
 procedure TMainForm.AddMenuBtnClick(Sender: TObject);
 var
-  P: TPoint;
+  p: TPoint;
 begin
-  P := AddMenuBtn.ClientToScreen(Point(0, 0));
-  AddMenu.Popup(P.X, P.Y + AddMenuBtn.Height)
+  p := AddMenuBtn.ClientToScreen(Point(0, 0));
+  AddMenu.Popup(p.X, p.Y + AddMenuBtn.Height)
 end;
 
 procedure TMainForm.AddPlaylistBtnClick(Sender: TObject);
@@ -867,7 +872,7 @@ begin
   if LName.Length > 0 then
   begin
     LPlaylistFile.Name := LName;
-    LPlaylistFile.PlaylistFile := FAppDataFolder + '\playlist' + FPlayListFiles.Count.ToString() + '.dat';
+    LPlaylistFile.PlaylistFile := FAppDataFolder + '\' + GeneratePlaylistFileName + '.dat';
     FPlayListFiles.Add(LPlaylistFile);
     LSW := TStreamWriter.Create(FAppDataFolder + '\playlists.dat', False);
     try
@@ -1070,6 +1075,22 @@ end;
 procedure TMainForm.C2Click(Sender: TObject);
 begin
   ShellExecute(handle, 'open', PWideChar(ExtractFileDir(Application.ExeName) + '\changelog.txt'), nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure TMainForm.ChangeSkin(const SkinIndex: integer);
+var
+  LSkins: TStringList;
+begin
+  LSkins := TStringList.Create;
+  try
+    LSkins.LoadFromFile(ExtractFileDir(Application.ExeName) + '\skins.txt');
+    if LSkins.Count < SkinIndex then
+    begin
+      sSkinManager1.SkinName := LSkins[SkinIndex];
+    end;
+  finally
+    LSkins.Free;
+  end;
 end;
 
 function TMainForm.CodecToExtension(const AudioCodec: string): string;
@@ -1486,7 +1507,7 @@ begin
   FCurrentItemInfo.ItemIndex := -1;
   FCurrentRadioIndex := -1;
   FStoppedByUser := False;
-  AppIniFileStorage.FileName := FAppDataFolder + 'position3.ini';
+  AppIniFileStorage.FileName := FAppDataFolder + 'position4.ini';
   FShuffleIndexes := TList<Integer>.Create;
   FTagReader := TTagReader.Create;
   CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
@@ -1504,6 +1525,7 @@ begin
   Taskbar.ProgressMaxValue := MaxInt;
   FPlayListFiles := TPlaylistFiles.Create;
   FStopAddFiles := True;
+  sSkinManager1.SkinDirectory := ExtractFileDir(Application.ExeName) + '\skins\';
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -1647,9 +1669,9 @@ begin
   end;
   Self.Width := Self.Width + 1;
   Self.Width := Self.Width - 1;
-  TrayIcon.ShowApplication;
+//  TrayIcon.ShowApplication;
   Self.FocusControl(VolumeBar);
-  Self.BringToFront;
+//  Self.BringToFront;
 end;
 
 procedure TMainForm.G1Click(Sender: TObject);
@@ -1676,6 +1698,14 @@ begin
       FShuffleIndexes.Exchange(i, LIndex);
     end;
   end;
+end;
+
+function TMainForm.GeneratePlaylistFileName: string;
+var
+  LGUID: TGUID;
+begin
+  CreateGUID(LGUID);
+  Result := GUIDToString(LGUID);
 end;
 
 function TMainForm.GetImage(const Dir: string): string;
@@ -1829,7 +1859,7 @@ begin
           FArtistLabel := '';
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
-          LyricList.Lines.Clear;
+          LyricList.Items.Clear;
           PlaybackInfoLabel.Caption := '';
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
@@ -1843,6 +1873,7 @@ begin
           LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+
         end
         else
         begin
@@ -1856,7 +1887,7 @@ begin
           FArtistLabel := '';
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
-          LyricList.Lines.Clear;
+          LyricList.Items.Clear;
           PlaybackInfoLabel.Caption := '';
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
@@ -1868,6 +1899,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+
           try
             if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
             begin
@@ -1876,6 +1908,7 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+
           end;
         end
         else
@@ -1890,7 +1923,7 @@ begin
           FArtistLabel := '';
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
-          LyricList.Lines.Clear;
+          LyricList.Items.Clear;
           PlaybackInfoLabel.Caption := '';
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
@@ -1902,6 +1935,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+
           try
             if FShuffleIndex + 1 < FShuffleIndexes.Count then
             begin
@@ -1914,6 +1948,7 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+
           end;
         end
         else
@@ -1928,7 +1963,7 @@ begin
           FArtistLabel := '';
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
-          LyricList.Lines.Clear;
+          LyricList.Items.Clear;
           PlaybackInfoLabel.Caption := '';
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
@@ -2450,14 +2485,16 @@ begin
       Splitter2.Visible := LyricPanel.Visible;
       H2.Checked := not QueueList.Visible;
       Splitter1.Visible := QueueList.Visible;
-      LSkinIndex := SettingsFile.ReadInteger('settings', 'skin', 1);
+      LSkinIndex := SettingsFile.ReadInteger('settings', 'skin2', 33);
     end;
   finally
     SettingsFile.Free;
     if LSkinIndex > 0 then
     begin
-      MainForm.sSkinManager1.SkinName := sSkinManager1.InternalSkins[LSkinIndex - 1].Name;
+      MainForm.sSkinManager1.BeginUpdate;
+      ChangeSkin(LSkinIndex - 1);
       MainForm.sSkinManager1.Active := True;
+      MainForm.sSkinManager1.EndUpdate(True);
     end
     else
     begin
@@ -2606,6 +2643,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+
           // first try queue
           if FQueuedItems.Count > 0 then
           begin
@@ -2666,6 +2704,7 @@ begin
           LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+
           PlayItem(LRndIndex);
           PlayItemUIUpdate;
         end;
@@ -2673,6 +2712,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+
           try
             if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
             begin
@@ -2682,12 +2722,14 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+
           end;
         end;
       3: // shuffle
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+
           try
             if FShuffleIndex + 1 < FShuffleIndexes.Count then
             begin
@@ -2701,6 +2743,7 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+
           end;
         end;
     end;
@@ -2757,6 +2800,7 @@ begin
       FPlayer.Pause;
       PositionTimer.Enabled := False;
       ProgressTimer.Enabled := PositionTimer.Enabled;
+
       Taskbar.ProgressState := TTaskBarProgressState.Paused;
       UpdateOverlayIcon(2);
       PlaybackInfoLabel.Caption := 'Paused | ' + FCurrentItemInfo.StatusInfoText;
@@ -2767,6 +2811,7 @@ begin
       FPlayer.SetVolume(100 - VolumeBar.Position);
       PositionTimer.Enabled := True;
       ProgressTimer.Enabled := PositionTimer.Enabled;
+
       Taskbar.ProgressState := TTaskBarProgressState.Normal;
       UpdateOverlayIcon(1);
       PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
@@ -2831,6 +2876,7 @@ begin
       FPlayer.SetVolume(100 - VolumeBar.Position);
       PositionTimer.Enabled := True;
       ProgressTimer.Enabled := PositionTimer.Enabled;
+
       Taskbar.ProgressState := TTaskBarProgressState.Normal;
       UpdateOverlayIcon(1);
       PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
@@ -2857,6 +2903,7 @@ begin
                 begin
                   PositionTimer.Enabled := False;
                   ProgressTimer.Enabled := PositionTimer.Enabled;
+
                   PlayItem(PlayList.ItemIndex);
                   PlayItemUIUpdate;
                 end
@@ -2873,6 +2920,7 @@ begin
                     // if stopped start platyng
                     PositionTimer.Enabled := False;
                     ProgressTimer.Enabled := PositionTimer.Enabled;
+
                     PlayItem(PlayList.ItemIndex);
                     PlayItemUIUpdate;
                   end;
@@ -2891,6 +2939,7 @@ begin
                   // if stopped start platyng
                   PositionTimer.Enabled := False;
                   ProgressTimer.Enabled := PositionTimer.Enabled;
+
                   PlayItem(PlayList.ItemIndex);
                   PlayItemUIUpdate;
                 end;
@@ -2902,6 +2951,7 @@ begin
               LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
               PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+
               PlayItem(LRndIndex);
               PlayItemUIUpdate;
             end;
@@ -2909,6 +2959,7 @@ begin
             begin
               PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+
               try
                 if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
                 begin
@@ -2918,12 +2969,14 @@ begin
               finally
                 PositionTimer.Enabled := True;
                 ProgressTimer.Enabled := PositionTimer.Enabled;
+
               end;
             end;
           3: // shuffle
             begin
               PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+
               try
                 if FShuffleIndex + 1 < FShuffleIndexes.Count then
                 begin
@@ -2937,6 +2990,7 @@ begin
               finally
                 PositionTimer.Enabled := True;
                 ProgressTimer.Enabled := PositionTimer.Enabled;
+
               end;
             end;
         end;
@@ -3019,6 +3073,7 @@ begin
             FPlayer.SetVolume(100 - VolumeBar.Position);
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+
             Taskbar.ProgressState := TTaskBarProgressState.Normal;
             UpdateOverlayIcon(1);
             PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
@@ -3045,6 +3100,7 @@ begin
                       begin
                         PositionTimer.Enabled := False;
                         ProgressTimer.Enabled := PositionTimer.Enabled;
+
                         PlayItem(PlayList.ItemIndex);
                         PlayItemUIUpdate;
                       end
@@ -3061,6 +3117,7 @@ begin
                           // if stopped start platyng
                           PositionTimer.Enabled := False;
                           ProgressTimer.Enabled := PositionTimer.Enabled;
+
                           PlayItem(PlayList.ItemIndex);
                           PlayItemUIUpdate;
                         end;
@@ -3079,6 +3136,7 @@ begin
                         // if stopped start platyng
                         PositionTimer.Enabled := False;
                         ProgressTimer.Enabled := PositionTimer.Enabled;
+
                         PlayItem(PlayList.ItemIndex);
                         PlayItemUIUpdate;
                       end;
@@ -3090,6 +3148,7 @@ begin
                     LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
                     PositionTimer.Enabled := False;
                     ProgressTimer.Enabled := PositionTimer.Enabled;
+
                     PlayItem(LRndIndex);
                     PlayItemUIUpdate;
                   end;
@@ -3097,6 +3156,7 @@ begin
                   begin
                     PositionTimer.Enabled := False;
                     ProgressTimer.Enabled := PositionTimer.Enabled;
+
                     try
                       if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
                       begin
@@ -3106,12 +3166,14 @@ begin
                     finally
                       PositionTimer.Enabled := True;
                       ProgressTimer.Enabled := PositionTimer.Enabled;
+
                     end;
                   end;
                 3: // shuffle
                   begin
                     PositionTimer.Enabled := False;
                     ProgressTimer.Enabled := PositionTimer.Enabled;
+
                     try
                       if FShuffleIndex + 1 < FShuffleIndexes.Count then
                       begin
@@ -3125,6 +3187,7 @@ begin
                     finally
                       PositionTimer.Enabled := True;
                       ProgressTimer.Enabled := PositionTimer.Enabled;
+
                     end;
                   end;
               end;
@@ -3249,6 +3312,7 @@ begin
   PositionTimer.Enabled := False;
   ProgressTimer.Enabled := PositionTimer.Enabled;
 
+
   if FPlayer.ErrorMsg = MY_ERROR_OK then
   begin
     LPlayIndex := FCurrentItemInfo.ItemIndex;
@@ -3289,6 +3353,7 @@ begin
       PositionTimer.Enabled := True;
       ProgressTimer.Enabled := PositionTimer.Enabled;
 
+
       PlayList.ItemIndex := -1;
       PlayList.ItemIndex := FCurrentItemInfo.ItemIndex;
       Taskbar.ProgressState := TTaskBarProgressState.Normal;
@@ -3327,7 +3392,7 @@ begin
         CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
       end;
       // lyric
-      LyricList.Lines.Clear;
+      LyricList.Items.Clear;
       LyricStatusLabel.Caption := '';
       LyricTitleEdit.Text := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title;
       LyricArtistEdit.Text := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist;
@@ -3341,8 +3406,8 @@ begin
         if FileExists(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title,
           FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist, FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album)) then
         begin
-          LyricList.Lines.Clear;
-          LyricList.Lines.LoadFromFile(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title,
+          LyricList.Items.Clear;
+          LyricList.Items.LoadFromFile(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title,
             FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist, FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album));
           LyricStatusLabel.Caption := 'Loaded local lyric file';
           LyricSearchBtn.Enabled := True;
@@ -3431,8 +3496,50 @@ begin
   begin
     if Item.Index < FPlaylists[FSelectedPlaylistIndex].Count then
     begin
-      Item.Caption := FloatToStr(Item.Index + 1) + '. ' + FPlaylists[FSelectedPlaylistIndex][Item.Index].Artist + ' - ' + FPlaylists[FSelectedPlaylistIndex][Item.Index].Album + ' - ' +
-        FPlaylists[FSelectedPlaylistIndex][Item.Index].Title;
+      case SettingsForm.PlaylistItemTextList.ItemIndex of
+        0:
+          begin
+            with FPlaylists[FSelectedPlaylistIndex][Item.Index] do
+            begin
+              Item.Caption := FloatToStr(Item.Index + 1) + '. ' + Title + ' - ' + Album + ' - ' + Artist;
+            end;
+          end;
+        1:
+          begin
+            with FPlaylists[FSelectedPlaylistIndex][Item.Index] do
+            begin
+              Item.Caption := FloatToStr(Item.Index + 1) + '. ' + Album + ' - ' + Title + ' - ' + Artist;
+            end;
+          end;
+        2:
+          begin
+            with FPlaylists[FSelectedPlaylistIndex][Item.Index] do
+            begin
+              Item.Caption := FloatToStr(Item.Index + 1) + '. ' + Artist + ' - ' + Album + ' - ' + Title;
+            end;
+          end;
+        3:
+          begin
+            with FPlaylists[FSelectedPlaylistIndex][Item.Index] do
+            begin
+              Item.Caption := FloatToStr(Item.Index + 1) + '. ' + Title + ' - ' + Artist + ' - ' + Album;
+            end;
+          end;
+        4:
+          begin
+            with FPlaylists[FSelectedPlaylistIndex][Item.Index] do
+            begin
+              Item.Caption := FloatToStr(Item.Index + 1) + '. ' + Album + ' - ' + Artist + ' - ' + Title;
+            end;
+          end;
+        5:
+          begin
+            with FPlaylists[FSelectedPlaylistIndex][Item.Index] do
+            begin
+              Item.Caption := FloatToStr(Item.Index + 1) + '. ' + Artist + ' - ' + Title + ' - ' + Album;
+            end;
+          end;
+      end;
       if FQueuedItems.Contains(Item.Index) then
       begin
         Item.SubItems.Add('Q')
@@ -3452,6 +3559,7 @@ begin
   begin
     PositionTimer.Enabled := False;
     ProgressTimer.Enabled := PositionTimer.Enabled;
+
     PlayItem(PlayList.ItemIndex);
     PlayItemUIUpdate;
   end;
@@ -3508,10 +3616,10 @@ end;
 
 procedure TMainForm.PlaylistMenuBtnClick(Sender: TObject);
 var
-  P: TPoint;
+  p: TPoint;
 begin
-  P := PlaylistMenuBtn.ClientToScreen(Point(0, 0));
-  Playlist2Menu.Popup(P.X, P.Y + PlaylistMenuBtn.Height)
+  p := PlaylistMenuBtn.ClientToScreen(Point(0, 0));
+  Playlist2Menu.Popup(p.X, p.Y + PlaylistMenuBtn.Height)
 end;
 
 procedure TMainForm.PlayListMouseEnter(Sender: TObject);
@@ -3567,7 +3675,7 @@ begin
   FArtistLabel := '';
   FAlbumLabel := '';
   PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
-  LyricList.Lines.Clear;
+  LyricList.Items.Clear;
   PlaybackInfoLabel.Caption := '';
   Taskbar.ProgressMaxValue := MaxInt;
   Taskbar.ProgressValue := 0;
@@ -3575,6 +3683,7 @@ begin
   PlayList.Invalidate;
   PositionTimer.Enabled := False;
   ProgressTimer.Enabled := PositionTimer.Enabled;
+
   FPlaybackType := radio;
   RadioConnectionBar.Visible := True;
   RadioConnectionBar.Style := pbstMarquee;
@@ -3637,6 +3746,7 @@ begin
   begin
     PositionTimer.Enabled := False;
     ProgressTimer.Enabled := PositionTimer.Enabled;
+
     try
       if not FPlayer.SetPosition((FPlayer.TotalLength * PositionBar.Position) div MaxInt) then
       begin
@@ -3645,6 +3755,7 @@ begin
     finally
       PositionTimer.Enabled := True;
       ProgressTimer.Enabled := PositionTimer.Enabled;
+
     end;
   end;
   if Self.Enabled and Self.Visible then
@@ -3664,6 +3775,7 @@ begin
       PositionBar.Position := NewTractBarPosition;
       PositionTimer.Enabled := False;
       ProgressTimer.Enabled := PositionTimer.Enabled;
+
       FPlayer.Pause;
       try
         if not FPlayer.SetPosition((FPlayer.TotalLength * PositionBar.Position) div MaxInt) then
@@ -3674,6 +3786,7 @@ begin
         Sleep(10);
         PositionTimer.Enabled := True;
         ProgressTimer.Enabled := PositionTimer.Enabled;
+
         FPlayer.Resume;
       end;
     end;
@@ -3708,6 +3821,7 @@ begin
     begin
       PositionTimer.Enabled := False;
       ProgressTimer.Enabled := PositionTimer.Enabled;
+
       PlaybackInfoLabel.Caption := '';
     end;
   end;
@@ -3724,6 +3838,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+
           if FCurrentItemInfo.ItemIndex > 0 then
           begin
             PlayItem(FCurrentItemInfo.ItemIndex - 1);
@@ -3736,6 +3851,7 @@ begin
           LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+
           PlayItem(LRndIndex);
           PlayItemUIUpdate;
         end;
@@ -3743,6 +3859,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+
           try
             if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
             begin
@@ -3752,12 +3869,14 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+
           end;
         end;
       3: // shuffle
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+
           try
             if FShuffleIndex + 1 < FShuffleIndexes.Count then
             begin
@@ -3771,6 +3890,7 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+
           end;
         end;
     end;
@@ -4182,10 +4302,10 @@ end;
 
 procedure TMainForm.RemoveMenuBtnClick(Sender: TObject);
 var
-  P: TPoint;
+  p: TPoint;
 begin
-  P := RemoveMenuBtn.ClientToScreen(Point(0, 0));
-  RemoveMenu.Popup(P.X, P.Y + RemoveMenuBtn.Height)
+  p := RemoveMenuBtn.ClientToScreen(Point(0, 0));
+  RemoveMenu.Popup(p.X, p.Y + RemoveMenuBtn.Height)
 end;
 
 procedure TMainForm.RemovePlaylistBtnClick(Sender: TObject);
@@ -4724,14 +4844,14 @@ begin
   FArtistLabel := '';
   FAlbumLabel := '';
   PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
-  LyricList.Lines.Clear;
+  LyricList.Items.Clear;
   PlaybackInfoLabel.Caption := '';
   Taskbar.ProgressMaxValue := MaxInt;
   Taskbar.ProgressValue := 0;
   UpdateOverlayIcon(3);
   PlayList.Invalidate;
   RadioList.Invalidate;
-  LyricList.Lines.Clear;
+  LyricList.Items.Clear;
   LyricTitleEdit.Clear;
   LyricArtistEdit.Clear;
   if Self.Enabled and Self.Visible then
@@ -5062,7 +5182,7 @@ begin
         begin
           Log('download lyric');
           // lyric
-          LyricList.Lines.Clear;
+          LyricList.Items.Clear;
           LyricStatusLabel.Caption := '';
           LyricTitleEdit.Text := '';
           LyricArtistEdit.Text := '';

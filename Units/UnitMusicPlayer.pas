@@ -40,16 +40,18 @@ type
     FTAKPluginHandle: Cardinal;
     FMixHandle: HSTREAM;
     FPosition: int64;
-
     function GetBassStreamStatus: TPlayerStatus;
     function GetTotalLength(): int64;
     function GetPosition(): int64;
     function GetPositionStr: string;
     function GetSecondDuration: Integer;
+    function GetLevel: DWORD;
 
     function IsM4AALAC: Boolean;
     function GetBassErrorCode: Integer;
     function GetMixerPlayStatus: TPlayerStatus;
+    function GetLeftLevel: Cardinal;
+    function GetRightLevel: Cardinal;
   public
     property PlayerStatus: TPlayerStatus read FPlayerStatus;
     property PlayerStatus2: TPlayerStatus read GetBassStreamStatus;
@@ -64,6 +66,8 @@ type
     property Channel: Cardinal read FBassHandle;
     property BassErrorCode: Integer read GetBassErrorCode;
     property MixHandle: HSTREAM read FMixHandle;
+    property LeftLevel: Cardinal read GetLeftLevel;
+    property RightLevel: Cardinal read GetRightLevel;
 
     constructor Create(const WinHandle: Cardinal);
     destructor Destroy; override;
@@ -286,6 +290,16 @@ begin
   end;
 end;
 
+function TMusicPlayer.GetLeftLevel: Cardinal;
+begin
+  Result := LOWORD(GetLevel);
+end;
+
+function TMusicPlayer.GetLevel: DWORD;
+begin
+  Result := BASS_ChannelGetLevel(FBassHandle);
+end;
+
 function TMusicPlayer.GetMixerPlayStatus: TPlayerStatus;
 begin
   case BASS_ChannelIsActive(FMixHandle) of
@@ -319,6 +333,11 @@ begin
     FPositionAsSec := Round(BASS_ChannelBytes2Seconds(FBassHandle, BASS_ChannelGetPosition(FBassHandle, BASS_POS_BYTE)));
     Result := IntToTime(FPositionAsSec);
   end;
+end;
+
+function TMusicPlayer.GetRightLevel: Cardinal;
+begin
+  Result := HIWORD(GetLevel);
 end;
 
 function TMusicPlayer.GetSecondDuration: Integer;

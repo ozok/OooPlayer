@@ -19,6 +19,7 @@ type
     Label5: TsLabel;
     Label6: TsLabel;
     sSkinProvider1: TsSkinProvider;
+    sLabelFX1: TsLabelFX;
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure Button2Click(Sender: TObject);

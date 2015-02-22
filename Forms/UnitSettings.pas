@@ -51,6 +51,7 @@ type
     sTabSheet1: TsTabSheet;
     SkinsList: TsComboBox;
     BufferEdit: TsSpinEdit;
+    PlaylistItemTextList: TsComboBox;
     WindowTitleList: TsComboBox;
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -62,8 +63,10 @@ type
     procedure FormShow(Sender: TObject);
     procedure SkinsListChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure PlaylistItemTextListChange(Sender: TObject);
   private
     { Private declarations }
+    procedure GetAllSkins;
   public
     { Public declarations }
     procedure LoadSettings;
@@ -103,17 +106,24 @@ procedure TSettingsForm.FormCreate(Sender: TObject);
 var
   I: Integer;
 begin
-  SkinsList.Items.Add('Disabled');
-  for I := 0 to MainForm.sSkinManager1.InternalSkins.Count - 1 do
-  begin
-    SkinsList.Items.Add(MainForm.sSkinManager1.InternalSkins[i].Name)
-  end;
+  GetAllSkins;
   LoadSettings;
 end;
 
 procedure TSettingsForm.FormShow(Sender: TObject);
 begin
   LoadSettings;
+end;
+
+procedure TSettingsForm.GetAllSkins;
+var
+  I: Integer;
+begin
+  SkinsList.Items.LoadFromFile(ExtractFileDir(Application.ExeName) + '\skins.txt');
+  for I := 0 to SkinsList.Items.Count - 1 do
+  begin
+    SkinsList.Items[i] := ChangeFileExt(SkinsList.Items[i], '');
+  end;
 end;
 
 procedure TSettingsForm.LoadArtBtnClick(Sender: TObject);
@@ -137,14 +147,20 @@ begin
       LyricBtn.Checked := SettingsFile.ReadBool('settings', 'lyric', True);
       LogLyricFailBtn.Checked := SettingsFile.ReadBool('settings', 'loglyric', False);
       BufferEdit.Text := SettingsFile.ReadString('settings', 'buffer', '500');
-      SkinsList.ItemIndex := SettingsFile.ReadInteger('settings', 'skin', 1);
+      SkinsList.ItemIndex := SettingsFile.ReadInteger('settings', 'skin2', 33);
       WindowTitleList.ItemIndex := SettingsFile.ReadInteger('settings', 'windowtitle', 0);
+      PlaylistItemTextList.ItemIndex := SettingsFile.ReadInteger('settings', 'playlistitemtext', 2);
     end;
   finally
     SettingsFile.Free;
     LoadArtBtnClick(Self);
     SkinsListChange(Self);
   end;
+end;
+
+procedure TSettingsForm.PlaylistItemTextListChange(Sender: TObject);
+begin
+  MainForm.PlayList.Invalidate;
 end;
 
 procedure TSettingsForm.SaveSettings;
@@ -163,8 +179,9 @@ begin
       SettingsFile.WriteBool('settings', 'lyric', LyricBtn.Checked);
       SettingsFile.WriteBool('settings', 'loglyric', LogLyricFailBtn.Checked);
       SettingsFile.WriteString('settings', 'buffer', BufferEdit.Text);
-      SettingsFile.WriteInteger('settings', 'skin', SkinsList.ItemIndex);
+      SettingsFile.WriteInteger('settings', 'skin2', SkinsList.ItemIndex);
       SettingsFile.WriteInteger('settings', 'windowtitle', WindowTitleList.ItemIndex);
+      SettingsFile.WriteInteger('settings', 'playlistitemtext', PlaylistItemTextList.ItemIndex);
     end;
   finally
     SettingsFile.Free;
@@ -175,8 +192,10 @@ procedure TSettingsForm.SkinsListChange(Sender: TObject);
 begin
   if SkinsList.ItemIndex > 0 then
   begin
-    MainForm.sSkinManager1.SkinName := SkinsList.Text;
+    MainForm.sSkinManager1.BeginUpdate;
+    MainForm.sSkinManager1.SkinName := SkinsList.Text + '.asz';
     MainForm.sSkinManager1.Active := True;
+    MainForm.sSkinManager1.EndUpdate(True);
   end
   else
   begin

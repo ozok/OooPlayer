@@ -1,6 +1,11 @@
 --2.1.2
--Added: [Music player] Small buttons below the playlist for easier access to some func.
+-Added: [General] Many skins (over 100)
+-Added: [General] An option to specify playlist item text combination
+-Added: [Music player] Small buttons below the playlist for easier access to some functions
+-Fixed: [Music player] New playlists could overwrite the old ones in some cases
+-Fixed: [General] Blinking when changing a skin
 -Updated: Tag libraries
+-Updated: Skin library
 
 --2.1.1
 -Fixed: [General] Title text wasn't reset properly after resizing the window

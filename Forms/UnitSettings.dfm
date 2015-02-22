@@ -56,53 +56,14 @@ object SettingsForm: TSettingsForm
         OnClick = Button2Click
         SkinData.SkinSection = 'BUTTON'
       end
-    end
-    object TabSheet2: TsTabSheet
-      Caption = 'Playback'
-      ImageIndex = 1
-      SkinData.CustomColor = False
-      SkinData.CustomFont = False
-      object PlayCursorBtn: TsCheckBox
-        Left = 16
-        Top = 16
-        Width = 139
-        Height = 19
-        Caption = 'Playback follows cursor'
-        TabOrder = 0
-        SkinData.SkinSection = 'CHECKBOX'
-        ImgChecked = 0
-        ImgUnchecked = 0
-      end
-      object PlayJumpBtn: TsCheckBox
-        Left = 16
-        Top = 39
-        Width = 121
-        Height = 19
-        Caption = 'Jump to current file'
-        TabOrder = 1
-        SkinData.SkinSection = 'CHECKBOX'
-        ImgChecked = 0
-        ImgUnchecked = 0
-      end
-      object BufferEdit: TsSpinEdit
-        Left = 124
-        Top = 64
-        Width = 75
+      object PlaylistItemTextList: TsComboBox
+        Left = 162
+        Top = 86
+        Width = 145
         Height = 21
-        Alignment = taCenter
-        Color = 2038810
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        NumbersOnly = True
-        ParentFont = False
-        TabOrder = 2
-        Text = '1000'
-        SkinData.SkinSection = 'EDIT'
+        Alignment = taLeftJustify
         BoundLabel.Active = True
-        BoundLabel.Caption = 'Buffer length in ms:'
+        BoundLabel.Caption = 'Playlist item text:'
         BoundLabel.Indent = 0
         BoundLabel.Font.Charset = DEFAULT_CHARSET
         BoundLabel.Font.Color = clWindowText
@@ -112,13 +73,31 @@ object SettingsForm: TSettingsForm
         BoundLabel.Layout = sclLeft
         BoundLabel.MaxWidth = 0
         BoundLabel.UseSkinColor = True
-        MaxValue = 5000
-        MinValue = 500
-        Value = 1000
+        SkinData.SkinSection = 'COMBOBOX'
+        VerticalAlignment = taAlignTop
+        Style = csDropDownList
+        Color = 2038810
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 13417908
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ItemIndex = 0
+        ParentFont = False
+        TabOrder = 2
+        Text = 'Song - Album - Artist'
+        OnChange = PlaylistItemTextListChange
+        Items.Strings = (
+          'Song - Album - Artist'
+          'Album - Song - Artist'
+          'Artist - Album - Song'
+          'Song - Artist - Album'
+          'Album - Artist - Song'
+          'Artist - Song - Album')
       end
       object WindowTitleList: TsComboBox
-        Left = 124
-        Top = 91
+        Left = 162
+        Top = 59
         Width = 145
         Height = 21
         Alignment = taLeftJustify
@@ -153,6 +132,66 @@ object SettingsForm: TSettingsForm
           'Song - Artist - Album'
           'Album - Artist - Song'
           'Artist - Song - Album')
+      end
+    end
+    object TabSheet2: TsTabSheet
+      Caption = 'Playback'
+      ImageIndex = 1
+      SkinData.CustomColor = False
+      SkinData.CustomFont = False
+      object PlayCursorBtn: TsCheckBox
+        Left = 16
+        Top = 16
+        Width = 139
+        Height = 19
+        Caption = 'Playback follows cursor'
+        TabOrder = 0
+        SkinData.SkinSection = 'CHECKBOX'
+        ImgChecked = 0
+        ImgUnchecked = 0
+      end
+      object PlayJumpBtn: TsCheckBox
+        Left = 16
+        Top = 39
+        Width = 121
+        Height = 19
+        Caption = 'Jump to current file'
+        TabOrder = 1
+        SkinData.SkinSection = 'CHECKBOX'
+        ImgChecked = 0
+        ImgUnchecked = 0
+      end
+      object BufferEdit: TsSpinEdit
+        Left = 180
+        Top = 64
+        Width = 75
+        Height = 21
+        Alignment = taCenter
+        Color = 2038810
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 13417908
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        NumbersOnly = True
+        ParentFont = False
+        TabOrder = 2
+        Text = '1000'
+        SkinData.SkinSection = 'EDIT'
+        BoundLabel.Active = True
+        BoundLabel.Caption = 'Buffer length in ms:'
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+        MaxValue = 5000
+        MinValue = 500
+        Value = 1000
       end
     end
     object TabSheet3: TsTabSheet

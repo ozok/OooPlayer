@@ -491,18 +491,18 @@ procedure TLyricDownloader.UpdateMainUI;
 var
   I: Integer;
 begin
-  MainForm.LyricList.Lines.Clear;
+  MainForm.LyricList.Items.Clear;
   // if (MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][MainForm.FCurrentRadioIndex].Title = FTitle) and
   // (MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][MainForm.FCurrentRadioIndex].Artist = FArtist) then
   // begin
-  MainForm.LyricList.Lines.BeginUpdate;
+  MainForm.LyricList.Items.BeginUpdate;
   try
     for I := 0 to FLyricFile.Count - 1 do
     begin
-      MainForm.LyricList.Lines.Add(Trim(FLyricFile[i]));
+      MainForm.LyricList.Items.Add(Trim(FLyricFile[i]));
     end;
   finally
-    MainForm.LyricList.Lines.EndUpdate;
+    MainForm.LyricList.Items.EndUpdate;
   end;
   if FLyricFile.Count > 1 then
   begin
