@@ -3,7 +3,7 @@ object MainForm: TMainForm
   Top = 0
   Caption = 'OooPlayer'
   ClientHeight = 742
-  ClientWidth = 1008
+  ClientWidth = 1224
   Color = 3485741
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -24,7 +24,7 @@ object MainForm: TMainForm
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter2: TsSplitter
-    Left = 652
+    Left = 868
     Top = 130
     Height = 552
     Align = alRight
@@ -35,7 +35,7 @@ object MainForm: TMainForm
     ExplicitHeight = 100
   end
   object Bevel3: TsBevel
-    Left = 649
+    Left = 865
     Top = 130
     Width = 3
     Height = 552
@@ -48,7 +48,7 @@ object MainForm: TMainForm
   object Bevel4: TsBevel
     Left = 0
     Top = 127
-    Width = 1008
+    Width = 1224
     Height = 3
     Align = alTop
     Shape = bsTopLine
@@ -57,7 +57,7 @@ object MainForm: TMainForm
   object TopBarPnl: TsPanel
     Left = 0
     Top = 0
-    Width = 1008
+    Width = 1224
     Height = 127
     Align = alTop
     BevelOuter = bvNone
@@ -67,15 +67,16 @@ object MainForm: TMainForm
     object Panel1: TsPanel
       Left = 0
       Top = 103
-      Width = 1008
+      Width = 1224
       Height = 24
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
+      OnMouseLeave = FuncPagesMouseLeave
       SkinData.SkinSection = 'PANEL'
       object PositionLabel: TsLabel
         AlignWithMargins = True
-        Left = 823
+        Left = 1039
         Top = 0
         Width = 182
         Height = 24
@@ -96,7 +97,7 @@ object MainForm: TMainForm
       object PositionBar: TsTrackBar
         Left = 0
         Top = 0
-        Width = 823
+        Width = 1039
         Height = 24
         Hint = 'Position'
         Align = alClient
@@ -114,7 +115,7 @@ object MainForm: TMainForm
     end
     object VolumePnl: TsPanel
       AlignWithMargins = True
-      Left = 983
+      Left = 1199
       Top = 0
       Width = 24
       Height = 103
@@ -131,6 +132,10 @@ object MainForm: TMainForm
         Top = 23
         Width = 24
         Height = 23
+        Margins.Left = 0
+        Margins.Top = 0
+        Margins.Right = 0
+        Margins.Bottom = 0
         Align = alTop
         Center = True
         Picture.Data = {
@@ -208,6 +213,10 @@ object MainForm: TMainForm
         Top = 0
         Width = 24
         Height = 23
+        Margins.Left = 0
+        Margins.Top = 0
+        Margins.Right = 0
+        Margins.Bottom = 0
         Align = alTop
         Center = True
         Picture.Data = {
@@ -286,6 +295,10 @@ object MainForm: TMainForm
         Top = 46
         Width = 24
         Height = 23
+        Margins.Left = 0
+        Margins.Top = 0
+        Margins.Right = 0
+        Margins.Bottom = 0
         Align = alTop
         Center = True
         Picture.Data = {
@@ -363,6 +376,10 @@ object MainForm: TMainForm
         Top = 69
         Width = 24
         Height = 23
+        Margins.Left = 0
+        Margins.Top = 0
+        Margins.Right = 0
+        Margins.Bottom = 0
         Align = alTop
         Center = True
         Picture.Data = {
@@ -441,6 +458,10 @@ object MainForm: TMainForm
         Top = 92
         Width = 24
         Height = 11
+        Margins.Left = 0
+        Margins.Top = 0
+        Margins.Right = 0
+        Margins.Bottom = 0
         Align = alClient
         Max = 100
         Orientation = trVertical
@@ -459,18 +480,18 @@ object MainForm: TMainForm
     object sPanel1: TsPanel
       Left = 0
       Top = 0
-      Width = 883
+      Width = 1099
       Height = 103
       Align = alClient
       TabOrder = 2
       SkinData.SkinSection = 'PANEL'
       DesignSize = (
-        883
+        1099
         103)
       object InfoPanel: TsPanel
         Left = 1
         Top = 52
-        Width = 881
+        Width = 1097
         Height = 50
         Align = alBottom
         BevelOuter = bvNone
@@ -480,7 +501,7 @@ object MainForm: TMainForm
           AlignWithMargins = True
           Left = 6
           Top = 35
-          Width = 875
+          Width = 1091
           Height = 15
           Hint = 'Status, Bitrate, Channels, Codec, Sample Rate, Play Count'
           Margins.Left = 6
@@ -503,7 +524,7 @@ object MainForm: TMainForm
           AlignWithMargins = True
           Left = 6
           Top = 6
-          Width = 869
+          Width = 1085
           Height = 20
           Hint = 'Title - Album - Artist'
           Margins.Left = 6
@@ -524,7 +545,7 @@ object MainForm: TMainForm
         end
       end
       object LogsBtn: TsBitBtn
-        Left = 832
+        Left = 1048
         Top = 1
         Width = 50
         Height = 51
@@ -892,7 +913,7 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'TOOLBUTTON'
       end
       object PlaybackOrderList: TsComboBox
-        Left = 625
+        Left = 791
         Top = 16
         Width = 101
         Height = 21
@@ -1217,7 +1238,7 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'TOOLBUTTON'
       end
       object SearchBtn: TsBitBtn
-        Left = 732
+        Left = 948
         Top = 1
         Width = 50
         Height = 51
@@ -1361,7 +1382,7 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'TOOLBUTTON'
       end
       object SettingsBtn: TsBitBtn
-        Left = 782
+        Left = 998
         Top = 1
         Width = 50
         Height = 51
@@ -1648,9 +1669,86 @@ object MainForm: TMainForm
         SkinData.OuterEffects.Visibility = ovAlways
         SkinData.SkinSection = 'TOOLBUTTON'
       end
+      object EQBtn: TsBitBtn
+        Left = 898
+        Top = 1
+        Width = 50
+        Height = 51
+        Hint = 'Equalizer Settings'
+        Align = alRight
+        Glyph.Data = {
+          C6070000424DC607000000000000360000002800000016000000160000000100
+          2000000000009007000000000000000000000000000000000000FFFFFF000000
+          00030000000A000000120000001A000000220000002B000000330000003C0000
+          00450000004D000000500000004A000000430000003A00000031000000290000
+          0020000000190000000F0000000600000002FFFFFF00382F2907382F2908382F
+          2908382F2908382F2908382F2908382F2908382F2908382F2908382F2908382F
+          2908382F2908382F2908382F2908382F2908382F2908382F2908382F2908382F
+          2908382F2907FFFFFF00382F29A9382F29FF3E3630FF463E38FF4E4641FF564F
+          4AFF5F5853FF69625EFF726C68FF7A7470FF817B77FF857F7BFF85807CFF827C
+          79FF7E7875FF7A7470FF756F6AFF716A66FF6C6661FF68625DFF635C57FF4F47
+          42BB534B47F2D4D2D1FFDFDEDDFFDFDEDDFFE4E2E2FFE5E4E3FFE8E7E6FFEAE9
+          E8FFECEBEAFFEDECEBFFECEBEAFFEFEEEEFFEFEEEEFFEFEEEDFFEEEDEDFFEEED
+          EDFFEDECECFFEAE9E9FFEBEAEAFFEAE9E8FFE4E3E2FF6D6762FF605954F3DFDE
+          DDFFE1E0DFFF8E8E8DFF959695FFAEADADFFEBEAEAFFEEEDECFFF0EFEFFFF2F1
+          F1FFB0B1B1FFE1E0E0FFF4F3F3FFF3F3F3FFF3F2F2FFF2F1F1FFF0EFEFFFA2A5
+          A3FFE7E6E5FFECEBEBFFEBEAE9FF78726EFF605954F3C1C0BFFF585858FF2828
+          28FF2C2C2CFF444444FFEEEDEDFFF1F0F0FFF3F3F2FFF6F5F5FFADAFAEFFE0DF
+          DFFFF9F9F8FFF8F8F8FFF6F6F6FFF5F5F4FFF3F3F3FF9C9E9CFFE5E5E4FFEEED
+          EDFFECEBEBFF78726EFF605954F3959393FF494949FF2C2C2CFF303030FF6666
+          66FFEFEEEEFFF2F2F1FFF5F5F5FFF8F7F7FFAFB1AFFFE3E3E3FFFDFDFDFFFBFB
+          FBFFF9F9F9FFF7F6F6FFF1F0F0FF787979FFA1A2A1FFBCBBBBFFEDECEBFF7973
+          6FFF605954F3E0DEDDFFD7D6D5FF7A7B7AFF767676FF989797FFEEEEEDFFF1F0
+          F0FFF4F3F3FFF6F6F6FFAEAFAEFFE1E1E1FFFAFAFAFFFAF9F9FFF8F7F7FFB1B1
+          B1FF424242FF262626FF292929FF676666FFECEBEAFF79736FFF605954F3DDDC
+          DBFFE1DFDEFFABACABFFC6C7C6FFE9E8E7FFEBEBEAFFEEEDEDFFF0F0EFFFF2F1
+          F1FFABACABFFDDDCDCFFF5F4F4FFF4F4F3FFF3F3F2FF919190FF4D4D4DFF2C2C
+          2CFF383838FF7C7C7CFFEAE9E8FF79736FFF5F5854F3DAD9D8FFDDDCDBFFA9AA
+          A8FFC3C3C3FFE5E4E3FFE7E6E5FFEAE9E8FFEBEAEAFFECECEBFFA8A9A8FFD7D7
+          D6FFEFEEEDFFEFEEEEFFEFEEEDFFEEEDECFFD9D9D8FF717271FF888888FFADAC
+          ABFFE8E7E6FF7A7370FF5F5853F2D6D5D3FFD9D7D6FFA6A7A5FFC0C0BFFFE0DE
+          DDFFE2E0DFFFE4E2E2FFE6E5E4FFE7E6E5FFA4A6A4FFD2D2D1FFE9E8E8FFE9E8
+          E7FFEAE8E8FFE9E8E7FFE8E7E7FF979998FFDCDCDBFFE6E4E4FFE4E3E2FF7973
+          6FFF5E5753F2D3D1CFFFD4D2D1FFA3A4A2FFBBBCBAFFDAD9D8FFDDDBDAFFDFDD
+          DCFFE0DEDEFFE1E0DFFFA1A3A1FFCDCCCCFFE3E2E1FFE4E3E2FFE4E3E2FFE7E5
+          E4FFE7E5E4FF979897FFDCDCDBFFE6E4E3FFE5E4E3FF7A7470FF5E5652F2CDCB
+          C9FFCFCDCCFFA0A19EFFB8B8B7FFD6D4D3FFD8D6D6FFD9D7D6FFDAD9D7FFA4A3
+          A2FF555655FF5D5C5CFF70706FFFDFDDDCFFDFDDDCFFE1DFDEFFE5E3E2FF9698
+          97FFDEDEDEFFE7E5E5FFE6E5E4FF7E7874FF645D59F2D9D7D6FFD9D7D6FFA5A6
+          A4FFBCBCBBFFDCDAD9FFDEDCDBFFDCDBDAFF6C6B6AFF141414FF0E0E0EFF1E1E
+          1EFF525252FFD9D7D6FFDAD8D7FFDAD8D7FFE0DEDDFF979997FFDEDFDFFFE8E7
+          E6FFE7E7E6FF827C78FF675F5BF2DEDCDCFFE1DFDEFFABACAAFFC5C4C3FFE2E1
+          E0FFE0DFDEFFDFDDDDFFD9D8D7FF888786FF535353FF414141FF727272FFD4D2
+          D1FFD4D2D1FFD4D2D1FFD6D4D2FF949694FFE0E1E0FFEBEAE9FFEAE9E8FF8580
+          7BFF69635EF3E2E0E0FFE4E3E2FFADADACFFC8C8C8FFEAE9E8FFEBEBEAFFECEB
+          EAFFE8E7E6FFE4E3E2FF9FA09EFFBCBBBBFFCDCBC9FFCECCCBFFCFCDCCFFCFCD
+          CCFFD0CDCCFF8C8E8CFFD7D6D5FFEDECECFFECEBEAFF89837FFF6C6460F4E5E4
+          E3FFE7E6E5FFBFBFBFFFD7D6D6FFEDEDECFFEFEEEEFFF0EFEFFFF1F1F0FFF2F1
+          F1FFBABBBBFFDCDCDBFFD6D4D3FFC9C6C4FFCAC7C6FFCBC8C7FFCBC9C7FF9B9C
+          9CFFC9C7C5FFDAD9D7FFEDECECFF8A8682FF4F4842F1C3C2C2FFCBCBCBFFCFCF
+          CEFFD2D2D1FFD5D4D4FFD8D7D6FFD9D9D9FFDBDADAFFDCDCDCFFDCDCDCFFDDDD
+          DDFFDADADAFFBEBEBDFF8E8D8CFF8A8988FF8B8988FF8A8988FF8A8988FF8A89
+          88FF959493FF6E6965FF382F29F0382F29FF39302AFF3C332EFF3F3731FF423A
+          34FF453D37FF48403BFF4C433EFF4F4742FF524A45FF554D48FF58514CFF5B54
+          4FFF5E5752FF564F49FF3D342EFF382F29FF382F29FF382F29FF382F29FF382F
+          29FF382F29F0382F29FF3A312BFF3D342EFF403732FF433B35FF463E38FF4941
+          3CFF4C443FFF4F4742FF534B46FF564E49FF59514CFF5C5550FF5F5853FF625B
+          56FF625B56FF473F39FF302C28FF352F2BFF2F2C2BFF372E28FF544C47B55B54
+          4FFF5D5550FF665F5AFF6D6763FF766F6BFF7D7774FF837E7AFF898480FF8E89
+          86FF928D8AFF948F8CFF96918DFF948F8CFF938E8BFF908B88FF8E8985FF8A85
+          81FF706A66FF5B5550FF514A46FF5D5651C3FFFFFF00382F2907382F2908382F
+          2908382F2908382F2908382F2908382F2908382F2908382F2908382F2908382F
+          2908382F2908382F2908382F2908382F2908382F2908382F2908382F2908382F
+          2908382F2907FFFFFF00}
+        TabOrder = 10
+        OnClick = EQBtnClick
+        OnMouseEnter = EQBtnMouseEnter
+        SkinData.SkinSection = 'TOOLBUTTON'
+        ShowCaption = False
+      end
     end
     object CoverPanel: TsPanel
-      Left = 883
+      Left = 1099
       Top = 0
       Width = 100
       Height = 103
@@ -1681,7 +1779,7 @@ object MainForm: TMainForm
   object StatusBar: TsStatusBar
     Left = 0
     Top = 723
-    Width = 1008
+    Width = 1224
     Height = 19
     Panels = <
       item
@@ -1698,7 +1796,7 @@ object MainForm: TMainForm
   object ProgressPanel: TsPanel
     Left = 0
     Top = 682
-    Width = 1008
+    Width = 1224
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
@@ -1710,7 +1808,7 @@ object MainForm: TMainForm
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 921
+      Width = 1137
       Height = 35
       Align = alClient
       Caption = 'Progress info'
@@ -1721,7 +1819,7 @@ object MainForm: TMainForm
     end
     object AbortBtn: TsBitBtn
       AlignWithMargins = True
-      Left = 930
+      Left = 1146
       Top = 3
       Width = 75
       Height = 35
@@ -1735,9 +1833,9 @@ object MainForm: TMainForm
   object FuncPages: TsPageControl
     Left = 0
     Top = 130
-    Width = 649
+    Width = 865
     Height = 552
-    ActivePage = TabSheet2
+    ActivePage = TabSheet1
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -1754,14 +1852,10 @@ object MainForm: TMainForm
       Caption = 'Music'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 351
       object Splitter1: TsSplitter
         Left = 0
         Top = 358
-        Width = 641
+        Width = 857
         Height = 3
         Cursor = crVSplit
         Align = alBottom
@@ -1775,7 +1869,7 @@ object MainForm: TMainForm
       object Bevel1: TsBevel
         Left = 0
         Top = 30
-        Width = 641
+        Width = 857
         Height = 3
         Align = alTop
         Shape = bsTopLine
@@ -1784,7 +1878,7 @@ object MainForm: TMainForm
       object PlayList: TsListView
         Left = 0
         Top = 33
-        Width = 641
+        Width = 857
         Height = 325
         Hint = 'Playlist'
         Margins.Left = 0
@@ -1817,6 +1911,10 @@ object MainForm: TMainForm
           end
           item
             Width = 100
+          end
+          item
+          end
+          item
           end>
         DragMode = dmAutomatic
         Font.Charset = DEFAULT_CHARSET
@@ -1831,7 +1929,6 @@ object MainForm: TMainForm
         RowSelect = True
         ParentFont = False
         PopupMenu = PlayListMenu
-        ShowColumnHeaders = False
         StateImages = PlayBackImgs
         TabOrder = 0
         ViewStyle = vsReport
@@ -1841,12 +1938,11 @@ object MainForm: TMainForm
         OnDragDrop = PlayListDragDrop
         OnDragOver = PlayListDragOver
         OnStartDrag = PlayListStartDrag
-        ExplicitHeight = 159
       end
       object QueueList: TsListView
         Left = 0
         Top = 361
-        Width = 641
+        Width = 857
         Height = 121
         BoundLabel.Indent = 0
         BoundLabel.Font.Charset = DEFAULT_CHARSET
@@ -1884,12 +1980,11 @@ object MainForm: TMainForm
         TabOrder = 1
         ViewStyle = vsReport
         OnDblClick = QueueListDblClick
-        ExplicitTop = 195
       end
       object PlaylistListPanel: TsPanel
         Left = 0
         Top = 0
-        Width = 641
+        Width = 857
         Height = 30
         Align = alTop
         BevelOuter = bvNone
@@ -1899,7 +1994,7 @@ object MainForm: TMainForm
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 467
+          Width = 683
           Height = 21
           Hint = 'List of the playlists you have'
           Align = alClient
@@ -1929,7 +2024,7 @@ object MainForm: TMainForm
         end
         object AddPlaylistBtn: TsBitBtn
           AlignWithMargins = True
-          Left = 476
+          Left = 692
           Top = 3
           Width = 50
           Height = 23
@@ -1943,7 +2038,7 @@ object MainForm: TMainForm
         end
         object RemovePlaylistBtn: TsBitBtn
           AlignWithMargins = True
-          Left = 532
+          Left = 748
           Top = 3
           Width = 50
           Height = 23
@@ -1957,7 +2052,7 @@ object MainForm: TMainForm
         end
         object RenamePlaylistBtn: TsButton
           AlignWithMargins = True
-          Left = 588
+          Left = 804
           Top = 3
           Width = 50
           Height = 23
@@ -1973,12 +2068,11 @@ object MainForm: TMainForm
       object ShortcutPanel: TsPanel
         Left = 0
         Top = 482
-        Width = 641
+        Width = 857
         Height = 35
         Align = alBottom
         TabOrder = 3
         SkinData.SkinSection = 'PANEL'
-        ExplicitTop = 316
         object AddMenuBtn: TsBitBtn
           Left = 1
           Top = 1
@@ -2130,7 +2224,7 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'BUTTON'
         end
         object SearchMenuBtn: TsBitBtn
-          Left = 574
+          Left = 790
           Top = 1
           Width = 33
           Height = 33
@@ -2205,7 +2299,7 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'BUTTON'
         end
         object PlaylistMenuBtn: TsBitBtn
-          Left = 607
+          Left = 823
           Top = 1
           Width = 33
           Height = 33
@@ -2277,7 +2371,7 @@ object MainForm: TMainForm
       object RadioCatList: TsComboBox
         Left = 0
         Top = 0
-        Width = 641
+        Width = 857
         Height = 21
         Hint = 'Radio station categories'
         Align = alTop
@@ -2338,7 +2432,7 @@ object MainForm: TMainForm
       object RadioList: TsListView
         Left = 0
         Top = 73
-        Width = 641
+        Width = 857
         Height = 424
         BoundLabel.Indent = 0
         BoundLabel.Font.Charset = DEFAULT_CHARSET
@@ -2381,16 +2475,16 @@ object MainForm: TMainForm
       object RadioRecordPanel: TsPanel
         Left = 0
         Top = 21
-        Width = 641
+        Width = 857
         Height = 52
         Align = alTop
         TabOrder = 2
         SkinData.SkinSection = 'PANEL'
         DesignSize = (
-          641
+          857
           52)
         object Label1: TsLabel
-          Left = 154
+          Left = 370
           Top = 6
           Width = 77
           Height = 13
@@ -2399,7 +2493,7 @@ object MainForm: TMainForm
           ExplicitLeft = 176
         end
         object Label2: TsLabel
-          Left = 276
+          Left = 492
           Top = 6
           Width = 67
           Height = 13
@@ -2431,7 +2525,7 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'BUTTON'
         end
         object RadioRecordFormatList: TsComboBox
-          Left = 154
+          Left = 370
           Top = 25
           Width = 114
           Height = 21
@@ -2468,7 +2562,7 @@ object MainForm: TMainForm
             'Without encode')
         end
         object RadioRecordingOptionsBtn: TsBitBtn
-          Left = 470
+          Left = 686
           Top = 6
           Width = 104
           Height = 40
@@ -2480,7 +2574,7 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'BUTTON'
         end
         object RadioRecordModeList: TsComboBox
-          Left = 274
+          Left = 490
           Top = 25
           Width = 190
           Height = 21
@@ -2514,7 +2608,7 @@ object MainForm: TMainForm
             'Save recording as a single long file')
         end
         object RadioRecordOutputFolderBtn: TsBitBtn
-          Left = 580
+          Left = 796
           Top = 6
           Width = 55
           Height = 40
@@ -2529,7 +2623,7 @@ object MainForm: TMainForm
       object RadioConnectionBar: TsProgressBar
         Left = 0
         Top = 497
-        Width = 641
+        Width = 857
         Height = 20
         Align = alBottom
         DoubleBuffered = False
@@ -2541,7 +2635,7 @@ object MainForm: TMainForm
     end
   end
   object LyricPanel: TsPanel
-    Left = 658
+    Left = 874
     Top = 130
     Width = 350
     Height = 552
@@ -8096,12 +8190,15 @@ object MainForm: TMainForm
     Top = 376
     object P8: TMenuItem
       Caption = 'Play'
+      OnClick = P8Click
     end
     object R5: TMenuItem
       Caption = 'Remove Selected'
+      OnClick = R5Click
     end
     object C3: TMenuItem
       Caption = 'Clear All'
+      OnClick = C3Click
     end
   end
   object AppInstances: TJvAppInstances
@@ -8329,7 +8426,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800F00016001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101050008002C0116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -8837,7 +8934,7 @@ object MainForm: TMainForm
       00000000000000000000000000000000000000000000}
   end
   object sSkinManager1: TsSkinManager
-    AnimEffects.DialogShow.Active = False
+    AnimEffects.DialogShow.Mode = atFading
     InternalSkins = <
       item
         Name = 'Graphite (internal)'

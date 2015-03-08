@@ -45,7 +45,9 @@ uses
   Vcl.Themes,
   Vcl.Styles,
   UnitImageResize in 'Units\UnitImageResize.pas',
-  UnitInternalArtworkReader in 'Units\UnitInternalArtworkReader.pas';
+  UnitInternalArtworkReader in 'Units\UnitInternalArtworkReader.pas',
+  UnitEQ in 'Forms\UnitEQ.pas' {EQForm} ,
+  UnitLyricTranslate in 'Units\UnitLyricTranslate.pas';
 
 {$R *.res}
 
@@ -60,6 +62,7 @@ begin
   Application.CreateForm(TAboutForm, AboutForm);
   Application.CreateForm(TNewRadioForm, NewRadioForm);
   Application.CreateForm(TRadioRecordOptionsForm, RadioRecordOptionsForm);
+  Application.CreateForm(TEQForm, EQForm);
   Application.Run;
 
 end.

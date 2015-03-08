@@ -29,6 +29,14 @@ type
   TPlayerStatus = (psPlaying = 0, psPaused = 1, psStopped = 2, psStalled = 3, psUnkown = 4);
 
 type
+  TEQValues = array [0 .. 17] of single;
+
+type
+  TLevels = record
+    Left, Right: Cardinal;
+  end;
+
+type
   TMusicPlayer = class
   private
     FBassHandle: HSTREAM;
@@ -40,18 +48,19 @@ type
     FTAKPluginHandle: Cardinal;
     FMixHandle: HSTREAM;
     FPosition: int64;
+    // FLevels: TLevels;
+    FFXHandle: Cardinal;
+    FEQParams: array [0 .. 17] of HFX;
+
     function GetBassStreamStatus: TPlayerStatus;
     function GetTotalLength(): int64;
     function GetPosition(): int64;
     function GetPositionStr: string;
     function GetSecondDuration: Integer;
-    function GetLevel: DWORD;
 
     function IsM4AALAC: Boolean;
     function GetBassErrorCode: Integer;
     function GetMixerPlayStatus: TPlayerStatus;
-    function GetLeftLevel: Cardinal;
-    function GetRightLevel: Cardinal;
   public
     property PlayerStatus: TPlayerStatus read FPlayerStatus;
     property PlayerStatus2: TPlayerStatus read GetBassStreamStatus;
@@ -66,8 +75,7 @@ type
     property Channel: Cardinal read FBassHandle;
     property BassErrorCode: Integer read GetBassErrorCode;
     property MixHandle: HSTREAM read FMixHandle;
-    property LeftLevel: Cardinal read GetLeftLevel;
-    property RightLevel: Cardinal read GetRightLevel;
+    // property Levels: TLevels read FLevels;
 
     constructor Create(const WinHandle: Cardinal);
     destructor Destroy; override;
@@ -80,6 +88,9 @@ type
     function SetPosition(const Position: int64): Boolean;
     function IntToTime(IntTime: Integer): string;
     procedure SetBuffer(const Buffer: DWORD);
+    procedure ChangeEQ(const EQValues: TEQValues);
+    procedure RemoveEQ;
+    procedure InitQE;
   end;
 
 const
@@ -88,12 +99,17 @@ const
   MY_ERROR_COULDNT_STOP_STREAM = 2;
   MY_ERROR_STREAM_ZERO = 3;
   MY_ERROR_COULDNT_FREE_STREAM = 4;
+  LEVEL_MAX = 32768;
+  UPDATE_LEFT_LEVEL = 14;
+  UPDATE_RIGHT_LEVEL = 15;
+  WM_COPYDATA = 74;
+  EQ_FRENQ: array [0 .. 17] of integer = (31, 63, 87, 125, 175, 250, 350, 500, 700, 1000, 1400, 2000, 2800, 4000, 5600, 8000, 11000, 16000);
 
 implementation
 
 { TMusicPlayer }
 
-uses UnitMain, UnitSettings, UnitLog;
+uses UnitMain, UnitSettings, UnitLog, UnitEQ;
 
 // procedure SyncProc(hSync: Thandle; hChan: THandle; NotUsed: DWord; MyObject: DWord); stdcall;
 procedure SyncProc(hSync: Thandle; hChan: HSTREAM; NotUsed: DWORD; MyObject: DWORD); stdcall;
@@ -237,6 +253,19 @@ begin
   BASS_ChannelSetPosition(FPlayer.MixHandle, 0, BASS_POS_BYTE);
 end;
 
+procedure TMusicPlayer.ChangeEQ(const EQValues: TEQValues);
+var
+  I: Integer;
+  LEQ: BASS_DX8_PARAMEQ;
+begin
+  for I := Low(EQValues) to High(EQValues) do
+  begin
+    BASS_FXGetParameters(FEQParams[i], @LEQ);
+    LEQ.fGain := EQValues[i];
+    BASS_FXSetParameters(FEQParams[i], @LEQ);
+  end;
+end;
+
 constructor TMusicPlayer.Create(const WinHandle: Cardinal);
 begin
   FPlayerStatus := psStopped;
@@ -250,6 +279,8 @@ begin
   begin
     FErrorMsg := MY_ERROR_BASS_NOT_LOADED;
   end;
+
+  BASS_SetConfig(BASS_CONFIG_FLOATDSP, 1);
   // BASS_SetConfig(BASS_CONFIG_ASYNCFILE_BUFFER, 131072);
   // BASS_SetConfig(BASS_CONFIG_BUFFER, 2000);
 
@@ -290,16 +321,6 @@ begin
   end;
 end;
 
-function TMusicPlayer.GetLeftLevel: Cardinal;
-begin
-  Result := LOWORD(GetLevel);
-end;
-
-function TMusicPlayer.GetLevel: DWORD;
-begin
-  Result := BASS_ChannelGetLevel(FBassHandle);
-end;
-
 function TMusicPlayer.GetMixerPlayStatus: TPlayerStatus;
 begin
   case BASS_ChannelIsActive(FMixHandle) of
@@ -335,11 +356,6 @@ begin
   end;
 end;
 
-function TMusicPlayer.GetRightLevel: Cardinal;
-begin
-  Result := HIWORD(GetLevel);
-end;
-
 function TMusicPlayer.GetSecondDuration: Integer;
 begin
   Result := 0;
@@ -355,6 +371,43 @@ begin
   if FBassHandle > 0 then
   begin
     Result := BASS_ChannelGetLength(FBassHandle, BASS_POS_BYTE);
+  end;
+end;
+
+procedure TMusicPlayer.InitQE;
+var
+  LEQ: BASS_DX8_PARAMEQ;
+  I: Integer;
+begin
+  RemoveEQ;
+  for i := Low(EQ_FRENQ) to High(EQ_FRENQ) do
+  begin
+    FEQParams[i] := 0;
+  end;
+  for i := Low(EQ_FRENQ) to High(EQ_FRENQ) do
+  begin
+    FEQParams[i] := BASS_ChannelSetFX(FBassHandle, BASS_FX_DX8_PARAMEQ, 13);
+
+    case BASS_ErrorGetCode of
+      BASS_ERROR_HANDLE:
+        LogForm.LogList.Lines.Add('Cant''t create equalizer because of invalid handle.');
+      BASS_ERROR_ILLTYPE:
+        LogForm.LogList.Lines.Add('Cant''t create equalizer because of illegal type.');
+      BASS_ERROR_NOFX:
+        LogForm.LogList.Lines.Add('Cant''t create equalizer because of DirectX error.');
+      BASS_ERROR_FORMAT:
+        LogForm.LogList.Lines.Add('Cant''t create equalizer because of format error.');
+      BASS_ERROR_UNKNOWN:
+        LogForm.LogList.Lines.Add('Cant''t create equalizer because of an unkown error.');
+    end;
+  end;
+  FFXHandle := BASS_ChannelSetFX(FMixHandle, BASS_FX_DX8_PARAMEQ, 0);
+  for I := Low(EQ_FRENQ) to High(EQ_FRENQ) do
+  begin
+    LEQ.fCenter := EQ_FRENQ[i];
+    LEQ.fGain := 0;
+    LEQ.fBandwidth := 3;
+    BASS_FXSetParameters(FEQParams[i], @LEQ);
   end;
 end;
 
@@ -461,63 +514,68 @@ begin
   LExt := LowerCase(ExtractFileExt(FFileName));
   if (LExt = '.aac') or (LExt = '.m4b') then
   begin
-    FBassHandle := BASS_MP4_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
+    FBassHandle := BASS_MP4_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX);
   end
   else if (LExt = '.m4a') then
   begin
     if IsM4AALAC then
     begin
-      FBassHandle := BASS_ALAC_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN)
+      FBassHandle := BASS_ALAC_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX)
     end
     else
     begin
-      FBassHandle := BASS_MP4_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
+      FBassHandle := BASS_MP4_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX);
     end;
   end
   else if (LExt = '.flac') then
   begin
-    FBassHandle := BASS_FLAC_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
+    FBassHandle := BASS_FLAC_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX);
   end
   else if (LExt = '.ape') then
   begin
-    FBassHandle := BASS_APE_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
+    FBassHandle := BASS_APE_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX);
   end
   else if (LExt = '.ac3') then
   begin
-    FBassHandle := BASS_AC3_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
+    FBassHandle := BASS_AC3_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX);
   end
   else if (LExt = '.wv') then
   begin
-    FBassHandle := BASS_WV_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
+    FBassHandle := BASS_WV_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX);
   end
   else if (LExt = '.ofr') then
   begin
-    FBassHandle := BASS_OFR_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
+    FBassHandle := BASS_OFR_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX);
   end
   else if (LExt = '.spx') then
   begin
-    FBassHandle := BASS_SPX_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
+    FBassHandle := BASS_SPX_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX);
   end
   else if (LExt = '.tta') then
   begin
-    FBassHandle := BASS_TTA_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
+    FBassHandle := BASS_TTA_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX);
   end
   else if (LExt = '.opus') then
   begin
-    FBassHandle := BASS_OPUS_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN);
+    FBassHandle := BASS_OPUS_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX);
   end
   else
   begin
-    FBassHandle := Bass_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE);
+    FBassHandle := Bass_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX);
   end;
-
   if FBassHandle > 0 then
   begin
     BASS_ChannelSetAttribute(FBassHandle, BASS_ATTRIB_VOL, (100 - MainForm.VolumeBar.Position) / 100.0);
     BASS_Mixer_StreamAddChannel(FMixHandle, FBassHandle, BASS_STREAM_AUTOFREE or BASS_MIXER_NORAMPIN or BASS_MIXER_BUFFER);
     BASS_ChannelSetPosition(FMixHandle, 0, BASS_POS_BYTE);
+
     if BASS_ChannelPlay(FMixHandle, False) then
     begin
+      if EQForm.EnableEQBtn.Checked then
+      begin
+        InitQE;
+        // MainForm.UpdateEQ;
+      end;
       FErrorMsg := MY_ERROR_OK;
       FPlayerStatus := psPlaying;
     end
@@ -533,12 +591,25 @@ begin
   end;
 end;
 
+procedure TMusicPlayer.RemoveEQ;
+begin
+  if FBassHandle > 0 then
+  begin
+    if not BASS_ChannelRemoveFX(FBassHandle, BASS_FX_DX8_PARAMEQ) then
+    begin
+      LogForm.LogList.Lines.Add(BASS_ErrorGetCode.ToString())
+    end;
+  end;
+end;
+
 procedure TMusicPlayer.Resume;
 begin
   if GetMixerPlayStatus = psPaused then
   begin
     if BASS_ChannelPlay(FMixHandle, False) then
+    begin
       FPlayerStatus := psPlaying;
+    end;
   end;
 end;
 

@@ -1,3 +1,11 @@
+--2.2.0
+-Added: [Music Player] 18 band equalizer with several presets
+-Added: [Music Player] Playlist now has columns for title, album and artist
+-Added: [Music Player] Pressing previous button in shuffle mode will return to previous random song instead playing the next random song
+-Added: [Music Player] Added index info to playlist names list
+-Fixed: [Music Player] Lyric list's width was not adjusted according to the content
+-Fixed: [Music Player] Queue list right-click menu options were not working
+
 --2.1.2
 -Added: [General] Many skins (over 100)
 -Added: [General] An option to specify playlist item text combination

@@ -138,6 +138,7 @@ const
   METRO_START = '<div id="lyrics-body-text">';
   // METRO_END = '<div id="selected-song-meaning-open" unselectable="on" style="display:none;">';
   METRO_END = '<p class="writers"><strong>Songwriters</strong>';
+  LRC123_START = '<font color="#008000">';
 var
   LSR: TStreamReader;
   LLine: string;
@@ -298,6 +299,7 @@ begin
         end;
       end;
     end;
+
     try
       FThread.Synchronize(EnableUIControls);
     except
@@ -409,6 +411,23 @@ begin
         Result := Trim(StringReplace(Result, ']', '', [rfReplaceAll]));
         Result := Trim(StringReplace(Result, '.', '', [rfReplaceAll]));
       end;
+    3: // lrc123
+      begin
+        Result := LowerCase(StringReplace(Str, ' ', '+', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, ' & ', '-', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, ' ', '-', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, 'Ö', 'o', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, 'ö', 'o', [rfReplaceAll]));
+        Result := LowerCase(StringReplace(Result, '''', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, ',', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '!', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '?', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '(', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, ')', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '[', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, ']', '', [rfReplaceAll]));
+        Result := Trim(StringReplace(Result, '.', '', [rfReplaceAll]));
+      end;
   end;
 end;
 
@@ -460,6 +479,7 @@ begin
     2:
       FPageDownloader.Url := 'http://www.metrolyrics.com/' + URIEncode(FixStrings(FTitle) + '-lyrics-' + FixStrings(FArtist)) + '.html';
   end;
+  LogForm.LogList.Lines.Add(FPageDownloader.Url);
   FPageDownloader.Start;
   while FPageDownloader.Status <> gsStopped do
   begin
@@ -497,11 +517,15 @@ begin
   // begin
   MainForm.LyricList.Items.BeginUpdate;
   try
-    for I := 0 to FLyricFile.Count - 1 do
+    if FLyricFile.Count > 0 then
     begin
-      MainForm.LyricList.Items.Add(Trim(FLyricFile[i]));
+      for I := 0 to FLyricFile.Count - 1 do
+      begin
+        MainForm.LyricList.Items.Add(Trim(FLyricFile[i]));
+      end;
     end;
   finally
+    MainForm.UpdateLyricBoxWidth;
     MainForm.LyricList.Items.EndUpdate;
   end;
   if FLyricFile.Count > 1 then

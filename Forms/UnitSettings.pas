@@ -103,8 +103,6 @@ begin
 end;
 
 procedure TSettingsForm.FormCreate(Sender: TObject);
-var
-  I: Integer;
 begin
   GetAllSkins;
   LoadSettings;
@@ -160,6 +158,7 @@ end;
 
 procedure TSettingsForm.PlaylistItemTextListChange(Sender: TObject);
 begin
+  MainForm.ChangePlaylistColumnNames;
   MainForm.PlayList.Invalidate;
 end;
 
