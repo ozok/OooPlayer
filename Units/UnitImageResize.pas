@@ -28,9 +28,7 @@ type
   private
     FSourcePath: string;
     FDestPath: string;
-
   public
-
     constructor Create;
     destructor Destroy; override;
 
@@ -40,6 +38,9 @@ type
     function ResizePngStream(const inFile: TStream; const TmpFile: string): Boolean;
     procedure Resize;
   end;
+
+const
+  IMG_SIZE = 300;
 
 implementation
 
@@ -92,8 +93,8 @@ begin
     end;
     // output bitmap
     LBMP.PixelFormat := pf24bit;
-    LBMP.Width := 98;
-    LBMP.Height := Round(98 * (LJpeg.Height / LJpeg.Width));
+    LBMP.Width := IMG_SIZE;
+    LBMP.Height := Round(IMG_SIZE * (LJpeg.Height / LJpeg.Width));
     // bitmap to hold data from jpeg
     LJpegBMP.PixelFormat := pf24bit;
     LJpegBMP.Width := LJpeg.Width;
@@ -146,8 +147,8 @@ begin
     end;
     // output bitmap
     LBMP.PixelFormat := pf24bit;
-    LBMP.Width := 98;
-    LBMP.Height := Round(98 * (LJpeg.Height / LJpeg.Width));
+    LBMP.Width := IMG_SIZE;
+    LBMP.Height := Round(IMG_SIZE * (LJpeg.Height / LJpeg.Width));
     // bitmap to hold data from jpeg
     LJpegBMP.PixelFormat := pf24bit;
     LJpegBMP.Width := LJpeg.Width;
@@ -163,6 +164,9 @@ begin
     LOutJpeg := TJPEGImage.Create;
     try
       LOutJpeg.Assign(LBMP);
+      LOutJpeg.JPEGNeeded;
+      LOutJpeg.CompressionQuality := 75;
+      LOutJpeg.Compress;
       try
         LOutJpeg.SaveToFile(TmpFile);
       except
@@ -200,8 +204,8 @@ begin
     end;
     // output bitmap
     LBMP.PixelFormat := pf24bit;
-    LBMP.Width := 98;
-    LBMP.Height := Round(98 * (LPng.Height / LPng.Width));
+    LBMP.Width := IMG_SIZE;
+    LBMP.Height := Round(IMG_SIZE * (LPng.Height / LPng.Width));
     // bitmap to hold data from png
     LPngBMP.PixelFormat := pf24bit;
     LPngBMP.Width := LPng.Width;
@@ -254,8 +258,8 @@ begin
     end;
     // output bitmap
     LBMP.PixelFormat := pf24bit;
-    LBMP.Width := 98;
-    LBMP.Height := Round(98 * (LPng.Height / LPng.Width));
+    LBMP.Width := IMG_SIZE;
+    LBMP.Height := Round(IMG_SIZE * (LPng.Height / LPng.Width));
     // bitmap to hold data from jpeg
     LPngBMP.PixelFormat := pf24bit;
     LPngBMP.Width := LPng.Width;

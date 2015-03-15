@@ -33,12 +33,13 @@ uses
   PNGImage, JvDragDrop, JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon,
   Jpeg, UnitMusicPlayer, Bass, BASSenc, IdBaseComponent, IdThreadComponent,
   UnitLyricDownloader, UnitTagWriter, UnitImageResize, JvAnimatedImage, JvGIFCtrl,
-  JvExExtCtrls, JvImage, JvAppInst, UnitInternalArtworkReader, Vcl.Taskbar,
+  JvExExtCtrls, JvImage, JvAppInst, UnitArtworkReader, Vcl.Taskbar,
   System.Win.TaskbarCore, sSkinManager, sDialogs, sMemo, sListView,
   sPageControl, sStatusBar, sLabel, sComboBox, sBitBtn, sPanel, sBevel,
   sSplitter, sSkinProvider, acProgressBar, sTrackBar, acImage, acPNG,
   acAlphaHints, acAlphaImageList, sButton, Vcl.AppEvnts, sHintManager,
-  acShellCtrls, sComboBoxes, sTreeView, sListBox, System.Types, UnitLyricTranslate;
+  acShellCtrls, sComboBoxes, sTreeView, sListBox, System.Types,
+  sEdit;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -66,7 +67,6 @@ type
     DurationBass: int64;
     DurationAsSecInt: Integer;
     InfoStr: string;
-    StatusInfoText: string;
   end;
 
 type
@@ -111,16 +111,7 @@ type
     PlayBackImgs: TImageList;
     AppIniFileStorage: TJvAppIniFileStorage;
     FormStorage: TJvFormStorage;
-    PlaybackOrderList: TsComboBox;
     G1: TMenuItem;
-    InfoPanel: TsPanel;
-    TitleLabel: TsLabel;
-    PlaybackInfoLabel: TsLabel;
-    PlayBtn: TsBitBtn;
-    PauseBtn: TsBitBtn;
-    StopBtn: TsBitBtn;
-    PrevBtn: TsBitBtn;
-    NextBtn: TsBitBtn;
     SysInfo: TJvComputerInfoEx;
     R1: TMenuItem;
     StatusBar: TsStatusBar;
@@ -161,7 +152,6 @@ type
     RadioListMenu: TPopupMenu;
     S6: TMenuItem;
     A2: TMenuItem;
-    CoverPanel: TsPanel;
     V5: TMenuItem;
     M1: TMenuItem;
     R3: TMenuItem;
@@ -182,7 +172,6 @@ type
     S8: TMenuItem;
     LyricPanel: TsPanel;
     LyricStatusLabel: TsLabel;
-    bvl1: TsBevel;
     bvl2: TsBevel;
     pnl3: TsPanel;
     LyricTitleEdit: TLabeledEdit;
@@ -196,25 +185,12 @@ type
     Bevel3: TsBevel;
     Bevel4: TsBevel;
     LyricList: TsListBox;
-    VolumeBar: TsTrackBar;
-    SettingsBtn: TsBitBtn;
-    LogsBtn: TsBitBtn;
-    SearchBtn: TsBitBtn;
-    CoverImage: TJvImage;
     QueuelistMenu: TPopupMenu;
     P8: TMenuItem;
     R5: TMenuItem;
     C3: TMenuItem;
     AppInstances: TJvAppInstances;
     ProgressTimer: TTimer;
-    Panel1: TsPanel;
-    PositionBar: TsTrackBar;
-    PositionLabel: TsLabel;
-    VolumePnl: TsPanel;
-    VolumeLowImg: TsImage;
-    VolumeMuteImg: TsImage;
-    VolumeMidImg: TsImage;
-    VolumeHighImg: TsImage;
     Taskbar: TTaskbar;
     OverlayImgs: TImageList;
     PlaylistList: TsComboBox;
@@ -222,7 +198,6 @@ type
     AddPlaylistBtn: TsBitBtn;
     RemovePlaylistBtn: TsBitBtn;
     Bevel1: TsBevel;
-    S9: TMenuItem;
     sSkinManager1: TsSkinManager;
     sSkinProvider1: TsSkinProvider;
     sAlphaHints1: TsAlphaHints;
@@ -246,8 +221,46 @@ type
     S10: TMenuItem;
     L3: TMenuItem;
     RadioConnectionBar: TsProgressBar;
+    CoverPanel: TsPanel;
+    CoverImage: TJvImage;
+    VolumePnl: TsPanel;
+    VolumeBar: TsTrackBar;
+    sPanel5: TsPanel;
+    Panel1: TsPanel;
+    PositionLabel: TsLabel;
+    PositionBar: TsTrackBar;
     sPanel1: TsPanel;
+    InfoPanel: TsPanel;
+    sPanel4: TsPanel;
+    TitleLabel: TsLabelFX;
+    sPanel2: TsPanel;
+    NextBtn: TsBitBtn;
+    PauseBtn: TsBitBtn;
+    PlayBtn: TsBitBtn;
+    PrevBtn: TsBitBtn;
+    StopBtn: TsBitBtn;
+    sPanel3: TsPanel;
+    LogsBtn: TsBitBtn;
     EQBtn: TsBitBtn;
+    SearchBtn: TsBitBtn;
+    SettingsBtn: TsBitBtn;
+    PlaybackOrderList: TsComboBox;
+    sPageControl1: TsPageControl;
+    sTabSheet1: TsTabSheet;
+    sTabSheet2: TsTabSheet;
+    TitleEdit: TsEdit;
+    AlbumEdit: TsEdit;
+    ArtistEdit: TsEdit;
+    DurationEdit: TsEdit;
+    BitrateEdit: TsEdit;
+    SampeRateEdit: TsEdit;
+    CodecEdit: TsEdit;
+    ChannelsEdit: TsEdit;
+    sWebLabel1: TsWebLabel;
+    PrevArtworkBtn: TsBitBtn;
+    NextArtworkBtn: TsBitBtn;
+    sPanel7: TsPanel;
+    CoverArtInfoLabel: TsLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -349,7 +362,6 @@ type
     procedure TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
     procedure AddPlaylistBtnClick(Sender: TObject);
     procedure PlaylistListChange(Sender: TObject);
-    procedure S9Click(Sender: TObject);
     procedure RemovePlaylistBtnClick(Sender: TObject);
     procedure RenamePlaylistBtnClick(Sender: TObject);
     procedure LabelScrollTimerTimer(Sender: TObject);
@@ -364,6 +376,8 @@ type
     procedure P8Click(Sender: TObject);
     procedure R5Click(Sender: TObject);
     procedure C3Click(Sender: TObject);
+    procedure PrevArtworkBtnClick(Sender: TObject);
+    procedure NextArtworkBtnClick(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -377,10 +391,10 @@ type
     FLyricDownloader: TLyricDownloader;
     FPageHasntChangedYet: Boolean;
     FTagWriter: TTagWriter;
-    FTempCoverPath: string;
-    FInternalArtworkReader: TInternalArtworkReader;
+    FArtworkReader: TArtworkReader;
     FPlayListFiles: TPlaylistFiles;
-    FLyricTranslator: TLyricTranslator;
+    FExternalArtworkFiles: TStringList;
+    FExternalArtworkIndex: integer;
 
     procedure AddFile(const FileName: string);
     procedure ReScanFile(const FileIndex: integer);
@@ -473,12 +487,6 @@ type
     function CreateLyricFileName(const Title, Artist, Album: string): string;
     function BassErrorCodeToString(const ErrorCode: integer): string;
     procedure SetPlayerBuffer(const Buffer: DWORD);
-
-    function GetImage(const Dir: string): string;
-    procedure LoadPicFromStream(const Stream: TStream; const PicType: TCoverArtType);
-    procedure LoadCoverArt;
-    function LoadExternalCoverArt(const FileName: string): Boolean;
-    function LoadInternalCoverArt(const FileName: string): Boolean;
 
     procedure HandlePlaybackFromBassThread;
 
@@ -1665,13 +1673,14 @@ begin
   FPageHasntChangedYet := True;
   PortableMode := Portable;
   FTagWriter := TTagWriter.Create;
-  FTempCoverPath := FAppDataFolder + '\cover';
-  FInternalArtworkReader := TInternalArtworkReader.Create;
+  FArtworkReader := TArtworkReader.Create;
+  FArtworkReader.DefaultImgPath := ExtractFileDir(Application.ExeName) + '\logo.png';
+  FArtworkReader.AppDataFolder := FAppDataFolder;
   Taskbar.ProgressMaxValue := MaxInt;
   FPlayListFiles := TPlaylistFiles.Create;
   FStopAddFiles := True;
   sSkinManager1.SkinDirectory := ExtractFileDir(Application.ExeName) + '\skins\';
-  FLyricTranslator := TLyricTranslator.Create;
+  FExternalArtworkFiles := TStringList.Create;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -1698,9 +1707,9 @@ begin
   FLyricDownloader.Free;
   FQueuedItems.Free;
   FTagWriter.Free;
-  FInternalArtworkReader.Free;
+  FArtworkReader.Free;
   FPlayListFiles.Free;
-  FLyricTranslator.Free;
+  FExternalArtworkFiles.Free;
 end;
 
 procedure TMainForm.FormResize(Sender: TObject);
@@ -1858,40 +1867,6 @@ begin
   Result := GUIDToString(LGUID);
 end;
 
-function TMainForm.GetImage(const Dir: string): string;
-var
-  Search: TSearchRec;
-  FileName: String;
-  Extension: String;
-begin
-  Result := '';
-  if DirectoryExists(Dir) then
-  begin
-    if (FindFirst(Dir + '\*.*', faAnyFile, Search) = 0) then
-    Begin
-      repeat
-        Application.ProcessMessages;
-        if (Search.Name <> '.') and (Search.Name <> '..') then
-        begin
-          FileName := Dir + '\' + Search.Name;
-
-          Extension := LowerCase(ExtractFileExt(FileName));
-          if (Extension = '.jpg') or (Extension = '.jpeg') or (Extension = '.png') or (Extension = '.bmp') or (Extension = '.gif') then
-          begin
-            if ContainsText(Search.Name, 'folder') or ContainsText(Search.Name, 'cover') or ContainsText(Search.Name, 'front') or ContainsText(Search.Name, 'cd') or ContainsText(Search.Name, 'back')
-            then
-            begin
-              Result := FileName;
-              Break;
-            end;
-          end;
-        end;
-      until (FindNext(Search) <> 0);
-      FindClose(Search);
-    end;
-  end;
-end;
-
 function TMainForm.GetRecordedFileType(const FileName: string): string;
 var
   MediaInfoHandle: Cardinal;
@@ -2010,7 +1985,14 @@ begin
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
           LyricList.Items.Clear;
-          PlaybackInfoLabel.Caption := '';
+          TitleEdit.Text := '';
+          ArtistEdit.Text := '';
+          AlbumEdit.Text := '';
+          DurationEdit.Text := '';
+          BitrateEdit.Text := '';
+          CodecEdit.Text := '';
+          ChannelsEdit.Text := '';
+          SampeRateEdit.Text := '';
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
         end;
@@ -2037,7 +2019,14 @@ begin
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
           LyricList.Items.Clear;
-          PlaybackInfoLabel.Caption := '';
+          TitleEdit.Text := '';
+          ArtistEdit.Text := '';
+          AlbumEdit.Text := '';
+          DurationEdit.Text := '';
+          BitrateEdit.Text := '';
+          CodecEdit.Text := '';
+          ChannelsEdit.Text := '';
+          SampeRateEdit.Text := '';
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
         end;
@@ -2073,7 +2062,14 @@ begin
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
           LyricList.Items.Clear;
-          PlaybackInfoLabel.Caption := '';
+          TitleEdit.Text := '';
+          ArtistEdit.Text := '';
+          AlbumEdit.Text := '';
+          DurationEdit.Text := '';
+          BitrateEdit.Text := '';
+          CodecEdit.Text := '';
+          ChannelsEdit.Text := '';
+          SampeRateEdit.Text := '';
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
         end;
@@ -2113,7 +2109,14 @@ begin
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
           LyricList.Items.Clear;
-          PlaybackInfoLabel.Caption := '';
+          TitleEdit.Text := '';
+          ArtistEdit.Text := '';
+          AlbumEdit.Text := '';
+          DurationEdit.Text := '';
+          BitrateEdit.Text := '';
+          CodecEdit.Text := '';
+          ChannelsEdit.Text := '';
+          SampeRateEdit.Text := '';
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
         end;
@@ -2185,8 +2188,7 @@ end;
 
 procedure TMainForm.L2Click(Sender: TObject);
 begin
-  FLyricTranslator.Translate(LyricList.Items);
-  // LogForm.Show;
+  LogForm.Show;
 end;
 
 procedure TMainForm.LabelScrollTimerTimer(Sender: TObject);
@@ -2205,85 +2207,6 @@ begin
   else
   begin
     TitleLabel.Caption := FTitleLabel;
-  end;
-end;
-
-procedure TMainForm.LoadCoverArt;
-begin
-  case SettingsForm.CoverArtList.ItemIndex of
-    0: // external
-      begin
-        if not LoadExternalCoverArt(ArtworkFileName) then
-        begin
-          LoadInternalCoverArt(ArtworkFileName)
-        end;
-      end;
-    1: // internal first
-      begin
-        if not LoadInternalCoverArt(ArtworkFileName) then
-        begin
-          LoadExternalCoverArt(ArtworkFileName)
-        end;
-      end;
-  end;
-end;
-
-function TMainForm.LoadExternalCoverArt(const FileName: string): Boolean;
-var
-  LImageFile: string;
-  LImgResizer: TImageResizer;
-begin
-  Result := False;
-  LImageFile := GetImage(ExtractFileDir(FileName));
-  if FileExists(LImageFile) then
-  begin
-    LImgResizer := TImageResizer.Create;
-    try
-      if (LowerCase(ExtractFileExt(LImageFile)) = '.jpg') or (LowerCase(ExtractFileExt(LImageFile)) = '.jpeg') then
-      begin
-        LImgResizer.ResizeJpgEx(LImageFile, FTempCoverPath + '.jpg');
-        CoverImage.Picture.LoadFromFile(FTempCoverPath + '.jpg');
-      end
-      else if LowerCase(ExtractFileExt(LImageFile)) = '.png' then
-      begin
-        LImgResizer.ResizePNGEx(LImageFile, FTempCoverPath + '.png');
-        CoverImage.Picture.LoadFromFile(FTempCoverPath + '.png');
-      end;
-    finally
-      LImgResizer.Free;
-    end;
-    Result := True;
-  end
-  else
-  begin
-    CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
-  end;
-end;
-
-function TMainForm.LoadInternalCoverArt(const FileName: string): Boolean;
-var
-  LImageFile: string;
-begin
-  Result := False;
-  if not FTagReader.IsBusy then
-  begin
-    FTagReader.ReadArtwork(FileName);
-  end
-  else
-  begin
-    LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
-    CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
-    Exit;
-  end;
-  if FTagReader.PicType <> none then
-  begin
-    LoadPicFromStream(FTagReader.PicStream, FTagReader.PicType);
-    Result := True;
-  end
-  else
-  begin
-    LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
-    CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
   end;
 end;
 
@@ -2309,62 +2232,6 @@ begin
       LStreamReader.Close;
       LStreamReader.Free;
     end;
-  end;
-end;
-
-procedure TMainForm.LoadPicFromStream(const Stream: TStream; const PicType: TCoverArtType);
-var
-  LImgResizer: TImageResizer;
-  LTmpFile: string;
-begin
-  if PicType = none then
-  begin
-    CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
-  end
-  else if PicType = TCoverArtType.Jpeg then
-  begin
-    try
-      LImgResizer := TImageResizer.Create;
-      try
-        LTmpFile := FAppDataFolder + '\cover.jpg';
-        LImgResizer.ResizeJpgStream(Stream, LTmpFile);
-        FJpeg.LoadFromFile(LTmpFile);
-        FJpeg.DIBNeeded;
-        CoverImage.Picture.Assign(FJpeg);
-      finally
-        LImgResizer.Free;
-      end;
-    except
-      on E: Exception do
-      begin
-        LogForm.LogList.Lines.Add('Internal jpg cover load problem: ' + E.Message);
-        CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
-      end;
-    end;
-  end
-  else if PicType = png then
-  begin
-    try
-      LImgResizer := TImageResizer.Create;
-      try
-        LTmpFile := FAppDataFolder + '\cover.png';
-        LImgResizer.ResizePngStream(Stream, LTmpFile);
-        FPng.LoadFromFile(LTmpFile);
-        CoverImage.Picture.Assign(FPng);
-      finally
-        LImgResizer.Free;
-      end;
-    except
-      on E: Exception do
-      begin
-        LogForm.LogList.Lines.Add('Internal png cover load problem: ' + E.Message);
-        CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
-      end;
-    end;
-  end
-  else if PicType = bmp then
-  begin
-    CoverImage.Picture.Bitmap.LoadFromStream(Stream);
   end;
 end;
 
@@ -2637,10 +2504,7 @@ begin
       LyricPanel.Width := ReadInteger('player', 'lyricw', 250);
       FSelectedPlaylistIndex := ReadInteger('player', 'playlistindex', 0);
       PlaylistList.ItemIndex := FSelectedPlaylistIndex;
-      LyricPanel.Visible := ReadBool('player', 'lyricvisible', True);
       QueueList.Visible := ReadBool('player', 'queuevisible', True);
-      S9.Checked := not LyricPanel.Visible;
-      Bevel3.Visible := LyricPanel.Visible;
       Splitter2.Visible := LyricPanel.Visible;
       H2.Checked := not QueueList.Visible;
       Splitter1.Visible := QueueList.Visible;
@@ -2789,6 +2653,14 @@ end;
 procedure TMainForm.MusicSearchProgress(Sender: TObject);
 begin
   Application.ProcessMessages;
+end;
+
+procedure TMainForm.NextArtworkBtnClick(Sender: TObject);
+begin
+  if FArtworkReader.ExternalArtworkFiles.Count > 0 then
+  begin
+    FArtworkReader.LoadNextExternalCoverArt;
+  end;
 end;
 
 procedure TMainForm.NextBtnClick(Sender: TObject);
@@ -2974,7 +2846,6 @@ begin
 
       Taskbar.ProgressState := TTaskBarProgressState.Paused;
       UpdateOverlayIcon(2);
-      PlaybackInfoLabel.Caption := 'Paused | ' + FCurrentItemInfo.StatusInfoText;
     end
     else if FPlayer.PlayerStatus = psPaused then
     begin
@@ -2985,7 +2856,6 @@ begin
 
       Taskbar.ProgressState := TTaskBarProgressState.Normal;
       UpdateOverlayIcon(1);
-      PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
     end;
   end
   else if FPlaybackType = radio then
@@ -2995,12 +2865,10 @@ begin
       if IsRadioPlayerPaused then
       begin
         ResumeRadio;
-        PlaybackInfoLabel.Caption := 'Playing';
       end
       else
       begin
         PauseRadio;
-        PlaybackInfoLabel.Caption := 'Paused';
       end;
     end;
   end;
@@ -3050,7 +2918,6 @@ begin
 
       Taskbar.ProgressState := TTaskBarProgressState.Normal;
       UpdateOverlayIcon(1);
-      PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
     end
     else
     begin
@@ -3247,7 +3114,6 @@ begin
 
             Taskbar.ProgressState := TTaskBarProgressState.Normal;
             UpdateOverlayIcon(1);
-            PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
           end
           else
           begin
@@ -3484,135 +3350,167 @@ begin
   if FPlayer.ErrorMsg = MY_ERROR_OK then
   begin
     LPlayIndex := FCurrentItemInfo.ItemIndex;
-    while not FileExists(FPlaylists[FSelectedPlaylistIndex][LPlayIndex].FullFileName) do
+    if FPlaylists[FSelectedPlaylistIndex].Count > 0 then
     begin
-      LogForm.LogList.Lines.Add('[' + DateTimeToStr(Now) + '] Unable to find ' + FPlaylists[FSelectedPlaylistIndex][LPlayIndex].FullFileName);
-      if not LogForm.Visible then
+      while not FileExists(FPlaylists[FSelectedPlaylistIndex][LPlayIndex].FullFileName) do
       begin
-        LogForm.Show;
-      end;
-      Inc(LPlayIndex);
-      if LPlayIndex >= FPlaylists[FSelectedPlaylistIndex].Count then
-      begin
-        Break;
-      end;
-    end;
-
-    if LPlayIndex < FPlaylists[FSelectedPlaylistIndex].Count then
-    begin
-      if FCurrentItemInfo.ItemIndex > -1 then
-      begin
-        PlayList.Items[FCurrentItemInfo.ItemIndex].Selected := False;
-      end;
-
-      if FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].PlayCount = 1 then
-      begin
-        LPlayCountStr := '1 time'
-      end
-      else
-      begin
-        LPlayCountStr := FloatToStr(FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].PlayCount) + ' times'
-      end;
-      FCurrentItemInfo.StatusInfoText := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Bitrate + ' | ' + FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Channels +
-        ' | ' + FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Codec + ' | ' + FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].SampleRate + ' Hz | ' + LPlayCountStr;
-      PlaybackInfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.StatusInfoText;
-      PositionBar.Position := 0;
-
-      PositionTimer.Enabled := True;
-      ProgressTimer.Enabled := PositionTimer.Enabled;
-
-      PlayList.ItemIndex := -1;
-      PlayList.ItemIndex := FCurrentItemInfo.ItemIndex;
-      Taskbar.ProgressState := TTaskBarProgressState.Normal;
-      UpdateOverlayIcon(1);
-      PlayList.Refresh;
-      with FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex] do
-      begin
-        Self.Caption := PlayWindowTitle(Title, Artist, Album);
-        TitleLabel.Caption := Title + ' - ' + Album + ' - ' + Artist;
-        FTitleLabel := TitleLabel.Caption;
-        if TitleLabel.Width < TitleLabel.Canvas.TextWidth(TitleLabel.Caption) then
+        LogForm.LogList.Lines.Add('[' + DateTimeToStr(Now) + '] Unable to find ' + FPlaylists[FSelectedPlaylistIndex][LPlayIndex].FullFileName);
+        if not LogForm.Visible then
         begin
-          TitleLabel.Caption := TitleLabel.Caption + ' - '
+          LogForm.Show;
         end;
-        FAlbumLabel := Album;
-        FArtistLabel := Artist;
-        PlayCount := PlayCount + 1;
-      end;
-      // jump to current song
-      if SettingsForm.PlayJumpBtn.Checked then
-      begin
-        J1Click(nil);
-      end;
-      if SettingsForm.LoadArtBtn.Checked then
-      begin
-        if not FInternalArtworkReader.Busy then
+        Inc(LPlayIndex);
+        if LPlayIndex >= FPlaylists[FSelectedPlaylistIndex].Count then
         begin
-          FInternalArtworkReader.FileName := FCurrentItemInfo.FullFileName;
-          FInternalArtworkReader.Start;
-          // LoadCoverArt(FCurrentItemInfo.FullFileName);
+          Break;
         end;
-      end
-      else
-      begin
-        LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
-        CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
       end;
-      // lyric
-      LyricList.Items.Clear;
-      LyricStatusLabel.Caption := '';
-      LyricTitleEdit.Text := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title;
-      LyricArtistEdit.Text := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist;
-      FLyricAlbumStr := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album;
-      LyricSearchBtn.Enabled := False;
-      LyricArtistEdit.Enabled := False;
-      LyricTitleEdit.Enabled := False;
-      LyricSourceList.Enabled := False;
-      if SettingsForm.LyricBtn.Checked then
+
+      if LPlayIndex < FPlaylists[FSelectedPlaylistIndex].Count then
       begin
-        if FileExists(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title,
-          FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist, FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album)) then
+        if FCurrentItemInfo.ItemIndex > -1 then
         begin
-          LyricList.Items.Clear;
-          LyricList.Items.LoadFromFile(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title,
-            FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist, FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album));
-          LyricStatusLabel.Caption := 'Loaded local lyric file';
+          PlayList.Items[FCurrentItemInfo.ItemIndex].Selected := False;
+        end;
+
+        if FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].PlayCount = 1 then
+        begin
+          LPlayCountStr := '1 time'
+        end
+        else
+        begin
+          LPlayCountStr := FloatToStr(FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].PlayCount) + ' times'
+        end;
+        // fill file info tab
+        with FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex] do
+        begin
+          TitleEdit.Text := Title;
+          ArtistEdit.Text := Artist;
+          AlbumEdit.Text := Album;
+          DurationEdit.Text := DurationStr;
+          BitrateEdit.Text := Bitrate;
+          CodecEdit.Text := Codec;
+          ChannelsEdit.Text := Channels;
+          SampeRateEdit.Text := SampleRate;
+        end;
+
+        // position to default
+        PositionBar.Position := 0;
+        PositionTimer.Enabled := True;
+        ProgressTimer.Enabled := PositionTimer.Enabled;
+        // reset playlist
+        PlayList.ItemIndex := -1;
+        PlayList.ItemIndex := FCurrentItemInfo.ItemIndex;
+        Taskbar.ProgressState := TTaskBarProgressState.Normal;
+        UpdateOverlayIcon(1);
+        PlayList.Refresh;
+        // update title label
+        with FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex] do
+        begin
+          Self.Caption := PlayWindowTitle(Title, Artist, Album);
+          TitleLabel.Caption := Title + ' - ' + Album + ' - ' + Artist;
+          FTitleLabel := TitleLabel.Caption;
+          if TitleLabel.Width < TitleLabel.Canvas.TextWidth(TitleLabel.Caption) then
+          begin
+            TitleLabel.Caption := TitleLabel.Caption + ' - '
+          end;
+          FAlbumLabel := Album;
+          FArtistLabel := Artist;
+          PlayCount := PlayCount + 1;
+        end;
+        // jump to current song
+        if SettingsForm.PlayJumpBtn.Checked then
+        begin
+          J1Click(nil);
+        end;
+        // load cover art
+        if SettingsForm.LoadArtBtn.Checked then
+        begin
+          if not FArtworkReader.IsBusy then
+          begin
+            FArtworkReader.SongPath := FCurrentItemInfo.FullFileName;
+            FArtworkReader.Start;
+          end;
+        end
+        else
+        begin
+          // default cover
+          LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
+          CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
+        end;
+        // load/download lyrics
+        LyricList.Items.Clear;
+        LyricStatusLabel.Caption := '';
+        LyricTitleEdit.Text := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title;
+        LyricArtistEdit.Text := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist;
+        FLyricAlbumStr := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album;
+        LyricSearchBtn.Enabled := False;
+        LyricArtistEdit.Enabled := False;
+        LyricTitleEdit.Enabled := False;
+        LyricSourceList.Enabled := False;
+        if SettingsForm.LyricBtn.Checked then
+        begin
+          // load existing lyric file
+          if FileExists(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title,
+            FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist, FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album)) then
+          begin
+            LyricList.Items.Clear;
+            LyricList.Items.LoadFromFile(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title,
+              FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist, FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album));
+            LyricStatusLabel.Caption := 'Loaded local lyric file';
+            LyricSearchBtn.Enabled := True;
+            LyricArtistEdit.Enabled := True;
+            LyricTitleEdit.Enabled := True;
+            LyricSourceList.Enabled := True;
+            UpdateLyricBoxWidth;
+          end
+          else
+          begin
+            // download new lyric
+            FLyricDownloader.Stop;
+            if FPlaylists[FSelectedPlaylistIndex].Count < 1 then
+              Exit;
+            FLyricDownloader.SongTitle := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title;
+            FLyricDownloader.Artist := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist;
+            FLyricDownloader.Album := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album;
+            FLyricDownloader.ItemInfo.Title := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title;
+            FLyricDownloader.ItemInfo.Artist := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist;
+            FLyricDownloader.ItemInfo.Album := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album;
+            FLyricDownloader.Start;
+          end;
+        end
+        else
+        begin
           LyricSearchBtn.Enabled := True;
           LyricArtistEdit.Enabled := True;
           LyricTitleEdit.Enabled := True;
           LyricSourceList.Enabled := True;
-          UpdateLyricBoxWidth;
-        end
-        else
-        begin
-          FLyricDownloader.Stop;
-          if FPlaylists[FSelectedPlaylistIndex].Count < 1 then
-            Exit;
-          FLyricDownloader.SongTitle := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title;
-          FLyricDownloader.Artist := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist;
-          FLyricDownloader.Album := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album;
-          FLyricDownloader.ItemInfo.Title := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Title;
-          FLyricDownloader.ItemInfo.Artist := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Artist;
-          FLyricDownloader.ItemInfo.Album := FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex].Album;
-          FLyricDownloader.Start;
         end;
+        Self.Enabled := False;
+        SaveSettings;
+        Sleep(100);
+        Self.Enabled := True;
       end
       else
       begin
-        LyricSearchBtn.Enabled := True;
-        LyricArtistEdit.Enabled := True;
-        LyricTitleEdit.Enabled := True;
-        LyricSourceList.Enabled := True;
+        FPlayer.Stop;
+        FStoppedByUser := False;
+        LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
+        CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
+
+        LogForm.LogList.Lines.Add('[' + DateTimeToStr(Now) + '] Reached the end of the playlist');
+        if not LogForm.Visible then
+        begin
+          LogForm.Show;
+        end;
       end;
-      Self.Enabled := False;
-      SaveSettings;
-      Sleep(100);
-      Self.Enabled := True;
     end
     else
     begin
-      FPlayer.Stop;
-      FStoppedByUser := False;
+      // ShowMessage('ad');
+      // FPlayer.Stop;
+      // FStoppedByUser := False;
+      StopBtnClick(Self);
       LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
       CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
 
@@ -3856,7 +3754,14 @@ begin
   FAlbumLabel := '';
   PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
   LyricList.Items.Clear;
-  PlaybackInfoLabel.Caption := '';
+  TitleEdit.Text := '';
+  ArtistEdit.Text := '';
+  AlbumEdit.Text := '';
+  DurationEdit.Text := '';
+  BitrateEdit.Text := '';
+  CodecEdit.Text := '';
+  ChannelsEdit.Text := '';
+  SampeRateEdit.Text := '';
   Taskbar.ProgressMaxValue := MaxInt;
   Taskbar.ProgressValue := 0;
   UpdateOverlayIcon(3);
@@ -3885,7 +3790,6 @@ begin
 
   RadioList.Invalidate;
   FRadioURL := URL;
-  PlaybackInfoLabel.Caption := 'Connecting...';
   UpdateOverlayIcon(1);
   RadioThread.Start;
 end;
@@ -4002,8 +3906,23 @@ begin
       PositionTimer.Enabled := False;
       ProgressTimer.Enabled := PositionTimer.Enabled;
 
-      PlaybackInfoLabel.Caption := '';
+      TitleEdit.Text := '';
+      ArtistEdit.Text := '';
+      AlbumEdit.Text := '';
+      DurationEdit.Text := '';
+      BitrateEdit.Text := '';
+      CodecEdit.Text := '';
+      ChannelsEdit.Text := '';
+      SampeRateEdit.Text := '';
     end;
+  end;
+end;
+
+procedure TMainForm.PrevArtworkBtnClick(Sender: TObject);
+begin
+  if FArtworkReader.ExternalArtworkFiles.Count > 0 then
+  begin
+    FArtworkReader.LoadPrevExternalCoverArt;
   end;
 end;
 
@@ -4312,12 +4231,18 @@ end;
 
 procedure TMainForm.RadioResetUI;
 begin
-  PlaybackInfoLabel.Caption := '';
+  TitleEdit.Text := '';
+  ArtistEdit.Text := '';
+  AlbumEdit.Text := '';
+  DurationEdit.Text := '';
+  BitrateEdit.Text := '';
+  CodecEdit.Text := '';
+  ChannelsEdit.Text := '';
+  SampeRateEdit.Text := '';
   TitleLabel.Caption := '';
   FTitleLabel := TitleLabel.Caption;
   FArtistLabel := '';
   FAlbumLabel := '';
-  PlaybackInfoLabel.Caption := '';
   Self.Caption := 'OooPlayer';
 end;
 
@@ -4767,15 +4692,6 @@ begin
   end;
 end;
 
-procedure TMainForm.S9Click(Sender: TObject);
-begin
-  LyricPanel.Visible := not LyricPanel.Visible;
-  S9.Checked := not LyricPanel.Visible;
-  Bevel3.Visible := LyricPanel.Visible;
-  Splitter2.Visible := LyricPanel.Visible;
-  FormResize(Self);
-end;
-
 procedure TMainForm.SaveM3UPlayList(const FileName: string; const UTF8: Boolean);
 var
   LStreamWriter: TStreamWriter;
@@ -4940,7 +4856,10 @@ end;
 
 procedure TMainForm.Splitter2Moved(Sender: TObject);
 begin
-  PlayList.Columns[0].Width := PlayList.ClientWidth - PlayList.Columns[1].Width - PlayList.Columns[2].Width;
+  PlayList.Columns[4].Width := 100;
+  PlayList.Columns[0].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
+  PlayList.Columns[1].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
+  PlayList.Columns[2].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
   QueueList.Columns[0].Width := QueueList.ClientWidth - QueueList.Columns[1].Width;
   StatusBar.Panels[0].Width := StatusBar.ClientWidth - StatusBar.Panels[1].Width;
   RadioList.Columns[0].Width := RadioList.ClientWidth - 20;
@@ -5034,7 +4953,14 @@ begin
   FAlbumLabel := '';
   PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
   LyricList.Items.Clear;
-  PlaybackInfoLabel.Caption := '';
+  TitleEdit.Text := '';
+  ArtistEdit.Text := '';
+  AlbumEdit.Text := '';
+  DurationEdit.Text := '';
+  BitrateEdit.Text := '';
+  CodecEdit.Text := '';
+  ChannelsEdit.Text := '';
+  SampeRateEdit.Text := '';
   Taskbar.ProgressMaxValue := MaxInt;
   Taskbar.ProgressValue := 0;
   UpdateOverlayIcon(3);
@@ -5235,34 +5161,6 @@ begin
     end;
   end;
   LVolLvl := 100 - VolumeBar.Position;
-  if LVolLvl = 0 then
-  begin
-    VolumeMuteImg.Visible := True;
-    VolumeMidImg.Visible := False;
-    VolumeHighImg.Visible := False;
-    VolumeLowImg.Visible := False;
-  end
-  else if LVolLvl <= 25 then
-  begin
-    VolumeMuteImg.Visible := False;
-    VolumeMidImg.Visible := False;
-    VolumeHighImg.Visible := False;
-    VolumeLowImg.Visible := True;
-  end
-  else if LVolLvl <= 75 then
-  begin
-    VolumeMuteImg.Visible := False;
-    VolumeMidImg.Visible := True;
-    VolumeHighImg.Visible := False;
-    VolumeLowImg.Visible := False;
-  end
-  else
-  begin
-    VolumeMuteImg.Visible := False;
-    VolumeMidImg.Visible := False;
-    VolumeHighImg.Visible := True;
-    VolumeLowImg.Visible := False;
-  end;
 
   StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
 end;
@@ -5308,12 +5206,18 @@ begin
         begin
           Log('Reset ui');
           TitleLabel.Caption := 'Connecting...';
-          PlaybackInfoLabel.Caption := '';
+          TitleEdit.Text := '';
+          ArtistEdit.Text := '';
+          AlbumEdit.Text := '';
+          DurationEdit.Text := '';
+          BitrateEdit.Text := '';
+          CodecEdit.Text := '';
+          ChannelsEdit.Text := '';
+          SampeRateEdit.Text := '';
           TitleLabel.Caption := '';
           FTitleLabel := TitleLabel.Caption;
           FArtistLabel := '';
           FAlbumLabel := '';
-          PlaybackInfoLabel.Caption := '';
           Self.Caption := 'Radio [OooPlayer]';
         end;
       SHOW_ERROR:
@@ -5393,11 +5297,12 @@ begin
           Log('status update');
           if (String(PAnsiChar(Msg.LParam)) = 'ICY 200 OK') or (String(PAnsiChar(Msg.LParam)) = 'HTTP/1.0 200 OK') then
           begin
-            PlaybackInfoLabel.Caption := 'Playing';
+            // todo: radio status label
+            // PlaybackInfoLabel.Caption := 'Playing';
           end
           else
           begin
-            PlaybackInfoLabel.Caption := String(PAnsiChar(Msg.LParam));
+            // PlaybackInfoLabel.Caption := String(PAnsiChar(Msg.LParam));
           end;
         end;
       REPAINT_RADIO_LIST:

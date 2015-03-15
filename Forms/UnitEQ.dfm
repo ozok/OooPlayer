@@ -32,7 +32,7 @@ object EQForm: TEQForm
       AlignWithMargins = True
       Left = 4
       Top = 176
-      Width = 625
+      Width = 612
       Height = 13
       Margins.Top = 0
       Align = alBottom
@@ -40,7 +40,6 @@ object EQForm: TEQForm
         ' 31       63        87       125      175     250      350     5' +
         '00       700      1K       1.4K     2K       2.8K      4K      5' +
         '.6K      8K      11K     16K'
-      ExplicitWidth = 612
     end
     object sTrackBar1: TsTrackBar
       Left = 1
