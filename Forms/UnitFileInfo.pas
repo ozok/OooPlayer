@@ -66,7 +66,7 @@ begin
   InfoList.Items.Clear;
   with MainForm do
   begin
-    GetFileInfo(FPlaylists[MainForm.FSelectedPlaylistIndex][PlayList.ItemIndex].FullFileName);
+    GetFileInfo(FPlaylists[FSelectedPlaylistIndex][PlayList.ItemIndex].FullFileName);
   end;
 end;
 

@@ -96,7 +96,7 @@ begin
     LBMP.Width := IMG_SIZE;
     LBMP.Height := Round(IMG_SIZE * (LJpeg.Height / LJpeg.Width));
     // bitmap to hold data from jpeg
-    LJpegBMP.PixelFormat := pf24bit;
+    LJpegBMP.PixelFormat := pf8bit;
     LJpegBMP.Width := LJpeg.Width;
     LJpegBMP.Height :=LJpeg.Height;
     LJpegBMP.Assign(LJpeg);
@@ -150,7 +150,7 @@ begin
     LBMP.Width := IMG_SIZE;
     LBMP.Height := Round(IMG_SIZE * (LJpeg.Height / LJpeg.Width));
     // bitmap to hold data from jpeg
-    LJpegBMP.PixelFormat := pf24bit;
+    LJpegBMP.PixelFormat := pf8bit;
     LJpegBMP.Width := LJpeg.Width;
     LJpegBMP.Height :=LJpeg.Height;
     LJpegBMP.Assign(LJpeg);
@@ -165,8 +165,6 @@ begin
     try
       LOutJpeg.Assign(LBMP);
       LOutJpeg.JPEGNeeded;
-      LOutJpeg.CompressionQuality := 75;
-      LOutJpeg.Compress;
       try
         LOutJpeg.SaveToFile(TmpFile);
       except
@@ -207,7 +205,7 @@ begin
     LBMP.Width := IMG_SIZE;
     LBMP.Height := Round(IMG_SIZE * (LPng.Height / LPng.Width));
     // bitmap to hold data from png
-    LPngBMP.PixelFormat := pf24bit;
+    LPngBMP.PixelFormat := pf8bit;
     LPngBMP.Width := LPng.Width;
     LPngBMP.Height := LPng.Height;
     LPngBMP.Assign(LPng);
@@ -261,7 +259,7 @@ begin
     LBMP.Width := IMG_SIZE;
     LBMP.Height := Round(IMG_SIZE * (LPng.Height / LPng.Width));
     // bitmap to hold data from jpeg
-    LPngBMP.PixelFormat := pf24bit;
+    LPngBMP.PixelFormat := pf8bit;
     LPngBMP.Width := LPng.Width;
     LPngBMP.Height := LPng.Height;
     LPngBMP.Assign(LPng);

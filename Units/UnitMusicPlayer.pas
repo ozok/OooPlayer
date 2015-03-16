@@ -48,9 +48,10 @@ type
     FTAKPluginHandle: Cardinal;
     FMixHandle: HSTREAM;
     FPosition: int64;
-    // FLevels: TLevels;
+    FLevels: Cardinal;
     FFXHandle: Cardinal;
     FEQParams: array [0 .. 17] of HFX;
+    FLevelCounter: integer;
 
     function GetBassStreamStatus: TPlayerStatus;
     function GetTotalLength(): int64;
@@ -100,8 +101,7 @@ const
   MY_ERROR_STREAM_ZERO = 3;
   MY_ERROR_COULDNT_FREE_STREAM = 4;
   LEVEL_MAX = 32768;
-  UPDATE_LEFT_LEVEL = 14;
-  UPDATE_RIGHT_LEVEL = 15;
+  UPDATE_LEVEL = 14;
   WM_COPYDATA = 74;
   EQ_FRENQ: array [0 .. 17] of integer = (31, 63, 87, 125, 175, 250, 350, 500, 700, 1000, 1400, 2000, 2800, 4000, 5600, 8000, 11000, 16000);
 
@@ -344,6 +344,13 @@ begin
   begin
     Result := BASS_ChannelGetPosition(FBassHandle, BASS_POS_BYTE);
     FPosition := Result;
+    Inc(FLevelCounter);
+    // if FLevelCounter > 10 then
+    // begin
+    // FLevels := BASS_ChannelGetLevel(FBassHandle);
+    // SendMessage(WinHandle, WM_INFO_UPDATE, UPDATE_LEVEL, FLevels);
+    // FLevelCounter := 0;
+    // end;
   end;
 end;
 

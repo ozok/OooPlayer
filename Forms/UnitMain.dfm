@@ -2334,6 +2334,17 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 4
     SkinData.SkinSection = 'PANEL'
+    object sSplitter1: TsSplitter
+      Left = 1
+      Top = 375
+      Width = 348
+      Height = 6
+      Cursor = crVSplit
+      Align = alBottom
+      SkinData.SkinSection = 'SPLITTER'
+      ExplicitTop = 348
+      ExplicitWidth = 340
+    end
     object CoverPanel: TsPanel
       Left = 1
       Top = 381
@@ -2378,7 +2389,6 @@ object MainForm: TMainForm
           Alignment = taCenter
           Caption = 'Cover art'
           Layout = tlCenter
-          ExplicitLeft = 21
           ExplicitWidth = 46
           ExplicitHeight = 13
         end
@@ -2455,7 +2465,6 @@ object MainForm: TMainForm
           TabOrder = 0
           OnClick = NextArtworkBtnClick
           SkinData.SkinSection = 'BUTTON'
-          ExplicitLeft = 325
         end
         object PrevArtworkBtn: TsBitBtn
           Left = 1
@@ -2537,7 +2546,7 @@ object MainForm: TMainForm
       Left = 1
       Top = 1
       Width = 348
-      Height = 380
+      Height = 374
       ActivePage = sTabSheet1
       Align = alClient
       TabOrder = 1
@@ -2559,7 +2568,7 @@ object MainForm: TMainForm
         end
         object LyricStatusLabel: TsLabel
           Left = 0
-          Top = 339
+          Top = 333
           Width = 340
           Height = 13
           Align = alBottom
@@ -2569,7 +2578,7 @@ object MainForm: TMainForm
           Left = 0
           Top = 107
           Width = 340
-          Height = 232
+          Height = 226
           Align = alClient
           BorderStyle = bsNone
           Color = 2038810
@@ -2694,7 +2703,7 @@ object MainForm: TMainForm
         SkinData.CustomFont = False
         DesignSize = (
           340
-          352)
+          346)
         object TitleEdit: TsEdit
           Left = 70
           Top = 9
@@ -2910,6 +2919,94 @@ object MainForm: TMainForm
           BoundLabel.Layout = sclLeft
           BoundLabel.MaxWidth = 0
           BoundLabel.UseSkinColor = True
+        end
+      end
+      object sTabSheet3: TsTabSheet
+        Caption = 'Artist Info'
+        SkinData.CustomColor = False
+        SkinData.CustomFont = False
+        object BandImage: TsImage
+          Left = 0
+          Top = 39
+          Width = 340
+          Height = 130
+          Align = alTop
+          Center = True
+          Picture.Data = {07544269746D617000000000}
+          Proportional = True
+          Transparent = True
+          SkinData.SkinSection = 'CHECKBOX'
+        end
+        object HtmlViewer1: THtmlViewer
+          Left = 0
+          Top = 169
+          Width = 340
+          Height = 177
+          BorderStyle = htFocused
+          DefFontName = 'Times New Roman'
+          DefPreFontName = 'Courier New'
+          HistoryMaxCount = 0
+          HtOptions = [htOverLinksActive, htPrintTableBackground, htPrintMonochromeBlack, htAllowHotSpotDblClick]
+          NoSelect = False
+          PrintMarginBottom = 2.000000000000000000
+          PrintMarginLeft = 2.000000000000000000
+          PrintMarginRight = 2.000000000000000000
+          PrintMarginTop = 2.000000000000000000
+          PrintScale = 1.000000000000000000
+          Align = alClient
+          TabOrder = 0
+          Touch.InteractiveGestures = [igPan]
+          Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia]
+        end
+        object sPanel6: TsPanel
+          Left = 0
+          Top = 0
+          Width = 340
+          Height = 39
+          Align = alTop
+          TabOrder = 1
+          SkinData.SkinSection = 'PANEL'
+          DesignSize = (
+            340
+            39)
+          object ArtistInfoEdit: TsEdit
+            Left = 40
+            Top = 8
+            Width = 218
+            Height = 21
+            Anchors = [akLeft, akTop, akRight]
+            Color = 2038810
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = 13417908
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 0
+            SkinData.SkinSection = 'EDIT'
+            BoundLabel.Active = True
+            BoundLabel.Caption = 'Artist:'
+            BoundLabel.Indent = 0
+            BoundLabel.Font.Charset = DEFAULT_CHARSET
+            BoundLabel.Font.Color = clWindowText
+            BoundLabel.Font.Height = -11
+            BoundLabel.Font.Name = 'Tahoma'
+            BoundLabel.Font.Style = []
+            BoundLabel.Layout = sclLeft
+            BoundLabel.MaxWidth = 0
+            BoundLabel.UseSkinColor = True
+          end
+          object GetArtistInfoBtn: TsButton
+            Left = 264
+            Top = 8
+            Width = 75
+            Height = 21
+            Anchors = [akTop, akRight]
+            Caption = 'Search'
+            TabOrder = 1
+            OnClick = GetArtistInfoBtnClick
+            SkinData.SkinSection = 'BUTTON'
+          end
         end
       end
     end
@@ -3151,7 +3248,6 @@ object MainForm: TMainForm
   object FormStorage: TJvFormStorage
     AppStorage = AppIniFileStorage
     AppStoragePath = '%FORM_NAME%\'
-    Options = [fpSize, fpLocation]
     StoredValues = <>
     Left = 128
     Top = 232
@@ -8535,7 +8631,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C0101050008005C0116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800640116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -10066,6 +10162,7 @@ object MainForm: TMainForm
     ThirdParty.ThirdScrollBar = 'TScrollBar'
     ThirdParty.ThirdStaticText = 'TStaticText'
     ThirdParty.ThirdNativePaint = ' '
+    OnAfterChange = sSkinManager1AfterChange
     Left = 440
     Top = 60
   end

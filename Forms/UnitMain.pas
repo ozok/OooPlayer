@@ -39,7 +39,7 @@ uses
   sSplitter, sSkinProvider, acProgressBar, sTrackBar, acImage, acPNG,
   acAlphaHints, acAlphaImageList, sButton, Vcl.AppEvnts, sHintManager,
   acShellCtrls, sComboBoxes, sTreeView, sListBox, System.Types,
-  sEdit;
+  sEdit, UnitArtistInfo, HTMLUn2, HtmlView;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -261,6 +261,13 @@ type
     NextArtworkBtn: TsBitBtn;
     sPanel7: TsPanel;
     CoverArtInfoLabel: TsLabel;
+    sSplitter1: TsSplitter;
+    sTabSheet3: TsTabSheet;
+    HtmlViewer1: THtmlViewer;
+    sPanel6: TsPanel;
+    ArtistInfoEdit: TsEdit;
+    GetArtistInfoBtn: TsButton;
+    BandImage: TsImage;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -378,6 +385,8 @@ type
     procedure C3Click(Sender: TObject);
     procedure PrevArtworkBtnClick(Sender: TObject);
     procedure NextArtworkBtnClick(Sender: TObject);
+    procedure sSkinManager1AfterChange(Sender: TObject);
+    procedure GetArtistInfoBtnClick(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -395,6 +404,8 @@ type
     FPlayListFiles: TPlaylistFiles;
     FExternalArtworkFiles: TStringList;
     FExternalArtworkIndex: integer;
+    // FLevel: Cardinal;
+    FArtistInfo: TArtistInfo;
 
     procedure AddFile(const FileName: string);
     procedure ReScanFile(const FileIndex: integer);
@@ -1681,6 +1692,8 @@ begin
   FStopAddFiles := True;
   sSkinManager1.SkinDirectory := ExtractFileDir(Application.ExeName) + '\skins\';
   FExternalArtworkFiles := TStringList.Create;
+  FArtistInfo := TArtistInfo.Create;
+  FArtistInfo.AppData := FAppDataFolder;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -1710,6 +1723,7 @@ begin
   FArtworkReader.Free;
   FPlayListFiles.Free;
   FExternalArtworkFiles.Free;
+  FArtistInfo.Free;
 end;
 
 procedure TMainForm.FormResize(Sender: TObject);
@@ -1865,6 +1879,16 @@ var
 begin
   CreateGUID(LGUID);
   Result := GUIDToString(LGUID);
+end;
+
+procedure TMainForm.GetArtistInfoBtnClick(Sender: TObject);
+begin
+  if Length(ArtistInfoEdit.Text) > 0 then
+  begin
+    FArtistInfo.Stop;
+    FArtistInfo.Artist := ArtistEdit.Text;
+    FArtistInfo.Start(ArtistEdit.Text);
+  end;
 end;
 
 function TMainForm.GetRecordedFileType(const FileName: string): string;
@@ -2143,8 +2167,8 @@ procedure TMainForm.VisTimerTimer(Sender: TObject);
 begin
   // if FPlayer.PlayerStatus2 = psPlaying then
   // begin
-  // LeftLevelBar.Position := (20 * FLevels.Left) div 32768;
-  // RightLevelBar.Position := (20 * FLevels.Right) div 32768;
+  // LeftBar.Position := (20 * LoWord(FLevel)) div 32768;
+  // RightBar.Position := (20 * HiWord(FLevel)) div 32768;
   // end;
 end;
 
@@ -2509,6 +2533,7 @@ begin
       H2.Checked := not QueueList.Visible;
       Splitter1.Visible := QueueList.Visible;
       LSkinIndex := SettingsFile.ReadInteger('settings', 'skin2', 33);
+      CoverPanel.Height := SettingsFile.ReadInteger('settings', 'coverheight', 182);
     end;
   finally
     SettingsFile.Free;
@@ -2523,6 +2548,8 @@ begin
     begin
       MainForm.sSkinManager1.Active := False;
     end;
+    HtmlViewer1.DefBackground := PlaylistList.Color;
+
   end;
 end;
 
@@ -3386,6 +3413,7 @@ begin
         begin
           TitleEdit.Text := Title;
           ArtistEdit.Text := Artist;
+          ArtistInfoEdit.Text := Artist;
           AlbumEdit.Text := Album;
           DurationEdit.Text := DurationStr;
           BitrateEdit.Text := Bitrate;
@@ -3486,6 +3514,10 @@ begin
           LyricTitleEdit.Enabled := True;
           LyricSourceList.Enabled := True;
         end;
+        // get artist info
+        FArtistInfo.Stop;
+        FArtistInfo.Artist := ArtistEdit.Text;
+        FArtistInfo.Start(ArtistEdit.Text);
         Self.Enabled := False;
         SaveSettings;
         Sleep(100);
@@ -4796,6 +4828,7 @@ begin
       WriteInteger('player', 'playlistindex', FSelectedPlaylistIndex);
       WriteBool('player', 'lyricvisible', LyricPanel.Visible);
       WriteBool('player', 'queuevisible', QueueList.Visible);
+      WriteInteger('settings', 'coverheight', CoverPanel.Height);
     end;
   finally
     SettingsFile.Free;
@@ -4863,6 +4896,11 @@ begin
   QueueList.Columns[0].Width := QueueList.ClientWidth - QueueList.Columns[1].Width;
   StatusBar.Panels[0].Width := StatusBar.ClientWidth - StatusBar.Panels[1].Width;
   RadioList.Columns[0].Width := RadioList.ClientWidth - 20;
+end;
+
+procedure TMainForm.sSkinManager1AfterChange(Sender: TObject);
+begin
+  HtmlViewer1.DefBackground := PlaylistList.Color;
 end;
 
 procedure TMainForm.StartRadioRecording;
@@ -5375,13 +5413,9 @@ begin
           Log('play next file');
           HandlePlaybackFromBassThread;
         end;
-      UPDATE_LEFT_LEVEL:
+      UPDATE_LEVEL:
         begin
-          // FLevels.Left := Cardinal(Msg.LParam);
-        end;
-      UPDATE_RIGHT_LEVEL:
-        begin
-          // FLevels.Right := Cardinal(Msg.LParam);
+          // FLevel := Cardinal(Msg.LParam);
         end;
     end;
   end

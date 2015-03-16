@@ -21,13 +21,14 @@ unit UnitArtworkReader;
 
 interface
 
-uses Classes, SysUtils, IdBaseComponent, IdThreadComponent, IdThread, UnitTagTypes, Vcl.Imaging.jpeg, Vcl.Imaging.pngimage, UnitImageResize, UnitTagReader;
+uses Classes, SysUtils, IdBaseComponent, IdThreadComponent, IdThread, UnitTagTypes, Vcl.Imaging.jpeg, Vcl.Imaging.pngimage, UnitImageResize, UnitTagReader, UnitArtworkInfo;
 
 type
   TArtworkReader = class
   private
     FThread: TIdThreadComponent;
     FResizeThread: TIdThreadComponent;
+    FInfoUpdateThread: TIdThreadComponent;
     FSongPath: string;
     FJpeg: TJPEGImage;
     FPng: TPngImage;
@@ -41,6 +42,8 @@ type
     FAppDataFolder: string;
     FCoverType: TCoverArtType;
     FCoverStream: TStream;
+    FCoverArtInfoStr: string;
+    FArtworkInfo: TArtworkInfo;
 
     procedure ThreadRun(Sender: TIdThreadComponent);
     procedure ThreadStopped(Sender: TIdThreadComponent);
@@ -50,6 +53,10 @@ type
     procedure ResizeThreadStopped(Sender: TIdThreadComponent);
     procedure ResizeThreadTerminate(Sender: TIdThreadComponent);
 
+    procedure InfoThreadRun(Sender: TIdThreadComponent);
+    procedure InfoThreadStopped(Sender: TIdThreadComponent);
+    procedure InfoThreadTerminate(Sender: TIdThreadComponent);
+
     procedure LoadCoverArt;
     function LoadExternalCoverArt(const FileName: string): Boolean;
     function LoadInternalCoverArt(const FileName: string): Boolean;
@@ -58,12 +65,15 @@ type
     procedure LoadCoverFile;
     procedure LoadCoverFromMemory;
     procedure ResizeCoverArtToLoad(const CoverArtPath: string);
+    procedure SetAppData(const Value: string);
+
+    procedure UpdateInfo;
   public
     property IsBusy: Boolean read FBusy;
     property SongPath: string read FSongPath write FSongPath;
     property ExternalArtworkFiles: TStringList read FExternalArtworkFiles;
     property DefaultImgPath: string read FDefaultImgPath write FDefaultImgPath;
-    property AppDataFolder: string read FAppDataFolder write FAppDataFolder;
+    property AppDataFolder: string read FAppDataFolder write SetAppData;
 
     constructor create;
     destructor destroy; override;
@@ -95,10 +105,20 @@ begin
   FResizeThread.OnStopped := ResizeThreadStopped;
   FResizeThread.OnTerminate := ResizeThreadTerminate;
 
+  FInfoUpdateThread := TIdThreadComponent.create(nil);
+  FInfoUpdateThread.Priority := tpIdle;
+  FInfoUpdateThread.StopMode := smSuspend;
+  FInfoUpdateThread.OnRun := InfoThreadRun;
+  FInfoUpdateThread.OnStopped := InfoThreadStopped;
+  FInfoUpdateThread.OnTerminate := InfoThreadTerminate;
+
   FBusy := False;
   FTagReader := TTagReader.create;
   FCoverStream := TStream.create;
   FExternalArtworkFiles := TStringList.create;
+  FJpeg := TJPEGImage.create;
+  FPng := TPngImage.create;
+  FArtworkInfo := TArtworkInfo.create;
 end;
 
 destructor TArtworkReader.destroy;
@@ -107,7 +127,26 @@ begin
   FTagReader.Free;
   FExternalArtworkFiles.Free;
   FCoverStream.Free;
+  FJpeg.Free;
+  FPng.Free;
+  FArtworkInfo.Free;
   inherited;
+end;
+
+procedure TArtworkReader.InfoThreadRun(Sender: TIdThreadComponent);
+begin
+  FInfoUpdateThread.Synchronize(UpdateInfo);
+  FInfoUpdateThread.Terminate;
+end;
+
+procedure TArtworkReader.InfoThreadStopped(Sender: TIdThreadComponent);
+begin
+  FBusy := False;
+end;
+
+procedure TArtworkReader.InfoThreadTerminate(Sender: TIdThreadComponent);
+begin
+  FBusy := False;
 end;
 
 function TArtworkReader.ListExternalArtworkFiles(const Dir: string): string;
@@ -140,6 +179,8 @@ end;
 
 procedure TArtworkReader.LoadCoverArt;
 begin
+  FBusy := False;
+  FExternalArtworkFiles.Clear;
   case SettingsForm.CoverArtList.ItemIndex of
     0: // external
       begin
@@ -164,23 +205,29 @@ begin
     none:
       begin
         FCoverArtFileToLoad := FDefaultImgPath;
+        FCoverArtInfoStr := '';
         FThread.Synchronize(LoadCoverFile);
+        FInfoUpdateThread.Start;
       end;
     jpeg:
       begin
         MainForm.CoverImage.Picture.Assign(FJpeg);
+        FInfoUpdateThread.Start;
       end;
     png:
       begin
         MainForm.CoverImage.Picture.Assign(FPng);
+        FInfoUpdateThread.Start;
       end;
     bmp:
       begin
         MainForm.CoverImage.LoadFromStream(FCoverStream);
+        FInfoUpdateThread.Start;
       end;
     gif:
       begin
         MainForm.CoverImage.Picture.Assign(FJpeg);
+        FInfoUpdateThread.Start;
       end;
   end;
 end;
@@ -190,7 +237,6 @@ begin
   if FileExists(FCoverArtFileToLoad) then
   begin
     MainForm.CoverImage.Picture.LoadFromFile(FCoverArtFileToLoad);
-    LogForm.LogList.Lines.Add('loaded: ' + FCoverArtFileToLoad);
   end;
 end;
 
@@ -220,7 +266,10 @@ begin
         if FileExists(FTempCoverPath + '.jpg') then
         begin
           FCoverArtFileToLoad := FTempCoverPath + '.jpg';
+          FArtworkInfo.FileName := LImageFile;
+          FCoverArtInfoStr := FArtworkInfo.InfoStr;
           FThread.Synchronize(LoadCoverFile);
+          FInfoUpdateThread.Start;
         end;
       end
       else if LowerCase(ExtractFileExt(LImageFile)) = '.png' then
@@ -229,7 +278,10 @@ begin
         if FileExists(FTempCoverPath + '.png') then
         begin
           FCoverArtFileToLoad := FTempCoverPath + '.png';
+          FArtworkInfo.FileName := LImageFile;
+          FCoverArtInfoStr := FArtworkInfo.InfoStr;
           FThread.Synchronize(LoadCoverFile);
+          FInfoUpdateThread.Start;
         end;
       end;
       // todo: for other formats
@@ -241,7 +293,9 @@ begin
   else
   begin
     FCoverArtFileToLoad := FDefaultImgPath;
+    FCoverArtInfoStr := '';
     FThread.Synchronize(LoadCoverFile);
+    FInfoUpdateThread.Start;
   end;
 end;
 
@@ -260,9 +314,12 @@ begin
     // if busy from a previous read
     // just load the default image
     FCoverArtFileToLoad := FDefaultImgPath;
+    FCoverArtInfoStr := '';
     FThread.Synchronize(LoadCoverFile);
+    FInfoUpdateThread.Start;
     Exit;
   end;
+
   // load internal cover art
   if FTagReader.PicType <> none then
   begin
@@ -272,7 +329,9 @@ begin
   else
   begin
     FCoverArtFileToLoad := FDefaultImgPath;
+    FCoverArtInfoStr := '';
     FThread.Synchronize(LoadCoverFile);
+    FInfoUpdateThread.Start;
   end;
 end;
 
@@ -284,7 +343,10 @@ begin
     begin
       Inc(FExternalArtworkIndex);
       FCoverArtFileToLoad := FExternalArtworkFiles[FExternalArtworkIndex];
+      FArtworkInfo.FileName := FCoverArtFileToLoad;
+      FCoverArtInfoStr := FArtworkInfo.InfoStr;
       FResizeThread.Start;
+      FInfoUpdateThread.Start;
     end;
   end;
 end;
@@ -298,7 +360,9 @@ begin
   begin
     // default image incase of no image
     FCoverArtFileToLoad := FDefaultImgPath;
+    FCoverArtInfoStr := '';
     FThread.Synchronize(LoadCoverFile);
+    FInfoUpdateThread.Start;
   end
   else if PicType = TCoverArtType.jpeg then
   begin
@@ -307,11 +371,14 @@ begin
       try
         LTmpFile := FAppDataFolder + '\cover.jpg';
         LImgResizer.ResizeJpgStream(Stream, LTmpFile);
+        FCoverArtInfoStr := FArtworkInfo.ReadFromStream(Stream);
         FJpeg.LoadFromFile(LTmpFile);
         FJpeg.DIBNeeded;
+        FCoverType := jpeg;
         if not FJpeg.Empty then
         begin
           FThread.Synchronize(LoadCoverFromMemory);
+          FInfoUpdateThread.Start;
         end;
       finally
         LImgResizer.Free;
@@ -320,7 +387,9 @@ begin
       on E: Exception do
       begin
         FCoverArtFileToLoad := FDefaultImgPath;
+        FCoverArtInfoStr := '';
         FThread.Synchronize(LoadCoverFile);
+        FInfoUpdateThread.Start;
       end;
     end;
   end
@@ -331,10 +400,13 @@ begin
       try
         LTmpFile := FAppDataFolder + '\cover.png';
         LImgResizer.ResizePngStream(Stream, LTmpFile);
+        FCoverArtInfoStr := FArtworkInfo.ReadFromStream(Stream);
         FPng.LoadFromFile(LTmpFile);
+        FCoverType := png;
         if not FPng.Empty then
         begin
           FThread.Synchronize(LoadCoverFromMemory);
+          FInfoUpdateThread.Start;
         end;
       finally
         LImgResizer.Free;
@@ -343,7 +415,9 @@ begin
       on E: Exception do
       begin
         FCoverArtFileToLoad := FDefaultImgPath;
+        FCoverArtInfoStr := '';
         FThread.Synchronize(LoadCoverFile);
+        FInfoUpdateThread.Start;
       end;
     end;
   end
@@ -351,11 +425,12 @@ begin
   begin
     if Stream.Size > 0 then
     begin
+      FCoverType := bmp;
       FCoverStream.CopyFrom(Stream, Stream.Size);
+      FCoverArtInfoStr := FArtworkInfo.ReadFromStream(Stream);
       FThread.Synchronize(LoadCoverFromMemory);
     end;
   end;
-
 end;
 
 procedure TArtworkReader.LoadPrevExternalCoverArt;
@@ -366,7 +441,10 @@ begin
     begin
       Dec(FExternalArtworkIndex);
       FCoverArtFileToLoad := FExternalArtworkFiles[FExternalArtworkIndex];
+      FArtworkInfo.FileName := FCoverArtFileToLoad;
+      FCoverArtInfoStr := FArtworkInfo.InfoStr;
       FResizeThread.Start;
+      FInfoUpdateThread.Start;
     end;
   end;
 end;
@@ -427,6 +505,12 @@ begin
   FBusy := False;
 end;
 
+procedure TArtworkReader.SetAppData(const Value: string);
+begin
+  FAppDataFolder := Value;
+  FArtworkInfo.AppData := FAppDataFolder;
+end;
+
 procedure TArtworkReader.Start;
 begin
   FBusy := True;
@@ -457,6 +541,11 @@ end;
 procedure TArtworkReader.ThreadTerminate(Sender: TIdThreadComponent);
 begin
   FBusy := False;
+end;
+
+procedure TArtworkReader.UpdateInfo;
+begin
+  MainForm.CoverArtInfoLabel.Caption := FCoverArtInfoStr;
 end;
 
 end.
