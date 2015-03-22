@@ -1517,9 +1517,9 @@ object MainForm: TMainForm
     end
   end
   object FuncPages: TsPageControl
-    Left = 0
+    Left = 200
     Top = 83
-    Width = 865
+    Width = 665
     Height = 599
     ActivePage = TabSheet1
     Align = alClient
@@ -1534,14 +1534,17 @@ object MainForm: TMainForm
     OnChange = FuncPagesChange
     OnMouseLeave = FuncPagesMouseLeave
     SkinData.SkinSection = 'PAGECONTROL'
+    ExplicitLeft = 0
+    ExplicitWidth = 865
     object TabSheet1: TsTabSheet
       Caption = 'Music'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
+      ExplicitWidth = 857
       object Splitter1: TsSplitter
         Left = 0
         Top = 405
-        Width = 857
+        Width = 657
         Height = 3
         Cursor = crVSplit
         Align = alBottom
@@ -1555,7 +1558,7 @@ object MainForm: TMainForm
       object Bevel1: TsBevel
         Left = 0
         Top = 30
-        Width = 857
+        Width = 657
         Height = 3
         Align = alTop
         Shape = bsTopLine
@@ -1564,7 +1567,7 @@ object MainForm: TMainForm
       object PlayList: TsListView
         Left = 0
         Top = 33
-        Width = 857
+        Width = 657
         Height = 372
         Hint = 'Playlist'
         Margins.Left = 0
@@ -1590,17 +1593,33 @@ object MainForm: TMainForm
         Color = 2038810
         Columns = <
           item
+            Caption = 'Artist'
           end
           item
-            Alignment = taCenter
+            Caption = 'Album'
             Width = 30
           end
           item
+            Caption = 'Title'
             Width = 100
           end
           item
+            Caption = 'Bitrate'
           end
           item
+            Caption = 'Sample Rate'
+          end
+          item
+            Caption = 'Channels'
+          end
+          item
+            Caption = 'Codec'
+          end
+          item
+            Caption = 'Queue'
+          end
+          item
+            Caption = 'Duration'
           end>
         DragMode = dmAutomatic
         Font.Charset = DEFAULT_CHARSET
@@ -1624,11 +1643,12 @@ object MainForm: TMainForm
         OnDragDrop = PlayListDragDrop
         OnDragOver = PlayListDragOver
         OnStartDrag = PlayListStartDrag
+        ExplicitWidth = 857
       end
       object QueueList: TsListView
         Left = 0
         Top = 408
-        Width = 857
+        Width = 657
         Height = 121
         BoundLabel.Indent = 0
         BoundLabel.Font.Charset = DEFAULT_CHARSET
@@ -1666,21 +1686,23 @@ object MainForm: TMainForm
         TabOrder = 1
         ViewStyle = vsReport
         OnDblClick = QueueListDblClick
+        ExplicitWidth = 857
       end
       object PlaylistListPanel: TsPanel
         Left = 0
         Top = 0
-        Width = 857
+        Width = 657
         Height = 30
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 2
         SkinData.SkinSection = 'PANEL'
+        ExplicitWidth = 857
         object PlaylistList: TsComboBox
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 683
+          Width = 483
           Height = 21
           Hint = 'List of the playlists you have'
           Align = alClient
@@ -1707,10 +1729,11 @@ object MainForm: TMainForm
           ParentFont = False
           TabOrder = 0
           OnChange = PlaylistListChange
+          ExplicitWidth = 683
         end
         object AddPlaylistBtn: TsBitBtn
           AlignWithMargins = True
-          Left = 692
+          Left = 492
           Top = 3
           Width = 50
           Height = 23
@@ -1721,10 +1744,11 @@ object MainForm: TMainForm
           TabOrder = 1
           OnClick = AddPlaylistBtnClick
           SkinData.SkinSection = 'BUTTON'
+          ExplicitLeft = 692
         end
         object RemovePlaylistBtn: TsBitBtn
           AlignWithMargins = True
-          Left = 748
+          Left = 548
           Top = 3
           Width = 50
           Height = 23
@@ -1735,10 +1759,11 @@ object MainForm: TMainForm
           TabOrder = 2
           OnClick = RemovePlaylistBtnClick
           SkinData.SkinSection = 'BUTTON'
+          ExplicitLeft = 748
         end
         object RenamePlaylistBtn: TsButton
           AlignWithMargins = True
-          Left = 804
+          Left = 604
           Top = 3
           Width = 50
           Height = 23
@@ -1749,16 +1774,18 @@ object MainForm: TMainForm
           TabOrder = 3
           OnClick = RenamePlaylistBtnClick
           SkinData.SkinSection = 'BUTTON'
+          ExplicitLeft = 804
         end
       end
       object ShortcutPanel: TsPanel
         Left = 0
         Top = 529
-        Width = 857
+        Width = 657
         Height = 35
         Align = alBottom
         TabOrder = 3
         SkinData.SkinSection = 'PANEL'
+        ExplicitWidth = 857
         object AddMenuBtn: TsBitBtn
           Left = 1
           Top = 1
@@ -1910,7 +1937,7 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'BUTTON'
         end
         object SearchMenuBtn: TsBitBtn
-          Left = 790
+          Left = 590
           Top = 1
           Width = 33
           Height = 33
@@ -1983,9 +2010,10 @@ object MainForm: TMainForm
           TabOrder = 2
           OnClick = S2Click
           SkinData.SkinSection = 'BUTTON'
+          ExplicitLeft = 790
         end
         object PlaylistMenuBtn: TsBitBtn
-          Left = 823
+          Left = 623
           Top = 1
           Width = 33
           Height = 33
@@ -2046,6 +2074,7 @@ object MainForm: TMainForm
           TabOrder = 3
           OnClick = PlaylistMenuBtnClick
           SkinData.SkinSection = 'BUTTON'
+          ExplicitLeft = 823
         end
       end
     end
@@ -2054,10 +2083,11 @@ object MainForm: TMainForm
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
+      ExplicitWidth = 857
       object RadioCatList: TsComboBox
         Left = 0
         Top = 0
-        Width = 857
+        Width = 657
         Height = 21
         Hint = 'Radio station categories'
         Align = alTop
@@ -2114,11 +2144,12 @@ object MainForm: TMainForm
           'Season'
           'User Favourites'
           'Imported')
+        ExplicitWidth = 857
       end
       object RadioList: TsListView
         Left = 0
         Top = 73
-        Width = 857
+        Width = 657
         Height = 471
         BoundLabel.Indent = 0
         BoundLabel.Font.Charset = DEFAULT_CHARSET
@@ -2157,20 +2188,22 @@ object MainForm: TMainForm
         OnAdvancedCustomDrawItem = RadioListAdvancedCustomDrawItem
         OnData = RadioListData
         OnDblClick = RadioListDblClick
+        ExplicitWidth = 857
       end
       object RadioRecordPanel: TsPanel
         Left = 0
         Top = 21
-        Width = 857
+        Width = 657
         Height = 52
         Align = alTop
         TabOrder = 2
         SkinData.SkinSection = 'PANEL'
+        ExplicitWidth = 857
         DesignSize = (
-          857
+          657
           52)
         object Label1: TsLabel
-          Left = 370
+          Left = 170
           Top = 6
           Width = 77
           Height = 13
@@ -2179,7 +2212,7 @@ object MainForm: TMainForm
           ExplicitLeft = 176
         end
         object Label2: TsLabel
-          Left = 492
+          Left = 292
           Top = 6
           Width = 67
           Height = 13
@@ -2211,7 +2244,7 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'BUTTON'
         end
         object RadioRecordFormatList: TsComboBox
-          Left = 370
+          Left = 170
           Top = 25
           Width = 114
           Height = 21
@@ -2246,9 +2279,10 @@ object MainForm: TMainForm
             'Opus'
             'AAC'
             'Without encode')
+          ExplicitLeft = 370
         end
         object RadioRecordingOptionsBtn: TsBitBtn
-          Left = 686
+          Left = 486
           Top = 6
           Width = 104
           Height = 40
@@ -2258,9 +2292,10 @@ object MainForm: TMainForm
           TabOrder = 3
           OnClick = RadioRecordingOptionsBtnClick
           SkinData.SkinSection = 'BUTTON'
+          ExplicitLeft = 686
         end
         object RadioRecordModeList: TsComboBox
-          Left = 490
+          Left = 290
           Top = 25
           Width = 190
           Height = 21
@@ -2292,9 +2327,10 @@ object MainForm: TMainForm
           Items.Strings = (
             'Try to save each song seperately'
             'Save recording as a single long file')
+          ExplicitLeft = 490
         end
         object RadioRecordOutputFolderBtn: TsBitBtn
-          Left = 796
+          Left = 596
           Top = 6
           Width = 55
           Height = 40
@@ -2304,12 +2340,13 @@ object MainForm: TMainForm
           TabOrder = 5
           OnClick = RadioRecordOutputFolderBtnClick
           SkinData.SkinSection = 'BUTTON'
+          ExplicitLeft = 796
         end
       end
       object RadioConnectionBar: TsProgressBar
         Left = 0
         Top = 544
-        Width = 857
+        Width = 657
         Height = 20
         Align = alBottom
         DoubleBuffered = False
@@ -2317,6 +2354,7 @@ object MainForm: TMainForm
         TabOrder = 3
         Visible = False
         SkinData.SkinSection = 'GAUGE'
+        ExplicitWidth = 857
       end
     end
   end
@@ -2697,230 +2735,6 @@ object MainForm: TMainForm
           end
         end
       end
-      object sTabSheet2: TsTabSheet
-        Caption = 'Info'
-        SkinData.CustomColor = False
-        SkinData.CustomFont = False
-        DesignSize = (
-          340
-          346)
-        object TitleEdit: TsEdit
-          Left = 70
-          Top = 9
-          Width = 265
-          Height = 21
-          Anchors = [akLeft, akTop, akRight]
-          Color = 2038810
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = 13417908
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          ParentFont = False
-          TabOrder = 0
-          SkinData.SkinSection = 'EDIT'
-          BoundLabel.Active = True
-          BoundLabel.Caption = 'Title:'
-          BoundLabel.Indent = 0
-          BoundLabel.Font.Charset = DEFAULT_CHARSET
-          BoundLabel.Font.Color = clWindowText
-          BoundLabel.Font.Height = -11
-          BoundLabel.Font.Name = 'Tahoma'
-          BoundLabel.Font.Style = []
-          BoundLabel.Layout = sclLeft
-          BoundLabel.MaxWidth = 0
-          BoundLabel.UseSkinColor = True
-        end
-        object AlbumEdit: TsEdit
-          Left = 70
-          Top = 36
-          Width = 265
-          Height = 21
-          Anchors = [akLeft, akTop, akRight]
-          Color = 2038810
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = 13417908
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          ParentFont = False
-          TabOrder = 1
-          SkinData.SkinSection = 'EDIT'
-          BoundLabel.Active = True
-          BoundLabel.Caption = 'Album:'
-          BoundLabel.Indent = 0
-          BoundLabel.Font.Charset = DEFAULT_CHARSET
-          BoundLabel.Font.Color = clWindowText
-          BoundLabel.Font.Height = -11
-          BoundLabel.Font.Name = 'Tahoma'
-          BoundLabel.Font.Style = []
-          BoundLabel.Layout = sclLeft
-          BoundLabel.MaxWidth = 0
-          BoundLabel.UseSkinColor = True
-        end
-        object ArtistEdit: TsEdit
-          Left = 70
-          Top = 63
-          Width = 265
-          Height = 21
-          Anchors = [akLeft, akTop, akRight]
-          Color = 2038810
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = 13417908
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          ParentFont = False
-          TabOrder = 2
-          SkinData.SkinSection = 'EDIT'
-          BoundLabel.Active = True
-          BoundLabel.Caption = 'Artist:'
-          BoundLabel.Indent = 0
-          BoundLabel.Font.Charset = DEFAULT_CHARSET
-          BoundLabel.Font.Color = clWindowText
-          BoundLabel.Font.Height = -11
-          BoundLabel.Font.Name = 'Tahoma'
-          BoundLabel.Font.Style = []
-          BoundLabel.Layout = sclLeft
-          BoundLabel.MaxWidth = 0
-          BoundLabel.UseSkinColor = True
-        end
-        object DurationEdit: TsEdit
-          Left = 70
-          Top = 90
-          Width = 265
-          Height = 21
-          Anchors = [akLeft, akTop, akRight]
-          Color = 2038810
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = 13417908
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          ParentFont = False
-          TabOrder = 3
-          SkinData.SkinSection = 'EDIT'
-          BoundLabel.Active = True
-          BoundLabel.Caption = 'Duration:'
-          BoundLabel.Indent = 0
-          BoundLabel.Font.Charset = DEFAULT_CHARSET
-          BoundLabel.Font.Color = clWindowText
-          BoundLabel.Font.Height = -11
-          BoundLabel.Font.Name = 'Tahoma'
-          BoundLabel.Font.Style = []
-          BoundLabel.Layout = sclLeft
-          BoundLabel.MaxWidth = 0
-          BoundLabel.UseSkinColor = True
-        end
-        object BitrateEdit: TsEdit
-          Left = 70
-          Top = 117
-          Width = 265
-          Height = 21
-          Anchors = [akLeft, akTop, akRight]
-          Color = 2038810
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = 13417908
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          ParentFont = False
-          TabOrder = 4
-          SkinData.SkinSection = 'EDIT'
-          BoundLabel.Active = True
-          BoundLabel.Caption = 'Bitrate:'
-          BoundLabel.Indent = 0
-          BoundLabel.Font.Charset = DEFAULT_CHARSET
-          BoundLabel.Font.Color = clWindowText
-          BoundLabel.Font.Height = -11
-          BoundLabel.Font.Name = 'Tahoma'
-          BoundLabel.Font.Style = []
-          BoundLabel.Layout = sclLeft
-          BoundLabel.MaxWidth = 0
-          BoundLabel.UseSkinColor = True
-        end
-        object SampeRateEdit: TsEdit
-          Left = 70
-          Top = 144
-          Width = 265
-          Height = 21
-          Anchors = [akLeft, akTop, akRight]
-          Color = 2038810
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = 13417908
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          ParentFont = False
-          TabOrder = 5
-          SkinData.SkinSection = 'EDIT'
-          BoundLabel.Active = True
-          BoundLabel.Caption = 'Sampe Rate:'
-          BoundLabel.Indent = 0
-          BoundLabel.Font.Charset = DEFAULT_CHARSET
-          BoundLabel.Font.Color = clWindowText
-          BoundLabel.Font.Height = -11
-          BoundLabel.Font.Name = 'Tahoma'
-          BoundLabel.Font.Style = []
-          BoundLabel.Layout = sclLeft
-          BoundLabel.MaxWidth = 0
-          BoundLabel.UseSkinColor = True
-        end
-        object CodecEdit: TsEdit
-          Left = 70
-          Top = 171
-          Width = 265
-          Height = 21
-          Anchors = [akLeft, akTop, akRight]
-          Color = 2038810
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = 13417908
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          ParentFont = False
-          TabOrder = 6
-          SkinData.SkinSection = 'EDIT'
-          BoundLabel.Active = True
-          BoundLabel.Caption = 'Codec:'
-          BoundLabel.Indent = 0
-          BoundLabel.Font.Charset = DEFAULT_CHARSET
-          BoundLabel.Font.Color = clWindowText
-          BoundLabel.Font.Height = -11
-          BoundLabel.Font.Name = 'Tahoma'
-          BoundLabel.Font.Style = []
-          BoundLabel.Layout = sclLeft
-          BoundLabel.MaxWidth = 0
-          BoundLabel.UseSkinColor = True
-        end
-        object ChannelsEdit: TsEdit
-          Left = 70
-          Top = 198
-          Width = 265
-          Height = 21
-          Anchors = [akLeft, akTop, akRight]
-          Color = 2038810
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = 13417908
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          ParentFont = False
-          TabOrder = 7
-          SkinData.SkinSection = 'EDIT'
-          BoundLabel.Active = True
-          BoundLabel.Caption = 'Channels:'
-          BoundLabel.Indent = 0
-          BoundLabel.Font.Charset = DEFAULT_CHARSET
-          BoundLabel.Font.Color = clWindowText
-          BoundLabel.Font.Height = -11
-          BoundLabel.Font.Name = 'Tahoma'
-          BoundLabel.Font.Style = []
-          BoundLabel.Layout = sclLeft
-          BoundLabel.MaxWidth = 0
-          BoundLabel.UseSkinColor = True
-        end
-      end
       object sTabSheet3: TsTabSheet
         Caption = 'Artist Info'
         SkinData.CustomColor = False
@@ -3010,6 +2824,34 @@ object MainForm: TMainForm
         end
       end
     end
+  end
+  object sTreeView1: TsTreeView
+    Left = 0
+    Top = 83
+    Width = 200
+    Height = 599
+    Align = alLeft
+    Color = 2038810
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = 13417908
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    Indent = 19
+    ParentFont = False
+    ReadOnly = True
+    RowSelect = True
+    TabOrder = 5
+    BoundLabel.Indent = 0
+    BoundLabel.Font.Charset = DEFAULT_CHARSET
+    BoundLabel.Font.Color = clWindowText
+    BoundLabel.Font.Height = -11
+    BoundLabel.Font.Name = 'Tahoma'
+    BoundLabel.Font.Style = []
+    BoundLabel.Layout = sclLeft
+    BoundLabel.MaxWidth = 0
+    BoundLabel.UseSkinColor = True
+    SkinData.SkinSection = 'EDIT'
   end
   object OpenFolder: TJvBrowseForFolderDialog
     Left = 96
@@ -8631,7 +8473,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800640116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800680116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

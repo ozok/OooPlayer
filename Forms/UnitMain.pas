@@ -247,15 +247,6 @@ type
     PlaybackOrderList: TsComboBox;
     sPageControl1: TsPageControl;
     sTabSheet1: TsTabSheet;
-    sTabSheet2: TsTabSheet;
-    TitleEdit: TsEdit;
-    AlbumEdit: TsEdit;
-    ArtistEdit: TsEdit;
-    DurationEdit: TsEdit;
-    BitrateEdit: TsEdit;
-    SampeRateEdit: TsEdit;
-    CodecEdit: TsEdit;
-    ChannelsEdit: TsEdit;
     sWebLabel1: TsWebLabel;
     PrevArtworkBtn: TsBitBtn;
     NextArtworkBtn: TsBitBtn;
@@ -268,6 +259,7 @@ type
     ArtistInfoEdit: TsEdit;
     GetArtistInfoBtn: TsButton;
     BandImage: TsImage;
+    sTreeView1: TsTreeView;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -1134,9 +1126,6 @@ begin
           Columns[0].Caption := 'Title';
           Columns[1].Caption := 'Album';
           Columns[2].Caption := 'Artist';
-          Columns[3].Caption := 'Queue';
-          Columns[4].Caption := 'Duration';
-
         end;
       end;
     1:
@@ -1146,8 +1135,6 @@ begin
           Columns[0].Caption := 'Album';
           Columns[1].Caption := 'Title';
           Columns[2].Caption := 'Artist';
-          Columns[3].Caption := 'Queue';
-          Columns[4].Caption := 'Duration';
         end;
       end;
     2:
@@ -1157,8 +1144,6 @@ begin
           Columns[0].Caption := 'Artist';
           Columns[1].Caption := 'Album';
           Columns[2].Caption := 'Title';
-          Columns[3].Caption := 'Queue';
-          Columns[4].Caption := 'Duration';
         end;
       end;
     3:
@@ -1168,8 +1153,6 @@ begin
           Columns[0].Caption := 'Title';
           Columns[1].Caption := 'Artist';
           Columns[2].Caption := 'Album';
-          Columns[3].Caption := 'Queue';
-          Columns[4].Caption := 'Duration';
         end;
       end;
     4:
@@ -1179,8 +1162,6 @@ begin
           Columns[0].Caption := 'Album';
           Columns[1].Caption := 'Artist';
           Columns[2].Caption := 'Title';
-          Columns[3].Caption := 'Queue';
-          Columns[4].Caption := 'Duration';
         end;
       end;
     5:
@@ -1190,8 +1171,6 @@ begin
           Columns[0].Caption := 'Artist';
           Columns[1].Caption := 'Title';
           Columns[2].Caption := 'Album';
-          Columns[3].Caption := 'Queue';
-          Columns[4].Caption := 'Duration';
         end;
       end;
   end;
@@ -1728,10 +1707,10 @@ end;
 
 procedure TMainForm.FormResize(Sender: TObject);
 begin
-  PlayList.Columns[4].Width := 100;
-  PlayList.Columns[0].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
-  PlayList.Columns[1].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
-  PlayList.Columns[2].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
+//  PlayList.Columns[4].Width := 100;
+//  PlayList.Columns[0].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
+//  PlayList.Columns[1].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
+//  PlayList.Columns[2].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
   QueueList.Columns[0].Width := QueueList.ClientWidth - QueueList.Columns[1].Width;
   StatusBar.Panels[0].Width := StatusBar.ClientWidth - StatusBar.Panels[1].Width;
   RadioList.Columns[0].Width := RadioList.ClientWidth;
@@ -1886,8 +1865,8 @@ begin
   if Length(ArtistInfoEdit.Text) > 0 then
   begin
     FArtistInfo.Stop;
-    FArtistInfo.Artist := ArtistEdit.Text;
-    FArtistInfo.Start(ArtistEdit.Text);
+    FArtistInfo.Artist := ArtistInfoEdit.Text;
+    FArtistInfo.Start(ArtistInfoEdit.Text);
   end;
 end;
 
@@ -2009,14 +1988,6 @@ begin
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
           LyricList.Items.Clear;
-          TitleEdit.Text := '';
-          ArtistEdit.Text := '';
-          AlbumEdit.Text := '';
-          DurationEdit.Text := '';
-          BitrateEdit.Text := '';
-          CodecEdit.Text := '';
-          ChannelsEdit.Text := '';
-          SampeRateEdit.Text := '';
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
         end;
@@ -2043,14 +2014,6 @@ begin
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
           LyricList.Items.Clear;
-          TitleEdit.Text := '';
-          ArtistEdit.Text := '';
-          AlbumEdit.Text := '';
-          DurationEdit.Text := '';
-          BitrateEdit.Text := '';
-          CodecEdit.Text := '';
-          ChannelsEdit.Text := '';
-          SampeRateEdit.Text := '';
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
         end;
@@ -2086,14 +2049,6 @@ begin
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
           LyricList.Items.Clear;
-          TitleEdit.Text := '';
-          ArtistEdit.Text := '';
-          AlbumEdit.Text := '';
-          DurationEdit.Text := '';
-          BitrateEdit.Text := '';
-          CodecEdit.Text := '';
-          ChannelsEdit.Text := '';
-          SampeRateEdit.Text := '';
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
         end;
@@ -2133,14 +2088,6 @@ begin
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
           LyricList.Items.Clear;
-          TitleEdit.Text := '';
-          ArtistEdit.Text := '';
-          AlbumEdit.Text := '';
-          DurationEdit.Text := '';
-          BitrateEdit.Text := '';
-          CodecEdit.Text := '';
-          ChannelsEdit.Text := '';
-          SampeRateEdit.Text := '';
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
         end;
@@ -2534,6 +2481,19 @@ begin
       Splitter1.Visible := QueueList.Visible;
       LSkinIndex := SettingsFile.ReadInteger('settings', 'skin2', 33);
       CoverPanel.Height := SettingsFile.ReadInteger('settings', 'coverheight', 182);
+
+      with PlayList do
+      begin
+        Columns[0].Width := ReadInteger('columns', '1', 200);
+        Columns[1].Width := ReadInteger('columns', '2', 200);
+        Columns[2].Width := ReadInteger('columns', '3', 200);
+        Columns[3].Width := ReadInteger('columns', '4', 150);
+        Columns[4].Width := ReadInteger('columns', '5', 150);
+        Columns[5].Width := ReadInteger('columns', '6', 150);
+        Columns[6].Width := ReadInteger('columns', '7', 150);
+        Columns[7].Width := ReadInteger('columns', '8', 50);
+        Columns[8].Width := ReadInteger('columns', '9', 100);
+      end;
     end;
   finally
     SettingsFile.Free;
@@ -3411,15 +3371,16 @@ begin
         // fill file info tab
         with FPlaylists[FSelectedPlaylistIndex][FCurrentItemInfo.ItemIndex] do
         begin
-          TitleEdit.Text := Title;
-          ArtistEdit.Text := Artist;
-          ArtistInfoEdit.Text := Artist;
-          AlbumEdit.Text := Album;
-          DurationEdit.Text := DurationStr;
-          BitrateEdit.Text := Bitrate;
-          CodecEdit.Text := Codec;
-          ChannelsEdit.Text := Channels;
-          SampeRateEdit.Text := SampleRate;
+        // todo: status bar
+//          TitleEdit.Text := Title;
+//          ArtistEdit.Text := Artist;
+//          ArtistInfoEdit.Text := Artist;
+//          AlbumEdit.Text := Album;
+//          DurationEdit.Text := DurationStr;
+//          BitrateEdit.Text := Bitrate;
+//          CodecEdit.Text := Codec;
+//          ChannelsEdit.Text := Channels;
+//          SampeRateEdit.Text := SampleRate;
         end;
 
         // position to default
@@ -3516,8 +3477,8 @@ begin
         end;
         // get artist info
         FArtistInfo.Stop;
-        FArtistInfo.Artist := ArtistEdit.Text;
-        FArtistInfo.Start(ArtistEdit.Text);
+        FArtistInfo.Artist := ArtistInfoEdit.Text;
+        FArtistInfo.Start(ArtistInfoEdit.Text);
         Self.Enabled := False;
         SaveSettings;
         Sleep(100);
@@ -3649,6 +3610,13 @@ begin
               Item.SubItems.Add(Album);
             end;
           end;
+      end;
+      with FPlaylists[FSelectedPlaylistIndex][Item.Index] do
+      begin
+        Item.SubItems.Add(Bitrate);
+        Item.SubItems.Add(SampleRate+ ' Hz');
+        Item.SubItems.Add(Channels);
+        Item.SubItems.Add(Codec);
       end;
       if FQueuedItems.Contains(Item.Index) then
       begin
@@ -3786,14 +3754,6 @@ begin
   FAlbumLabel := '';
   PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
   LyricList.Items.Clear;
-  TitleEdit.Text := '';
-  ArtistEdit.Text := '';
-  AlbumEdit.Text := '';
-  DurationEdit.Text := '';
-  BitrateEdit.Text := '';
-  CodecEdit.Text := '';
-  ChannelsEdit.Text := '';
-  SampeRateEdit.Text := '';
   Taskbar.ProgressMaxValue := MaxInt;
   Taskbar.ProgressValue := 0;
   UpdateOverlayIcon(3);
@@ -3937,15 +3897,6 @@ begin
     begin
       PositionTimer.Enabled := False;
       ProgressTimer.Enabled := PositionTimer.Enabled;
-
-      TitleEdit.Text := '';
-      ArtistEdit.Text := '';
-      AlbumEdit.Text := '';
-      DurationEdit.Text := '';
-      BitrateEdit.Text := '';
-      CodecEdit.Text := '';
-      ChannelsEdit.Text := '';
-      SampeRateEdit.Text := '';
     end;
   end;
 end;
@@ -4263,15 +4214,6 @@ end;
 
 procedure TMainForm.RadioResetUI;
 begin
-  TitleEdit.Text := '';
-  ArtistEdit.Text := '';
-  AlbumEdit.Text := '';
-  DurationEdit.Text := '';
-  BitrateEdit.Text := '';
-  CodecEdit.Text := '';
-  ChannelsEdit.Text := '';
-  SampeRateEdit.Text := '';
-  TitleLabel.Caption := '';
   FTitleLabel := TitleLabel.Caption;
   FArtistLabel := '';
   FAlbumLabel := '';
@@ -4829,6 +4771,19 @@ begin
       WriteBool('player', 'lyricvisible', LyricPanel.Visible);
       WriteBool('player', 'queuevisible', QueueList.Visible);
       WriteInteger('settings', 'coverheight', CoverPanel.Height);
+
+      with PlayList do
+      begin
+        WriteInteger('columns', '1', Columns[0].Width);
+        WriteInteger('columns', '2', Columns[1].Width);
+        WriteInteger('columns', '3', Columns[2].Width);
+        WriteInteger('columns', '4', Columns[3].Width);
+        WriteInteger('columns', '5', Columns[4].Width);
+        WriteInteger('columns', '6', Columns[5].Width);
+        WriteInteger('columns', '7', Columns[6].Width);
+        WriteInteger('columns', '8', Columns[7].Width);
+        WriteInteger('columns', '9', Columns[8].Width);
+      end;
     end;
   finally
     SettingsFile.Free;
@@ -4889,10 +4844,10 @@ end;
 
 procedure TMainForm.Splitter2Moved(Sender: TObject);
 begin
-  PlayList.Columns[4].Width := 100;
-  PlayList.Columns[0].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
-  PlayList.Columns[1].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
-  PlayList.Columns[2].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
+//  PlayList.Columns[4].Width := 100;
+//  PlayList.Columns[0].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
+//  PlayList.Columns[1].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
+//  PlayList.Columns[2].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
   QueueList.Columns[0].Width := QueueList.ClientWidth - QueueList.Columns[1].Width;
   StatusBar.Panels[0].Width := StatusBar.ClientWidth - StatusBar.Panels[1].Width;
   RadioList.Columns[0].Width := RadioList.ClientWidth - 20;
@@ -4991,14 +4946,6 @@ begin
   FAlbumLabel := '';
   PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
   LyricList.Items.Clear;
-  TitleEdit.Text := '';
-  ArtistEdit.Text := '';
-  AlbumEdit.Text := '';
-  DurationEdit.Text := '';
-  BitrateEdit.Text := '';
-  CodecEdit.Text := '';
-  ChannelsEdit.Text := '';
-  SampeRateEdit.Text := '';
   Taskbar.ProgressMaxValue := MaxInt;
   Taskbar.ProgressValue := 0;
   UpdateOverlayIcon(3);
@@ -5244,14 +5191,6 @@ begin
         begin
           Log('Reset ui');
           TitleLabel.Caption := 'Connecting...';
-          TitleEdit.Text := '';
-          ArtistEdit.Text := '';
-          AlbumEdit.Text := '';
-          DurationEdit.Text := '';
-          BitrateEdit.Text := '';
-          CodecEdit.Text := '';
-          ChannelsEdit.Text := '';
-          SampeRateEdit.Text := '';
           TitleLabel.Caption := '';
           FTitleLabel := TitleLabel.Caption;
           FArtistLabel := '';

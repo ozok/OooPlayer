@@ -286,8 +286,16 @@ begin
 
   end;
 
-  GetPageAsString(FArtist);
-  FThread.Synchronize(UpdateMainUI);
+  try
+    GetPageAsString(FArtist);
+  except
+
+  end;
+  try
+    FThread.Synchronize(UpdateMainUI);
+  except
+
+  end;
 
   try
     FThread.Terminate;
