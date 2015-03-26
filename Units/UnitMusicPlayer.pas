@@ -48,10 +48,8 @@ type
     FTAKPluginHandle: Cardinal;
     FMixHandle: HSTREAM;
     FPosition: int64;
-    FLevels: Cardinal;
     FFXHandle: Cardinal;
     FEQParams: array [0 .. 17] of HFX;
-    FLevelCounter: integer;
 
     function GetBassStreamStatus: TPlayerStatus;
     function GetTotalLength(): int64;
@@ -141,16 +139,16 @@ begin
                 if PlayList.ItemIndex > -1 then
                 begin
                   // if not last played item selected
-                  if PlayList.ItemIndex <> FCurrentItemInfo.ItemIndex then
+                  if PlayList.ItemIndex <> FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex then
                   begin
                     PlayItem(PlayList.ItemIndex);
                   end
                   else
                   begin
                     // if last played item selected then try next item
-                    if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
+                    if FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex + 1 < PlayList.Items.Count then
                     begin
-                      PlayItem(FCurrentItemInfo.ItemIndex + 1);
+                      PlayItem(FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex + 1);
                     end
                     else
                     begin
@@ -161,18 +159,18 @@ begin
                 else
                 begin
                   // play next item
-                  if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
+                  if FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex + 1 < PlayList.Items.Count then
                   begin
-                    PlayItem(FCurrentItemInfo.ItemIndex + 1);
+                    PlayItem(FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex + 1);
                   end;
                 end;
               end
               else
               begin
                 // ignore selection and try next song
-                if FCurrentItemInfo.ItemIndex + 1 < PlayList.Items.Count then
+                if FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex + 1 < PlayList.Items.Count then
                 begin
-                  PlayItem(FCurrentItemInfo.ItemIndex + 1);
+                  PlayItem(FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex + 1);
                 end;
               end;
             end;
@@ -206,9 +204,9 @@ begin
             PositionTimer.Enabled := False;
             ProgressTimer.Enabled := PositionTimer.Enabled;
             try
-              if (FCurrentItemInfo.ItemIndex > -1) and (FCurrentItemInfo.ItemIndex < PlayList.Items.Count) then
+              if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
               begin
-                PlayItem(FCurrentItemInfo.ItemIndex);
+                PlayItem(FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex);
               end;
             finally
               PositionTimer.Enabled := True;
@@ -344,13 +342,6 @@ begin
   begin
     Result := BASS_ChannelGetPosition(FBassHandle, BASS_POS_BYTE);
     FPosition := Result;
-    Inc(FLevelCounter);
-    // if FLevelCounter > 10 then
-    // begin
-    // FLevels := BASS_ChannelGetLevel(FBassHandle);
-    // SendMessage(WinHandle, WM_INFO_UPDATE, UPDATE_LEVEL, FLevels);
-    // FLevelCounter := 0;
-    // end;
   end;
 end;
 

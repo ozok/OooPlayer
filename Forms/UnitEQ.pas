@@ -153,7 +153,7 @@ end;
 procedure TEQForm.FormShow(Sender: TObject);
 begin
   Self.Color := MainForm.Color;
-  EQPresetsList.Color := MainForm.PlaylistList.Color;
+  EQPresetsList.Color := MainForm.PlaylistView.Color;
 end;
 
 procedure TEQForm.LoadSettings;
