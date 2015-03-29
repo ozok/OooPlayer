@@ -47,7 +47,8 @@ uses
   UnitImageResize in 'Units\UnitImageResize.pas',
   UnitArtworkReader in 'Units\UnitArtworkReader.pas',
   UnitEQ in 'Forms\UnitEQ.pas' {EQForm} ,
-  UnitArtworkInfo in 'Units\UnitArtworkInfo.pas';
+  UnitArtworkInfo in 'Units\UnitArtworkInfo.pas',
+  UnitLastFMToolLauncher in 'Units\UnitLastFMToolLauncher.pas';
 
 {$R *.res}
 

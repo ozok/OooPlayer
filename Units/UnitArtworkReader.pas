@@ -300,8 +300,6 @@ begin
 end;
 
 function TArtworkReader.LoadInternalCoverArt(const FileName: string): Boolean;
-var
-  LImageFile: string;
 begin
   Result := False;
   if not FBusy then

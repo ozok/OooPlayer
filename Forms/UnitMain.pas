@@ -39,7 +39,7 @@ uses
   sSplitter, sSkinProvider, acProgressBar, sTrackBar, acImage, acPNG,
   acAlphaHints, acAlphaImageList, sButton, Vcl.AppEvnts,
   acShellCtrls, sComboBoxes, sTreeView, sListBox, System.Types,
-  sEdit, sGauge;
+  sEdit, sGauge, UnitLastFMToolLauncher;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -258,6 +258,7 @@ type
     RadiosView: TsTreeView;
     sSplitter2: TsSplitter;
     PositionBar: TsGauge;
+    LastFMLaunchTimer: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -377,6 +378,7 @@ type
     procedure PlaylistViewChange(Sender: TObject; Node: TTreeNode);
     procedure TitleLabelMouseEnter(Sender: TObject);
     procedure RadiosViewChange(Sender: TObject; Node: TTreeNode);
+    procedure LastFMLaunchTimerTimer(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -396,6 +398,8 @@ type
     FLastActivePlaylistIndex: integer;
     FCurrentRadioCatName: string;
     FCurrentRadioCatIndex: integer;
+    FLastFMToolLauncher: TLastFMToolLauncher;
+    FLastFMLaunchCounter: integer;
 
     procedure AddFile(const FileName: string);
     procedure ReScanFile(const FileIndex: integer);
@@ -424,6 +428,8 @@ type
     procedure UpdateOverlayIcon(const Index: integer);
 
     procedure ChangeSkin(const SkinIndex: integer);
+
+    procedure LastFMScrobble;
   public
     { Public declarations }
     // encoder paths
@@ -1679,6 +1685,8 @@ begin
   FExternalArtworkFiles := TStringList.Create;
   FuncPages.Pages[0].TabVisible := False;
   FuncPages.Pages[1].TabVisible := False;
+  FLastFMToolLauncher := TLastFMToolLauncher.Create;
+
   LRadios := TStringList.Create;
   try
     if FileExists(ExtractFileDir(Application.ExeName) + '\radios.txt') then
@@ -1722,6 +1730,7 @@ begin
   FArtworkReader.Free;
   FPlayListFiles.Free;
   FExternalArtworkFiles.Free;
+  FLastFMToolLauncher.Free;
 end;
 
 procedure TMainForm.FormResize(Sender: TObject);
@@ -2190,6 +2199,52 @@ begin
   end;
 end;
 
+procedure TMainForm.LastFMLaunchTimerTimer(Sender: TObject);
+begin
+  if FPlayer.PlayerStatus2 = psPlaying then
+  begin
+    Inc(FLastFMLaunchCounter);
+    if FLastFMLaunchCounter >= 30 then
+    begin
+      LastFMLaunchTimer.Enabled := False;
+      LastFMScrobble;
+    end;
+  end;
+end;
+
+procedure TMainForm.LastFMScrobble;
+var
+  LSettingsFile: TStringList;
+  LArtist, LTitle: string;
+begin
+  if SettingsForm.LastFMEnableBtn.Checked then
+  begin
+    LSettingsFile := TStringList.Create;
+    try
+      if (Length(SettingsForm.LastFMUser) > 0) or (Length(SettingsForm.LastFMHashedPass) > 0) then
+      begin
+        LArtist := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist.Trim;
+        LTitle := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title.Trim;
+        if (Length(LArtist) > 0) and (Length(LTitle) > 0) then
+        begin
+          LSettingsFile.Add(SettingsForm.LastFMUser);
+          LSettingsFile.Add(SettingsForm.LastFMHashedPass);
+          LSettingsFile.Add(LArtist);
+          LSettingsFile.Add(LTitle);
+
+          LSettingsFile.SaveToFile(FAppDataFolder + '\lastfm.txt');
+
+          FLastFMToolLauncher.Stop;
+          FLastFMToolLauncher.Start('" " "' + LSettingsFile[0] + '" "' + LSettingsFile[1].Trim + '" "' + LArtist + '" "' + LTitle + '"',
+          ExtractFileDir(Application.ExeName) + '\lastfmscrobble\lastfmscrobble.exe');
+        end;
+      end;
+    finally
+      LSettingsFile.Free;
+    end;
+  end;
+end;
+
 procedure TMainForm.LoadM3UPlaylist(const PlaylistPath: string);
 var
   LStreamReader: TStreamReader;
@@ -2497,7 +2552,10 @@ begin
       PlaybackOrderList.ItemIndex := ReadInteger('player', 'order', 0);
       FLastDir := ReadString('player', 'lastdir', SysInfo.Folders.Personal);
       FCurrentRadioCatIndex := ReadInteger('radio', 'cat', 0);
-      RadiosView.Items[ReadInteger('radio', 'cat', 0)+1].Selected := True;
+      if (ReadInteger('radio', 'cat', 0) + 1) < RadiosView.Items.Count then
+      begin
+        RadiosView.Items[ReadInteger('radio', 'cat', 0) + 1].Selected := True;
+      end;
       FuncPages.ActivePageIndex := ReadInteger('general', 'func', 0);
       FCurrentRadioIndex := ReadInteger('radio', 'curr', -1);
       QueueList.Height := ReadInteger('ui', 'queueh', 120);
@@ -2532,7 +2590,7 @@ begin
     end;
   finally
     SettingsFile.Free;
-    if LSkinIndex > 0 then
+    if (LSkinIndex > 0) and (LSkinIndex < 111) then
     begin
       MainForm.sSkinManager1.BeginUpdate;
       ChangeSkin(LSkinIndex - 1);
@@ -3490,6 +3548,12 @@ begin
           // default cover
           LImageFile := ExtractFileDir(Application.ExeName) + '\logo.png';
           CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
+        end;
+
+        if SettingsForm.LastFMEnableBtn.Checked then
+        begin
+          FLastFMLaunchCounter := 0;
+          LastFMLaunchTimer.Enabled := True;
         end;
 
         // load/download lyrics

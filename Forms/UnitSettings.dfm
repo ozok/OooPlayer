@@ -27,7 +27,7 @@ object SettingsForm: TSettingsForm
     Top = 8
     Width = 544
     Height = 278
-    ActivePage = TabSheet1
+    ActivePage = sTabSheet2
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     SkinData.SkinSection = 'PAGECONTROL'
@@ -35,10 +35,6 @@ object SettingsForm: TSettingsForm
       Caption = 'General'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object CheckUpdateBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -143,10 +139,6 @@ object SettingsForm: TSettingsForm
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object PlayCursorBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -207,10 +199,6 @@ object SettingsForm: TSettingsForm
       ImageIndex = 2
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LoadArtBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -269,10 +257,6 @@ object SettingsForm: TSettingsForm
       ParentFont = False
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LyricBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -305,13 +289,9 @@ object SettingsForm: TSettingsForm
       end
     end
     object sTabSheet1: TsTabSheet
-      Caption = 'Skin'
+      Caption = 'Look'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object SkinsList: TsComboBox
         Left = 46
         Top = 16
@@ -344,6 +324,85 @@ object SettingsForm: TSettingsForm
         OnChange = SkinsListChange
       end
     end
+    object sTabSheet2: TsTabSheet
+      Caption = 'Last.fm'
+      SkinData.CustomColor = False
+      SkinData.CustomFont = False
+      object LastFMUserEdit: TsEdit
+        Left = 80
+        Top = 41
+        Width = 121
+        Height = 21
+        Color = 2038810
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 13417908
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+        SkinData.SkinSection = 'EDIT'
+        BoundLabel.Active = True
+        BoundLabel.Caption = 'User name:'
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+      end
+      object LastFMPassEdit: TsEdit
+        Left = 80
+        Top = 68
+        Width = 121
+        Height = 21
+        Color = 2038810
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 13417908
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        PasswordChar = '*'
+        TabOrder = 1
+        SkinData.SkinSection = 'EDIT'
+        BoundLabel.Active = True
+        BoundLabel.Caption = 'Password:'
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+      end
+      object LastFMSaveBtn: TsButton
+        Left = 207
+        Top = 41
+        Width = 75
+        Height = 48
+        Caption = 'Save'
+        TabOrder = 2
+        OnClick = LastFMSaveBtnClick
+        SkinData.SkinSection = 'BUTTON'
+      end
+      object LastFMEnableBtn: TsCheckBox
+        Left = 16
+        Top = 16
+        Width = 147
+        Height = 19
+        Caption = 'Enable last.fm scrobbling'
+        TabOrder = 3
+        SkinData.SkinSection = 'CHECKBOX'
+        ImgChecked = 0
+        ImgUnchecked = 0
+      end
+    end
   end
   object Button1: TsButton
     Left = 477
@@ -364,8 +423,8 @@ object SettingsForm: TSettingsForm
     ProxyAddresses = 'proxyserver'
     ProxyIgnoreList = '<local>'
     OnDoneStream = UpdateCheckerDoneStream
-    Left = 460
-    Top = 78
+    Left = 52
+    Top = 190
   end
   object UpdateThread: TJvThread
     Exclusive = True
@@ -373,8 +432,8 @@ object SettingsForm: TSettingsForm
     RunOnCreate = True
     FreeOnTerminate = True
     OnExecute = UpdateThreadExecute
-    Left = 380
-    Top = 46
+    Left = 132
+    Top = 198
   end
   object sSkinProvider1: TsSkinProvider
     AddedTitle.Font.Charset = DEFAULT_CHARSET
@@ -384,7 +443,7 @@ object SettingsForm: TSettingsForm
     AddedTitle.Font.Style = []
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
-    Left = 368
-    Top = 104
+    Left = 224
+    Top = 200
   end
 end

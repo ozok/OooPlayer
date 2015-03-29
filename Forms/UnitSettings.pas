@@ -27,7 +27,7 @@ uses
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
   Vcl.ComCtrls, IniFiles, Vcl.Mask, JvExMask, JvSpin, JvThread, JvComponentBase,
   JvUrlListGrabber, JvUrlGrabbers, ShellAPI, sComboBox, sLabel, sButton,
-  sCheckBox, sPageControl, sSkinProvider, sEdit, sSpinEdit;
+  sCheckBox, sPageControl, sSkinProvider, sEdit, sSpinEdit, IdGlobal, IdHash, IdHashMessageDigest;
 
 type
   TSettingsForm = class(TForm)
@@ -53,6 +53,11 @@ type
     BufferEdit: TsSpinEdit;
     PlaylistItemTextList: TsComboBox;
     WindowTitleList: TsComboBox;
+    sTabSheet2: TsTabSheet;
+    LastFMUserEdit: TsEdit;
+    LastFMPassEdit: TsEdit;
+    LastFMSaveBtn: TsButton;
+    LastFMEnableBtn: TsCheckBox;
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LoadArtBtnClick(Sender: TObject);
@@ -64,11 +69,15 @@ type
     procedure SkinsListChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure PlaylistItemTextListChange(Sender: TObject);
+    procedure LastFMSaveBtnClick(Sender: TObject);
   private
     { Private declarations }
     procedure GetAllSkins;
   public
     { Public declarations }
+    LastFMUser: string;
+    LastFMHashedPass: string;
+
     procedure LoadSettings;
     procedure SaveSettings;
   end;
@@ -124,6 +133,37 @@ begin
   end;
 end;
 
+procedure TSettingsForm.LastFMSaveBtnClick(Sender: TObject);
+var
+  LMD5: TIdHashMessageDigest5;
+  LSettingsFile: TIniFile;
+begin
+  if (Length(LastFMUserEdit.Text) > 0) and (Length(LastFMPassEdit.Text) > 0) then
+  begin
+    LMD5 := TIdHashMessageDigest5.Create;
+    try
+      LSettingsFile := TIniFile.Create(MainForm.FAppDataFolder + '\lastfm.ini');
+      try
+        LSettingsFile.WriteString('general', 'user', LastFMUserEdit.Text);
+        LSettingsFile.WriteString('general', 'pass', LMD5.HashStringAsHex(UTF8Encode(LastFMPassEdit.Text)).ToLower);
+        LastFMPassEdit.Text := LMD5.HashStringAsHex(UTF8Encode(LastFMPassEdit.Text)).ToLower;
+
+        LastFMUser := LastFMUserEdit.Text;
+        LastFMHashedPass := LastFMPassEdit.Text;
+      finally
+        LSettingsFile.Free;
+      end;
+    finally
+      LMD5.Free;
+    end;
+    Application.MessageBox('Your last.fm user name and hashed password is saved.', 'Info', MB_ICONINFORMATION);
+  end
+  else
+  begin
+    Application.MessageBox('Please enter your user name and password.', 'Error', MB_ICONERROR);
+  end;
+end;
+
 procedure TSettingsForm.LoadArtBtnClick(Sender: TObject);
 begin
   CoverArtList.Enabled := LoadArtBtn.Checked;
@@ -148,11 +188,22 @@ begin
       SkinsList.ItemIndex := SettingsFile.ReadInteger('settings', 'skin2', 33);
       WindowTitleList.ItemIndex := SettingsFile.ReadInteger('settings', 'windowtitle', 0);
       PlaylistItemTextList.ItemIndex := SettingsFile.ReadInteger('settings', 'playlistitemtext', 2);
+      LastFMEnableBtn.Checked := SettingsFile.ReadBool('settings', 'lastfm', True);
     end;
   finally
     SettingsFile.Free;
     LoadArtBtnClick(Self);
     SkinsListChange(Self);
+  end;
+  SettingsFile := TIniFile.Create(MainForm.FAppDataFolder + '\lastfm.ini');
+  try
+    LastFMUserEdit.Text := SettingsFile.ReadString('general', 'user', '');
+    LastFMPassEdit.Text := SettingsFile.ReadString('general', 'pass', '');
+
+    LastFMUser := LastFMUserEdit.Text;
+    LastFMHashedPass := LastFMPassEdit.Text;
+  finally
+    SettingsFile.Free;
   end;
 end;
 
@@ -181,6 +232,7 @@ begin
       SettingsFile.WriteInteger('settings', 'skin2', SkinsList.ItemIndex);
       SettingsFile.WriteInteger('settings', 'windowtitle', WindowTitleList.ItemIndex);
       SettingsFile.WriteInteger('settings', 'playlistitemtext', PlaylistItemTextList.ItemIndex);
+      SettingsFile.WriteBool('settings', 'lastfm', LastFMEnableBtn.Checked);
     end;
   finally
     SettingsFile.Free;

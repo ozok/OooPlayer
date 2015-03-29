@@ -5,6 +5,7 @@
 -Added: [Music Player] Added index info to playlist names list
 -Fixed: [Music Player] Lyric list's width was not adjusted according to the content
 -Fixed: [Music Player] Queue list right-click menu options were not working
+-Updated: Bassmix to 2.4.8
 
 --2.1.2
 -Added: [General] Many skins (over 100)

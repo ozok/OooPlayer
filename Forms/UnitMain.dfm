@@ -146,9 +146,6 @@ object MainForm: TMainForm
         TabOrder = 0
         OnMouseLeave = FuncPagesMouseLeave
         SkinData.SkinSection = 'PANEL'
-        ExplicitLeft = 1
-        ExplicitTop = 55
-        ExplicitWidth = 1196
         object PositionLabel: TsLabel
           AlignWithMargins = True
           Left = 1013
@@ -167,7 +164,6 @@ object MainForm: TMainForm
           Font.Height = -12
           Font.Name = 'Tahoma'
           Font.Style = [fsBold]
-          ExplicitLeft = 1011
           ExplicitHeight = 14
         end
         object PositionBar: TsGauge
@@ -202,39 +198,33 @@ object MainForm: TMainForm
         BevelOuter = bvNone
         TabOrder = 1
         SkinData.SkinSection = 'TRANSPARENT'
-        ExplicitLeft = 1
-        ExplicitTop = 1
-        ExplicitWidth = 1196
-        ExplicitHeight = 54
         object InfoPanel: TsPanel
-          Left = 250
+          Left = 280
           Top = 0
-          Width = 630
+          Width = 589
           Height = 56
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
           SkinData.SkinSection = 'PANEL'
-          ExplicitLeft = 253
-          ExplicitTop = 1
-          ExplicitWidth = 624
-          ExplicitHeight = 52
+          ExplicitLeft = 250
+          ExplicitWidth = 630
           object sPanel4: TsPanel
             Left = 0
             Top = 0
-            Width = 630
+            Width = 589
             Height = 56
             Align = alClient
             BevelOuter = bvNone
             TabOrder = 0
             SkinData.SkinSection = 'TRANSPARENT'
-            ExplicitWidth = 624
-            ExplicitHeight = 52
+            ExplicitWidth = 630
             object TitleLabel: TsLabelFX
-              Left = 0
-              Top = 0
-              Width = 630
-              Height = 56
+              AlignWithMargins = True
+              Left = 6
+              Top = 6
+              Width = 577
+              Height = 50
               Hint = 'Title - Album - Artist'
               Margins.Left = 6
               Margins.Top = 6
@@ -265,7 +255,7 @@ object MainForm: TMainForm
         object sPanel2: TsPanel
           Left = 0
           Top = 0
-          Width = 250
+          Width = 280
           Height = 56
           Align = alLeft
           AutoSize = True
@@ -273,10 +263,11 @@ object MainForm: TMainForm
           TabOrder = 1
           SkinData.SkinSection = 'TRANSPARENT'
           object NextBtn: TsBitBtn
-            Left = 200
-            Top = 0
+            AlignWithMargins = True
+            Left = 227
+            Top = 3
             Width = 50
-            Height = 56
+            Height = 50
             Hint = 'Next'
             Align = alLeft
             Glyph.Data = {
@@ -414,16 +405,15 @@ object MainForm: TMainForm
             OnClick = NextBtnClick
             OnMouseEnter = NextBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
-            SkinData.SkinSection = 'TOOLBUTTON'
-            ExplicitLeft = 201
-            ExplicitTop = 1
-            ExplicitHeight = 50
+            SkinData.SkinSection = 'BUTTON'
+            ExplicitLeft = 265
           end
           object PauseBtn: TsBitBtn
-            Left = 100
-            Top = 0
+            AlignWithMargins = True
+            Left = 115
+            Top = 3
             Width = 50
-            Height = 56
+            Height = 50
             Hint = 'Pause'
             Align = alLeft
             Glyph.Data = {
@@ -561,16 +551,15 @@ object MainForm: TMainForm
             OnClick = PauseBtnClick
             OnMouseEnter = PauseBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
-            SkinData.SkinSection = 'TOOLBUTTON'
-            ExplicitLeft = 101
-            ExplicitTop = 1
-            ExplicitHeight = 50
+            SkinData.SkinSection = 'BUTTON'
+            ExplicitLeft = 137
           end
           object PlayBtn: TsBitBtn
-            Left = 0
-            Top = 0
+            AlignWithMargins = True
+            Left = 3
+            Top = 3
             Width = 50
-            Height = 56
+            Height = 50
             Hint = 'Play'
             Align = alLeft
             Glyph.Data = {
@@ -708,16 +697,14 @@ object MainForm: TMainForm
             OnClick = PlayBtnClick
             OnMouseEnter = PlayBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
-            SkinData.SkinSection = 'TOOLBUTTON'
-            ExplicitLeft = 1
-            ExplicitTop = 1
-            ExplicitHeight = 50
+            SkinData.SkinSection = 'BUTTON'
           end
           object PrevBtn: TsBitBtn
-            Left = 150
-            Top = 0
+            AlignWithMargins = True
+            Left = 171
+            Top = 3
             Width = 50
-            Height = 56
+            Height = 50
             Hint = 'Previous'
             Align = alLeft
             Glyph.Data = {
@@ -855,16 +842,15 @@ object MainForm: TMainForm
             OnClick = PrevBtnClick
             OnMouseEnter = PrevBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
-            SkinData.SkinSection = 'TOOLBUTTON'
-            ExplicitLeft = 151
-            ExplicitTop = 1
-            ExplicitHeight = 50
+            SkinData.SkinSection = 'BUTTON'
+            ExplicitLeft = 187
           end
           object StopBtn: TsBitBtn
-            Left = 50
-            Top = 0
+            AlignWithMargins = True
+            Left = 59
+            Top = 3
             Width = 50
-            Height = 56
+            Height = 50
             Hint = 'Stop'
             Align = alLeft
             Glyph.Data = {
@@ -1002,32 +988,27 @@ object MainForm: TMainForm
             OnClick = StopBtnClick
             OnMouseEnter = StopBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
-            SkinData.SkinSection = 'TOOLBUTTON'
-            ExplicitLeft = 51
-            ExplicitTop = 1
-            ExplicitHeight = 50
+            SkinData.SkinSection = 'BUTTON'
           end
         end
         object sPanel3: TsPanel
-          Left = 880
+          Left = 869
           Top = 0
-          Width = 318
+          Width = 329
           Height = 56
           Align = alRight
           BevelOuter = bvNone
           TabOrder = 2
           SkinData.SkinSection = 'TRANSPARENT'
-          ExplicitLeft = 877
-          ExplicitTop = 1
-          ExplicitHeight = 52
           DesignSize = (
-            318
+            329
             56)
           object LogsBtn: TsBitBtn
-            Left = 268
-            Top = 0
+            AlignWithMargins = True
+            Left = 276
+            Top = 3
             Width = 50
-            Height = 56
+            Height = 50
             Hint = 'Logs'
             Align = alRight
             Glyph.Data = {
@@ -1101,16 +1082,17 @@ object MainForm: TMainForm
             OnClick = L2Click
             OnMouseEnter = LogsBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
-            SkinData.SkinSection = 'TOOLBUTTON'
-            ExplicitLeft = 267
-            ExplicitTop = 1
-            ExplicitHeight = 50
+            SkinData.SkinSection = 'BUTTON'
+            ExplicitLeft = 268
+            ExplicitTop = 0
+            ExplicitHeight = 56
           end
           object EQBtn: TsBitBtn
-            Left = 118
-            Top = 0
+            AlignWithMargins = True
+            Left = 108
+            Top = 3
             Width = 50
-            Height = 56
+            Height = 50
             Hint = 'Equalizer Settings'
             Align = alRight
             Glyph.Data = {
@@ -1180,17 +1162,18 @@ object MainForm: TMainForm
             TabOrder = 1
             OnClick = EQBtnClick
             OnMouseEnter = EQBtnMouseEnter
-            SkinData.SkinSection = 'TOOLBUTTON'
+            SkinData.SkinSection = 'BUTTON'
             ShowCaption = False
-            ExplicitLeft = 117
-            ExplicitTop = 1
-            ExplicitHeight = 50
+            ExplicitLeft = 118
+            ExplicitTop = 0
+            ExplicitHeight = 56
           end
           object SearchBtn: TsBitBtn
-            Left = 168
-            Top = 0
+            AlignWithMargins = True
+            Left = 164
+            Top = 3
             Width = 50
-            Height = 56
+            Height = 50
             Hint = 'Search'
             Align = alRight
             Glyph.Data = {
@@ -1328,16 +1311,17 @@ object MainForm: TMainForm
             OnClick = S2Click
             OnMouseEnter = SearchBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
-            SkinData.SkinSection = 'TOOLBUTTON'
-            ExplicitLeft = 167
-            ExplicitTop = 1
-            ExplicitHeight = 50
+            SkinData.SkinSection = 'BUTTON'
+            ExplicitLeft = 168
+            ExplicitTop = 0
+            ExplicitHeight = 56
           end
           object SettingsBtn: TsBitBtn
-            Left = 218
-            Top = 0
+            AlignWithMargins = True
+            Left = 220
+            Top = 3
             Width = 50
-            Height = 56
+            Height = 50
             Hint = 'Settings'
             Align = alRight
             Glyph.Data = {
@@ -1475,14 +1459,15 @@ object MainForm: TMainForm
             OnClick = G1Click
             OnMouseEnter = SettingsBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
-            SkinData.SkinSection = 'TOOLBUTTON'
-            ExplicitLeft = 217
-            ExplicitTop = 1
-            ExplicitHeight = 50
+            SkinData.SkinSection = 'BUTTON'
+            ExplicitLeft = 218
+            ExplicitTop = 0
+            ExplicitHeight = 56
           end
           object PlaybackOrderList: TsComboBox
-            Left = 10
-            Top = 15
+            AlignWithMargins = True
+            Left = 1
+            Top = 17
             Width = 101
             Height = 21
             Hint = 'Playback order'
@@ -1632,6 +1617,7 @@ object MainForm: TMainForm
         BoundLabel.MaxWidth = 0
         BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'EDIT'
+        OnMouseEnter = PlayListMouseEnter
         Align = alClient
         BorderStyle = bsNone
         Color = 2038810
@@ -1666,11 +1652,17 @@ object MainForm: TMainForm
             Caption = 'Duration'
           end>
         DragMode = dmAutomatic
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 13417908
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
         HideSelection = False
         MultiSelect = True
         OwnerData = True
         ReadOnly = True
         RowSelect = True
+        ParentFont = False
         PopupMenu = PlayListMenu
         StateImages = PlayBackImgs
         TabOrder = 0
@@ -8071,8 +8063,8 @@ object MainForm: TMainForm
     Enabled = False
     Interval = 50
     OnTimer = PositionTimerTimer
-    Left = 360
-    Top = 280
+    Left = 312
+    Top = 288
   end
   object RadioThread: TIdThreadComponent
     Active = False
@@ -8128,8 +8120,8 @@ object MainForm: TMainForm
     Enabled = False
     Interval = 500
     OnTimer = ProgressTimerTimer
-    Left = 424
-    Top = 280
+    Left = 392
+    Top = 288
   end
   object Taskbar: TTaskbar
     TaskBarButtons = <
@@ -8344,7 +8336,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800700116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800780116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -10086,5 +10078,11 @@ object MainForm: TMainForm
     object R6: TMenuItem
       Caption = 'Rename selected list'
     end
+  end
+  object LastFMLaunchTimer: TTimer
+    Enabled = False
+    OnTimer = LastFMLaunchTimerTimer
+    Left = 392
+    Top = 224
   end
 end
