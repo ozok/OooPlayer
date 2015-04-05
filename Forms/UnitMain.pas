@@ -259,6 +259,7 @@ type
     sSplitter2: TsSplitter;
     PositionBar: TsGauge;
     LastFMLaunchTimer: TTimer;
+    InfoLabel: TsLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -379,6 +380,7 @@ type
     procedure TitleLabelMouseEnter(Sender: TObject);
     procedure RadiosViewChange(Sender: TObject; Node: TTreeNode);
     procedure LastFMLaunchTimerTimer(Sender: TObject);
+    procedure CategoryPagesResize(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -929,6 +931,7 @@ begin
       PlaylistView.Items.AddChild(LPlaylistsNode, (i + 1).ToString + '. ' + FPlayListFiles[i].Name);
     end;
     FSelectedPlaylistIndex := FPlayListFiles.Count - 1;
+    LPlaylistsNode.Expand(True);
 
     LPlaylist := TPlaylist.Create;
     FPlaylists.Add(LPlaylist);
@@ -1123,6 +1126,13 @@ begin
     QueueList.Items.Clear;
     // PlayList.Invalidate;
   end;
+end;
+
+procedure TMainForm.CategoryPagesResize(Sender: TObject);
+begin
+  AddPlaylistBtn.Width := (PlaylistListPanel.Width - 18) div 3;
+  RemovePlaylistBtn.Width := (PlaylistListPanel.Width - 18) div 3;
+  RenamePlaylistBtn.Width := (PlaylistListPanel.Width - 18) div 3;
 end;
 
 procedure TMainForm.ChangePlaylistColumnNames;
@@ -1669,7 +1679,7 @@ begin
   FPng := TPngImage.Create;
   FJpeg := TJPEGImage.Create;
   FRadioStations := TRadioList.Create;
-  PositionBar.MaxValue := High(int64);
+  PositionBar.MaxValue := MAXINT;
   FLyricDownloader := TLyricDownloader.Create(FAppDataFolder + '\lyric\');
   FQueuedItems := TList<Integer>.Create;
   FPageHasntChangedYet := True;
@@ -2552,9 +2562,9 @@ begin
       PlaybackOrderList.ItemIndex := ReadInteger('player', 'order', 0);
       FLastDir := ReadString('player', 'lastdir', SysInfo.Folders.Personal);
       FCurrentRadioCatIndex := ReadInteger('radio', 'cat', 0);
-      if (ReadInteger('radio', 'cat', 0) + 1) < RadiosView.Items.Count then
+      if (ReadInteger('radio', 'cat', 0)) < RadiosView.Items.Count then
       begin
-        RadiosView.Items[ReadInteger('radio', 'cat', 0) + 1].Selected := True;
+        RadiosView.Items[ReadInteger('radio', 'cat', 0)].Selected := True;
       end;
       FuncPages.ActivePageIndex := ReadInteger('general', 'func', 0);
       FCurrentRadioIndex := ReadInteger('radio', 'curr', -1);
@@ -2952,6 +2962,7 @@ begin
       FPlayer.Pause;
       PositionTimer.Enabled := False;
       ProgressTimer.Enabled := PositionTimer.Enabled;
+      InfoLabel.Caption := 'Paused | ' + FCurrentItemInfo.InfoStr;
 
       Taskbar.ProgressState := TTaskBarProgressState.Paused;
       UpdateOverlayIcon(2);
@@ -2962,6 +2973,7 @@ begin
       FPlayer.SetVolume(100 - VolumeBar.Position);
       PositionTimer.Enabled := True;
       ProgressTimer.Enabled := PositionTimer.Enabled;
+      InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
       Taskbar.ProgressState := TTaskBarProgressState.Normal;
       UpdateOverlayIcon(1);
@@ -3024,6 +3036,7 @@ begin
       FPlayer.SetVolume(100 - VolumeBar.Position);
       PositionTimer.Enabled := True;
       ProgressTimer.Enabled := PositionTimer.Enabled;
+      InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
       Taskbar.ProgressState := TTaskBarProgressState.Normal;
       UpdateOverlayIcon(1);
@@ -3102,7 +3115,7 @@ begin
               PlayItem(LRndIndex);
               PlayItemUIUpdate;
             end;
-          2: // repear track
+          2: // repeat track
             begin
               PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
@@ -3220,6 +3233,7 @@ begin
             FPlayer.SetVolume(100 - VolumeBar.Position);
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+      InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
             Taskbar.ProgressState := TTaskBarProgressState.Normal;
             UpdateOverlayIcon(1);
@@ -3423,8 +3437,8 @@ begin
       FPlayer.FileName := FCurrentItemInfo.FullFileName;
       FPlayer.Play;
       FCurrentItemInfo.DurationBass := FPlayer.TotalLength;
-      PositionBar.MaxValue := FCurrentItemInfo.DurationBass;
-      Taskbar.ProgressMaxValue := FCurrentItemInfo.DurationBass;
+      PositionBar.MaxValue := MaxInt;
+      Taskbar.ProgressMaxValue := MaxInt;
       FCurrentItemInfo.DurationAsSecInt := FPlayer.DurationAsSec;
       FPlayer.SetVolume(100 - VolumeBar.Position);
       FStoppedByUser := False;
@@ -3493,16 +3507,8 @@ begin
         // fill file info tab
         with FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex] do
         begin
-          // todo: status bar
-          // TitleEdit.Text := Title;
-          // ArtistEdit.Text := Artist;
-          // ArtistInfoEdit.Text := Artist;
-          // AlbumEdit.Text := Album;
-          // DurationEdit.Text := DurationStr;
-          // BitrateEdit.Text := Bitrate;
-          // CodecEdit.Text := Codec;
-          // ChannelsEdit.Text := Channels;
-          // SampeRateEdit.Text := SampleRate;
+          FCurrentItemInfo.InfoStr :=  Bitrate + ' | ' + Channels + ' | ' + Codec + ' | ' + SampleRate + ' | ' + LPlayCountStr;
+          InfoLabel.Caption := 'Playing | ' +  FCurrentItemInfo.InfoStr;
         end;
 
         // position to default
@@ -3740,6 +3746,7 @@ begin
       end;
       with FPlaylists[FSelectedPlaylistIndex][Item.Index] do
       begin
+        Item.SubItems.Add(DurationStr);
         Item.SubItems.Add(Bitrate);
         Item.SubItems.Add(SampleRate + ' Hz');
         Item.SubItems.Add(Channels);
@@ -3753,7 +3760,6 @@ begin
       begin
         Item.SubItems.Add('')
       end;
-      Item.SubItems.Add(FPlaylists[FSelectedPlaylistIndex][Item.Index].DurationStr);
     end;
   end;
 end;
@@ -3865,6 +3871,7 @@ begin
   // PlayList.Invalidate;
   PositionTimer.Enabled := False;
   ProgressTimer.Enabled := PositionTimer.Enabled;
+  InfoLabel.Caption := '';
 
   FPlaybackType := radio;
   RadioConnectionBar.Visible := True;
@@ -3982,11 +3989,11 @@ end;
 
 procedure TMainForm.PositionTimerTimer(Sender: TObject);
 var
-  LPosition: Int64;
+  LPosition: Integer;
 begin
   if FPlayer.PlayerStatus2 = psPlaying then
   begin
-    LPosition := FPlayer.Position;
+    LPosition := (MaxInt * FPlayer.Position) div FCurrentItemInfo.DurationBass;
     if LPosition > PositionBar.Progress then
     begin
       PositionBar.Progress := LPosition;
@@ -5110,6 +5117,7 @@ begin
   FArtistLabel := '';
   FAlbumLabel := '';
   PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
+      InfoLabel.Caption := 'Stopped' ;
   LyricList.Items.Clear;
   Taskbar.ProgressMaxValue := High(Int64);
   Taskbar.ProgressValue := 0;

@@ -20,6 +20,8 @@ type
     Label6: TsLabel;
     sSkinProvider1: TsSkinProvider;
     sLabelFX1: TsLabelFX;
+    sLabel1: TsLabel;
+    sLabel2: TsLabel;
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure Button2Click(Sender: TObject);
@@ -28,6 +30,8 @@ type
     procedure Label6Click(Sender: TObject);
     procedure Label5Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure sLabel1Click(Sender: TObject);
+    procedure sLabel2Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -82,6 +86,16 @@ end;
 procedure TAboutForm.Label6Click(Sender: TObject);
 begin
   ShellExecute(Handle, 'open', 'http://mediaarea.net/en/MediaInfo', nil, nil, SW_NORMAL);
+end;
+
+procedure TAboutForm.sLabel1Click(Sender: TObject);
+begin
+  ShellExecute(Handle, 'open', 'https://github.com/pylast/pylast', nil, nil, SW_NORMAL);
+end;
+
+procedure TAboutForm.sLabel2Click(Sender: TObject);
+begin
+  ShellExecute(Handle, 'open', 'http://www.alphaskins.com/index.php', nil, nil, SW_NORMAL);
 end;
 
 end.

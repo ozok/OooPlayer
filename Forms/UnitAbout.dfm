@@ -3,7 +3,7 @@ object AboutForm: TAboutForm
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'About OooPlayer'
-  ClientHeight = 192
+  ClientHeight = 219
   ClientWidth = 304
   Color = 3485741
   DoubleBuffered = True
@@ -18,7 +18,7 @@ object AboutForm: TAboutForm
   OnShow = FormShow
   DesignSize = (
     304
-    192)
+    219)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TsLabel
@@ -243,7 +243,7 @@ object AboutForm: TAboutForm
   end
   object sLabelFX1: TsLabelFX
     Left = 0
-    Top = 134
+    Top = 160
     Width = 304
     Height = 19
     Align = alTop
@@ -252,11 +252,49 @@ object AboutForm: TAboutForm
     Angle = 0
     Shadow.OffsetKeeper.LeftTop = -2
     Shadow.OffsetKeeper.RightBottom = 4
+    ExplicitTop = 134
     ExplicitWidth = 299
+  end
+  object sLabel1: TsLabel
+    Left = 0
+    Top = 147
+    Width = 304
+    Height = 13
+    Cursor = crHandPoint
+    Align = alTop
+    Alignment = taCenter
+    Caption = 'pylast'
+    ParentFont = False
+    OnClick = sLabel1Click
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsUnderline]
+    ExplicitTop = 134
+    ExplicitWidth = 29
+  end
+  object sLabel2: TsLabel
+    Left = 0
+    Top = 134
+    Width = 304
+    Height = 13
+    Cursor = crHandPoint
+    Align = alTop
+    Alignment = taCenter
+    Caption = 'alphaskins'
+    ParentFont = False
+    OnClick = sLabel2Click
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsUnderline]
+    ExplicitWidth = 49
   end
   object Button1: TsButton
     Left = 221
-    Top = 159
+    Top = 186
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -264,11 +302,11 @@ object AboutForm: TAboutForm
     TabOrder = 0
     OnClick = Button1Click
     SkinData.SkinSection = 'BUTTON'
-    ExplicitLeft = 212
+    ExplicitTop = 159
   end
   object Button2: TsButton
     Left = 8
-    Top = 159
+    Top = 186
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -276,6 +314,7 @@ object AboutForm: TAboutForm
     TabOrder = 1
     OnClick = Button2Click
     SkinData.SkinSection = 'BUTTON'
+    ExplicitTop = 159
   end
   object sSkinProvider1: TsSkinProvider
     AddedTitle.Font.Charset = DEFAULT_CHARSET
@@ -285,7 +324,7 @@ object AboutForm: TAboutForm
     AddedTitle.Font.Style = []
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
-    Left = 120
+    Left = 16
     Top = 88
   end
 end
