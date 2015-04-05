@@ -396,8 +396,6 @@ type
     FTagWriter: TTagWriter;
     FArtworkReader: TArtworkReader;
     FExternalArtworkFiles: TStringList;
-    FExternalArtworkIndex: integer;
-    FLastActivePlaylistIndex: integer;
     FCurrentRadioCatName: string;
     FCurrentRadioCatIndex: integer;
     FLastFMToolLauncher: TLastFMToolLauncher;
@@ -3507,7 +3505,7 @@ begin
         // fill file info tab
         with FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex] do
         begin
-          FCurrentItemInfo.InfoStr :=  Bitrate + ' | ' + Channels + ' | ' + Codec + ' | ' + SampleRate + ' | ' + LPlayCountStr;
+          FCurrentItemInfo.InfoStr :=  Bitrate + ' | ' + Channels + ' | ' + Codec + ' | ' + SampleRate + ' hz | ' + LPlayCountStr;
           InfoLabel.Caption := 'Playing | ' +  FCurrentItemInfo.InfoStr;
         end;
 
@@ -5304,8 +5302,6 @@ begin
 end;
 
 procedure TMainForm.VolumeBarChange(Sender: TObject);
-var
-  LVolLvl: integer;
 begin
 
   if FPlaybackType = music then
@@ -5324,7 +5320,6 @@ begin
       SetRadioVolume(100 - VolumeBar.Position);
     end;
   end;
-  LVolLvl := 100 - VolumeBar.Position;
 
   StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
 end;
