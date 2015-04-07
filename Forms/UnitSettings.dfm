@@ -27,7 +27,7 @@ object SettingsForm: TSettingsForm
     Top = 8
     Width = 544
     Height = 278
-    ActivePage = sTabSheet2
+    ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     SkinData.SkinSection = 'PAGECONTROL'

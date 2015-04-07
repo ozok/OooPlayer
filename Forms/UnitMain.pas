@@ -381,6 +381,8 @@ type
     procedure RadiosViewChange(Sender: TObject; Node: TTreeNode);
     procedure LastFMLaunchTimerTimer(Sender: TObject);
     procedure CategoryPagesResize(Sender: TObject);
+    procedure LyricPanelResize(Sender: TObject);
+    procedure QueueListData(Sender: TObject; Item: TListItem);
   private
     { Private declarations }
     FLastDir: string;
@@ -400,6 +402,7 @@ type
     FCurrentRadioCatIndex: integer;
     FLastFMToolLauncher: TLastFMToolLauncher;
     FLastFMLaunchCounter: integer;
+    FLastFMArtist, FLastFMSong: string;
 
     procedure AddFile(const FileName: string);
     procedure ReScanFile(const FileIndex: integer);
@@ -439,6 +442,7 @@ type
     FPlayListFiles: TPlaylistFiles;
     FStoppedByUser: Boolean;
     FPlaylists: TList<TPlaylist>;
+    FQueueLists: TList<TQueueList>;
     FRadioStations: TRadioList;
     FCurrentItemInfo: TCurrentItemInfo;
     FTagReader: TTagReader;
@@ -448,7 +452,6 @@ type
     FLyricAlbumStr: string;
     FShuffleIndexes: TList<Integer>;
     FShuffleIndex: Integer;
-    FQueuedItems: TList<Integer>;
     PortableMode: Boolean;
     ArtworkFileName: string;
     FSelectedPlaylistIndex: integer;
@@ -612,15 +615,14 @@ begin
     if PlayList.Items[i].Selected then
     begin
       // add if not already in the queue
-      if not FQueuedItems.Contains(i) then
+      if not FQueueLists[FSelectedPlaylistIndex].Contains(i) then
       begin
         // add to queue list
-        FQueuedItems.Add(i);
+        FQueueLists[FSelectedPlaylistIndex].Add(i);
         // PlayList.Invalidate;
         // add to queue list
-        LItem := QueueList.Items.Add;
-        LItem.Caption := FPlaylists[FSelectedPlaylistIndex][i].Artist + ' - ' + FPlaylists[FSelectedPlaylistIndex][i].Album + ' - ' + FPlaylists[FSelectedPlaylistIndex][i].Title;
-        LItem.SubItems.Add(FPlaylists[FSelectedPlaylistIndex][i].DurationStr);
+        QueueList.Items.Count := FQueueLists[FSelectedPlaylistIndex].Count;
+        QueueList.Invalidate;
       end;
     end;
   end;
@@ -1098,8 +1100,9 @@ begin
   begin
     FPlaylists[FSelectedPlaylistIndex][i].Free;
   end;
-  FQueuedItems.Clear;
-  QueueList.Items.Clear;
+  FQueueLists[FSelectedPlaylistIndex].Clear;
+  QueueList.Items.Count := 0;
+  QueueList.Invalidate;
   FPlaylists[FSelectedPlaylistIndex].Clear;
   PlayList.Items.Count := 0;
   FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex := -1;
@@ -1120,8 +1123,9 @@ begin
   if QueueList.Items.Count > 0 then
   begin
     // delete it from lists
-    FQueuedItems.Clear;
+    FQueueLists[FSelectedPlaylistIndex].Clear;
     QueueList.Items.Clear;
+    QueueList.Invalidate;
     // PlayList.Invalidate;
   end;
 end;
@@ -1667,6 +1671,7 @@ begin
   ForceDirectories(FAppDataFolder + '\lyric\');
 
   FPlaylists := TList<TPlaylist>.Create;
+  FQueueLists := TList<TQueueList>.Create;
 
   FCurrentRadioIndex := -1;
   FStoppedByUser := False;
@@ -1677,9 +1682,8 @@ begin
   FPng := TPngImage.Create;
   FJpeg := TJPEGImage.Create;
   FRadioStations := TRadioList.Create;
-  PositionBar.MaxValue := MAXINT;
+  PositionBar.MaxValue := MaxInt;
   FLyricDownloader := TLyricDownloader.Create(FAppDataFolder + '\lyric\');
-  FQueuedItems := TList<Integer>.Create;
   FPageHasntChangedYet := True;
   PortableMode := Portable;
   FTagWriter := TTagWriter.Create;
@@ -1725,6 +1729,10 @@ begin
     end;
     FPlaylists[i].Free;
   end;
+  for I := 0 to FQueueLists.Count - 1 do
+  begin
+    FQueueLists[i].Free;
+  end;
   FPlaylists.Free;
   FShuffleIndexes.Free;
   FTagReader.Free;
@@ -1733,7 +1741,6 @@ begin
   FRadioStations.Free;
   BASS_Free;
   FLyricDownloader.Free;
-  FQueuedItems.Free;
   FTagWriter.Free;
   FArtworkReader.Free;
   FPlayListFiles.Free;
@@ -1949,12 +1956,12 @@ begin
         if PlayList.Items.Count > 0 then
         begin
           // first try queue
-          if FQueuedItems.Count > 0 then
+          if FQueueLists[FSelectedPlaylistIndex].Count > 0 then
           begin
             // delete it from lists
-            FQueuedItems.Delete(0);
+            FQueueLists[FSelectedPlaylistIndex].Delete(0);
             QueueList.Items.Delete(0);
-            // PlayList.Invalidate;
+            QueueList.Invalidate;
           end
           else
           begin
@@ -2221,34 +2228,17 @@ begin
 end;
 
 procedure TMainForm.LastFMScrobble;
-var
-  LSettingsFile: TStringList;
-  LArtist, LTitle: string;
 begin
   if SettingsForm.LastFMEnableBtn.Checked then
   begin
-    LSettingsFile := TStringList.Create;
-    try
-      if (Length(SettingsForm.LastFMUser) > 0) or (Length(SettingsForm.LastFMHashedPass) > 0) then
+    if (Length(SettingsForm.LastFMUser) > 0) or (Length(SettingsForm.LastFMHashedPass) > 0) then
+    begin
+      if (Length(FLastFMArtist) > 0) and (Length(FLastFMSong) > 0) then
       begin
-        LArtist := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist.Trim;
-        LTitle := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title.Trim;
-        if (Length(LArtist) > 0) and (Length(LTitle) > 0) then
-        begin
-          LSettingsFile.Add(SettingsForm.LastFMUser);
-          LSettingsFile.Add(SettingsForm.LastFMHashedPass);
-          LSettingsFile.Add(LArtist);
-          LSettingsFile.Add(LTitle);
-
-          LSettingsFile.SaveToFile(FAppDataFolder + '\lastfm.txt');
-
-          FLastFMToolLauncher.Stop;
-          FLastFMToolLauncher.Start('" " "' + LSettingsFile[0] + '" "' + LSettingsFile[1].Trim + '" "' + LArtist + '" "' + LTitle + '"',
+        FLastFMToolLauncher.Stop;
+        FLastFMToolLauncher.Start('" " "' + SettingsForm.LastFMUser.Trim + '" "' + SettingsForm.LastFMHashedPass + '" "' + FLastFMArtist + '" "' + FLastFMSong + '"',
           ExtractFileDir(Application.ExeName) + '\lastfmscrobble\lastfmscrobble.exe');
-        end;
       end;
-    finally
-      LSettingsFile.Free;
     end;
   end;
 end;
@@ -2291,6 +2281,7 @@ var
   LPlaylist: TPlaylist;
   LPlaylistNode: TTreeNode;
   LNewNode: TTreeNode;
+  LQueueList: TQueueList;
 begin
   // load playlists.
   // if playlists file doesnt exists, create it.
@@ -2376,6 +2367,7 @@ begin
       LStreamReader := TStreamReader.Create(FPlayListFiles[i].PlaylistFile, True);
       LSpltLst := TStringList.Create;
       LPlaylist := TPlaylist.Create;
+      LQueueList := TQueueList.Create;
       try
         LSpltLst.Delimiter := '|';
         LSpltLst.StrictDelimiter := True;
@@ -2414,14 +2406,23 @@ begin
               end;
             end;
             LPlaylist.Add(LPlayListItem);
+          end
+          else if LSpltLst.Count = 1 then
+          begin
+            if LSpltLst[0].StartsWith('#') then
+            begin
+              LQueueList.Add(LSpltLst[0].Replace('#', '').Trim.ToInteger());
+            end;
           end;
         end;
       finally
         FPlaylists.Add(LPlaylist);
+        FQueueLists.Add(LQueueList);
         LStreamReader.Close;
         LStreamReader.Free;
         LSpltLst.Free;
         PlayList.Items.Count := FPlaylists[i].Count;
+        QueueList.Items.Count := FQueueLists[i].Count;
       end;
     end
     else
@@ -2631,6 +2632,11 @@ begin
     Self.FocusControl(VolumeBar);
 end;
 
+procedure TMainForm.LyricPanelResize(Sender: TObject);
+begin
+  UpdateLyricBoxWidth;
+end;
+
 procedure TMainForm.LyricSearchBtnClick(Sender: TObject);
 begin
   if not FStopAddFiles then
@@ -2762,14 +2768,15 @@ begin
           ProgressTimer.Enabled := PositionTimer.Enabled;
 
           // first try queue
-          if FQueuedItems.Count > 0 then
+          if FQueueLists[FSelectedPlaylistIndex].Count > 0 then
           begin
             // play first item in the queue list
-            PlayItem(FQueuedItems[0]);
+            PlayItem(FQueueLists[FSelectedPlaylistIndex][0]);
             PlayItemUIUpdate;
             // remove item from queue
-            FQueuedItems.Delete(0);
-            QueueList.Items.Delete(0);
+            FQueueLists[FSelectedPlaylistIndex].Delete(0);
+            QueueList.Items.Count := FQueueLists[FSelectedPlaylistIndex].Count;
+            QueueList.Invalidate;
             // PlayList.Invalidate;
           end
           else
@@ -2907,6 +2914,9 @@ begin
 end;
 
 procedure TMainForm.PlaylistViewChange(Sender: TObject; Node: TTreeNode);
+var
+  I: Integer;
+  LItem: TListItem;
 begin
   if Assigned(Node) then
   begin
@@ -2917,11 +2927,12 @@ begin
       FCurrentItemInfo.FullFileName := '';
       FShuffleIndexes.Clear;
       FShuffleIndex := -1;
-      FQueuedItems.Clear;
-      QueueList.Items.Clear;
       PlayList.Items.Count := 0;
+      QueueList.Items.Count := 0;
       FSelectedPlaylistIndex := Node.AbsoluteIndex - 1;
       PlayList.Items.Count := FPlaylists[FSelectedPlaylistIndex].Count;
+      QueueList.Items.Count := FQueueLists[FSelectedPlaylistIndex].Count;
+      QueueList.Invalidate;
       GenerateShuffleList;
       FShuffleIndex := -1;
       PlayList.Repaint;
@@ -2929,10 +2940,6 @@ begin
       StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
       ScrollToCurrentSong;
       FuncPages.ActivePageIndex := 0;
-    end
-    else if Node.AbsoluteIndex = 0 then
-    begin
-      // music root
     end;
   end;
 end;
@@ -2942,11 +2949,12 @@ begin
   if QueueList.ItemIndex > -1 then
   begin
     // play selected item
-    PlayItem(FQueuedItems[QueueList.ItemIndex]);
+    PlayItem(FQueueLists[FSelectedPlaylistIndex][QueueList.ItemIndex]);
     PlayItemUIUpdate;
     // delete it from lists
-    FQueuedItems.Delete(QueueList.ItemIndex);
-    QueueList.Items.Delete(QueueList.ItemIndex);
+    FQueueLists[FSelectedPlaylistIndex].Delete(QueueList.ItemIndex);
+    QueueList.Items.Count := FQueueLists[FSelectedPlaylistIndex].Count;
+    QueueList.Invalidate;
     // PlayList.Invalidate;
   end;
 end;
@@ -3231,7 +3239,7 @@ begin
             FPlayer.SetVolume(100 - VolumeBar.Position);
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
-      InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
+            InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
             Taskbar.ProgressState := TTaskBarProgressState.Normal;
             UpdateOverlayIcon(1);
@@ -3505,8 +3513,8 @@ begin
         // fill file info tab
         with FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex] do
         begin
-          FCurrentItemInfo.InfoStr :=  Bitrate + ' | ' + Channels + ' | ' + Codec + ' | ' + SampleRate + ' hz | ' + LPlayCountStr;
-          InfoLabel.Caption := 'Playing | ' +  FCurrentItemInfo.InfoStr;
+          FCurrentItemInfo.InfoStr := Bitrate + ' | ' + Channels + ' | ' + Codec + ' | ' + SampleRate + ' hz | ' + LPlayCountStr;
+          InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
         end;
 
         // position to default
@@ -3531,6 +3539,8 @@ begin
           end;
           FAlbumLabel := Album;
           FArtistLabel := Artist;
+          FLastFMArtist := Artist;
+          FLastFMSong := Title;
           PlayCount := PlayCount + 1;
         end;
         // jump to current song
@@ -3750,7 +3760,7 @@ begin
         Item.SubItems.Add(Channels);
         Item.SubItems.Add(Codec);
       end;
-      if FQueuedItems.Contains(Item.Index) then
+      if FQueueLists[FSelectedPlaylistIndex].Contains(Item.Index) then
       begin
         Item.SubItems.Add('Q')
       end
@@ -3788,7 +3798,7 @@ begin
     end;
     if FDraggedQueueItemIndex > -1 then
     begin
-      FQueuedItems[FDraggedQueueItemIndex] := Item.Index;
+      FQueueLists[FSelectedPlaylistIndex][FDraggedQueueItemIndex] := Item.Index;
     end;
     PlayList.Items[TMyDragObject(Source).ItemIndex].Selected := True;
     PlayList.Items[Item.Index].Selected := False;
@@ -3833,9 +3843,9 @@ begin
     TMyDragObject(DragObject).ItemIndex := Item.Index;
     FDraggingCurrentFile := Item.Index = FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex;
     FDraggedQueueItemIndex := -1;
-    for I := 0 to FQueuedItems.Count - 1 do
+    for I := 0 to FQueueLists[FSelectedPlaylistIndex].Count - 1 do
     begin
-      if FQueuedItems[i] = Item.Index then
+      if FQueueLists[FSelectedPlaylistIndex][i] = Item.Index then
       begin
         FDraggedQueueItemIndex := I;
         Break;
@@ -4112,16 +4122,27 @@ begin
   end;
 end;
 
+procedure TMainForm.QueueListData(Sender: TObject; Item: TListItem);
+begin
+  if Item.Index < FQueueLists[FSelectedPlaylistIndex].Count then
+  begin
+    Item.Caption := FPlaylists[FSelectedPlaylistIndex][FQueueLists[FSelectedPlaylistIndex][Item.Index]].Artist + ' - ' + FPlaylists[FSelectedPlaylistIndex]
+      [FQueueLists[FSelectedPlaylistIndex][Item.Index]].Album + ' - ' + FPlaylists[FSelectedPlaylistIndex][FQueueLists[FSelectedPlaylistIndex][Item.Index]].Title;
+    Item.SubItems.Add(FPlaylists[FSelectedPlaylistIndex][FQueueLists[FSelectedPlaylistIndex][Item.Index]].DurationStr);
+  end;
+end;
+
 procedure TMainForm.QueueListDblClick(Sender: TObject);
 begin
   if QueueList.ItemIndex > -1 then
   begin
     // play selected item
-    PlayItem(FQueuedItems[QueueList.ItemIndex]);
+    PlayItem(FQueueLists[FSelectedPlaylistIndex][QueueList.ItemIndex]);
     PlayItemUIUpdate;
     // delete it from lists
-    FQueuedItems.Delete(QueueList.ItemIndex);
-    QueueList.Items.Delete(QueueList.ItemIndex);
+    FQueueLists[FSelectedPlaylistIndex].Delete(QueueList.ItemIndex);
+    QueueList.Items.Count := FQueueLists[FSelectedPlaylistIndex].Count;
+    QueueList.Invalidate;
     // PlayList.Invalidate;
   end;
 end;
@@ -4163,27 +4184,28 @@ begin
   begin
     FDeletedQueueIndex := -1;
     // if a queued item is selected to be deleted, store its index to delete it later
-    for I := 0 to FQueuedItems.Count - 1 do
+    for I := 0 to FQueueLists[FSelectedPlaylistIndex].Count - 1 do
     begin
-      if FQueuedItems[i] = PlayList.ItemIndex then
+      if FQueueLists[FSelectedPlaylistIndex][i] = PlayList.ItemIndex then
       begin
         FDeletedQueueIndex := i;
         Break;
       end;
     end;
     // adjust queue items
-    for I := 0 to FQueuedItems.Count - 1 do
+    for I := 0 to FQueueLists[FSelectedPlaylistIndex].Count - 1 do
     begin
       // if queued item is below the deleted item then decrease it's index by 1
-      if FQueuedItems[i] > PlayList.ItemIndex then
+      if FQueueLists[FSelectedPlaylistIndex][i] > PlayList.ItemIndex then
       begin
-        FQueuedItems[i] := FQueuedItems[i] - 1;
+        FQueueLists[FSelectedPlaylistIndex][i] := FQueueLists[FSelectedPlaylistIndex][i] - 1;
       end;
     end;
     if FDeletedQueueIndex > -1 then
     begin
-      FQueuedItems.Delete(FDeletedQueueIndex);
-      QueueList.Items.Delete(FDeletedQueueIndex);
+      FQueueLists[FSelectedPlaylistIndex].Delete(FDeletedQueueIndex);
+      QueueList.Items.Count := FQueueLists[FSelectedPlaylistIndex].Count;
+      QueueList.Invalidate;
     end;
     PlayList.Items[PlayList.ItemIndex].Delete;
     FPlaylists[FSelectedPlaylistIndex].Delete(PlayList.ItemIndex);
@@ -4248,8 +4270,9 @@ begin
   if QueueList.ItemIndex > -1 then
   begin
     // delete it from lists
-    FQueuedItems.Delete(QueueList.ItemIndex);
-    QueueList.Items.Delete(QueueList.ItemIndex);
+    FQueueLists[FSelectedPlaylistIndex].Delete(QueueList.ItemIndex);
+    QueueList.Items.Count := FQueueLists[FSelectedPlaylistIndex].Count;
+    QueueList.Invalidate;
     // PlayList.Invalidate;
   end;
 end;
@@ -4876,6 +4899,7 @@ begin
     begin
       DeleteFile(FPlayListFiles[j].PlaylistFile)
     end;
+
     // create a playlist file for each playlist
     LStreamWriter := TStreamWriter.Create(FPlayListFiles[j].PlaylistFile, False, TEncoding.UTF8);
     try
@@ -4886,6 +4910,10 @@ begin
           LStreamWriter.WriteLine(FullFileName + '|' + Artist + '|' + Album + '|' + Title + '|' + DurationStr + '|' + Bitrate + '|' + Channels + '|' + Codec + '|' + SampleRate + '|' +
             FloatToStr(PlayCount) + '|' + FloatToStr(Stars));
         end;
+      end;
+      for I := 0 to FQueueLists[j].Count - 1 do
+      begin
+        LStreamWriter.WriteLine('#' + FQueueLists[j][i].ToString());
       end;
     finally
       LStreamWriter.Close;
@@ -5115,7 +5143,7 @@ begin
   FArtistLabel := '';
   FAlbumLabel := '';
   PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
-      InfoLabel.Caption := 'Stopped' ;
+  InfoLabel.Caption := 'Stopped';
   LyricList.Items.Clear;
   Taskbar.ProgressMaxValue := High(Int64);
   Taskbar.ProgressValue := 0;
@@ -5265,7 +5293,7 @@ begin
     if LIntMaxWidth < LIntWidth then
       LIntMaxWidth := LIntWidth;
   end;
-  SendMessage(LyricList.handle, LB_SETHORIZONTALEXTENT, LIntMaxWidth, 0);
+  SendMessage(LyricList.handle, LB_SETHORIZONTALEXTENT, LIntMaxWidth + 5, 0);
 end;
 
 procedure TMainForm.UpdateOverlayIcon(const Index: integer);

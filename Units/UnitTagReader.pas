@@ -39,6 +39,9 @@ type
     FPicStream: TStream;
     FPicType: TCoverArtType;
     FIsBusy: Boolean;
+
+    function ConvertFrameID2String(FrameID: TFrameID): String;
+    function AtomNameToString(ID: TAtomName): String;
   public
     property PicStream: TStream read FPicStream;
     property PicType: TCoverArtType read FPicType;
@@ -48,6 +51,7 @@ type
     destructor Destroy(); override;
 
     function ReadTags(const FileName: string): TPlayItem;
+    function ReadTags2(const FileName: string): TGeneralTagList;
     procedure ReadArtwork(const FileName: string);
     procedure ClearArtwork;
   end;
@@ -56,9 +60,19 @@ implementation
 
 { TTagReader }
 
+function TTagReader.AtomNameToString(ID: TAtomName): String;
+begin
+  Result := Char(ID[0]) + Char(ID[1]) + Char(ID[2]) + Char(ID[3]);
+end;
+
 procedure TTagReader.ClearArtwork;
 begin
   FPicType := none;
+end;
+
+function TTagReader.ConvertFrameID2String(FrameID: TFrameID): String;
+begin
+  Result := Char(FrameID[0]) + Char(FrameID[1]) + Char(FrameID[2]) + Char(FrameID[3]);
 end;
 
 constructor TTagReader.Create;
@@ -417,6 +431,169 @@ begin
           Title := FWAVTag.ReadFrameByNameAsText('INAM');
           Artist := FWAVTag.ReadFrameByNameAsText('IART');
           Album := FWAVTag.ReadFrameByNameAsText('IPRD');
+        end;
+      end;
+    end;
+  finally
+    FIsBusy := False;
+  end;
+end;
+
+function TTagReader.ReadTags2(const FileName: string): TGeneralTagList;
+var
+  I: Integer;
+  LGeneralTag: TGeneralTag;
+begin
+  FIsBusy := True;
+  try
+    Result := TGeneralTagList.Create;
+    LGeneralTag := TGeneralTag.Create;
+    if FID3v2Tag.LoadFromFile(FileName) = 0 then
+    begin
+      if FID3v2Tag.Loaded then
+      begin
+        for I := 0 to FID3v2Tag.FrameCount - 1 do
+        begin
+          LGeneralTag := TGeneralTag.Create;
+          LGeneralTag.Tag := ConvertFrameID2String(FID3v2Tag.Frames[i].ID);
+          LGeneralTag.Value := FID3v2Tag.GetUnicodeText(ConvertFrameID2String(FID3v2Tag.Frames[i].ID));
+          if (LGeneralTag.Tag <> 'PRIV') and (LGeneralTag.Tag <> 'TXXX') then
+          begin
+            Result.Add(LGeneralTag);
+          end;
+        end;
+      end;
+    end
+    else if FID3v1Tag.LoadFromFile(FileName) = 0 then
+    begin
+      if FID3v1Tag.Loaded then
+      begin
+        LGeneralTag := TGeneralTag.Create;
+        LGeneralTag.Tag := 'Title';
+        LGeneralTag.Value := FID3v1Tag.Title;
+        Result.Add(LGeneralTag);
+        LGeneralTag := TGeneralTag.Create;
+        LGeneralTag.Tag := 'Artist';
+        LGeneralTag.Value := FID3v1Tag.Artist;
+        Result.Add(LGeneralTag);
+        LGeneralTag := TGeneralTag.Create;
+        LGeneralTag.Tag := 'Album';
+        LGeneralTag.Value := FID3v1Tag.Album;
+        Result.Add(LGeneralTag);
+        LGeneralTag := TGeneralTag.Create;
+        LGeneralTag.Tag := 'Comment';
+        LGeneralTag.Value := FID3v1Tag.Comment;
+        Result.Add(LGeneralTag);
+        LGeneralTag := TGeneralTag.Create;
+        LGeneralTag.Tag := 'Genre';
+        LGeneralTag.Value := FID3v1Tag.Genre;
+        Result.Add(LGeneralTag);
+        LGeneralTag := TGeneralTag.Create;
+        LGeneralTag.Tag := 'Track';
+        LGeneralTag.Value := FID3v1Tag.TrackString;
+        Result.Add(LGeneralTag);
+        LGeneralTag := TGeneralTag.Create;
+        LGeneralTag.Tag := 'Year';
+        LGeneralTag.Value := FID3v1Tag.Year;
+        Result.Add(LGeneralTag);
+      end;
+    end
+    else if FMP4Tag.LoadFromFile(FileName) = 0 then
+    begin
+      if FMP4Tag.Loaded then
+      begin
+        for I := 0 to Length(FMP4Tag.Atoms) - 1 do
+        begin
+          LGeneralTag := TGeneralTag.Create;
+          LGeneralTag.Tag := AtomNameToString(FMP4Tag.Atoms[i].ID);
+          LGeneralTag.Value := FMP4Tag.GetText(FMP4Tag.Atoms[i].ID);
+          if LGeneralTag.Tag <> '----' then
+          begin
+            Result.Add(LGeneralTag);
+          end;
+        end;
+      end;
+    end
+    else if FAPETag.LoadFromFile(FileName) = 0 then
+    begin
+      if FAPETag.Loaded then
+      begin
+        for I := 0 to Length(FAPETag.Frames) - 1 do
+        begin
+          if FAPETag.Frames[i].Format = ffApeText then
+          begin
+            LGeneralTag := TGeneralTag.Create;
+            LGeneralTag.Tag := FAPETag.Frames[i].Name;
+            LGeneralTag.Value := FAPETag.ReadFrameByNameAsText(FAPETag.Frames[i].Name);
+            Result.Add(LGeneralTag);
+          end;
+        end;
+      end;
+    end
+    else if FFLACTag.LoadFromFile(FileName) = 0 then
+    begin
+      if FFLACTag.Loaded then
+      begin
+        for I := 0 to Length(FFLACTag.Tags) - 1 do
+        begin
+          if FFLACTag.Tags[i].Format = vcfText then
+          begin
+            LGeneralTag := TGeneralTag.Create;
+            LGeneralTag.Tag := FFLACTag.Tags[i].Name;
+            LGeneralTag.Value := FFLACTag.ReadFrameByNameAsText(FFLACTag.Tags[i].Name);
+            Result.Add(LGeneralTag);
+          end;
+        end;
+      end;
+    end
+    else if FOPUSTag.LoadFromFile(FileName) = 0 then
+    begin
+      if FOPUSTag.Loaded then
+      begin
+        with Result do
+        begin
+          for I := 0 to Length(FOPUSTag.Frames) - 1 do
+          begin
+            if FOPUSTag.Frames[i].Format = otffText then
+            begin
+              LGeneralTag := TGeneralTag.Create;
+              LGeneralTag.Tag := FOPUSTag.Frames[i].Name;
+              LGeneralTag.Value := FOPUSTag.ReadFrameByNameAsText(FOPUSTag.Frames[i].Name);
+              Result.Add(LGeneralTag);
+            end;
+          end;
+        end;
+      end;
+    end
+    else if FWMATag.LoadFromFile(FileName) = 0 then
+    begin
+      if FWMATag.Loaded then
+      begin
+        for I := 0 to Length(FWMATag.Frames) - 1 do
+        begin
+          if FWMATag.Frames[i].Format <> WMT_TYPE_BINARY then
+          begin
+            LGeneralTag := TGeneralTag.Create;
+            LGeneralTag.Tag := FWMATag.Frames[i].Name;
+            LGeneralTag.Value := FWMATag.ReadFrameByNameAsText(FWMATag.Frames[i].Name);
+            Result.Add(LGeneralTag);
+          end;
+        end;
+      end;
+    end
+    else if FWAVTag.LoadFromFile(FileName) = 0 then
+    begin
+      if FWAVTag.Loaded then
+      begin
+        for I := 0 to Length(FWMATag.Frames) - 1 do
+        begin
+          if FWAVTag.Frames[i].Format = ffText then
+          begin
+            LGeneralTag := TGeneralTag.Create;
+            LGeneralTag.Tag := FWAVTag.Frames[i].Name;
+            LGeneralTag.Value := FWAVTag.ReadFrameByNameAsText(FWAVTag.Frames[i].Name);
+            Result.Add(LGeneralTag);
+          end;
         end;
       end;
     end;

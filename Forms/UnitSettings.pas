@@ -198,7 +198,7 @@ begin
   SettingsFile := TIniFile.Create(MainForm.FAppDataFolder + '\lastfm.ini');
   try
     LastFMUserEdit.Text := SettingsFile.ReadString('general', 'user', '');
-    LastFMPassEdit.Text := SettingsFile.ReadString('general', 'pass', '');
+    // LastFMPassEdit.Text := SettingsFile.ReadString('general', 'pass', '');
 
     LastFMUser := LastFMUserEdit.Text;
     LastFMHashedPass := LastFMPassEdit.Text;

@@ -207,8 +207,6 @@ object MainForm: TMainForm
           BevelOuter = bvNone
           TabOrder = 0
           SkinData.SkinSection = 'PANEL'
-          ExplicitLeft = 280
-          ExplicitWidth = 584
           object sPanel4: TsPanel
             Left = 0
             Top = 0
@@ -218,7 +216,6 @@ object MainForm: TMainForm
             BevelOuter = bvNone
             TabOrder = 0
             SkinData.SkinSection = 'TRANSPARENT'
-            ExplicitWidth = 584
             object TitleLabel: TsLabelFX
               AlignWithMargins = True
               Left = 6
@@ -415,9 +412,6 @@ object MainForm: TMainForm
             OnMouseEnter = NextBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitLeft = 227
-            ExplicitTop = 3
-            ExplicitHeight = 50
           end
           object PauseBtn: TsBitBtn
             Left = 100
@@ -562,9 +556,6 @@ object MainForm: TMainForm
             OnMouseEnter = PauseBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitLeft = 115
-            ExplicitTop = 3
-            ExplicitHeight = 50
           end
           object PlayBtn: TsBitBtn
             Left = 0
@@ -709,9 +700,6 @@ object MainForm: TMainForm
             OnMouseEnter = PlayBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitLeft = 3
-            ExplicitTop = 3
-            ExplicitHeight = 50
           end
           object PrevBtn: TsBitBtn
             Left = 150
@@ -856,9 +844,6 @@ object MainForm: TMainForm
             OnMouseEnter = PrevBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitLeft = 171
-            ExplicitTop = 3
-            ExplicitHeight = 50
           end
           object StopBtn: TsBitBtn
             Left = 50
@@ -1003,9 +988,6 @@ object MainForm: TMainForm
             OnMouseEnter = StopBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitLeft = 59
-            ExplicitTop = 3
-            ExplicitHeight = 50
           end
         end
         object sPanel3: TsPanel
@@ -1099,9 +1081,6 @@ object MainForm: TMainForm
             OnMouseEnter = LogsBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitLeft = 281
-            ExplicitTop = 3
-            ExplicitHeight = 50
           end
           object EQBtn: TsBitBtn
             Left = 118
@@ -1179,9 +1158,6 @@ object MainForm: TMainForm
             OnMouseEnter = EQBtnMouseEnter
             SkinData.SkinSection = 'BUTTON'
             ShowCaption = False
-            ExplicitLeft = 113
-            ExplicitTop = 3
-            ExplicitHeight = 50
           end
           object SearchBtn: TsBitBtn
             Left = 168
@@ -1326,9 +1302,6 @@ object MainForm: TMainForm
             OnMouseEnter = SearchBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitLeft = 169
-            ExplicitTop = 3
-            ExplicitHeight = 50
           end
           object SettingsBtn: TsBitBtn
             Left = 218
@@ -1473,9 +1446,6 @@ object MainForm: TMainForm
             OnMouseEnter = SettingsBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitLeft = 225
-            ExplicitTop = 3
-            ExplicitHeight = 50
           end
           object PlaybackOrderList: TsComboBox
             AlignWithMargins = True
@@ -1719,6 +1689,7 @@ object MainForm: TMainForm
         Font.Style = []
         HideSelection = False
         MultiSelect = True
+        OwnerData = True
         ReadOnly = True
         RowSelect = True
         ParentFont = False
@@ -1727,6 +1698,7 @@ object MainForm: TMainForm
         StateImages = PlayBackImgs
         TabOrder = 1
         ViewStyle = vsReport
+        OnData = QueueListData
         OnDblClick = QueueListDblClick
       end
       object ShortcutPanel: TsPanel
@@ -2250,6 +2222,7 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 4
+    OnResize = LyricPanelResize
     SkinData.SkinSection = 'PANEL'
     object sSplitter1: TsSplitter
       Left = 1
@@ -2693,7 +2666,7 @@ object MainForm: TMainForm
       end
     end
     object sTabSheet4: TsTabSheet
-      Caption = 'Radios'
+      Caption = 'Radio'
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
@@ -8350,7 +8323,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C0101050008007C0116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800840116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

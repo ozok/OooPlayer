@@ -1349,7 +1349,7 @@ begin
       end;
       PictureStream.Seek(0, soBeginning);
     except
-      PictureStream.Size := 0;
+
     end;
   end;
   Result := True;

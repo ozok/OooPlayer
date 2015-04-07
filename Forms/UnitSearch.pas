@@ -83,10 +83,10 @@ begin
       with MainForm do
       begin
         // add if not already in the queue
-        if not FQueuedItems.Contains(LItemIndex) then
+        if not FQueueLists[FSelectedPlaylistIndex].Contains(LItemIndex) then
         begin
           // add to queue list
-          FQueuedItems.Add(LItemIndex);
+          FQueueLists[FSelectedPlaylistIndex].Add(LItemIndex);
           PlayList.Invalidate;
           // add to queue list
           LItem := QueueList.Items.Add;

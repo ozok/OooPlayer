@@ -252,7 +252,6 @@ object AboutForm: TAboutForm
     Angle = 0
     Shadow.OffsetKeeper.LeftTop = -2
     Shadow.OffsetKeeper.RightBottom = 4
-    ExplicitTop = 134
     ExplicitWidth = 299
   end
   object sLabel1: TsLabel
@@ -271,7 +270,6 @@ object AboutForm: TAboutForm
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
-    ExplicitTop = 134
     ExplicitWidth = 29
   end
   object sLabel2: TsLabel

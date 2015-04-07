@@ -14,15 +14,15 @@ Features
 ----
 ####OooPlayer aims to be simple and fast. But while keeping it simple, it offers many features:
 * Several playback modes: Normal, Random, Repeat Track, Shuffle
-* Cover art support: OooPlayer can read both embedded and external cover art and display it
-* Fast search: Oooplayer has a very fast search mechanism
-* Gapless playback: Supports gapless playback
-* Multiple playlist support
-* Queue support: Add songs in queue
-* Radio player: Online radio player that has more than 1500 radio stations
-* Radio recorder: You can record radios to mp3, ogg vorbis, aac and opus
-* Lyric downloader: OooPlayer can download lyrics automatically from many sources
-* Clear interface: OooPlayer has a very simple interface that offers sufficient functionality to users
+* OooPlayer can display both embedded and external cover art
+* Oooplayer has a very fast search mechanism
+* Oooplayer supports gapless playback
+* Oooplayer supports multiple playlists
+* Oooplayer has a song queue
+* Oooplayer has an online radio player that has more than 1500 radio stations
+* You can record radios to mp3, ogg vorbis, aac and opus or record without encoding
+* OooPlayer can download lyrics automatically from many sources
+* OooPlayer has a very simple interface that offers sufficient functionality
 
 To-Do
 ---

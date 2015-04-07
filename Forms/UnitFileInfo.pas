@@ -25,7 +25,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, 
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, 
-  Vcl.ComCtrls, MediaInfoDll, sButton, sTreeView, sPageControl, sSkinProvider;
+  Vcl.ComCtrls, MediaInfoDll, sButton, sTreeView, sPageControl, sSkinProvider,
+  sListView, UnitTagReader, UnitTagTypes, Generics.Collections;
 
 type
   TInfoForm = class(TForm)
@@ -34,11 +35,17 @@ type
     Button1: TsButton;
     InfoList: TsTreeView;
     sSkinProvider1: TsSkinProvider;
+    sTabSheet1: TsTabSheet;
+    TagsList: TsListView;
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure TagsListResize(Sender: TObject);
   private
     { Private declarations }
+    FTagReader: TTagReader;
   public
     { Public declarations }
     procedure GetFileInfo(const FileName: string);
@@ -61,6 +68,16 @@ begin
   InfoList.Items.Clear;
 end;
 
+procedure TInfoForm.FormCreate(Sender: TObject);
+begin
+  FTagReader := TTagReader.Create;
+end;
+
+procedure TInfoForm.FormDestroy(Sender: TObject);
+begin
+  FTagReader.Free;
+end;
+
 procedure TInfoForm.FormShow(Sender: TObject);
 begin
   InfoList.Items.Clear;
@@ -78,6 +95,8 @@ var
   Line: string;
   NewNode: TTreeNode;
   LTmpList: TStringList;
+  LTags: TGeneralTagList;
+  LItem: TListItem;
 begin
   if (FileExists(FileName)) then
   begin
@@ -119,11 +138,28 @@ begin
         finally
           MediaInfo_Close(MediaInfoHandle);
         end;
+
+        if not FTagReader.IsBusy then
+        begin
+          LTags := FTagReader.ReadTags2(FileName);
+          TagsList.Items.Clear;
+          for I := 0 to LTags.Count-1 do
+          begin
+            LItem := TagsList.Items.Add;
+            LItem.Caption := LTags[i].Tag;
+            Litem.SubItems.Add(LTags[i].Value);
+          end;
+        end;
       end;
     finally
       LTmpList.Free;
     end;
   end;
+end;
+
+procedure TInfoForm.TagsListResize(Sender: TObject);begin
+  TagsList.Columns[0].Width := 150;
+  TagsList.Columns[1].Width := TagsList.ClientWidth - 170;
 end;
 
 end.

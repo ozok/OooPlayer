@@ -91,7 +91,7 @@ type
   TAPEv2PictureFormat = (pfUnknown, pfJPEG, pfPNG, pfBMP, pfGIF);
 
 type
-  TAPEv2FrameFormat = (ffUnknown, ffText, ffBinary);
+  TAPEv2FrameFormat = (ffUnknown, ffApeText, ffBinary);
 
 type
   TAPEv2Tag = class;
@@ -349,7 +349,7 @@ begin
   Stream.Clear;
   Stream.Write(Bytes[0], Length(Bytes));
   Stream.Seek(0, soBeginning);
-  Format := ffText;
+  Format := ffApeText;
   Result := True;
 end;
 
@@ -390,7 +390,7 @@ begin
     Stream.Write(Data, 1);
   end;
   Stream.Seek(0, soBeginning);
-  Format := ffText;
+  Format := ffApeText;
   Result := True;
 end;
 
@@ -404,7 +404,7 @@ var
 begin
   Result := False;
   List.Clear;
-  if Format <> ffText then
+  if Format <> ffApeText then
   begin
     Exit;
   end;
@@ -781,7 +781,7 @@ begin
                 begin
                   Stream.CopyFrom(TagStream, DataSize);
                 end;
-                Format := ffText;
+                Format := ffApeText;
               end;
             end;
           1:
@@ -1076,7 +1076,7 @@ begin
           end;
         end;
         case Frames[i].Format of
-          ffText:
+          ffApeText:
             begin
               FrameFlags := 0;
             end;
@@ -1237,7 +1237,7 @@ begin
   end
   else
   begin
-    if Frames[i].Format = ffText then
+    if Frames[i].Format = ffApeText then
     begin
       Result := Frames[i].GetAsText;
     end;
@@ -1262,7 +1262,7 @@ begin
   end
   else
   begin
-    if Frames[i].Format = ffText then
+    if Frames[i].Format = ffApeText then
     begin
       Result := Frames[i].GetAsList(List);
     end;
@@ -1787,7 +1787,7 @@ begin
     for i := 0 to Length(Source.Frames) - 1 do
     begin
       case Source.Frames[i].Format of
-        ffText:
+        ffApeText:
           begin
             SetTextFrameText(Source.Frames[i].Name, Source.Frames[i].GetAsText);
           end;

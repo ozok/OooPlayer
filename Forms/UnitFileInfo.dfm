@@ -14,6 +14,8 @@ object InfoForm: TInfoForm
   OldCreateOrder = False
   Position = poMainFormCenter
   OnClose = FormClose
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
     784
@@ -25,10 +27,49 @@ object InfoForm: TInfoForm
     Top = 8
     Width = 766
     Height = 517
-    ActivePage = TabSheet2
+    ActivePage = sTabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     SkinData.SkinSection = 'PAGECONTROL'
+    object sTabSheet1: TsTabSheet
+      Caption = 'Tags'
+      SkinData.CustomColor = False
+      SkinData.CustomFont = False
+      object TagsList: TsListView
+        Left = 0
+        Top = 0
+        Width = 758
+        Height = 489
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+        SkinData.SkinSection = 'EDIT'
+        Align = alClient
+        Color = 2038810
+        Columns = <
+          item
+            Caption = 'Tag Field'
+          end
+          item
+            Caption = 'Value'
+          end>
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 13417908
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+        ViewStyle = vsReport
+        OnResize = TagsListResize
+      end
+    end
     object TabSheet2: TsTabSheet
       Caption = 'Details'
       ImageIndex = 1

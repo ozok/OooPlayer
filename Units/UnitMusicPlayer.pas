@@ -125,10 +125,10 @@ begin
           if PlayList.Items.Count > 0 then
           begin
             // first try queue
-            if FQueuedItems.Count > 0 then
+            if FQueueLists[FSelectedPlaylistIndex].Count > 0 then
             begin
               // play first queue item
-              PlayItem(FQueuedItems[0]);
+              PlayItem(FQueueLists[FSelectedPlaylistIndex][0]);
             end
             else
             begin

@@ -88,7 +88,7 @@ procedure TLastFMToolLauncher.Start(const SettingsFilePath: string; const Proces
 begin
   if FProcess.ProcessInfo.hProcess = 0 then
   begin
-//    if FileExists(SettingsFilePath) then
+    // if FileExists(SettingsFilePath) then
     begin
       if FileExists(ProcessPath) then
       begin
@@ -101,10 +101,10 @@ begin
         LogForm.LogList.Lines.Add('Unable to find file ' + ProcessPath)
       end;
     end
-//    else
-//    begin
-//      LogForm.LogList.Lines.Add('Unable to find file ' + SettingsFilePath)
-//    end;;
+    // else
+    // begin
+    // LogForm.LogList.Lines.Add('Unable to find file ' + SettingsFilePath)
+    // end;;
   end;
 end;
 

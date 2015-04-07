@@ -25,6 +25,14 @@ interface
 uses Classes, Generics.Collections;
 
 type
+  TGeneralTag = class
+    Tag, Value: string;
+  end;
+
+type
+  TGeneralTagList = TList<TGeneralTag>;
+
+type
   TCoverArtType = (none = 0, jpeg = 1, png = 2, bmp = 3, gif = 4);
 
 type
@@ -61,6 +69,7 @@ type
   end;
 
   TPlaylist = TList<TPlayItem>;
+  TQueueList = TList<integer>;
 
 implementation
 
