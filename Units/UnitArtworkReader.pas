@@ -75,8 +75,8 @@ type
     property DefaultImgPath: string read FDefaultImgPath write FDefaultImgPath;
     property AppDataFolder: string read FAppDataFolder write SetAppData;
 
-    constructor create;
-    destructor destroy; override;
+    constructor Create;
+    destructor Destroy; override;
     procedure Start;
 
     procedure LoadNextExternalCoverArt;

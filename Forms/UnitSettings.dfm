@@ -76,9 +76,9 @@ object SettingsForm: TSettingsForm
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -115,9 +115,9 @@ object SettingsForm: TSettingsForm
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -167,9 +167,9 @@ object SettingsForm: TSettingsForm
         Width = 75
         Height = 21
         Alignment = taCenter
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -231,9 +231,9 @@ object SettingsForm: TSettingsForm
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -312,9 +312,9 @@ object SettingsForm: TSettingsForm
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -322,6 +322,104 @@ object SettingsForm: TSettingsForm
         ParentFont = False
         TabOrder = 0
         OnChange = SkinsListChange
+      end
+      object sGroupBox1: TsGroupBox
+        Left = 10
+        Top = 43
+        Width = 359
+        Height = 118
+        Caption = 'Skin Colors'
+        TabOrder = 1
+        SkinData.SkinSection = 'GROUPBOX'
+        object sLabel2: TsLabel
+          Left = 26
+          Top = 60
+          Width = 115
+          Height = 13
+          Caption = 'Saturation (-100 - 100):'
+        end
+        object sLabel3: TsLabel
+          Left = 38
+          Top = 91
+          Width = 103
+          Height = 13
+          Caption = 'Brightness (-40 - 15):'
+        end
+        object sLabel1: TsLabel
+          Left = 79
+          Top = 29
+          Width = 62
+          Height = 13
+          Caption = 'Hue (0-360):'
+        end
+        object HueLabel: TsLabel
+          Left = 330
+          Top = 29
+          Width = 6
+          Height = 13
+          Caption = '0'
+        end
+        object SaturationLabel: TsLabel
+          Left = 330
+          Top = 60
+          Width = 6
+          Height = 13
+          Caption = '0'
+        end
+        object BrightnessLabel: TsLabel
+          Left = 330
+          Top = 91
+          Width = 6
+          Height = 13
+          Caption = '0'
+        end
+        object SaturationBar: TsTrackBar
+          Left = 147
+          Top = 54
+          Width = 174
+          Height = 25
+          Max = 100
+          Min = -100
+          ShowSelRange = False
+          TabOrder = 0
+          TickMarks = tmBoth
+          TickStyle = tsNone
+          OnChange = SaturationBarChange
+          SkinData.SkinSection = 'TRACKBAR'
+          BarOffsetV = 0
+          BarOffsetH = 0
+        end
+        object BrightnessBar: TsTrackBar
+          Left = 147
+          Top = 85
+          Width = 174
+          Height = 25
+          Max = 15
+          Min = -40
+          ShowSelRange = False
+          TabOrder = 1
+          TickMarks = tmBoth
+          TickStyle = tsNone
+          OnChange = BrightnessBarChange
+          SkinData.SkinSection = 'TRACKBAR'
+          BarOffsetV = 0
+          BarOffsetH = 0
+        end
+        object HueBar: TsTrackBar
+          Left = 147
+          Top = 23
+          Width = 174
+          Height = 25
+          Max = 360
+          ShowSelRange = False
+          TabOrder = 2
+          TickMarks = tmBoth
+          TickStyle = tsNone
+          OnChange = HueBarChange
+          SkinData.SkinSection = 'TRACKBAR'
+          BarOffsetV = 0
+          BarOffsetH = 0
+        end
       end
     end
     object sTabSheet2: TsTabSheet
@@ -333,9 +431,9 @@ object SettingsForm: TSettingsForm
         Top = 41
         Width = 121
         Height = 21
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -359,9 +457,9 @@ object SettingsForm: TSettingsForm
         Top = 68
         Width = 121
         Height = 21
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -423,8 +521,8 @@ object SettingsForm: TSettingsForm
     ProxyAddresses = 'proxyserver'
     ProxyIgnoreList = '<local>'
     OnDoneStream = UpdateCheckerDoneStream
-    Left = 52
-    Top = 190
+    Left = 84
+    Top = 262
   end
   object UpdateThread: TJvThread
     Exclusive = True
@@ -432,8 +530,8 @@ object SettingsForm: TSettingsForm
     RunOnCreate = True
     FreeOnTerminate = True
     OnExecute = UpdateThreadExecute
-    Left = 132
-    Top = 198
+    Left = 220
+    Top = 262
   end
   object sSkinProvider1: TsSkinProvider
     AddedTitle.Font.Charset = DEFAULT_CHARSET
@@ -443,7 +541,7 @@ object SettingsForm: TSettingsForm
     AddedTitle.Font.Style = []
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
-    Left = 224
-    Top = 200
+    Left = 296
+    Top = 264
   end
 end

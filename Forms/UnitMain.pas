@@ -607,7 +607,6 @@ end;
 
 procedure TMainForm.A2Click(Sender: TObject);
 var
-  LItem: TListItem;
   i: integer;
 begin
   for I := 0 to PlayList.Items.Count - 1 do
@@ -902,6 +901,7 @@ var
   LPlaylistFile: TPlaylistFile;
   I: Integer;
   LPlaylist: TPlaylist;
+  LQueueList: TQueueList;
   LSW: TStreamWriter;
   LPlaylistsNode: TTreeNode;
 begin
@@ -909,6 +909,7 @@ begin
   if LName.Length > 0 then
   begin
     LPlaylistFile := TPlaylistFile.Create;
+    LQueueList := TQueueList.Create;
     LPlaylistFile.Name := LName;
     LPlaylistFile.PlaylistFile := FAppDataFolder + '\' + GeneratePlaylistFileName + '.dat';
     LPlaylistFile.CurrentItemIndex := -1;
@@ -935,6 +936,7 @@ begin
 
     LPlaylist := TPlaylist.Create;
     FPlaylists.Add(LPlaylist);
+    FQueueLists.Add(LQueueList);
     SavePlayList;
     // PlaylistListChange(Self);
   end;
@@ -2202,16 +2204,21 @@ var
 begin
   if Length(TitleLabel.Caption) < 1 then
     Exit;
-  LTextWidth := TitleLabel.Canvas.TextWidth(TitleLabel.Caption);
-  if LTextWidth > TitleLabel.Width then
-  begin
-    LContent := TitleLabel.Caption;
-    TitleLabel.Caption := Copy(LContent, 2, Length(LContent) - 1) + Copy(LContent, 1, 1)
-  end
-  else
-  begin
-    TitleLabel.Caption := FTitleLabel;
+  try
+    LTextWidth := TitleLabel.Canvas.TextWidth(TitleLabel.Caption);
+    if LTextWidth > TitleLabel.Width then
+    begin
+      LContent := TitleLabel.Caption;
+      TitleLabel.Caption := Copy(LContent, 2, Length(LContent) - 1) + Copy(LContent, 1, 1)
+    end
+    else
+    begin
+      TitleLabel.Caption := FTitleLabel;
+    end;
+  except
+    on E: Exception do
   end;
+
 end;
 
 procedure TMainForm.LastFMLaunchTimerTimer(Sender: TObject);
@@ -2342,6 +2349,7 @@ begin
       LStreamWriter.Close;
       LStreamWriter.Free;
     end;
+    LPlaylistFile := TPlaylistFile.Create;
     LPlaylistFile.Name := 'Default';
     LPlaylistFile.PlaylistFile := FAppDataFolder + '\playlist.dat';
     FPlayListFiles.Add(LPlaylistFile);
@@ -2432,6 +2440,9 @@ begin
       try
         LPlaylist := TPlaylist.Create;
         FPlaylists.Add(LPlaylist);
+
+        LQueueList := TQueueList.Create;
+        FQueueLists.Add(LQueueList);
       finally
         LStreamWriter.Close;
         LStreamWriter.Free;
@@ -2511,40 +2522,44 @@ begin
   FRadioStations.Clear;
   RadioList.Items.Count := 0;
   RadioList.Invalidate;
-  if not Portable then
+  if Length(FCurrentRadioCatName) > 0 then
   begin
-    LStreamReader := TStreamReader.Create(FAppDataFolder + '\' + FCurrentRadioCatName + '.txt');
-  end
-  else
-  begin
-    LStreamReader := TStreamReader.Create(ExtractFileDir(Application.ExeName) + '\Radios\' + FCurrentRadioCatName + '.txt');
-  end;
-  LSplitList := TStringList.Create;
-  try
-    LSplitList.StrictDelimiter := True;
-    LSplitList.Delimiter := ';';
-    while not LStreamReader.EndOfStream do
+    if not Portable then
     begin
-      LLine := Trim(LStreamReader.ReadLine);
-      if Length(LLine) > 0 then
+      LStreamReader := TStreamReader.Create(FAppDataFolder + '\' + FCurrentRadioCatName + '.txt');
+    end
+    else
+    begin
+      LStreamReader := TStreamReader.Create(ExtractFileDir(Application.ExeName) + '\Radios\' + FCurrentRadioCatName + '.txt');
+    end;
+    LSplitList := TStringList.Create;
+    try
+      LSplitList.StrictDelimiter := True;
+      LSplitList.Delimiter := ';';
+      while not LStreamReader.EndOfStream do
       begin
-        LSplitList.DelimitedText := LLine;
-        if LSplitList.Count = 3 then
+        LLine := Trim(LStreamReader.ReadLine);
+        if Length(LLine) > 0 then
         begin
-          LRadioStation.Name := LSplitList[0];
-          LRadioStation.Web := LSplitList[1];
-          LRadioStation.URL := LSplitList[2];
+          LSplitList.DelimitedText := LLine;
+          if LSplitList.Count = 3 then
+          begin
+            LRadioStation.Name := LSplitList[0];
+            LRadioStation.Web := LSplitList[1];
+            LRadioStation.URL := LSplitList[2];
 
-          RadioList.Items.Count := RadioList.Items.Count + 1;
-          FRadioStations.Add(LRadioStation);
+            RadioList.Items.Count := RadioList.Items.Count + 1;
+            FRadioStations.Add(LRadioStation);
+          end;
         end;
       end;
+    finally
+      LStreamReader.Close;
+      LStreamReader.Free;
+      LSplitList.Free;
     end;
-  finally
-    LStreamReader.Close;
-    LStreamReader.Free;
-    LSplitList.Free;
   end;
+
 end;
 
 procedure TMainForm.LoadSettings;
@@ -2583,6 +2598,13 @@ begin
       LSkinIndex := SettingsFile.ReadInteger('settings', 'skin2', 33);
       CoverPanel.Height := SettingsFile.ReadInteger('settings', 'coverheight', 182);
       CategoryPages.Width := SettingsFile.ReadInteger('settings', 'categorywidth', 255);
+
+      SettingsForm.HueBar.Position := SettingsFile.ReadInteger('settings', 'hue', 0);
+      SettingsForm.SaturationBar.Position := SettingsFile.ReadInteger('settings', 'satu', 0);
+      SettingsForm.BrightnessBar.Position := SettingsFile.ReadInteger('settings', 'bright', 0);
+      SettingsForm.HueBarChange(Self);    
+      SettingsForm.SaturationBarChange(Self);
+      SettingsForm.BrightnessBarChange(Self);
 
       with PlayList do
       begin
@@ -2914,9 +2936,6 @@ begin
 end;
 
 procedure TMainForm.PlaylistViewChange(Sender: TObject; Node: TTreeNode);
-var
-  I: Integer;
-  LItem: TListItem;
 begin
   if Assigned(Node) then
   begin
@@ -5293,7 +5312,7 @@ begin
     if LIntMaxWidth < LIntWidth then
       LIntMaxWidth := LIntWidth;
   end;
-  SendMessage(LyricList.handle, LB_SETHORIZONTALEXTENT, LIntMaxWidth + 5, 0);
+  SendMessage(LyricList.handle, LB_SETHORIZONTALEXTENT, LIntMaxWidth + 20, 0);
 end;
 
 procedure TMainForm.UpdateOverlayIcon(const Index: integer);
@@ -5476,12 +5495,11 @@ begin
           Log('status update');
           if (String(PAnsiChar(Msg.LParam)) = 'ICY 200 OK') or (String(PAnsiChar(Msg.LParam)) = 'HTTP/1.0 200 OK') then
           begin
-            // todo: radio status label
-            // PlaybackInfoLabel.Caption := 'Playing';
+            InfoLabel.Caption := 'Playing';
           end
           else
           begin
-            // PlaybackInfoLabel.Caption := String(PAnsiChar(Msg.LParam));
+            InfoLabel.Caption := String(PAnsiChar(Msg.LParam));
           end;
         end;
       REPAINT_RADIO_LIST:

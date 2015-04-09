@@ -27,7 +27,8 @@ uses
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
   Vcl.ComCtrls, IniFiles, Vcl.Mask, JvExMask, JvSpin, JvThread, JvComponentBase,
   JvUrlListGrabber, JvUrlGrabbers, ShellAPI, sComboBox, sLabel, sButton,
-  sCheckBox, sPageControl, sSkinProvider, sEdit, sSpinEdit, IdGlobal, IdHash, IdHashMessageDigest;
+  sCheckBox, sPageControl, sSkinProvider, sEdit, sSpinEdit, IdGlobal, IdHash, IdHashMessageDigest,
+  sTrackBar, sGroupBox;
 
 type
   TSettingsForm = class(TForm)
@@ -58,6 +59,16 @@ type
     LastFMPassEdit: TsEdit;
     LastFMSaveBtn: TsButton;
     LastFMEnableBtn: TsCheckBox;
+    sGroupBox1: TsGroupBox;
+    sLabel2: TsLabel;
+    SaturationBar: TsTrackBar;
+    BrightnessBar: TsTrackBar;
+    sLabel3: TsLabel;
+    sLabel1: TsLabel;
+    HueBar: TsTrackBar;
+    HueLabel: TsLabel;
+    SaturationLabel: TsLabel;
+    BrightnessLabel: TsLabel;
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LoadArtBtnClick(Sender: TObject);
@@ -70,6 +81,9 @@ type
     procedure FormCreate(Sender: TObject);
     procedure PlaylistItemTextListChange(Sender: TObject);
     procedure LastFMSaveBtnClick(Sender: TObject);
+    procedure HueBarChange(Sender: TObject);
+    procedure SaturationBarChange(Sender: TObject);
+    procedure BrightnessBarChange(Sender: TObject);
   private
     { Private declarations }
     procedure GetAllSkins;
@@ -90,6 +104,14 @@ implementation
 {$R *.dfm}
 
 uses UnitMain, UnitAbout, UnitLog;
+
+procedure TSettingsForm.BrightnessBarChange(Sender: TObject);
+begin
+  MainForm.sSkinManager1.BeginUpdate;
+  MainForm.sSkinManager1.Brightness := BrightnessBar.Position;
+  BrightnessLabel.Caption := BrightnessBar.Position.ToString();
+  MainForm.sSkinManager1.EndUpdate(True, False);
+end;
 
 procedure TSettingsForm.BufferEditChange(Sender: TObject);
 begin
@@ -133,6 +155,14 @@ begin
   end;
 end;
 
+procedure TSettingsForm.HueBarChange(Sender: TObject);
+begin
+  MainForm.sSkinManager1.BeginUpdate;
+  MainForm.sSkinManager1.HueOffset := HueBar.Position;
+  HueLabel.Caption := HueBar.Position.ToString();
+  MainForm.sSkinManager1.EndUpdate(True, False);
+end;
+
 procedure TSettingsForm.LastFMSaveBtnClick(Sender: TObject);
 var
   LMD5: TIdHashMessageDigest5;
@@ -156,6 +186,7 @@ begin
     finally
       LMD5.Free;
     end;
+    LastFMPassEdit.Text := '';
     Application.MessageBox('Your last.fm user name and hashed password is saved.', 'Info', MB_ICONINFORMATION);
   end
   else
@@ -213,6 +244,14 @@ begin
   MainForm.PlayList.Invalidate;
 end;
 
+procedure TSettingsForm.SaturationBarChange(Sender: TObject);
+begin
+  MainForm.sSkinManager1.BeginUpdate;
+  MainForm.sSkinManager1.Saturation := SaturationBar.Position;
+  SaturationLabel.Caption := SaturationBar.Position.ToString();
+  MainForm.sSkinManager1.EndUpdate(True, False);
+end;
+
 procedure TSettingsForm.SaveSettings;
 var
   SettingsFile: TIniFile;
@@ -233,6 +272,9 @@ begin
       SettingsFile.WriteInteger('settings', 'windowtitle', WindowTitleList.ItemIndex);
       SettingsFile.WriteInteger('settings', 'playlistitemtext', PlaylistItemTextList.ItemIndex);
       SettingsFile.WriteBool('settings', 'lastfm', LastFMEnableBtn.Checked);
+      SettingsFile.WriteInteger('settings', 'hue', HueBar.Position);
+      SettingsFile.WriteInteger('settings', 'satu', SaturationBar.Position);
+      SettingsFile.WriteInteger('settings', 'bright', BrightnessBar.Position);
     end;
   finally
     SettingsFile.Free;

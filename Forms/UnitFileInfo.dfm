@@ -64,6 +64,8 @@ object InfoForm: TInfoForm
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
+        HideSelection = False
+        RowSelect = True
         ParentFont = False
         TabOrder = 0
         ViewStyle = vsReport

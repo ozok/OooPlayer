@@ -270,11 +270,16 @@ object MainForm: TMainForm
           TabOrder = 1
           SkinData.SkinSection = 'TRANSPARENT'
           object NextBtn: TsBitBtn
+            AlignWithMargins = True
             Left = 200
-            Top = 0
+            Top = 2
             Width = 50
-            Height = 56
+            Height = 52
             Hint = 'Next'
+            Margins.Left = 0
+            Margins.Top = 2
+            Margins.Right = 0
+            Margins.Bottom = 2
             Align = alLeft
             Glyph.Data = {
               36100000424D3610000000000000360000002800000020000000200000000100
@@ -412,13 +417,20 @@ object MainForm: TMainForm
             OnMouseEnter = NextBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            ExplicitTop = 0
+            ExplicitHeight = 56
           end
           object PauseBtn: TsBitBtn
+            AlignWithMargins = True
             Left = 100
-            Top = 0
+            Top = 2
             Width = 50
-            Height = 56
+            Height = 52
             Hint = 'Pause'
+            Margins.Left = 0
+            Margins.Top = 2
+            Margins.Right = 0
+            Margins.Bottom = 2
             Align = alLeft
             Glyph.Data = {
               36100000424D3610000000000000360000002800000020000000200000000100
@@ -556,13 +568,20 @@ object MainForm: TMainForm
             OnMouseEnter = PauseBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            ExplicitTop = 0
+            ExplicitHeight = 56
           end
           object PlayBtn: TsBitBtn
+            AlignWithMargins = True
             Left = 0
-            Top = 0
+            Top = 2
             Width = 50
-            Height = 56
+            Height = 52
             Hint = 'Play'
+            Margins.Left = 0
+            Margins.Top = 2
+            Margins.Right = 0
+            Margins.Bottom = 2
             Align = alLeft
             Glyph.Data = {
               36100000424D3610000000000000360000002800000020000000200000000100
@@ -700,13 +719,20 @@ object MainForm: TMainForm
             OnMouseEnter = PlayBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            ExplicitTop = 0
+            ExplicitHeight = 56
           end
           object PrevBtn: TsBitBtn
+            AlignWithMargins = True
             Left = 150
-            Top = 0
+            Top = 2
             Width = 50
-            Height = 56
+            Height = 52
             Hint = 'Previous'
+            Margins.Left = 0
+            Margins.Top = 2
+            Margins.Right = 0
+            Margins.Bottom = 2
             Align = alLeft
             Glyph.Data = {
               36100000424D3610000000000000360000002800000020000000200000000100
@@ -844,13 +870,20 @@ object MainForm: TMainForm
             OnMouseEnter = PrevBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            ExplicitTop = 0
+            ExplicitHeight = 56
           end
           object StopBtn: TsBitBtn
+            AlignWithMargins = True
             Left = 50
-            Top = 0
+            Top = 2
             Width = 50
-            Height = 56
+            Height = 52
             Hint = 'Stop'
+            Margins.Left = 0
+            Margins.Top = 2
+            Margins.Right = 0
+            Margins.Bottom = 2
             Align = alLeft
             Glyph.Data = {
               36100000424D3610000000000000360000002800000020000000200000000100
@@ -988,6 +1021,8 @@ object MainForm: TMainForm
             OnMouseEnter = StopBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            ExplicitTop = 0
+            ExplicitHeight = 56
           end
         end
         object sPanel3: TsPanel
@@ -1003,11 +1038,16 @@ object MainForm: TMainForm
             318
             56)
           object LogsBtn: TsBitBtn
+            AlignWithMargins = True
             Left = 268
-            Top = 0
+            Top = 2
             Width = 50
-            Height = 56
+            Height = 52
             Hint = 'Logs'
+            Margins.Left = 0
+            Margins.Top = 2
+            Margins.Right = 0
+            Margins.Bottom = 2
             Align = alRight
             Glyph.Data = {
               36080000424D3608000000000000360400002800000020000000200000000100
@@ -1081,13 +1121,20 @@ object MainForm: TMainForm
             OnMouseEnter = LogsBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            ExplicitTop = 0
+            ExplicitHeight = 56
           end
           object EQBtn: TsBitBtn
+            AlignWithMargins = True
             Left = 118
-            Top = 0
+            Top = 2
             Width = 50
-            Height = 56
+            Height = 52
             Hint = 'Equalizer Settings'
+            Margins.Left = 0
+            Margins.Top = 2
+            Margins.Right = 0
+            Margins.Bottom = 2
             Align = alRight
             Glyph.Data = {
               C6070000424DC607000000000000360000002800000016000000160000000100
@@ -1158,13 +1205,20 @@ object MainForm: TMainForm
             OnMouseEnter = EQBtnMouseEnter
             SkinData.SkinSection = 'BUTTON'
             ShowCaption = False
+            ExplicitTop = 0
+            ExplicitHeight = 56
           end
           object SearchBtn: TsBitBtn
+            AlignWithMargins = True
             Left = 168
-            Top = 0
+            Top = 2
             Width = 50
-            Height = 56
+            Height = 52
             Hint = 'Search'
+            Margins.Left = 0
+            Margins.Top = 2
+            Margins.Right = 0
+            Margins.Bottom = 2
             Align = alRight
             Glyph.Data = {
               36100000424D3610000000000000360000002800000020000000200000000100
@@ -1302,13 +1356,20 @@ object MainForm: TMainForm
             OnMouseEnter = SearchBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            ExplicitTop = 0
+            ExplicitHeight = 56
           end
           object SettingsBtn: TsBitBtn
+            AlignWithMargins = True
             Left = 218
-            Top = 0
+            Top = 2
             Width = 50
-            Height = 56
+            Height = 52
             Hint = 'Settings'
+            Margins.Left = 0
+            Margins.Top = 2
+            Margins.Right = 0
+            Margins.Bottom = 2
             Align = alRight
             Glyph.Data = {
               36100000424D3610000000000000360000002800000020000000200000000100
@@ -1446,10 +1507,12 @@ object MainForm: TMainForm
             OnMouseEnter = SettingsBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            ExplicitTop = 0
+            ExplicitHeight = 56
           end
           object PlaybackOrderList: TsComboBox
             AlignWithMargins = True
-            Left = 11
+            Left = 8
             Top = 17
             Width = 101
             Height = 21
@@ -1468,9 +1531,9 @@ object MainForm: TMainForm
             SkinData.SkinSection = 'COMBOBOX'
             VerticalAlignment = taAlignTop
             Style = csDropDownList
-            Color = 2038810
+            Color = 722950
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = 13417908
+            Font.Color = 12102048
             Font.Height = -11
             Font.Name = 'Tahoma'
             Font.Style = []
@@ -1603,7 +1666,7 @@ object MainForm: TMainForm
         OnMouseEnter = PlayListMouseEnter
         Align = alClient
         BorderStyle = bsNone
-        Color = 2038810
+        Color = 722950
         Columns = <
           item
             Caption = 'Artist'
@@ -1636,7 +1699,7 @@ object MainForm: TMainForm
           end>
         DragMode = dmAutomatic
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -1675,7 +1738,7 @@ object MainForm: TMainForm
         OnMouseEnter = QueueListMouseEnter
         OnMouseLeave = QueueListMouseLeave
         Align = alBottom
-        Color = 2038810
+        Color = 722950
         Columns = <
           item
           end
@@ -1683,7 +1746,7 @@ object MainForm: TMainForm
             Width = 100
           end>
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2023,13 +2086,13 @@ object MainForm: TMainForm
         OnMouseLeave = RadioListMouseLeave
         Align = alClient
         BorderStyle = bsNone
-        Color = 2038810
+        Color = 722950
         Columns = <
           item
           end>
         ColumnClick = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2119,9 +2182,9 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'COMBOBOX'
           VerticalAlignment = taAlignTop
           Style = csDropDownList
-          Color = 2038810
+          Color = 722950
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 13417908
+          Font.Color = 12102048
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -2168,9 +2231,9 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'COMBOBOX'
           VerticalAlignment = taAlignTop
           Style = csDropDownList
-          Color = 2038810
+          Color = 722950
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 13417908
+          Font.Color = 12102048
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -2516,9 +2579,9 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2539,9 +2602,9 @@ object MainForm: TMainForm
       Height = 261
       Align = alClient
       BorderStyle = bsNone
-      Color = 2038810
+      Color = 722950
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 13417908
+      Font.Color = 12102048
       Font.Height = -13
       Font.Name = 'Tahoma'
       Font.Style = []
@@ -2583,9 +2646,9 @@ object MainForm: TMainForm
         Width = 245
         Height = 534
         Align = alClient
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2676,15 +2739,16 @@ object MainForm: TMainForm
         Width = 245
         Height = 564
         Align = alClient
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
         Images = CategoryList
         Indent = 25
         ParentFont = False
+        ReadOnly = True
         TabOrder = 0
         OnChange = RadiosViewChange
         Items.NodeData = {
@@ -8048,7 +8112,7 @@ object MainForm: TMainForm
   end
   object PositionTimer: TTimer
     Enabled = False
-    Interval = 50
+    Interval = 250
     OnTimer = PositionTimerTimer
     Left = 312
     Top = 288
@@ -8323,7 +8387,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800840116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800880116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -8835,6 +8899,7 @@ object MainForm: TMainForm
     Effects.AllowOuterEffects = True
     ExtendedBorders = True
     AnimEffects.DialogShow.Mode = atFading
+    Brightness = -20
     InternalSkins = <
       item
         Name = 'Graphite (internal)'
