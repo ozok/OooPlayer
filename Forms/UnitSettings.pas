@@ -232,7 +232,7 @@ begin
     // LastFMPassEdit.Text := SettingsFile.ReadString('general', 'pass', '');
 
     LastFMUser := LastFMUserEdit.Text;
-    LastFMHashedPass := LastFMPassEdit.Text;
+    LastFMHashedPass := SettingsFile.ReadString('general', 'pass', '');
   finally
     SettingsFile.Free;
   end;

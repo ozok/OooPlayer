@@ -24,9 +24,9 @@ object LogForm: TLogForm
     Width = 635
     Height = 300
     Align = alClient
-    Color = 2038810
+    Color = 722950
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = 13417908
+    Font.Color = 12102048
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
@@ -34,6 +34,7 @@ object LogForm: TLogForm
     ReadOnly = True
     ScrollBars = ssBoth
     TabOrder = 0
+    OnChange = LogListChange
     BoundLabel.Indent = 0
     BoundLabel.Font.Charset = DEFAULT_CHARSET
     BoundLabel.Font.Color = clWindowText

@@ -458,6 +458,7 @@ type
     FArtistLabel: string;
     FAlbumLabel: string;
     FTitleLabel: string;
+    FSelfCaption: string;
     FWinHandle: HWND;
     FActivelyPlayedPlaylistIndex: integer;
 
@@ -1773,9 +1774,15 @@ begin
             begin
               TitleLabel.Caption := Title + ' - ' + Album + ' - ' + Artist;
               FTitleLabel := TitleLabel.Caption;
+              Self.Caption := FSelfCaption;
+              FSelfCaption := Self.Caption;
               if TitleLabel.Width < TitleLabel.Canvas.TextWidth(TitleLabel.Caption) then
               begin
                 TitleLabel.Caption := TitleLabel.Caption + ' - '
+              end;
+              if Self.Width < Self.Canvas.TextWidth(TitleLabel.Caption) then
+              begin
+                Self.Caption := Self.Caption + ' - '
               end;
             end;
           end;
@@ -2019,6 +2026,7 @@ begin
           CoverImage.Picture.LoadFromFile('logo.png');
           TitleLabel.Caption := '';
           FTitleLabel := TitleLabel.Caption;
+          FSelfCaption := Self.Caption;
           FArtistLabel := '';
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
@@ -2045,6 +2053,7 @@ begin
           CoverImage.Picture.LoadFromFile('logo.png');
           TitleLabel.Caption := '';
           FTitleLabel := TitleLabel.Caption;
+          FSelfCaption := Self.Caption;
           FArtistLabel := '';
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
@@ -2080,6 +2089,7 @@ begin
           CoverImage.Picture.LoadFromFile('logo.png');
           TitleLabel.Caption := '';
           FTitleLabel := TitleLabel.Caption;
+          FSelfCaption := Self.Caption;
           FArtistLabel := '';
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
@@ -2119,6 +2129,7 @@ begin
           CoverImage.Picture.LoadFromFile('logo.png');
           TitleLabel.Caption := '';
           FTitleLabel := TitleLabel.Caption;
+          FSelfCaption := Self.Caption;
           FArtistLabel := '';
           FAlbumLabel := '';
           PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
@@ -2201,6 +2212,8 @@ procedure TMainForm.LabelScrollTimerTimer(Sender: TObject);
 var
   LContent: string;
   LTextWidth: integer;
+  LContent2: string;
+  LTextWidth2: integer;
 begin
   if Length(TitleLabel.Caption) < 1 then
     Exit;
@@ -2215,6 +2228,18 @@ begin
     begin
       TitleLabel.Caption := FTitleLabel;
     end;
+
+    LTextWidth := Self.Canvas.TextWidth(Self.Caption);
+    if LTextWidth > Self.Width then
+    begin
+      LContent := Self.Caption;
+      Self.Caption := Copy(LContent, 2, Length(LContent) - 1) + Copy(LContent, 1, 1)
+    end
+    else
+    begin
+      Self.Caption := FSelfCaption;
+    end;
+
   except
     on E: Exception do
   end;
@@ -2244,7 +2269,7 @@ begin
       begin
         FLastFMToolLauncher.Stop;
         FLastFMToolLauncher.Start('" " "' + SettingsForm.LastFMUser.Trim + '" "' + SettingsForm.LastFMHashedPass + '" "' + FLastFMArtist + '" "' + FLastFMSong + '"',
-          ExtractFileDir(Application.ExeName) + '\lastfmscrobble\lastfmscrobble.exe');
+          ExtractFileDir(Application.ExeName) + '\lastfmscrobble.exe');
       end;
     end;
   end;
@@ -2602,7 +2627,7 @@ begin
       SettingsForm.HueBar.Position := SettingsFile.ReadInteger('settings', 'hue', 0);
       SettingsForm.SaturationBar.Position := SettingsFile.ReadInteger('settings', 'satu', 0);
       SettingsForm.BrightnessBar.Position := SettingsFile.ReadInteger('settings', 'bright', 0);
-      SettingsForm.HueBarChange(Self);    
+      SettingsForm.HueBarChange(Self);
       SettingsForm.SaturationBarChange(Self);
       SettingsForm.BrightnessBarChange(Self);
 
@@ -3532,7 +3557,7 @@ begin
         // fill file info tab
         with FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex] do
         begin
-          FCurrentItemInfo.InfoStr := Bitrate + ' | ' + Channels + ' | ' + Codec + ' | ' + SampleRate + ' hz | ' + LPlayCountStr;
+          FCurrentItemInfo.InfoStr := Bitrate + ' | ' + Channels + ' | ' + Codec + ' | ' + SampleRate + ' hz | ' + LPlayCountStr + ' | ' + DurationStr;
           InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
         end;
 
@@ -3552,6 +3577,7 @@ begin
           Self.Caption := PlayWindowTitle(Title, Artist, Album);
           TitleLabel.Caption := Title + ' - ' + Album + ' - ' + Artist;
           FTitleLabel := TitleLabel.Caption;
+          FSelfCaption := Self.Caption;
           if TitleLabel.Width < TitleLabel.Canvas.TextWidth(TitleLabel.Caption) then
           begin
             TitleLabel.Caption := TitleLabel.Caption + ' - '
@@ -3888,6 +3914,7 @@ begin
   CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
   TitleLabel.Caption := 'Trying to connect to the radio station...';
   FTitleLabel := TitleLabel.Caption;
+  FSelfCaption := Self.Caption;
   FArtistLabel := '';
   FAlbumLabel := '';
   PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
@@ -4368,6 +4395,7 @@ begin
   FArtistLabel := '';
   FAlbumLabel := '';
   Self.Caption := 'OooPlayer';
+  FSelfCaption := Self.Caption;
 end;
 
 procedure TMainForm.RadiosViewChange(Sender: TObject; Node: TTreeNode);
@@ -5159,6 +5187,7 @@ begin
   CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
   TitleLabel.Caption := '';
   FTitleLabel := TitleLabel.Caption;
+  FSelfCaption := Self.Caption;
   FArtistLabel := '';
   FAlbumLabel := '';
   PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
@@ -5417,6 +5446,7 @@ begin
           FArtistLabel := '';
           FAlbumLabel := '';
           Self.Caption := 'Radio [OooPlayer]';
+          FSelfCaption := Self.Caption;
         end;
       SHOW_ERROR:
         begin
@@ -5440,6 +5470,7 @@ begin
           TitleLabel.Caption := String(PAnsiChar(Msg.LParam)) + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
           FTitleLabel := TitleLabel.Caption;
           Self.Caption := String(PAnsiChar(Msg.LParam)) + ' [OooPlayer]';
+          FSelfCaption := Self.Caption;
           if TitleLabel.Width < TitleLabel.Canvas.TextWidth(TitleLabel.Caption) then
           begin
             TitleLabel.Caption := TitleLabel.Caption + ' - '

@@ -89,23 +89,23 @@ uses UnitMain, UnitSettings, UnitLog;
 
 { TArtworkReader }
 
-constructor TArtworkReader.create;
+constructor TArtworkReader.Create;
 begin
-  FThread := TIdThreadComponent.create(nil);
+  FThread := TIdThreadComponent.Create(nil);
   FThread.Priority := tpIdle;
   FThread.StopMode := smSuspend;
   FThread.OnRun := ThreadRun;
   FThread.OnStopped := ThreadStopped;
   FThread.OnTerminate := ThreadTerminate;
 
-  FResizeThread := TIdThreadComponent.create(nil);
+  FResizeThread := TIdThreadComponent.Create(nil);
   FResizeThread.Priority := tpIdle;
   FResizeThread.StopMode := smSuspend;
   FResizeThread.OnRun := ResizeThreadRun;
   FResizeThread.OnStopped := ResizeThreadStopped;
   FResizeThread.OnTerminate := ResizeThreadTerminate;
 
-  FInfoUpdateThread := TIdThreadComponent.create(nil);
+  FInfoUpdateThread := TIdThreadComponent.Create(nil);
   FInfoUpdateThread.Priority := tpIdle;
   FInfoUpdateThread.StopMode := smSuspend;
   FInfoUpdateThread.OnRun := InfoThreadRun;
@@ -113,15 +113,15 @@ begin
   FInfoUpdateThread.OnTerminate := InfoThreadTerminate;
 
   FBusy := False;
-  FTagReader := TTagReader.create;
-  FCoverStream := TStream.create;
-  FExternalArtworkFiles := TStringList.create;
-  FJpeg := TJPEGImage.create;
-  FPng := TPngImage.create;
-  FArtworkInfo := TArtworkInfo.create;
+  FTagReader := TTagReader.Create;
+  FCoverStream := TStream.Create;
+  FExternalArtworkFiles := TStringList.Create;
+  FJpeg := TJPEGImage.Create;
+  FPng := TPngImage.Create;
+  FArtworkInfo := TArtworkInfo.Create;
 end;
 
-destructor TArtworkReader.destroy;
+destructor TArtworkReader.Destroy;
 begin
   FThread.Free;
   FTagReader.Free;
@@ -257,7 +257,7 @@ begin
   begin
     FExternalArtworkIndex := 0;
     LImageFile := FExternalArtworkFiles[0];
-    LImgResizer := TImageResizer.create;
+    LImgResizer := TImageResizer.Create;
     try
       // resize the image and load it to the main form
       if (LowerCase(ExtractFileExt(LImageFile)) = '.jpg') or (LowerCase(ExtractFileExt(LImageFile)) = '.jpeg') then
@@ -365,7 +365,7 @@ begin
   else if PicType = TCoverArtType.jpeg then
   begin
     try
-      LImgResizer := TImageResizer.create;
+      LImgResizer := TImageResizer.Create;
       try
         LTmpFile := FAppDataFolder + '\cover.jpg';
         LImgResizer.ResizeJpgStream(Stream, LTmpFile);
@@ -394,7 +394,7 @@ begin
   else if PicType = png then
   begin
     try
-      LImgResizer := TImageResizer.create;
+      LImgResizer := TImageResizer.Create;
       try
         LTmpFile := FAppDataFolder + '\cover.png';
         LImgResizer.ResizePngStream(Stream, LTmpFile);
@@ -451,7 +451,7 @@ procedure TArtworkReader.ResizeCoverArtToLoad(const CoverArtPath: string);
 var
   LImgResizer: TImageResizer;
 begin
-  LImgResizer := TImageResizer.create;
+  LImgResizer := TImageResizer.Create;
   try
     if (LowerCase(ExtractFileExt(CoverArtPath)) = '.jpg') or (LowerCase(ExtractFileExt(CoverArtPath)) = '.jpeg') then
     begin

@@ -33,6 +33,7 @@ type
     sSkinProvider1: TsSkinProvider;
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
+    procedure LogListChange(Sender: TObject);
   private
     { Private declarations }
   public
@@ -57,6 +58,11 @@ begin
   Self.Color := clBtnFace;
   LogList.Color := clBtnFace;
   LogList.Font.Color := clBlack;
+end;
+
+procedure TLogForm.LogListChange(Sender: TObject);
+begin
+  SendMessage(LogList.Handle, EM_LINESCROLL, 0, LogList.Lines.Count);
 end;
 
 end.

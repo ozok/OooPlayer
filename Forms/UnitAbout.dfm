@@ -300,7 +300,6 @@ object AboutForm: TAboutForm
     TabOrder = 0
     OnClick = Button1Click
     SkinData.SkinSection = 'BUTTON'
-    ExplicitTop = 159
   end
   object Button2: TsButton
     Left = 8
@@ -312,7 +311,6 @@ object AboutForm: TAboutForm
     TabOrder = 1
     OnClick = Button2Click
     SkinData.SkinSection = 'BUTTON'
-    ExplicitTop = 159
   end
   object sSkinProvider1: TsSkinProvider
     AddedTitle.Font.Charset = DEFAULT_CHARSET

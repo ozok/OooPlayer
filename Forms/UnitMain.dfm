@@ -417,8 +417,6 @@ object MainForm: TMainForm
             OnMouseEnter = NextBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitTop = 0
-            ExplicitHeight = 56
           end
           object PauseBtn: TsBitBtn
             AlignWithMargins = True
@@ -568,8 +566,6 @@ object MainForm: TMainForm
             OnMouseEnter = PauseBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitTop = 0
-            ExplicitHeight = 56
           end
           object PlayBtn: TsBitBtn
             AlignWithMargins = True
@@ -719,8 +715,6 @@ object MainForm: TMainForm
             OnMouseEnter = PlayBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitTop = 0
-            ExplicitHeight = 56
           end
           object PrevBtn: TsBitBtn
             AlignWithMargins = True
@@ -870,8 +864,6 @@ object MainForm: TMainForm
             OnMouseEnter = PrevBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitTop = 0
-            ExplicitHeight = 56
           end
           object StopBtn: TsBitBtn
             AlignWithMargins = True
@@ -1021,8 +1013,6 @@ object MainForm: TMainForm
             OnMouseEnter = StopBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitTop = 0
-            ExplicitHeight = 56
           end
         end
         object sPanel3: TsPanel
@@ -1121,8 +1111,6 @@ object MainForm: TMainForm
             OnMouseEnter = LogsBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitTop = 0
-            ExplicitHeight = 56
           end
           object EQBtn: TsBitBtn
             AlignWithMargins = True
@@ -1205,8 +1193,6 @@ object MainForm: TMainForm
             OnMouseEnter = EQBtnMouseEnter
             SkinData.SkinSection = 'BUTTON'
             ShowCaption = False
-            ExplicitTop = 0
-            ExplicitHeight = 56
           end
           object SearchBtn: TsBitBtn
             AlignWithMargins = True
@@ -1356,8 +1342,6 @@ object MainForm: TMainForm
             OnMouseEnter = SearchBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitTop = 0
-            ExplicitHeight = 56
           end
           object SettingsBtn: TsBitBtn
             AlignWithMargins = True
@@ -1507,8 +1491,6 @@ object MainForm: TMainForm
             OnMouseEnter = SettingsBtnMouseEnter
             SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
-            ExplicitTop = 0
-            ExplicitHeight = 56
           end
           object PlaybackOrderList: TsComboBox
             AlignWithMargins = True
@@ -8387,7 +8369,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800880116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101050008008C0116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -9931,6 +9913,7 @@ object MainForm: TMainForm
     AddedTitle.Font.Height = -11
     AddedTitle.Font.Name = 'Tahoma'
     AddedTitle.Font.Style = []
+    CaptionAlignment = taCenter
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
     Left = 560
@@ -10075,7 +10058,7 @@ object MainForm: TMainForm
   end
   object LabelScrollTimer: TJvThreadTimer
     Enabled = True
-    Interval = 150
+    Interval = 200
     KeepAlive = True
     OnTimer = LabelScrollTimerTimer
     Priority = tpLowest
