@@ -2269,7 +2269,7 @@ begin
       begin
         FLastFMToolLauncher.Stop;
         FLastFMToolLauncher.Start('" " "' + SettingsForm.LastFMUser.Trim + '" "' + SettingsForm.LastFMHashedPass + '" "' + FLastFMArtist + '" "' + FLastFMSong + '"',
-          ExtractFileDir(Application.ExeName) + '\lastfmscrobble.exe');
+          ExtractFileDir(Application.ExeName) + '\lastfm\lastfmscrobble.exe');
       end;
     end;
   end;
