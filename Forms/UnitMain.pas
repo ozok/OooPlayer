@@ -383,6 +383,7 @@ type
     procedure CategoryPagesResize(Sender: TObject);
     procedure LyricPanelResize(Sender: TObject);
     procedure QueueListData(Sender: TObject; Item: TListItem);
+    procedure sSkinManager1Deactivate(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -3482,16 +3483,24 @@ begin
 
     if FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < FPlaylists[FSelectedPlaylistIndex].Count then
     begin
-      FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex := FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex;
       FCurrentItemInfo.FullFileName := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].FullFileName;
-      FPlayer.FileName := FCurrentItemInfo.FullFileName;
-      FPlayer.Play;
-      FCurrentItemInfo.DurationBass := FPlayer.TotalLength;
-      PositionBar.MaxValue := MaxInt;
-      Taskbar.ProgressMaxValue := MaxInt;
-      FCurrentItemInfo.DurationAsSecInt := FPlayer.DurationAsSec;
-      FPlayer.SetVolume(100 - VolumeBar.Position);
-      FStoppedByUser := False;
+      if FileExists(FCurrentItemInfo.FullFileName) then
+      begin
+        FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex := FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex;
+        FPlayer.FileName := FCurrentItemInfo.FullFileName;
+        FPlayer.Play;
+        FCurrentItemInfo.DurationBass := FPlayer.TotalLength;
+        PositionBar.MaxValue := MaxInt;
+        Taskbar.ProgressMaxValue := MaxInt;
+        FCurrentItemInfo.DurationAsSecInt := FPlayer.DurationAsSec;
+        FPlayer.SetVolume(100 - VolumeBar.Position);
+        FStoppedByUser := False;
+      end
+      else
+      begin
+        FPlayer.Stop;
+        FStoppedByUser := False;
+      end;
     end
     else
     begin
@@ -3525,18 +3534,14 @@ begin
     LPlayIndex := FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex;
     if FPlaylists[FSelectedPlaylistIndex].Count > 0 then
     begin
-      while not FileExists(FPlaylists[FSelectedPlaylistIndex][LPlayIndex].FullFileName) do
+      if not FileExists(FPlaylists[FSelectedPlaylistIndex][LPlayIndex].FullFileName) then
       begin
         LogForm.LogList.Lines.Add('[' + DateTimeToStr(Now) + '] Unable to find ' + FPlaylists[FSelectedPlaylistIndex][LPlayIndex].FullFileName);
         if not LogForm.Visible then
         begin
           LogForm.Show;
         end;
-        Inc(LPlayIndex);
-        if LPlayIndex >= FPlaylists[FSelectedPlaylistIndex].Count then
-        begin
-          Break;
-        end;
+        Exit;
       end;
 
       if LPlayIndex < FPlaylists[FSelectedPlaylistIndex].Count then
@@ -3545,7 +3550,7 @@ begin
         begin
           PlayList.Items[FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Selected := False;
         end;
-
+        // play count
         if FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].PlayCount = 1 then
         begin
           LPlayCountStr := '1 time'
@@ -3554,7 +3559,7 @@ begin
         begin
           LPlayCountStr := FloatToStr(FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].PlayCount) + ' times'
         end;
-        // fill file info tab
+        // file info
         with FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex] do
         begin
           FCurrentItemInfo.InfoStr := Bitrate + ' | ' + Channels + ' | ' + Codec + ' | ' + SampleRate + ' hz | ' + LPlayCountStr + ' | ' + DurationStr;
@@ -5103,6 +5108,14 @@ begin
   RadioList.Columns[0].Width := RadioList.ClientWidth - 20;
 end;
 
+procedure TMainForm.sSkinManager1Deactivate(Sender: TObject);
+begin
+  if Assigned(PositionBar) then
+  begin
+    PositionBar.ForeColor := clActiveCaption;
+  end;
+end;
+
 procedure TMainForm.StartRadioRecording;
 var
   LEncodeCMD: PWideChar;
@@ -5335,6 +5348,7 @@ var
   i, LIntWidth, LIntMaxWidth: Integer;
 begin
   LIntMaxWidth := 0;
+  LyricList.Canvas.Font.Assign(LyricList.Font);
   for i := 0 to LyricList.Items.Count - 1 do
   begin
     LIntWidth := LyricList.Canvas.TextWidth(LyricList.Items.Strings[i] + 'x');
@@ -5342,6 +5356,7 @@ begin
       LIntMaxWidth := LIntWidth;
   end;
   SendMessage(LyricList.handle, LB_SETHORIZONTALEXTENT, LIntMaxWidth + 20, 0);
+  Log('lyric width: ' +  FloatToStr(LIntWidth));
 end;
 
 procedure TMainForm.UpdateOverlayIcon(const Index: integer);

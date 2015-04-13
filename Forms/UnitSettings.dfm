@@ -35,6 +35,10 @@ object SettingsForm: TSettingsForm
       Caption = 'General'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object CheckUpdateBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -139,6 +143,10 @@ object SettingsForm: TSettingsForm
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object PlayCursorBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -199,6 +207,10 @@ object SettingsForm: TSettingsForm
       ImageIndex = 2
       SkinData.CustomColor = False
       SkinData.CustomFont = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object LoadArtBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -257,6 +269,10 @@ object SettingsForm: TSettingsForm
       ParentFont = False
       SkinData.CustomColor = False
       SkinData.CustomFont = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object LyricBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -292,6 +308,10 @@ object SettingsForm: TSettingsForm
       Caption = 'Look'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object SkinsList: TsComboBox
         Left = 46
         Top = 16
@@ -426,6 +446,10 @@ object SettingsForm: TSettingsForm
       Caption = 'Last.fm'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object LastFMUserEdit: TsEdit
         Left = 80
         Top = 41

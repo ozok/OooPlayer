@@ -3,7 +3,6 @@ __author__ = 'ozok'
 import pylast
 import time
 import sys
-import os
 
 API_KEY = "0a5674077da2782718075412eab00800"
 API_SECRET = "56668ad9e4293be48def8f5ab1a6c658"
