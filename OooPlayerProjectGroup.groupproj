@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{C65DA1E6-C35D-4828-9D34-EC3F1516D842}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="OooPlayer.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="OooTagEditor.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="OooPlayer">
+        <MSBuild Projects="OooPlayer.dproj"/>
+    </Target>
+    <Target Name="OooPlayer:Clean">
+        <MSBuild Projects="OooPlayer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OooPlayer:Make">
+        <MSBuild Projects="OooPlayer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OooTagEditor">
+        <MSBuild Projects="OooTagEditor.dproj"/>
+    </Target>
+    <Target Name="OooTagEditor:Clean">
+        <MSBuild Projects="OooTagEditor.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OooTagEditor:Make">
+        <MSBuild Projects="OooTagEditor.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="OooPlayer;OooTagEditor"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="OooPlayer:Clean;OooTagEditor:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="OooPlayer:Make;OooTagEditor:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

@@ -27,7 +27,7 @@ object SettingsForm: TSettingsForm
     Top = 8
     Width = 544
     Height = 278
-    ActivePage = sTabSheet2
+    ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     SkinData.SkinSection = 'PAGECONTROL'
@@ -64,7 +64,7 @@ object SettingsForm: TSettingsForm
         Left = 162
         Top = 86
         Width = 145
-        Height = 21
+        Height = 24
         Alignment = taLeftJustify
         BoundLabel.Active = True
         BoundLabel.Caption = 'Playlist item text:'
@@ -103,7 +103,7 @@ object SettingsForm: TSettingsForm
         Left = 162
         Top = 59
         Width = 145
-        Height = 21
+        Height = 24
         Alignment = taLeftJustify
         BoundLabel.Active = True
         BoundLabel.Caption = 'Window title layout:'
@@ -175,9 +175,9 @@ object SettingsForm: TSettingsForm
         Width = 75
         Height = 21
         Alignment = taCenter
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -229,7 +229,7 @@ object SettingsForm: TSettingsForm
         Left = 16
         Top = 39
         Width = 201
-        Height = 21
+        Height = 24
         Alignment = taLeftJustify
         BoundLabel.Indent = 0
         BoundLabel.Font.Charset = DEFAULT_CHARSET
@@ -351,6 +351,7 @@ object SettingsForm: TSettingsForm
         Caption = 'Skin Colors'
         TabOrder = 1
         SkinData.SkinSection = 'GROUPBOX'
+        Checked = False
         object sLabel2: TsLabel
           Left = 26
           Top = 60
@@ -450,6 +451,15 @@ object SettingsForm: TSettingsForm
       ExplicitTop = 0
       ExplicitWidth = 0
       ExplicitHeight = 0
+      object sLabel4: TsLabel
+        Left = 3
+        Top = 95
+        Width = 475
+        Height = 13
+        Caption = 
+          'Once you'#39've entered your password, it won'#39't be shown here. You c' +
+          'an enter a new password here.'
+      end
       object LastFMUserEdit: TsEdit
         Left = 80
         Top = 41

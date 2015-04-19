@@ -124,6 +124,8 @@ end;
 destructor TArtworkReader.Destroy;
 begin
   FThread.Free;
+  FInfoUpdateThread.Free;
+  FResizeThread.Free;
   FTagReader.Free;
   FExternalArtworkFiles.Free;
   FCoverStream.Free;

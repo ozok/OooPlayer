@@ -16,6 +16,7 @@ object MainForm: TMainForm
   OldCreateOrder = False
   Position = poScreenCenter
   ShowHint = True
+  OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -206,57 +207,48 @@ object MainForm: TMainForm
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
+          OnMouseEnter = InfoPanelMouseEnter
           SkinData.SkinSection = 'PANEL'
-          object sPanel4: TsPanel
-            Left = 0
-            Top = 0
-            Width = 630
-            Height = 56
+          object InfoLabel: TsLabel
+            AlignWithMargins = True
+            Left = 3
+            Top = 40
+            Width = 624
+            Height = 13
+            Align = alBottom
+            Alignment = taCenter
+            OnMouseEnter = InfoLabelMouseEnter
+            ExplicitWidth = 3
+          end
+          object TitleLabel: TsLabelFX
+            AlignWithMargins = True
+            Left = 6
+            Top = 3
+            Width = 618
+            Height = 34
+            Hint = 'Title - Album - Artist'
+            Margins.Left = 6
+            Margins.Right = 6
+            Margins.Bottom = 0
             Align = alClient
-            BevelOuter = bvNone
-            TabOrder = 0
-            SkinData.SkinSection = 'TRANSPARENT'
-            object TitleLabel: TsLabelFX
-              AlignWithMargins = True
-              Left = 6
-              Top = 6
-              Width = 618
-              Height = 31
-              Hint = 'Title - Album - Artist'
-              Margins.Left = 6
-              Margins.Top = 6
-              Margins.Right = 6
-              Margins.Bottom = 0
-              Align = alClient
-              Alignment = taCenter
-              AutoSize = False
-              ParentFont = False
-              ShowAccelChar = False
-              Layout = tlCenter
-              OnMouseEnter = TitleLabelMouseEnter
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -24
-              Font.Name = 'Tahoma'
-              Font.Style = []
-              Angle = 0
-              Shadow.OffsetKeeper.LeftTop = -2
-              Shadow.OffsetKeeper.RightBottom = 4
-              ExplicitLeft = 8
-              ExplicitTop = 8
-              ExplicitWidth = 608
-              ExplicitHeight = 42
-            end
-            object InfoLabel: TsLabel
-              AlignWithMargins = True
-              Left = 3
-              Top = 40
-              Width = 624
-              Height = 13
-              Align = alBottom
-              Alignment = taCenter
-              ExplicitWidth = 3
-            end
+            Alignment = taCenter
+            AutoSize = False
+            ParentFont = False
+            ShowAccelChar = False
+            Layout = tlCenter
+            OnMouseEnter = TitleLabelMouseEnter
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -24
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            Angle = 0
+            Shadow.OffsetKeeper.LeftTop = -2
+            Shadow.OffsetKeeper.RightBottom = 4
+            ExplicitLeft = 8
+            ExplicitTop = 8
+            ExplicitWidth = 608
+            ExplicitHeight = 42
           end
         end
         object sPanel2: TsPanel
@@ -415,8 +407,8 @@ object MainForm: TMainForm
             TabOrder = 0
             OnClick = NextBtnClick
             OnMouseEnter = NextBtnMouseEnter
-            SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            SkinData.OuterEffects.Visibility = ovAlways
           end
           object PauseBtn: TsBitBtn
             AlignWithMargins = True
@@ -564,8 +556,8 @@ object MainForm: TMainForm
             TabOrder = 1
             OnClick = PauseBtnClick
             OnMouseEnter = PauseBtnMouseEnter
-            SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            SkinData.OuterEffects.Visibility = ovAlways
           end
           object PlayBtn: TsBitBtn
             AlignWithMargins = True
@@ -713,8 +705,8 @@ object MainForm: TMainForm
             TabOrder = 2
             OnClick = PlayBtnClick
             OnMouseEnter = PlayBtnMouseEnter
-            SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            SkinData.OuterEffects.Visibility = ovAlways
           end
           object PrevBtn: TsBitBtn
             AlignWithMargins = True
@@ -862,8 +854,8 @@ object MainForm: TMainForm
             TabOrder = 3
             OnClick = PrevBtnClick
             OnMouseEnter = PrevBtnMouseEnter
-            SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            SkinData.OuterEffects.Visibility = ovAlways
           end
           object StopBtn: TsBitBtn
             AlignWithMargins = True
@@ -1011,8 +1003,8 @@ object MainForm: TMainForm
             TabOrder = 4
             OnClick = StopBtnClick
             OnMouseEnter = StopBtnMouseEnter
-            SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            SkinData.OuterEffects.Visibility = ovAlways
           end
         end
         object sPanel3: TsPanel
@@ -1109,8 +1101,8 @@ object MainForm: TMainForm
             TabOrder = 0
             OnClick = L2Click
             OnMouseEnter = LogsBtnMouseEnter
-            SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            SkinData.OuterEffects.Visibility = ovAlways
           end
           object EQBtn: TsBitBtn
             AlignWithMargins = True
@@ -1340,8 +1332,8 @@ object MainForm: TMainForm
             TabOrder = 2
             OnClick = S2Click
             OnMouseEnter = SearchBtnMouseEnter
-            SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            SkinData.OuterEffects.Visibility = ovAlways
           end
           object SettingsBtn: TsBitBtn
             AlignWithMargins = True
@@ -1489,8 +1481,8 @@ object MainForm: TMainForm
             TabOrder = 3
             OnClick = G1Click
             OnMouseEnter = SettingsBtnMouseEnter
-            SkinData.OuterEffects.Visibility = ovAlways
             SkinData.SkinSection = 'BUTTON'
+            SkinData.OuterEffects.Visibility = ovAlways
           end
           object PlaybackOrderList: TsComboBox
             AlignWithMargins = True
@@ -1513,9 +1505,9 @@ object MainForm: TMainForm
             SkinData.SkinSection = 'COMBOBOX'
             VerticalAlignment = taAlignTop
             Style = csDropDownList
-            Color = 722950
+            Color = 2038810
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = 12102048
+            Font.Color = 13417908
             Font.Height = -11
             Font.Name = 'Tahoma'
             Font.Style = []
@@ -1648,7 +1640,7 @@ object MainForm: TMainForm
         OnMouseEnter = PlayListMouseEnter
         Align = alClient
         BorderStyle = bsNone
-        Color = 722950
+        Color = 2038810
         Columns = <
           item
             Caption = 'Artist'
@@ -1681,7 +1673,7 @@ object MainForm: TMainForm
           end>
         DragMode = dmAutomatic
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -1720,7 +1712,7 @@ object MainForm: TMainForm
         OnMouseEnter = QueueListMouseEnter
         OnMouseLeave = QueueListMouseLeave
         Align = alBottom
-        Color = 722950
+        Color = 2038810
         Columns = <
           item
           end
@@ -1728,7 +1720,7 @@ object MainForm: TMainForm
             Width = 100
           end>
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2068,7 +2060,7 @@ object MainForm: TMainForm
         OnMouseLeave = RadioListMouseLeave
         Align = alClient
         BorderStyle = bsNone
-        Color = 722950
+        Color = 2038810
         Columns = <
           item
           end>
@@ -2164,9 +2156,9 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'COMBOBOX'
           VerticalAlignment = taAlignTop
           Style = csDropDownList
-          Color = 722950
+          Color = 2038810
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 12102048
+          Font.Color = 13417908
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -2213,9 +2205,9 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'COMBOBOX'
           VerticalAlignment = taAlignTop
           Style = csDropDownList
-          Color = 722950
+          Color = 2038810
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 12102048
+          Font.Color = 13417908
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -2488,17 +2480,17 @@ object MainForm: TMainForm
       Left = 1
       Top = 1
       Width = 348
-      Height = 104
+      Height = 108
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 1
       SkinData.SkinSection = 'PANEL'
       DesignSize = (
         348
-        104)
+        108)
       object LyricTitleEdit: TLabeledEdit
         Left = 5
-        Top = 39
+        Top = 43
         Width = 336
         Height = 21
         Anchors = [akLeft, akTop, akRight]
@@ -2517,7 +2509,7 @@ object MainForm: TMainForm
       end
       object LyricArtistEdit: TLabeledEdit
         Left = 5
-        Top = 77
+        Top = 81
         Width = 281
         Height = 21
         Anchors = [akLeft, akTop, akRight]
@@ -2530,7 +2522,7 @@ object MainForm: TMainForm
       end
       object LyricSearchBtn: TsBitBtn
         Left = 292
-        Top = 64
+        Top = 72
         Width = 50
         Height = 34
         Anchors = [akRight, akBottom]
@@ -2561,9 +2553,9 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2579,14 +2571,14 @@ object MainForm: TMainForm
     end
     object LyricList: TsListBox
       Left = 1
-      Top = 105
+      Top = 109
       Width = 348
-      Height = 261
+      Height = 257
       Align = alClient
       BorderStyle = bsNone
-      Color = 722950
+      Color = 2038810
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 12102048
+      Font.Color = 13417908
       Font.Height = -13
       Font.Name = 'Tahoma'
       Font.Style = []
@@ -2628,9 +2620,9 @@ object MainForm: TMainForm
         Width = 245
         Height = 534
         Align = alClient
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2721,9 +2713,9 @@ object MainForm: TMainForm
         Width = 245
         Height = 564
         Align = alClient
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -8369,7 +8361,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800940116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800AC0116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -8881,6 +8873,7 @@ object MainForm: TMainForm
     Effects.AllowOuterEffects = True
     ExtendedBorders = True
     AnimEffects.DialogShow.Mode = atFading
+    IsDefault = False
     Brightness = -20
     InternalSkins = <
       item
@@ -9881,29 +9874,30 @@ object MainForm: TMainForm
     SkinInfo = '9'
     ThirdParty.ThirdEdits = 
       'TEdit'#13#10'TMemo'#13#10'TMaskEdit'#13#10'TLabeledEdit'#13#10'THotKey'#13#10'TListBox'#13#10'TCheck' +
-      'ListBox'#13#10'TRichEdit'#13#10'TDateTimePicker'
-    ThirdParty.ThirdButtons = 'TButton'
-    ThirdParty.ThirdBitBtns = 'TBitBtn'
-    ThirdParty.ThirdCheckBoxes = 'TCheckBox'#13#10'TRadioButton'#13#10'TGroupButton'
-    ThirdParty.ThirdGroupBoxes = 'TGroupBox'#13#10'TRadioGroup'
-    ThirdParty.ThirdListViews = 'TListView'
-    ThirdParty.ThirdPanels = 'TPanel'
-    ThirdParty.ThirdGrids = 'TStringGrid'#13#10'TDrawGrid'
-    ThirdParty.ThirdTreeViews = 'TTreeView'
-    ThirdParty.ThirdComboBoxes = 'TComboBox'#13#10'TColorBox'
-    ThirdParty.ThirdWWEdits = ' '
-    ThirdParty.ThirdVirtualTrees = ' '
-    ThirdParty.ThirdGridEh = ' '
-    ThirdParty.ThirdPageControl = 'TPageControl'
-    ThirdParty.ThirdTabControl = 'TTabControl'
-    ThirdParty.ThirdToolBar = 'TToolBar'
-    ThirdParty.ThirdStatusBar = 'TStatusBar'
-    ThirdParty.ThirdSpeedButton = 'TSpeedButton'
-    ThirdParty.ThirdScrollControl = 'TScrollBox'
-    ThirdParty.ThirdUpDown = 'TUpDown'
-    ThirdParty.ThirdScrollBar = 'TScrollBar'
-    ThirdParty.ThirdStaticText = 'TStaticText'
-    ThirdParty.ThirdNativePaint = ' '
+      'ListBox'#13#10'TRichEdit'#13#10'TDateTimePicker'#13#10'TDBListBox'#13#10'TDBMemo'#13#10'TDBLoo' +
+      'kupListBox'#13#10'TDBRichEdit'#13#10'TDBCtrlGrid'#13#10'TDBEdit'#13#10
+    ThirdParty.ThirdButtons = 'TButton'#13#10
+    ThirdParty.ThirdBitBtns = 'TBitBtn'#13#10
+    ThirdParty.ThirdCheckBoxes = 'TCheckBox'#13#10'TRadioButton'#13#10'TGroupButton'#13#10'TDBCheckBox'#13#10
+    ThirdParty.ThirdGroupBoxes = 'TGroupBox'#13#10'TRadioGroup'#13#10'TDBRadioGroup'#13#10
+    ThirdParty.ThirdListViews = 'TListView'#13#10
+    ThirdParty.ThirdPanels = 'TPanel'#13#10'TDBNavigator'#13#10'TDBCtrlPanel'#13#10
+    ThirdParty.ThirdGrids = 'TStringGrid'#13#10'TDrawGrid'#13#10'TDBGrid'#13#10
+    ThirdParty.ThirdTreeViews = 'TTreeView'#13#10'TDBTreeView'#13#10
+    ThirdParty.ThirdComboBoxes = 'TComboBox'#13#10'TColorBox'#13#10'TDBComboBox'#13#10
+    ThirdParty.ThirdWWEdits = ' '#13#10
+    ThirdParty.ThirdVirtualTrees = ' '#13#10
+    ThirdParty.ThirdGridEh = ' '#13#10
+    ThirdParty.ThirdPageControl = 'TPageControl'#13#10
+    ThirdParty.ThirdTabControl = 'TTabControl'#13#10
+    ThirdParty.ThirdToolBar = 'TToolBar'#13#10
+    ThirdParty.ThirdStatusBar = 'TStatusBar'#13#10
+    ThirdParty.ThirdSpeedButton = 'TSpeedButton'#13#10'TNavButton'#13#10
+    ThirdParty.ThirdScrollControl = 'TScrollBox'#13#10
+    ThirdParty.ThirdUpDown = 'TUpDown'#13#10
+    ThirdParty.ThirdScrollBar = 'TScrollBar'#13#10
+    ThirdParty.ThirdStaticText = 'TStaticText'#13#10
+    ThirdParty.ThirdNativePaint = ' '#13#10
     OnDeactivate = sSkinManager1Deactivate
     Left = 440
     Top = 60
@@ -10120,5 +10114,12 @@ object MainForm: TMainForm
     OnTimer = LastFMLaunchTimerTimer
     Left = 392
     Top = 224
+  end
+  object PipeServer: TPipeServer
+    Active = False
+    OnPipeConnect = PipeServerPipeConnect
+    PipeName = 'OooPlayerPipe'
+    Left = 779
+    Top = 354
   end
 end

@@ -39,7 +39,7 @@ uses
   sSplitter, sSkinProvider, acProgressBar, sTrackBar, acImage, acPNG,
   acAlphaHints, acAlphaImageList, sButton, Vcl.AppEvnts,
   acShellCtrls, sComboBoxes, sTreeView, sListBox, System.Types,
-  sEdit, sGauge, UnitLastFMToolLauncher;
+  sEdit, sGauge, UnitLastFMToolLauncher, Pipes;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -223,7 +223,6 @@ type
     PositionLabel: TsLabel;
     sPanel1: TsPanel;
     InfoPanel: TsPanel;
-    sPanel4: TsPanel;
     TitleLabel: TsLabelFX;
     sPanel2: TsPanel;
     NextBtn: TsBitBtn;
@@ -260,6 +259,7 @@ type
     PositionBar: TsGauge;
     LastFMLaunchTimer: TTimer;
     InfoLabel: TsLabel;
+    PipeServer: TPipeServer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -384,6 +384,10 @@ type
     procedure LyricPanelResize(Sender: TObject);
     procedure QueueListData(Sender: TObject; Item: TListItem);
     procedure sSkinManager1Deactivate(Sender: TObject);
+    procedure InfoLabelMouseEnter(Sender: TObject);
+    procedure InfoPanelMouseEnter(Sender: TObject);
+    procedure PipeServerPipeConnect(Sender: TObject; Pipe: HPIPE);
+    procedure FormActivate(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -402,6 +406,7 @@ type
     FCurrentRadioCatName: string;
     FCurrentRadioCatIndex: integer;
     FLastFMToolLauncher: TLastFMToolLauncher;
+    FFileInfoLauncher: TLastFMToolLauncher;
     FLastFMLaunchCounter: integer;
     FLastFMArtist, FLastFMSong: string;
 
@@ -545,7 +550,7 @@ implementation
 
 {$R *.dfm}
 
-uses UnitSearch, UnitSettings, UnitFileInfo, UnitLog, UnitAbout, UnitRadioInfo,
+uses UnitSearch, UnitSettings, UnitLog, UnitAbout, UnitRadioInfo,
   UnitNewRadio, UnitRadioRecordOptions, UnitEQ;
 
 // radio sync func
@@ -1584,11 +1589,47 @@ begin
 end;
 
 procedure TMainForm.F2Click(Sender: TObject);
+var
+  LFile: TStringList;
+  I: Integer;
 begin
   if PlayList.ItemIndex > -1 then
   begin
-    TInfoForm.Create(Application).Show;
+    LFile := TStringList.Create;
+    try
+      for I := 0 to PlayList.Items.Count - 1 do
+      begin
+        if PlayList.Items[i].Selected then
+        begin
+          LFile.Add(FPlaylists[FSelectedPlaylistIndex][i].FullFileName);
+        end;
+      end;
+      if FileExists(FAppDataFolder + '\fileinfo.txt') then
+      begin
+        DeleteFile(FAppDataFolder + '\fileinfo.txt')
+      end;
+      LFile.SaveToFile(FAppDataFolder + '\fileinfo.txt', TEncoding.UTF8);
+      if sSkinManager1.Active then
+      begin
+        FFileInfoLauncher.Start('', ExtractFileDir(Application.ExeName) + '\OooTagEditor.exe');
+      end
+      else
+      begin
+        FFileInfoLauncher.Start('', ExtractFileDir(Application.ExeName) + '\OooTagEditor.exe');
+      end;
+    finally
+      LFile.Free;
+      if not PipeServer.Broadcast(PWideChar(FAppDataFolder + '\fileinfo.txt')^, Length(FAppDataFolder + '\fileinfo.txt') * SizeOf(WideChar)) then
+      begin
+        ShowMessage('no broad');
+      end;
+    end;
   end;
+end;
+
+procedure TMainForm.FormActivate(Sender: TObject);
+begin
+  PipeServer.Broadcast(PWideChar('Active')^, Length('Active') * SizeOf(WideChar));
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1601,6 +1642,8 @@ begin
   TrayIcon.Active := False;
   Sleep(100);
   FLyricDownloader.Stop;
+  FFileInfoLauncher.Stop;
+  Taskbar.OverlayIcon := nil;
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
@@ -1702,6 +1745,8 @@ begin
   FuncPages.Pages[0].TabVisible := False;
   FuncPages.Pages[1].TabVisible := False;
   FLastFMToolLauncher := TLastFMToolLauncher.Create;
+  FFileInfoLauncher := TLastFMToolLauncher.Create;
+  PipeServer.Active := True;
 
   LRadios := TStringList.Create;
   try
@@ -1733,6 +1778,10 @@ begin
     end;
     FPlaylists[i].Free;
   end;
+  for I := 0 to FPlayListFiles.Count - 1 do
+  begin
+    FPlayListFiles[i].Free;
+  end;
   for I := 0 to FQueueLists.Count - 1 do
   begin
     FQueueLists[i].Free;
@@ -1747,9 +1796,9 @@ begin
   FLyricDownloader.Free;
   FTagWriter.Free;
   FArtworkReader.Free;
-  FPlayListFiles.Free;
   FExternalArtworkFiles.Free;
   FLastFMToolLauncher.Free;
+  FFileInfoLauncher.Free;
 end;
 
 procedure TMainForm.FormResize(Sender: TObject);
@@ -1807,7 +1856,6 @@ begin
   GenerateShuffleList;
   FShuffleIndex := -1;
   StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
-  // PlaylistListChange(Self);
 
   // FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex is reseted to -1 above so we need to
   // re-read it from ini file
@@ -2140,6 +2188,18 @@ begin
         end;
       end;
   end;
+end;
+
+procedure TMainForm.InfoLabelMouseEnter(Sender: TObject);
+begin
+  if Self.Enabled and Self.Visible then
+    Self.FocusControl(VolumeBar);
+end;
+
+procedure TMainForm.InfoPanelMouseEnter(Sender: TObject);
+begin
+  if Self.Enabled and Self.Visible then
+    Self.FocusControl(VolumeBar);
 end;
 
 function TMainForm.IsRadioPlayerPaused: Boolean;
@@ -3061,6 +3121,27 @@ begin
     BASS_ChannelPause(FRadioHandle);
     UpdateOverlayIcon(2);
   end;
+end;
+
+procedure TMainForm.PipeServerPipeConnect(Sender: TObject; Pipe: HPIPE);
+var
+  LFilePath: string;
+  LSkinName: string;
+  LHue: string;
+  LBrightness: string;
+  LSaturation: string;
+begin
+  LFilePath := 'File:' + FAppDataFolder + '\fileinfo.txt';
+  LSkinName := 'Skin:' + sSkinManager1.SkinName;
+  LHue := 'Hue:' + sSkinManager1.HueOffset.ToString();
+  LBrightness := 'Brig:' + sSkinManager1.Brightness.ToString();
+  LSaturation := 'Sat:' + sSkinManager1.Saturation.ToString();
+
+  PipeServer.Broadcast(PWideChar(LFilePath)^, Length(LFilePath) * SizeOf(WideChar));
+  PipeServer.Broadcast(PWideChar(LSkinName)^, Length(LSkinName) * SizeOf(WideChar));
+  PipeServer.Broadcast(PWideChar(LHue)^, Length(LHue) * SizeOf(WideChar));
+  PipeServer.Broadcast(PWideChar(LBrightness)^, Length(LBrightness) * SizeOf(WideChar));
+  PipeServer.Broadcast(PWideChar(LSaturation)^, Length(LSaturation) * SizeOf(WideChar));
 end;
 
 procedure TMainForm.PlaybackOrderListChange(Sender: TObject);
@@ -5356,7 +5437,7 @@ begin
       LIntMaxWidth := LIntWidth;
   end;
   SendMessage(LyricList.handle, LB_SETHORIZONTALEXTENT, LIntMaxWidth + 20, 0);
-  Log('lyric width: ' +  FloatToStr(LIntWidth));
+  Log('lyric width: ' + FloatToStr(LIntWidth));
 end;
 
 procedure TMainForm.UpdateOverlayIcon(const Index: integer);

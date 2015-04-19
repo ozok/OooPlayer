@@ -27,6 +27,7 @@ uses Classes, Generics.Collections;
 type
   TGeneralTag = class
     Tag, Value: string;
+    Edited: Boolean;
   end;
 
 type
@@ -61,9 +62,13 @@ type
     SampleRate: string;
     Title: string;
     Artist: string;
+    AlbumArtist: string;
     Album: string;
     PlayCount: integer;
     Stars: integer;
+    Genre: string;
+    Track: string;
+    Comment: string;
     constructor Create;
     destructor Destroy; override;
   end;

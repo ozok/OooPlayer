@@ -21,7 +21,7 @@ unit UnitLastFMToolLauncher;
 
 interface
 
-uses Classes, Windows, SysUtils, JvCreateProcess, Messages, StrUtils, ComCtrls;
+uses Classes, Windows, SysUtils, JvCreateProcess, Messages, StrUtils, ComCtrls, dialogs;
 
 type
   TLastFMToolLauncher = class(TObject)

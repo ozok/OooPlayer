@@ -7,8 +7,6 @@ uses
   MediaInfoDLL in 'Units\MediaInfoDLL.pas',
   UnitSearch in 'Forms\UnitSearch.pas' {SearchForm} ,
   UnitSettings in 'Forms\UnitSettings.pas' {SettingsForm} ,
-  UnitFileInfo in 'Forms\UnitFileInfo.pas' {InfoForm} ,
-  UnitTagReader in 'Units\UnitTagReader.pas',
   UnitTagTypes in 'Units\UnitTagTypes.pas',
   APEv2Library in 'Units\TagLibraries\APEv2Library.pas',
   FlacTagLibrary in 'Units\TagLibraries\FlacTagLibrary.pas',
@@ -48,7 +46,8 @@ uses
   UnitArtworkReader in 'Units\UnitArtworkReader.pas',
   UnitEQ in 'Forms\UnitEQ.pas' {EQForm} ,
   UnitArtworkInfo in 'Units\UnitArtworkInfo.pas',
-  UnitLastFMToolLauncher in 'Units\UnitLastFMToolLauncher.pas';
+  UnitLastFMToolLauncher in 'Units\UnitLastFMToolLauncher.pas',
+  UnitTagReader in 'Units\UnitTagReader.pas';
 
 {$R *.res}
 

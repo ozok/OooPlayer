@@ -69,6 +69,7 @@ type
     HueLabel: TsLabel;
     SaturationLabel: TsLabel;
     BrightnessLabel: TsLabel;
+    sLabel4: TsLabel;
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LoadArtBtnClick(Sender: TObject);
