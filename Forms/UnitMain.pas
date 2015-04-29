@@ -131,12 +131,10 @@ type
     C2: TMenuItem;
     E3: TMenuItem;
     A1: TMenuItem;
-    UpdateChecker: TJvHttpUrlGrabber;
     UpdateThread: TJvThread;
     OpenDialog: TsOpenDialog;
     S4: TMenuItem;
     D1: TMenuItem;
-    TrayIcon: TJvTrayIcon;
     TrayMenu: TPopupMenu;
     P6: TMenuItem;
     P7: TMenuItem;
@@ -260,6 +258,8 @@ type
     LastFMLaunchTimer: TTimer;
     InfoLabel: TsLabel;
     PipeServer: TPipeServer;
+    TrayIcon: TJvTrayIcon;
+    UpdateChecker: TJvHttpUrlGrabber;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -388,6 +388,7 @@ type
     procedure InfoPanelMouseEnter(Sender: TObject);
     procedure PipeServerPipeConnect(Sender: TObject; Pipe: HPIPE);
     procedure FormActivate(Sender: TObject);
+    procedure sSkinManager1Activate(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -530,7 +531,7 @@ var
 const
 {$DEFINE WRITEDEBUGLOG}
   BuildInt = 2212;
-  Portable = False;
+  Portable = True;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
   SHOW_ERROR = 1;
@@ -1621,7 +1622,7 @@ begin
       LFile.Free;
       if not PipeServer.Broadcast(PWideChar(FAppDataFolder + '\fileinfo.txt')^, Length(FAppDataFolder + '\fileinfo.txt') * SizeOf(WideChar)) then
       begin
-        ShowMessage('no broad');
+        LogForm.LogList.Lines.Add('Unable to broadcast tag editor message.')
       end;
     end;
   end;
@@ -2290,8 +2291,9 @@ begin
       TitleLabel.Caption := FTitleLabel;
     end;
 
-    LTextWidth := Self.Canvas.TextWidth(Self.Caption);
-    if LTextWidth > Self.Width then
+    LTextWidth := Self.Canvas.TextWidth(Self.Caption) + 160;
+    // Log(FloatToStr(Self.ClientWidth) + '/' + LTextWidth.ToString());
+    if LTextWidth > Self.ClientWidth then
     begin
       LContent := Self.Caption;
       Self.Caption := Copy(LContent, 2, Length(LContent) - 1) + Copy(LContent, 1, 1)
@@ -3132,7 +3134,14 @@ var
   LSaturation: string;
 begin
   LFilePath := 'File:' + FAppDataFolder + '\fileinfo.txt';
-  LSkinName := 'Skin:' + sSkinManager1.SkinName;
+  if sSkinManager1.Active then
+  begin
+    LSkinName := 'Skin:' + sSkinManager1.SkinName;
+  end
+  else
+  begin
+    LSkinName := 'Skin:none';
+  end;
   LHue := 'Hue:' + sSkinManager1.HueOffset.ToString();
   LBrightness := 'Brig:' + sSkinManager1.Brightness.ToString();
   LSaturation := 'Sat:' + sSkinManager1.Saturation.ToString();
@@ -5189,8 +5198,17 @@ begin
   RadioList.Columns[0].Width := RadioList.ClientWidth - 20;
 end;
 
+procedure TMainForm.sSkinManager1Activate(Sender: TObject);
+begin
+  Self.Canvas.Font.Assign(Self.Font);
+end;
+
 procedure TMainForm.sSkinManager1Deactivate(Sender: TObject);
 begin
+  if Assigned(Self.Canvas) then
+  begin
+    Self.Canvas.Font.Assign(Self.Font);
+  end;
   if Assigned(PositionBar) then
   begin
     PositionBar.ForeColor := clActiveCaption;
@@ -5437,7 +5455,6 @@ begin
       LIntMaxWidth := LIntWidth;
   end;
   SendMessage(LyricList.handle, LB_SETHORIZONTALEXTENT, LIntMaxWidth + 20, 0);
-  Log('lyric width: ' + FloatToStr(LIntWidth));
 end;
 
 procedure TMainForm.UpdateOverlayIcon(const Index: integer);

@@ -107,7 +107,7 @@ begin
     OnDoneStream := DoneStream;
     OnError := Error;
     OutputMode := omStream;
-    Agent := 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:32.0) Gecko/20100101 Firefox/32.0';
+    Agent := 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0';
   end;
 
   FLyricFolder := LyricFolder;
@@ -130,8 +130,8 @@ end;
 
 procedure TLyricDownloader.DoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string);
 const
-  START_STR = '<!-- start of lyrics -->';
-  END_STR = '<!-- end of lyrics -->';
+  START_STR = '<!-- Usage of azlyrics.com content';
+  END_STR = '<!-- MxM banner -->';
   START_STR_BAT = '<pre id="from_pre">';
   END_STR_BAT = '<pre id="to_pre" style="display';
   BAT_SPAN = '<span style="font-size';
@@ -184,7 +184,7 @@ begin
                 except
 
                 end;
-                if LLine = START_STR then
+                if LLine.StartsWith(START_STR) then
                 begin
                   LAddToLyricFile := True;
                 end
@@ -192,7 +192,7 @@ begin
                 begin
                   Break;
                 end;
-                if LAddToLyricFile then
+                if LAddToLyricFile and (not LLine.StartsWith(START_STR)) then
                 begin
                   FLyricFile.Add(Trim(FixLine(LLine)));
                 end;
@@ -358,6 +358,7 @@ begin
   Result := Trim(StringReplace(Result, '<br/>', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, 'º', 'ş', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, 'þ', 'ş', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '<br>', '', [rfReplaceAll]));
 
   Result := Trim(Result)
 end;
@@ -479,7 +480,6 @@ begin
     2:
       FPageDownloader.Url := 'http://www.metrolyrics.com/' + URIEncode(FixStrings(FTitle) + '-lyrics-' + FixStrings(FArtist)) + '.html';
   end;
-  LogForm.LogList.Lines.Add(FPageDownloader.Url);
   FPageDownloader.Start;
   while FPageDownloader.Status <> gsStopped do
   begin

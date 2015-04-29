@@ -1,6 +1,6 @@
 //********************************************************************************************************************************
 //*                                                                                                                              *
-//*     ID3v2 Library 2.0.37.90 © 3delite 2010-2015                                                                              *
+//*     ID3v2 Library 2.0.39.94 © 3delite 2010-2015                                                                              *
 //*     See ID3v2 Library 2.0 ReadMe.txt for details                                                                             *
 //*                                                                                                                              *
 //* Two licenses are available for commercial usage of this component:                                                           *
@@ -57,11 +57,12 @@ interface
 
 Uses
     SysUtils,
-    //Dialogs,
     Classes;
 
+{$MINENUMSIZE 4}
+
 Const
-    ID3V2LIBRARY_VERSION = $02003790;
+    ID3V2LIBRARY_VERSION = $02003994;
 
 Const
     ID3V2LIBRARY_DEFAULT_PARSE_AUDIO_ATTRBIUTES = True;
@@ -1196,113 +1197,116 @@ var
 begin
     Result := ID3V2LIBRARY_ERROR;
     Loaded := False;
-    Clear;
-    PreviousPosition := TagStream.Position;
-    if NOT ID3v2ValidTag(TagStream) then begin
-        TagStream.Seek(PreviousPosition, soBeginning);
-        //* WAV
-        if CheckRIFF(TagStream) then begin
-            FSourceFileType := sftWAVE;
-            if ParseAudioAttributes then begin
-                LoadWAVEAttributes(TagStream);
-            end;
-            if SeekRIFF(TagStream) = 0 then begin
-                Result := ID3V2LIBRARY_ERROR_NO_TAG_FOUND;
-                Exit;
-            end;
-        end else begin
-            //* WAV64
+    try
+        Clear;
+        PreviousPosition := TagStream.Position;
+        if NOT ID3v2ValidTag(TagStream) then begin
             TagStream.Seek(PreviousPosition, soBeginning);
-            if CheckRF64(TagStream) then begin
-                FSourceFileType := sftRF64;
+            //* WAV
+            if CheckRIFF(TagStream) then begin
+                FSourceFileType := sftWAVE;
                 if ParseAudioAttributes then begin
                     LoadWAVEAttributes(TagStream);
                 end;
-                if SeekRF64(TagStream) = 0 then begin
+                if SeekRIFF(TagStream) = 0 then begin
                     Result := ID3V2LIBRARY_ERROR_NO_TAG_FOUND;
                     Exit;
                 end;
             end else begin
-                //* AIFF
+                //* WAV64
                 TagStream.Seek(PreviousPosition, soBeginning);
-                if CheckAIFF(TagStream) then begin
-                    FSourceFileType := sftAIFF;
+                if CheckRF64(TagStream) then begin
+                    FSourceFileType := sftRF64;
                     if ParseAudioAttributes then begin
-                        AIFFInfo := GetAIFFInformation(TagStream);
+                        LoadWAVEAttributes(TagStream);
                     end;
-                    if SeekAIFF(TagStream) = 0 then begin
+                    if SeekRF64(TagStream) = 0 then begin
                         Result := ID3V2LIBRARY_ERROR_NO_TAG_FOUND;
                         Exit;
                     end;
                 end else begin
-                    //* DSF
+                    //* AIFF
                     TagStream.Seek(PreviousPosition, soBeginning);
-                    if CheckDSF(TagStream) then begin
-                        FSourceFileType := sftDSF;
+                    if CheckAIFF(TagStream) then begin
+                        FSourceFileType := sftAIFF;
                         if ParseAudioAttributes then begin
-                            LoadDSFInfo(TagStream);
+                            AIFFInfo := GetAIFFInformation(TagStream);
                         end;
-                        if SeekDSF(TagStream) = 0 then begin
+                        if SeekAIFF(TagStream) = 0 then begin
                             Result := ID3V2LIBRARY_ERROR_NO_TAG_FOUND;
                             Exit;
+                        end;
+                    end else begin
+                        //* DSF
+                        TagStream.Seek(PreviousPosition, soBeginning);
+                        if CheckDSF(TagStream) then begin
+                            FSourceFileType := sftDSF;
+                            if ParseAudioAttributes then begin
+                                LoadDSFInfo(TagStream);
+                            end;
+                            if SeekDSF(TagStream) = 0 then begin
+                                Result := ID3V2LIBRARY_ERROR_NO_TAG_FOUND;
+                                Exit;
+                            end;
                         end;
                     end;
                 end;
             end;
+            if NOT ID3v2ValidTag(TagStream) then begin
+                Result := ID3V2LIBRARY_ERROR_NO_TAG_FOUND;
+                Exit;
+            end;
         end;
-        if NOT ID3v2ValidTag(TagStream) then begin
-            Result := ID3V2LIBRARY_ERROR_NO_TAG_FOUND;
+        try
+            TagStream.Read(MajorVersion, 1);
+            TagStream.Read(MinorVersion, 1);
+        except
             Exit;
         end;
-    end;
-    try
-        TagStream.Read(MajorVersion, 1);
-        TagStream.Read(MinorVersion, 1);
-    except
-        Exit;
-    end;
-    if (MajorVersion > 4)
-    OR (MajorVersion < 2)
-    then begin
-        Result := ID3V2LIBRARY_ERROR_NOT_SUPPORTED_VERSION;
-        Exit;
-    end;
-    try
-        TagStream.Read(Flags, 1);
-        DecodeFlags;
-    except
-        Exit;
-    end;
-    try
-        TagStream.Read(CodedSize, 4);
-        DecodeSize;
-    except
-        Exit;
-    end;
-    FPosition := TagStream.Position - 10;
-    if ExtendedHeader then begin
-        //Showmessage('Extended header found!');
-        ReadExtendedHeader(TagStream);
-    end;
-    repeat
-        ValidFrameLoaded := LoadFrame(TagStream);
-        //* TODO seek back 3 bytes for compatibility for corrupt tags and try again
-    until NOT ValidFrameLoaded
-    OR (TagStream.Position >= FPosition + 10 + Self.Size);
-    //* Check if source is an MPEG
-    TagStream.Seek(Self.Size, soBeginning);
-    if CheckMPEG(TagStream) then begin
-        FSourceFileType := sftMPEG;
-        if ParseAudioAttributes then begin
-            //TagStream.Seek(Self.Size, soBeginning);
-            MPEGInfo := MPEGProcessHeader(TagStream);
-            Self.BitRate := MPEGInfo.BitRate;
-            //TagStream.Seek(Self.Size, soBeginning);
-            GetMPEGHeaderInformation(TagStream);
+        if (MajorVersion > 4)
+        OR (MajorVersion < 2)
+        then begin
+            Result := ID3V2LIBRARY_ERROR_NOT_SUPPORTED_VERSION;
+            Exit;
+        end;
+        try
+            TagStream.Read(Flags, 1);
+            DecodeFlags;
+        except
+            Exit;
+        end;
+        try
+            TagStream.Read(CodedSize, 4);
+            DecodeSize;
+        except
+            Exit;
+        end;
+        FPosition := TagStream.Position - 10;
+        if ExtendedHeader then begin
+            //Showmessage('Extended header found!');
+            ReadExtendedHeader(TagStream);
+        end;
+        repeat
+            ValidFrameLoaded := LoadFrame(TagStream);
+            //* TODO seek back 3 bytes for compatibility for corrupt tags and try again
+        until NOT ValidFrameLoaded
+        OR (TagStream.Position >= FPosition + 10 + Self.Size);
+        Result := ID3V2LIBRARY_SUCCESS;
+        Loaded := True;
+    finally
+        //* Check if source is an MPEG
+        TagStream.Seek(Self.Size, soBeginning);
+        if CheckMPEG(TagStream) then begin
+            FSourceFileType := sftMPEG;
+            if ParseAudioAttributes then begin
+                //TagStream.Seek(Self.Size, soBeginning);
+                MPEGInfo := MPEGProcessHeader(TagStream);
+                Self.BitRate := MPEGInfo.BitRate;
+                //TagStream.Seek(Self.Size, soBeginning);
+                GetMPEGHeaderInformation(TagStream);
+            end;
         end;
     end;
-    Result := ID3V2LIBRARY_SUCCESS;
-    Loaded := True;
 end;
 
 function TID3v2Tag.LoadFromFile(FileName: String): Integer;
@@ -1323,8 +1327,8 @@ begin
     end;
     try
         Result := LoadFromStream(FileStream);
-        if (Result = ID3V2LIBRARY_SUCCESS)
-        OR (Result = ID3V2LIBRARY_ERROR_NOT_SUPPORTED_VERSION)
+        if Result < ID3V2LIBRARY_ERROR_OPENING_FILE
+        //OR (Result = ID3V2LIBRARY_ERROR_NOT_SUPPORTED_VERSION)
         then begin
             Self.FileName := FileName;
         end;
@@ -4449,13 +4453,18 @@ begin
             end;
         end;
         //* Get the URL
+        SetLength(Bytes, 0);
+        ByteCounter  := 0;
         repeat
             Frames[FrameIndex].Stream.Read(Data, 1);
             if Data <> $0 then begin
-                Result := Result + Char(Data);
+                SetLength(Bytes, Length(Bytes) + 1);
+                Bytes[ByteCounter] := Data;
+                Inc(ByteCounter);
             end;
         until (Data = 0)
         OR (Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size);
+        Result := StringOf(Bytes);
     except
         //*
     end;
@@ -5011,7 +5020,7 @@ end;
 
 function TID3v2Tag.CheckMPEG(MPEGStream: TStream): Boolean;
 Const
-    MPEG_SEARCH_LENGTH = 4096;
+    MPEG_SEARCH_LENGTH = 32; //* Increasing this value helps for corrupted ID3v2 tags, but increses false MPEG sync detection
 var
     i: Integer;
     Data: Byte;
@@ -8857,6 +8866,7 @@ var
     ID: TFrameID;
 begin
     Result := False;
+    List.Clear;
     AnsiStringToPAnsiChar(FrameID, ID);
     Index := FrameExists(ID);
     if Index < 0 then begin
@@ -9820,6 +9830,7 @@ var
     Padding: Byte;
     PreviousPosition: Int64;
 begin
+    FillChar(Result, SizeOf(TMPEGHeader), 0);
     PreviousPosition := MPEGStream.Position;
     try
         Result.Position := MPEGStream.Position;
@@ -9836,91 +9847,91 @@ begin
 
         TmpHdr := ((Header shl 11) shr 30);
         case TmpHdr of
-            $0 : Result.Version := tmpegv25;
-            $1 : Result.Version := tmpegvUnknown;           // Reserved
-            $2 : Result.Version := tmpegv2;
-            $3 : Result.Version := tmpegv1;
+            $0: Result.Version := tmpegv25;
+            $1: Result.Version := tmpegvUnknown;           // Reserved
+            $2: Result.Version := tmpegv2;
+            $3: Result.Version := tmpegv1;
         end;
         TmpHdr := ((Header shl 13) shr 30);
         case TmpHdr of
-            $0 : Result.Layer := tmpeglUnknown;             // Reserved
-            $1 : Result.Layer := tmpegl3;
-            $2 : Result.Layer := tmpegl2;
-            $3 : Result.Layer := tmpegl1;
+            $0: Result.Layer := tmpeglUnknown;             // Reserved
+            $1: Result.Layer := tmpegl3;
+            $2: Result.Layer := tmpegl2;
+            $3: Result.Layer := tmpegl1;
         end;
         TmpHdr := ((Header shl 15) shr 31);
         case TmpHdr of
-            $0 : Result.CRC := True;
-            $1 : Result.CRC := False;
+            $0: Result.CRC := True;
+            $1: Result.CRC := False;
         end;
         TmpHdr := ((Header shl 16) shr 28);
         if Result.Version = tmpegv1 then begin
             if Result.Layer = tmpegl3 then begin
                 case TmpHdr of
-                    $0 : Result.BitRate := 65535;           // Free bitrate
-                    $1 : Result.BitRate := 32;
-                    $2 : Result.BitRate := 40;
-                    $3 : Result.BitRate := 48;
-                    $4 : Result.BitRate := 56;
-                    $5 : Result.BitRate := 64;
-                    $6 : Result.BitRate := 80;
-                    $7 : Result.BitRate := 96;
-                    $8 : Result.BitRate := 112;
-                    $9 : Result.BitRate := 128;
-                    $A : Result.BitRate := 160;
-                    $B : Result.BitRate := 192;
-                    $C : Result.BitRate := 224;
-                    $D : Result.BitRate := 256;
-                    $E : Result.BitRate := 320;
-                    $F : Result.BitRate := 0;               // Bad bitrate
+                    $0: Result.BitRate := 65535;           // Free bitrate
+                    $1: Result.BitRate := 32;
+                    $2: Result.BitRate := 40;
+                    $3: Result.BitRate := 48;
+                    $4: Result.BitRate := 56;
+                    $5: Result.BitRate := 64;
+                    $6: Result.BitRate := 80;
+                    $7: Result.BitRate := 96;
+                    $8: Result.BitRate := 112;
+                    $9: Result.BitRate := 128;
+                    $A: Result.BitRate := 160;
+                    $B: Result.BitRate := 192;
+                    $C: Result.BitRate := 224;
+                    $D: Result.BitRate := 256;
+                    $E: Result.BitRate := 320;
+                    $F: Result.BitRate := 0;               // Bad bitrate
                 end;
             end;
             if Result.Layer = tmpegl2 then begin
                 case TmpHdr of
-                    $0 : Result.BitRate := 65535;           // Free bitrate
-                    $1 : Result.BitRate := 32;
-                    $2 : Result.BitRate := 48;
-                    $3 : Result.BitRate := 56;
-                    $4 : Result.BitRate := 64;
-                    $5 : Result.BitRate := 80;
-                    $6 : Result.BitRate := 96;
-                    $7 : Result.BitRate := 112;
-                    $8 : Result.BitRate := 128;
-                    $9 : Result.BitRate := 160;
-                    $A : Result.BitRate := 192;
-                    $B : Result.BitRate := 224;
-                    $C : Result.BitRate := 256;
-                    $D : Result.BitRate := 320;
-                    $E : Result.BitRate := 384;
-                    $F : Result.BitRate := 0;               // Bad bitrate
+                    $0: Result.BitRate := 65535;           // Free bitrate
+                    $1: Result.BitRate := 32;
+                    $2: Result.BitRate := 48;
+                    $3: Result.BitRate := 56;
+                    $4: Result.BitRate := 64;
+                    $5: Result.BitRate := 80;
+                    $6: Result.BitRate := 96;
+                    $7: Result.BitRate := 112;
+                    $8: Result.BitRate := 128;
+                    $9: Result.BitRate := 160;
+                    $A: Result.BitRate := 192;
+                    $B: Result.BitRate := 224;
+                    $C: Result.BitRate := 256;
+                    $D: Result.BitRate := 320;
+                    $E: Result.BitRate := 384;
+                    $F: Result.BitRate := 0;               // Bad bitrate
                 end;
             end;
             if Result.Layer = tmpegl1 then begin
                 case TmpHdr of
-                    $0 : Result.BitRate := 65535;           // Free bitrate
-                    $1 : Result.BitRate := 32;
-                    $2 : Result.BitRate := 64;
-                    $3 : Result.BitRate := 96;
-                    $4 : Result.BitRate := 128;
-                    $5 : Result.BitRate := 160;
-                    $6 : Result.BitRate := 192;
-                    $7 : Result.BitRate := 224;
-                    $8 : Result.BitRate := 256;
-                    $9 : Result.BitRate := 288;
-                    $A : Result.BitRate := 320;
-                    $B : Result.BitRate := 352;
-                    $C : Result.BitRate := 384;
-                    $D : Result.BitRate := 416;
-                    $E : Result.BitRate := 448;
-                    $F : Result.BitRate := 0;               // Bad bitrate
+                    $0: Result.BitRate := 65535;           // Free bitrate
+                    $1: Result.BitRate := 32;
+                    $2: Result.BitRate := 64;
+                    $3: Result.BitRate := 96;
+                    $4: Result.BitRate := 128;
+                    $5: Result.BitRate := 160;
+                    $6: Result.BitRate := 192;
+                    $7: Result.BitRate := 224;
+                    $8: Result.BitRate := 256;
+                    $9: Result.BitRate := 288;
+                    $A: Result.BitRate := 320;
+                    $B: Result.BitRate := 352;
+                    $C: Result.BitRate := 384;
+                    $D: Result.BitRate := 416;
+                    $E: Result.BitRate := 448;
+                    $F: Result.BitRate := 0;               // Bad bitrate
                 end;
             end;
             TmpHdr := ((Header shl 20) shr 30);
             case TmpHdr of
-                $0 : Result.SampleRate := 44100;
-                $1 : Result.SampleRate := 48000;
-                $2 : Result.SampleRate := 32000;
-                $3 : Result.SampleRate := 0;                // Reserved
+                $0: Result.SampleRate := 44100;
+                $1: Result.SampleRate := 48000;
+                $2: Result.SampleRate := 32000;
+                $3: Result.SampleRate := 0;                // Reserved
             end;
         end;
         if (Result.Version = tmpegv2) OR (Result.Version = tmpegv25) then begin
@@ -9984,46 +9995,55 @@ begin
         end;
         TmpHdr := ((Header shl 22) shr 31);
         case TmpHdr of
-            $0 : Result.Padding := False;
-            $1 : Result.Padding := True;
+            $0: Result.Padding := False;
+            $1: Result.Padding := True;
         end;
         TmpHdr := ((Header shl 23) shr 31);
         case TmpHdr of
-            $0 : Result._Private := False;
-            $1 : Result._Private := True;
+            $0: Result._Private := False;
+            $1: Result._Private := True;
         end;
         TmpHdr := ((Header shl 24) shr 30);
         case TmpHdr of
-            $0 : Result.ChannelMode := tmpegcmStereo;
-            $1 : begin
+            $0: begin
+                Result.ChannelMode := tmpegcmStereo;
+                Result.ModeExtension := tmpegmeNone;
+            end;
+            $1: begin
                 Result.ChannelMode := tmpegcmJointStereo;
                 TmpHdr := ((Header shl 26) shr 30);
                 case TmpHdr of
-                    $0 : Result.ModeExtension := tmpegmeNone;
-                    $1 : Result.ModeExtension := tmpegmeIntensity;
-                    $2 : Result.ModeExtension := tmpegmeMS;
-                    $3 : Result.ModeExtension := tmpegmeIntensityMS;
+                    $0: Result.ModeExtension := tmpegmeNone;
+                    $1: Result.ModeExtension := tmpegmeIntensity;
+                    $2: Result.ModeExtension := tmpegmeMS;
+                    $3: Result.ModeExtension := tmpegmeIntensityMS;
                 end;
             end;
-            $2 : Result.ChannelMode := tmpegcmDualChannel;
-            $3 : Result.ChannelMode := tmpegcmMono;
+            $2: begin
+                Result.ChannelMode := tmpegcmDualChannel;
+                Result.ModeExtension := tmpegmeNone;
+            end;
+            $3: begin
+                Result.ChannelMode := tmpegcmMono;
+                Result.ModeExtension := tmpegmeNone;
+            end;
         end;
         TmpHdr := ((Header shl 28) shr 31);
         case TmpHdr of
-            $0 : Result.Copyrighted := False;
-            $1 : Result.Copyrighted := True;
+            $0: Result.Copyrighted := False;
+            $1: Result.Copyrighted := True;
         end;
         TmpHdr := ((Header shl 29) shr 31);
         case TmpHdr of
-            $0 : Result.Original := False;
-            $1 : Result.Original := True;
+            $0: Result.Original := False;
+            $1: Result.Original := True;
         end;
         TmpHdr := ((Header shl 30) shr 30);
         case TmpHdr of
-            $0 : Result.Emphasis := tmpegeNo;
-            $1 : Result.Emphasis := tmpege5015;
-            $2 : Result.Emphasis := tmpegeUnknown;
-            $3 : Result.Emphasis := tmpegeCCITJ17;
+            $0: Result.Emphasis := tmpegeNo;
+            $1: Result.Emphasis := tmpege5015;
+            $2: Result.Emphasis := tmpegeUnknown;
+            $3: Result.Emphasis := tmpegeCCITJ17;
         end;
         if Result.Padding
             then Padding := 1

@@ -1,6 +1,6 @@
 //********************************************************************************************************************************
 //*                                                                                                                              *
-//*     ID3v1 Library 2.0.37.90 © 3delite 2010-2015                                                                              *
+//*     ID3v1 Library 2.0.39.94 © 3delite 2010-2015                                                                              *
 //*     See ID3v2 Library 2.0 ReadMe.txt for details                                                                             *
 //*                                                                                                                              *
 //* Two licenses are available for commercial usage of this component:                                                           *
@@ -58,6 +58,8 @@ interface
 Uses
     SysUtils,
     Classes;
+
+{$MINENUMSIZE 4}
 
 const
     ID3V1TAGSIZE = 128;
@@ -351,7 +353,7 @@ begin
     end else begin
         SetLength(Bytes, Counter);
     end;
-    Result := StringOf(Bytes);
+    Result := Trim(StringOf(Bytes));
 end;
 
 Constructor TID3v1Tag.Create;

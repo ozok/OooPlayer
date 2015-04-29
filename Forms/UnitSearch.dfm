@@ -3,8 +3,8 @@ object SearchForm: TSearchForm
   Top = 0
   BorderStyle = bsSizeToolWin
   Caption = 'Search'
-  ClientHeight = 304
-  ClientWidth = 635
+  ClientHeight = 478
+  ClientWidth = 787
   Color = 3485741
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -22,14 +22,14 @@ object SearchForm: TSearchForm
   OnResize = FormResize
   OnShow = FormShow
   DesignSize = (
-    635
-    304)
+    787
+    478)
   PixelsPerInch = 96
   TextHeight = 13
   object ResultsLbl: TsLabel
     Left = 0
-    Top = 291
-    Width = 635
+    Top = 465
+    Width = 787
     Height = 13
     Align = alBottom
     ExplicitWidth = 3
@@ -37,7 +37,7 @@ object SearchForm: TSearchForm
   object QueryEdit: TLabeledEdit
     Left = 48
     Top = 10
-    Width = 498
+    Width = 650
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     EditLabel.Width = 34
@@ -48,9 +48,10 @@ object SearchForm: TSearchForm
     TabOrder = 0
     OnKeyDown = QueryEditKeyDown
     OnMouseEnter = QueryEditMouseEnter
+    ExplicitWidth = 498
   end
   object SearchBtn: TsButton
-    Left = 552
+    Left = 704
     Top = 8
     Width = 75
     Height = 25
@@ -59,12 +60,13 @@ object SearchForm: TSearchForm
     TabOrder = 1
     OnClick = SearchBtnClick
     SkinData.SkinSection = 'BUTTON'
+    ExplicitLeft = 552
   end
   object ResultsList: TsListView
     Left = 8
     Top = 39
-    Width = 619
-    Height = 223
+    Width = 771
+    Height = 397
     BoundLabel.Indent = 0
     BoundLabel.Font.Charset = DEFAULT_CHARSET
     BoundLabel.Font.Color = clWindowText
@@ -76,7 +78,7 @@ object SearchForm: TSearchForm
     BoundLabel.UseSkinColor = True
     SkinData.SkinSection = 'EDIT'
     Anchors = [akLeft, akTop, akRight, akBottom]
-    Color = 2038810
+    Color = 722950
     Columns = <
       item
         Caption = 'Title'
@@ -86,21 +88,30 @@ object SearchForm: TSearchForm
         Caption = 'Duration'
         Width = 80
       end>
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = 12102048
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
     ReadOnly = True
     RowSelect = True
+    ParentFont = False
     PopupMenu = ListMenu
     ShowColumnHeaders = False
     TabOrder = 2
     ViewStyle = vsReport
     OnClick = ResultsListClick
     OnDblClick = ResultsListDblClick
+    ExplicitWidth = 619
+    ExplicitHeight = 223
   end
   object chkCloseOnPlayBtn: TsCheckBox
     Left = 8
-    Top = 268
+    Top = 451
     Width = 250
     Height = 19
     Caption = 'Close this window if a result is selected to play'
+    Anchors = [akLeft, akBottom]
     Checked = True
     State = cbChecked
     TabOrder = 3

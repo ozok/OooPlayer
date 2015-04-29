@@ -425,10 +425,20 @@ begin
   begin
     if Stream.Size > 0 then
     begin
-      FCoverType := bmp;
-      FCoverStream.CopyFrom(Stream, Stream.Size);
-      FCoverArtInfoStr := FArtworkInfo.ReadFromStream(Stream);
-      FThread.Synchronize(LoadCoverFromMemory);
+      try
+        FCoverType := bmp;
+        FCoverStream.CopyFrom(Stream, Stream.Size);
+        FCoverArtInfoStr := FArtworkInfo.ReadFromStream(Stream);
+        FThread.Synchronize(LoadCoverFromMemory);
+      except
+        on E: Exception do
+        begin
+          FCoverArtFileToLoad := FDefaultImgPath;
+          FCoverArtInfoStr := '';
+          FThread.Synchronize(LoadCoverFile);
+          FInfoUpdateThread.Start;
+        end;
+      end;
     end;
   end;
 end;

@@ -1217,10 +1217,4 @@ object MainForm: TMainForm
     Left = 288
     Top = 504
   end
-  object JvDragDrop1: TJvDragDrop
-    DropTarget = Owner
-    OnDrop = JvDragDrop1Drop
-    Left = 584
-    Top = 448
-  end
 end
