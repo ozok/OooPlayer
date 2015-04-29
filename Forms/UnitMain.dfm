@@ -167,27 +167,19 @@ object MainForm: TMainForm
           Font.Style = [fsBold]
           ExplicitHeight = 14
         end
-        object PositionBar: TsGauge
-          AlignWithMargins = True
-          Left = 3
-          Top = 4
-          Width = 1007
-          Height = 16
-          Margins.Top = 4
-          Margins.Bottom = 4
+        object PositionBar: TsTrackBar
+          Left = 0
+          Top = 0
+          Width = 1013
+          Height = 24
           Align = alClient
+          TabOrder = 0
+          TickMarks = tmBoth
+          TickStyle = tsNone
           OnMouseDown = PositionBarMouseDown
-          BorderStyle = bsNone
-          Animated = False
-          SkinData.SkinSection = 'GAUGE'
-          ForeColor = clActiveCaption
-          Progress = 0
-          ShowText = False
-          Suffix = '%'
-          ExplicitLeft = 336
-          ExplicitTop = 16
-          ExplicitWidth = 120
-          ExplicitHeight = 30
+          SkinData.SkinSection = 'TRACKBAR'
+          BarOffsetV = 0
+          BarOffsetH = 0
         end
       end
       object sPanel1: TsPanel
@@ -5219,6 +5211,7 @@ object MainForm: TMainForm
   end
   object UpdateChecker: TJvHttpUrlGrabber
     FileName = 'output.txt'
+    OutputMode = omStream
     Agent = 'JEDI-VCL'
     Port = 0
     ProxyAddresses = 'proxyserver'

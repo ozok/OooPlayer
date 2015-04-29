@@ -254,12 +254,12 @@ type
     RenamePlaylistBtn: TsButton;
     RadiosView: TsTreeView;
     sSplitter2: TsSplitter;
-    PositionBar: TsGauge;
     LastFMLaunchTimer: TTimer;
     InfoLabel: TsLabel;
     PipeServer: TPipeServer;
     TrayIcon: TJvTrayIcon;
     UpdateChecker: TJvHttpUrlGrabber;
+    PositionBar: TsTrackBar;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -1730,7 +1730,7 @@ begin
   FPng := TPngImage.Create;
   FJpeg := TJPEGImage.Create;
   FRadioStations := TRadioList.Create;
-  PositionBar.MaxValue := MaxInt;
+  PositionBar.Max := MaxInt;
   FLyricDownloader := TLyricDownloader.Create(FAppDataFolder + '\lyric\');
   FPageHasntChangedYet := True;
   PortableMode := Portable;
@@ -2071,7 +2071,7 @@ begin
         begin
           // empty playlist
           MainForm.FStoppedByUser := True;
-          PositionBar.Progress := 0;
+          PositionBar.Position := 0;
           MainForm.Caption := 'OooPlayer';
           CoverImage.Picture.LoadFromFile('logo.png');
           TitleLabel.Caption := '';
@@ -2098,7 +2098,7 @@ begin
         begin
           // empty playlist
           MainForm.FStoppedByUser := True;
-          PositionBar.Progress := 0;
+          PositionBar.Position := 0;
           MainForm.Caption := 'OooPlayer';
           CoverImage.Picture.LoadFromFile('logo.png');
           TitleLabel.Caption := '';
@@ -2134,7 +2134,7 @@ begin
         begin
           // empty playlist
           MainForm.FStoppedByUser := True;
-          PositionBar.Progress := 0;
+          PositionBar.Position := 0;
           MainForm.Caption := 'OooPlayer';
           CoverImage.Picture.LoadFromFile('logo.png');
           TitleLabel.Caption := '';
@@ -2174,7 +2174,7 @@ begin
         begin
           // empty playlist
           MainForm.FStoppedByUser := True;
-          PositionBar.Progress := 0;
+          PositionBar.Position := 0;
           MainForm.Caption := 'OooPlayer';
           CoverImage.Picture.LoadFromFile('logo.png');
           TitleLabel.Caption := '';
@@ -3580,7 +3580,7 @@ begin
         FPlayer.FileName := FCurrentItemInfo.FullFileName;
         FPlayer.Play;
         FCurrentItemInfo.DurationBass := FPlayer.TotalLength;
-        PositionBar.MaxValue := MaxInt;
+        PositionBar.Max := MaxInt;
         Taskbar.ProgressMaxValue := MaxInt;
         FCurrentItemInfo.DurationAsSecInt := FPlayer.DurationAsSec;
         FPlayer.SetVolume(100 - VolumeBar.Position);
@@ -3657,7 +3657,7 @@ begin
         end;
 
         // position to default
-        PositionBar.Progress := 0;
+        PositionBar.Position := 0;
         PositionTimer.Enabled := True;
         ProgressTimer.Enabled := PositionTimer.Enabled;
         // reset playlist
@@ -4003,7 +4003,7 @@ begin
 
   FPlayer.Stop;
   StopRadioRecording;
-  PositionBar.Progress := 0;
+  PositionBar.Position := 0;
   Self.Caption := 'OooPlayer';
   PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
   CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
@@ -4085,9 +4085,9 @@ begin
     ProgressTimer.Enabled := PositionTimer.Enabled;
 
     try
-      if not FPlayer.SetPosition((FPlayer.TotalLength * PositionBar.Progress) div High(Int64)) then
+      if not FPlayer.SetPosition((FPlayer.TotalLength * PositionBar.Position) div High(Int64)) then
       begin
-        PositionBar.Progress := FPlayer.Position;
+        PositionBar.Position := FPlayer.Position;
       end;
     finally
       PositionTimer.Enabled := True;
@@ -4105,19 +4105,19 @@ var
 begin
   if FPlayer.PlayerStatus2 = psPlaying then
   begin
-    NewTractBarPosition := Round((X / PositionBar.Width) * FCurrentItemInfo.DurationBass);
+    NewTractBarPosition := Round((X / PositionBar.ClientWidth) * FCurrentItemInfo.DurationBass);
 
-    if (NewTractBarPosition <> PositionBar.Progress) then
+    if (NewTractBarPosition <> PositionBar.Position) then
     begin
-      PositionBar.Progress := NewTractBarPosition;
       PositionTimer.Enabled := False;
       ProgressTimer.Enabled := PositionTimer.Enabled;
+      PositionBar.Position := NewTractBarPosition;
 
       FPlayer.Pause;
       try
-        if not FPlayer.SetPosition((FPlayer.TotalLength * PositionBar.Progress) div FCurrentItemInfo.DurationBass) then
+        if not FPlayer.SetPosition((FPlayer.TotalLength * PositionBar.Position) div FCurrentItemInfo.DurationBass) then
         begin
-          PositionBar.Progress := FPlayer.Position;
+          PositionBar.Position := FPlayer.Position;
         end;
       finally
         Sleep(10);
@@ -4143,9 +4143,9 @@ begin
   if FPlayer.PlayerStatus2 = psPlaying then
   begin
     LPosition := (MaxInt * FPlayer.Position) div FCurrentItemInfo.DurationBass;
-    if LPosition > PositionBar.Progress then
+    if LPosition > PositionBar.Position then
     begin
-      PositionBar.Progress := LPosition;
+      PositionBar.Position := LPosition;
       Taskbar.ProgressValue := LPosition;
     end;
   end
@@ -5209,10 +5209,6 @@ begin
   begin
     Self.Canvas.Font.Assign(Self.Font);
   end;
-  if Assigned(PositionBar) then
-  begin
-    PositionBar.ForeColor := clActiveCaption;
-  end;
 end;
 
 procedure TMainForm.StartRadioRecording;
@@ -5294,7 +5290,7 @@ begin
       StopRadioRecording;
     end;
   end;
-  PositionBar.Progress := 0;
+  PositionBar.Position := 0;
   Self.Caption := 'OooPlayer';
   CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
   TitleLabel.Caption := '';
