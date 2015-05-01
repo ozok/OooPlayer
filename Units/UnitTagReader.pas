@@ -658,6 +658,8 @@ begin
           Genre := FID3v2Tag.GetUnicodeText('TCON');
           Track := FID3v2Tag.GetUnicodeText('TRCK');
           Comment := FID3v2Tag.GetUnicodeText('COMM');
+          Composer := FID3v2Tag.GetUnicodeText('TCOM');
+          Date := FID3v2Tag.GetUnicodeText('TYER');
         end;
       end;
     end
@@ -675,6 +677,7 @@ begin
           Genre := FID3v1Tag.Genre;
           Track := FID3v1Tag.TrackString;
           Comment := FID3v1Tag.Comment;
+          Date := FID3v1Tag.Year;
         end;
       end;
     end
@@ -690,8 +693,10 @@ begin
           Album := FMP4Tag.GetText('©alb');
           AlbumArtist := FMP4Tag.GetText('aART');
           Genre := FMP4Tag.GetGenre;
-          Track := FMP4Tag.GetText('trkn');
+          Track := FMP4Tag.GetTrack.ToString;
           Comment := FMP4Tag.GetText('©cmt');
+          Composer := FMP4Tag.GetText('©wrt');
+          Date := FMP4Tag.GetText('©day');
           // artwork
         end;
       end;
@@ -710,6 +715,8 @@ begin
           Genre := FAPETag.ReadFrameByNameAsText('Genre');
           Track := FAPETag.ReadFrameByNameAsText('Track');
           Comment := FAPETag.ReadFrameByNameAsText('Comment');
+          Composer := FAPETag.ReadFrameByNameAsText('Composer');
+          Date := FAPETag.ReadFrameByNameAsText('Year');
         end;
       end;
     end
@@ -727,6 +734,8 @@ begin
           Genre := FFLACTag.ReadFrameByNameAsText('GENRE');
           Track := FFLACTag.ReadFrameByNameAsText('TRACKNUMBER');
           Comment := FFLACTag.ReadFrameByNameAsText('COMMENT');
+          Composer := FFLACTag.ReadFrameByNameAsText('COMPOSER');
+          Date := FFLACTag.ReadFrameByNameAsText('YEAR');
         end;
       end;
     end
@@ -744,6 +753,8 @@ begin
           Genre := FOPUSTag.ReadFrameByNameAsText('GENRE');
           Track := FOPUSTag.ReadFrameByNameAsText('TRACKNUMBER');
           Comment := FOPUSTag.ReadFrameByNameAsText('COMMENT');
+          Composer := FOPUSTag.ReadFrameByNameAsText('COMPOSER');
+          Date := FOPUSTag.ReadFrameByNameAsText('YEAR');
         end;
       end;
     end
@@ -761,6 +772,8 @@ begin
           Genre := FWMATag.ReadFrameByNameAsText(g_wszWMGenre);
           Track := FWMATag.ReadFrameByNameAsText(g_wszWMTrackNumber);
           Comment := FWMATag.ReadFrameByNameAsText(g_wszWMDescription);
+          Composer := FWMATag.ReadFrameByNameAsText(g_wszWMComposer);
+          Date := FWMATag.ReadFrameByNameAsText(g_wszWMYear);
         end;
       end;
     end
@@ -778,6 +791,8 @@ begin
           Genre := FWAVTag.ReadFrameByNameAsText('IGNR');
           Track := FWAVTag.ReadFrameByNameAsText('ITRK');
           Comment := FWAVTag.ReadFrameByNameAsText('ICMT');
+          Composer := FWAVTag.ReadFrameByNameAsText('ICOM');
+          Date := FWAVTag.ReadFrameByNameAsText('ICRD');
         end;
       end;
     end;

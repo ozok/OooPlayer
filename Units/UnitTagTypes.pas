@@ -69,6 +69,8 @@ type
     Genre: string;
     Track: string;
     Comment: string;
+    Composer: string;
+    Date: string;
     constructor Create;
     destructor Destroy; override;
   end;

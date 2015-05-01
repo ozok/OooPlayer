@@ -2798,7 +2798,6 @@ object MainForm: TMainForm
       end
       object E2: TMenuItem
         Caption = 'Exit'
-        ShortCut = 16472
         OnClick = E2Click
       end
     end
@@ -3031,7 +3030,7 @@ object MainForm: TMainForm
   end
   object PositionTimer: TTimer
     Enabled = False
-    Interval = 250
+    Interval = 200
     OnTimer = PositionTimerTimer
     Left = 312
     Top = 288
@@ -3306,7 +3305,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800C00116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800C80116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

@@ -11,45 +11,41 @@ object MainForm: TMainForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  Menu = MainMenu1
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  DesignSize = (
-    942
-    562)
   PixelsPerInch = 96
   TextHeight = 13
   object PageControl1: TsPageControl
-    Left = 8
-    Top = 8
+    Left = 0
+    Top = 40
     Width = 289
-    Height = 515
+    Height = 501
     ActivePage = sTabSheet1
-    Anchors = [akLeft, akTop, akBottom]
+    Align = alLeft
     TabOrder = 0
     SkinData.SkinSection = 'PAGECONTROL'
+    ExplicitLeft = 8
+    ExplicitTop = 56
+    ExplicitHeight = 481
     object sTabSheet1: TsTabSheet
       Caption = 'Tags'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      object TagsList: TsScrollBox
-        Left = 0
-        Top = 0
-        Width = 281
-        Height = 450
-        Align = alClient
-        TabOrder = 0
-        SkinData.SkinSection = 'PANEL_LOW'
-      end
+      ExplicitLeft = 0
+      ExplicitTop = 8
+      ExplicitHeight = 487
       object sPanel1: TsPanel
         Left = 0
-        Top = 450
+        Top = 436
         Width = 281
         Height = 37
         Align = alBottom
-        TabOrder = 1
+        TabOrder = 0
         SkinData.SkinSection = 'PANEL'
+        ExplicitTop = 450
         DesignSize = (
           281
           37)
@@ -65,16 +61,6 @@ object MainForm: TMainForm
           OnClick = ApplyBtnClick
           SkinData.SkinSection = 'BUTTON'
         end
-        object OKBtn: TsButton
-          Left = 115
-          Top = 6
-          Width = 75
-          Height = 25
-          Anchors = [akRight, akBottom]
-          Caption = 'OK'
-          TabOrder = 1
-          SkinData.SkinSection = 'BUTTON'
-        end
         object ReloadBtn: TsButton
           Left = 8
           Top = 6
@@ -82,28 +68,263 @@ object MainForm: TMainForm
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = 'Reload'
-          TabOrder = 2
+          TabOrder = 1
           SkinData.SkinSection = 'BUTTON'
         end
       end
+      object TitleEdit: TsEdit
+        Left = 3
+        Top = 24
+        Width = 275
+        Height = 21
+        Color = 722950
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 12102048
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 1
+        OnChange = TitleEditChange
+        SkinData.SkinSection = 'EDIT'
+        BoundLabel.Active = True
+        BoundLabel.Caption = 'Title:'
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclTopLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+      end
+      object ArtistEdit: TsEdit
+        Left = 3
+        Top = 64
+        Width = 275
+        Height = 21
+        Color = 722950
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 12102048
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 2
+        OnChange = TitleEditChange
+        SkinData.SkinSection = 'EDIT'
+        BoundLabel.Active = True
+        BoundLabel.Caption = 'Artist:'
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclTopLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+      end
+      object AlbumArtistEdit: TsEdit
+        Left = 3
+        Top = 104
+        Width = 275
+        Height = 21
+        Color = 722950
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 12102048
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 3
+        OnChange = TitleEditChange
+        SkinData.SkinSection = 'EDIT'
+        BoundLabel.Active = True
+        BoundLabel.Caption = 'Album Artist:'
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclTopLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+      end
+      object AlbumEdit: TsEdit
+        Left = 3
+        Top = 144
+        Width = 275
+        Height = 21
+        Color = 722950
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 12102048
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 4
+        OnChange = TitleEditChange
+        SkinData.SkinSection = 'EDIT'
+        BoundLabel.Active = True
+        BoundLabel.Caption = 'Album:'
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclTopLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+      end
+      object DateEdit: TsEdit
+        Left = 3
+        Top = 184
+        Width = 70
+        Height = 21
+        Color = 722950
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 12102048
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 5
+        OnChange = TitleEditChange
+        SkinData.SkinSection = 'EDIT'
+        BoundLabel.Active = True
+        BoundLabel.Caption = 'Year:'
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclTopLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+      end
+      object TrackEdit: TsEdit
+        Left = 79
+        Top = 184
+        Width = 70
+        Height = 21
+        Color = 722950
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 12102048
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 6
+        OnChange = TitleEditChange
+        SkinData.SkinSection = 'EDIT'
+        BoundLabel.Active = True
+        BoundLabel.Caption = 'Track:'
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclTopLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+      end
+      object ComposerEdit: TsEdit
+        Left = 3
+        Top = 224
+        Width = 275
+        Height = 21
+        Color = 722950
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 12102048
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 7
+        OnChange = TitleEditChange
+        SkinData.SkinSection = 'EDIT'
+        BoundLabel.Active = True
+        BoundLabel.Caption = 'Composer:'
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclTopLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+      end
+      object CommentEdit: TsEdit
+        Left = 3
+        Top = 267
+        Width = 275
+        Height = 21
+        Color = 722950
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 12102048
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 8
+        OnChange = TitleEditChange
+        SkinData.SkinSection = 'EDIT'
+        BoundLabel.Active = True
+        BoundLabel.Caption = 'Comment:'
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclTopLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+      end
+      object GenreList: TsComboBox
+        Left = 155
+        Top = 184
+        Width = 123
+        Height = 21
+        Alignment = taLeftJustify
+        BoundLabel.Active = True
+        BoundLabel.Caption = 'Genre:'
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclTopLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+        VerticalAlignment = taAlignTop
+        Color = 722950
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 12102048
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ItemIndex = -1
+        ParentFont = False
+        TabOrder = 9
+        Text = 'GenreList'
+        OnChange = TitleEditChange
+      end
     end
   end
-  object Button1: TsButton
-    Left = 843
-    Top = 529
-    Width = 85
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Caption = 'Close'
-    TabOrder = 1
-    OnClick = Button1Click
-    SkinData.SkinSection = 'BUTTON'
-  end
   object FileList: TsListView
-    Left = 303
-    Top = 8
-    Width = 631
-    Height = 515
+    Left = 289
+    Top = 40
+    Width = 653
+    Height = 501
     BoundLabel.Indent = 0
     BoundLabel.Font.Charset = DEFAULT_CHARSET
     BoundLabel.Font.Color = clWindowText
@@ -114,8 +335,8 @@ object MainForm: TMainForm
     BoundLabel.MaxWidth = 0
     BoundLabel.UseSkinColor = True
     SkinData.SkinSection = 'EDIT'
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    Color = 2038810
+    Align = alClient
+    Color = 722950
     Columns = <
       item
         Caption = 'File Name'
@@ -154,21 +375,97 @@ object MainForm: TMainForm
         Width = 150
       end>
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = 13417908
+    Font.Color = 12102048
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
+    HideSelection = False
     OwnerData = True
     ReadOnly = True
     RowSelect = True
     ParentFont = False
     StateImages = sAlphaImageList1
-    TabOrder = 2
+    TabOrder = 1
     ViewStyle = vsReport
     OnClick = FileListClick
     OnData = FileListData
   end
+  object sStatusBar1: TsStatusBar
+    Left = 0
+    Top = 541
+    Width = 942
+    Height = 21
+    Panels = <
+      item
+        Text = 'OooTagEditor 1.0 Beta'
+        Width = 50
+      end>
+    SkinData.SkinSection = 'STATUSBAR'
+    ExplicitTop = 543
+  end
+  object TopPanel: TsPanel
+    Left = 0
+    Top = 0
+    Width = 942
+    Height = 40
+    Align = alTop
+    TabOrder = 3
+    SkinData.SkinSection = 'PANEL'
+    object AddFileBtn: TsBitBtn
+      AlignWithMargins = True
+      Left = 4
+      Top = 4
+      Width = 75
+      Height = 32
+      Align = alLeft
+      Caption = 'Add Files'
+      TabOrder = 0
+      ExplicitLeft = 432
+      ExplicitTop = 16
+      ExplicitHeight = 25
+    end
+    object RemoveSelectedBtn: TsBitBtn
+      AlignWithMargins = True
+      Left = 85
+      Top = 4
+      Width = 75
+      Height = 32
+      Align = alLeft
+      Caption = 'Remove'
+      TabOrder = 1
+      ExplicitLeft = 440
+      ExplicitTop = 24
+      ExplicitHeight = 25
+    end
+    object RemoveAllBtn: TsBitBtn
+      AlignWithMargins = True
+      Left = 166
+      Top = 4
+      Width = 75
+      Height = 32
+      Align = alLeft
+      Caption = 'Remove All'
+      TabOrder = 2
+      ExplicitLeft = 448
+      ExplicitTop = 32
+      ExplicitHeight = 25
+    end
+    object AboutBtn: TsBitBtn
+      AlignWithMargins = True
+      Left = 863
+      Top = 4
+      Width = 75
+      Height = 32
+      Align = alRight
+      Caption = 'About...'
+      TabOrder = 3
+      ExplicitLeft = 424
+      ExplicitTop = 25
+      ExplicitHeight = 25
+    end
+  end
   object sSkinManager1: TsSkinManager
+    IsDefault = False
     InternalSkins = <
       item
         Name = 'Graphite (internal)'
@@ -1189,8 +1486,8 @@ object MainForm: TMainForm
     ThirdParty.ThirdScrollBar = ' '
     ThirdParty.ThirdStaticText = ' '
     ThirdParty.ThirdNativePaint = ' '
-    Left = 32
-    Top = 512
+    Left = 544
+    Top = 360
   end
   object sSkinProvider1: TsSkinProvider
     AddedTitle.Font.Charset = DEFAULT_CHARSET
@@ -1200,21 +1497,59 @@ object MainForm: TMainForm
     AddedTitle.Font.Style = []
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
-    Left = 160
-    Top = 512
+    Left = 544
+    Top = 448
   end
   object PipeClient1: TPipeClient
     MemoryThrottle = 10240000
     PipeName = 'OooPlayerPipe'
     OnPipeMessage = PipeClient1PipeMessage
-    Left = 116
-    Top = 512
+    Left = 540
+    Top = 400
   end
   object sAlphaImageList1: TsAlphaImageList
     Height = 22
     Width = 1
     Items = <>
-    Left = 288
-    Top = 504
+    Left = 440
+    Top = 424
+  end
+  object JvDragDrop1: TJvDragDrop
+    DropTarget = Owner
+    OnDrop = JvDragDrop1Drop
+    Left = 464
+    Top = 288
+  end
+  object MainMenu1: TMainMenu
+    Left = 624
+    Top = 248
+    object F1: TMenuItem
+      Caption = 'File'
+      object A1: TMenuItem
+        Caption = 'Add'
+      end
+      object R1: TMenuItem
+        Caption = 'Remove'
+        ShortCut = 46
+      end
+      object R2: TMenuItem
+        Caption = 'Remove All'
+        ShortCut = 8238
+      end
+    end
+    object T1: TMenuItem
+      Caption = 'Tags'
+      object S1: TMenuItem
+        Caption = 'Save'
+        ShortCut = 16467
+      end
+      object R3: TMenuItem
+        Caption = 'Reload'
+        ShortCut = 16466
+      end
+    end
+    object A2: TMenuItem
+      Caption = 'About'
+    end
   end
 end

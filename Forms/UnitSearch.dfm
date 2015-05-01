@@ -48,7 +48,6 @@ object SearchForm: TSearchForm
     TabOrder = 0
     OnKeyDown = QueryEditKeyDown
     OnMouseEnter = QueryEditMouseEnter
-    ExplicitWidth = 498
   end
   object SearchBtn: TsButton
     Left = 704
@@ -60,7 +59,6 @@ object SearchForm: TSearchForm
     TabOrder = 1
     OnClick = SearchBtnClick
     SkinData.SkinSection = 'BUTTON'
-    ExplicitLeft = 552
   end
   object ResultsList: TsListView
     Left = 8
@@ -102,12 +100,10 @@ object SearchForm: TSearchForm
     ViewStyle = vsReport
     OnClick = ResultsListClick
     OnDblClick = ResultsListDblClick
-    ExplicitWidth = 619
-    ExplicitHeight = 223
   end
   object chkCloseOnPlayBtn: TsCheckBox
     Left = 8
-    Top = 451
+    Top = 440
     Width = 250
     Height = 19
     Caption = 'Close this window if a result is selected to play'

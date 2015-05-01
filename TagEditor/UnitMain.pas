@@ -8,11 +8,12 @@ uses
   sButton, Vcl.ExtCtrls, sPanel, sScrollBox, sPageControl, sSkinProvider,
   sSkinManager, UnitTagReader, Generics.Collections, sEdit, UnitTagTypes, MediaInfoDll,
   Pipes, Vcl.Mask, sMaskEdit, sCustomComboEdit, sToolEdit, sListView, sConst,
-  Vcl.ImgList, acAlphaImageList, JvComponentBase, JvDragDrop;
+  Vcl.ImgList, acAlphaImageList, JvComponentBase, JvDragDrop, sComboBox,
+  Vcl.Buttons, sBitBtn, sStatusBar, Vcl.Menus;
 
 type
   TFileItem = class
-    FullPath, TagType, Title, Artist, Album, AlbumArtist, Genre, Comment, Track: string;
+    FullPath, TagType, Title, Artist, Album, AlbumArtist, Genre, Comment, Track, Composer, Year: string;
   end;
 
   TFileItems = TList<TFileItem>;
@@ -33,25 +34,46 @@ type
     sSkinProvider1: TsSkinProvider;
     PageControl1: TsPageControl;
     sTabSheet1: TsTabSheet;
-    TagsList: TsScrollBox;
     sPanel1: TsPanel;
     ApplyBtn: TsButton;
-    OKBtn: TsButton;
     ReloadBtn: TsButton;
-    Button1: TsButton;
     PipeClient1: TPipeClient;
     FileList: TsListView;
     sAlphaImageList1: TsAlphaImageList;
+    TitleEdit: TsEdit;
+    ArtistEdit: TsEdit;
+    AlbumArtistEdit: TsEdit;
+    AlbumEdit: TsEdit;
+    DateEdit: TsEdit;
+    TrackEdit: TsEdit;
+    ComposerEdit: TsEdit;
+    CommentEdit: TsEdit;
+    GenreList: TsComboBox;
     JvDragDrop1: TJvDragDrop;
+    sStatusBar1: TsStatusBar;
+    TopPanel: TsPanel;
+    AddFileBtn: TsBitBtn;
+    RemoveSelectedBtn: TsBitBtn;
+    RemoveAllBtn: TsBitBtn;
+    AboutBtn: TsBitBtn;
+    MainMenu1: TMainMenu;
+    F1: TMenuItem;
+    T1: TMenuItem;
+    A1: TMenuItem;
+    R1: TMenuItem;
+    R2: TMenuItem;
+    S1: TMenuItem;
+    R3: TMenuItem;
+    A2: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure ApplyBtnClick(Sender: TObject);
     procedure PipeClient1PipeMessage(Sender: TObject; Pipe: HPIPE; Stream: TStream);
-    procedure ReadFileBtnClick(Sender: TObject);
     procedure FileListData(Sender: TObject; Item: TListItem);
     procedure FileListClick(Sender: TObject);
     procedure JvDragDrop1Drop(Sender: TObject; Pos: TPoint; Value: TStrings);
+    procedure TitleEditChange(Sender: TObject);
   private
     { Private declarations }
     FTagReader: TTagReader;
@@ -70,7 +92,7 @@ type
     procedure GetFileInfoForDisplay(const FileName: string);
   public
     { Public declarations }
-    procedure GetFileInfo(const FileName: string);
+    procedure GetFileInfo(const FileIndex: integer);
     // protected
     // procedure CreateParams(var Params: TCreateParams); override;
   end;
@@ -119,7 +141,7 @@ procedure TMainForm.FileListClick(Sender: TObject);
 begin
   if FileList.ItemIndex > -1 then
   begin
-    GetFileInfo(FFileItems[FileList.ItemIndex].FullPath);
+    GetFileInfo(FileList.ItemIndex);
   end;
 end;
 
@@ -196,83 +218,30 @@ begin
   FSettingsFile.Free;
 end;
 
-procedure TMainForm.GetFileInfo(const FileName: string);
-var
-  i: Integer;
-  LItem: TListItem;
-  LTagItem: TTagItem;
-  LTagDisplayName: string;
+procedure TMainForm.GetFileInfo(const FileIndex: integer);
 begin
-  if (FileExists(FileName)) then
+  TitleEdit.Text := '';
+  ArtistEdit.Text := '';
+  AlbumArtistEdit.Text := '';
+  AlbumEdit.Text := '';
+  TrackEdit.Text := '';
+  DateEdit.Text := '';
+  GenreList.Text := '';
+  ComposerEdit.Text := '';
+  CommentEdit.Text := '';
+  with FFileItems[FileIndex] do
   begin
-    if not FTagReader.IsBusy then
-    begin
-      SendMessage(TagsList.Handle, WM_SETREDRAW, 0, 0);
-      try
-        for I := 0 to FTagItems.Count - 1 do
-        begin
-          FTagItems[i].Panel.Visible := False;
-          FTagItems[i].Free;
-        end;
-        for I := 0 to FTags.Count - 1 do
-        begin
-          FTags[i].Free;
-        end;
-        FTagItems.Clear;
-        FTags.Clear;
-
-        FTags := FTagReader.ReadTags2(FileName);
-        for I := 0 to FTags.Count - 1 do
-        begin
-          LTagItem := TTagItem.Create(TagsList, i, i * 45);
-
-          LTagDisplayName := FTags[i].Tag;
-          case FTagReader.TagType of
-            id3v2:
-              begin
-                if FId3v2TagFieldNames.ContainsKey(FTags[i].Tag) then
-                begin
-                  FId3v2TagFieldNames.TryGetValue(FTags[i].Tag, LTagDisplayName)
-                end;
-              end;
-            id3v1:
-              ;
-            flac:
-              ;
-            ape:
-              ;
-            wma:
-              ;
-            mp4:
-              begin
-                if FMp4TagFieldNames.ContainsKey(FTags[i].Tag) then
-                begin
-                  FMp4TagFieldNames.TryGetValue(FTags[i].Tag, LTagDisplayName)
-                end;
-              end;
-            ogg:
-              ;
-            wav:
-              ;
-          end;
-
-          LTagItem.TagEdit.Text := FTags[i].Value;
-          LTagItem.TagEdit.BoundLabel.Caption := LTagDisplayName + ':';
-          LTagItem.TagEdit.OnChange := EditChange;
-
-          FTagItems.Add(LTagItem);
-          TagsList.InsertControl(LTagItem.Panel);
-          LTagItem.TagEdit.Width := LTagItem.Panel.ClientWidth - 20;
-          LTagItem.TagEdit.Left := 10;
-        end;
-      finally
-        SendMessage(TagsList.Handle, WM_SETREDRAW, 1, 0);
-        RedrawWindow(TagsList.Handle, nil, 0, RDW_ERASE or RDW_INVALIDATE or RDW_FRAME or RDW_ALLCHILDREN);
-      end;
-
-    end;
-    Self.BringToFront;
+    TitleEdit.Text := Title;
+    ArtistEdit.Text := Artist;
+    AlbumArtistEdit.Text := AlbumArtist;
+    AlbumEdit.Text := Album;
+    TrackEdit.Text := Track;
+    DateEdit.Text := '';
+    GenreList.Text := Genre;
+    ComposerEdit.Text := Composer;
+    CommentEdit.Text := Comment;
   end;
+  ApplyBtn.Enabled := False;
 end;
 
 procedure TMainForm.GetFileInfoForDisplay(const FileName: string);
@@ -299,6 +268,8 @@ begin
         LFileItem.Genre := LTags.Genre;
         LFileItem.Comment := LTags.Comment;
         LFileItem.Track := LTags.Track;
+        LFileItem.Composer := LTags.Composer;
+        LFileItem.Year := LTags.Date;
 
         FFileItems.Add(LFileItem);
       finally
@@ -317,7 +288,7 @@ begin
     GetFileInfoForDisplay(Value[i]);
   end;
   FileList.Items.Count := FFileItems.Count;
-  GetFileInfo(Value[0]);
+  GetFileInfo(0);
 end;
 
 procedure TMainForm.LoadTagFielNames;
@@ -376,7 +347,7 @@ begin
         GetFileInfoForDisplay(LSettingsFile[i]);
       end;
       FileList.Items.Count := FFileItems.Count;
-      GetFileInfo(LSettingsFile[0]);
+      GetFileInfo(0);
     finally
       LSettingsFile.Free;
     end;
@@ -412,9 +383,9 @@ begin
   end
 end;
 
-procedure TMainForm.ReadFileBtnClick(Sender: TObject);
+procedure TMainForm.TitleEditChange(Sender: TObject);
 begin
-
+  ApplyBtn.Enabled := True;
 end;
 
 { TTagItem }
