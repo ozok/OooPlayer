@@ -93,6 +93,7 @@ begin
           LItem.Caption := FPlaylists[FSelectedPlaylistIndex][LItemIndex].Artist + ' - ' + FPlaylists[FSelectedPlaylistIndex][LItemIndex].Album + ' - ' + FPlaylists[FSelectedPlaylistIndex]
             [LItemIndex].Title;
           LItem.SubItems.Add(FPlaylists[FSelectedPlaylistIndex][LItemIndex].DurationStr);
+          PlayList.Items[LItemIndex].Update;
         end;
       end;
     end;

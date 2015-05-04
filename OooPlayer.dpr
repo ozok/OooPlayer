@@ -47,7 +47,8 @@ uses
   UnitEQ in 'Forms\UnitEQ.pas' {EQForm} ,
   UnitArtworkInfo in 'Units\UnitArtworkInfo.pas',
   UnitLastFMToolLauncher in 'Units\UnitLastFMToolLauncher.pas',
-  UnitTagReader in 'Units\UnitTagReader.pas';
+  UnitTagReader in 'Units\UnitTagReader.pas',
+  UnitSubProcessLauncher in 'Units\UnitSubProcessLauncher.pas';
 
 {$R *.res}
 

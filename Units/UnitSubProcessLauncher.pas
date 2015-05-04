@@ -17,14 +17,14 @@
   * along with OooPlayer.  If not, see <http://www.gnu.org/licenses/>.
   *
   * }
-unit UnitLastFMToolLauncher;
+unit UnitSubProcessLauncher;
 
 interface
 
 uses Classes, Windows, SysUtils, JvCreateProcess, Messages, StrUtils, ComCtrls;
 
 type
-  TLastFMToolLauncher = class(TObject)
+  TSubProcessLauncher = class(TObject)
   private
     FProcess: TJvCreateProcess;
     procedure ProcessTerminate(Sender: TObject; ExitCode: Cardinal);
@@ -40,11 +40,11 @@ type
 
 implementation
 
-{ TLastFMToolLauncher }
-
 uses UnitLog;
 
-constructor TLastFMToolLauncher.Create;
+{ TSubProcessLauncher }
+
+constructor TSubProcessLauncher.Create;
 begin
   inherited Create;
 
@@ -58,28 +58,28 @@ begin
 
     with StartupInfo do
     begin
-      DefaultPosition := False;
-      DefaultSize := False;
-      DefaultWindowState := False;
-      ShowWindow := swHide;
+      DefaultPosition := True;
+      DefaultSize := True;
+      DefaultWindowState := True;
+      ShowWindow := swNormal;
     end;
 
-    WaitForTerminate := true;
+    WaitForTerminate := True;
   end;
 end;
 
-destructor TLastFMToolLauncher.Destroy;
+destructor TSubProcessLauncher.Destroy;
 begin
   inherited Destroy;
   FProcess.Free;
 end;
 
-function TLastFMToolLauncher.GetRunning: Boolean;
+function TSubProcessLauncher.GetRunning: Boolean;
 begin
   Result := 0 <> FProcess.ProcessInfo.hProcess;
 end;
 
-procedure TLastFMToolLauncher.ProcessTerminate(Sender: TObject; ExitCode: Cardinal);
+procedure TSubProcessLauncher.ProcessTerminate(Sender: TObject; ExitCode: Cardinal);
 begin
   if ExitCode <> 0 then
   begin
@@ -91,7 +91,7 @@ begin
   LogForm.LogList.Lines.AddStrings(FProcess.ConsoleOutput);
 end;
 
-procedure TLastFMToolLauncher.Start(const SettingsFilePath: string; const ProcessPath: string);
+procedure TSubProcessLauncher.Start(const SettingsFilePath: string; const ProcessPath: string);
 begin
   if FProcess.ProcessInfo.hProcess = 0 then
   begin
@@ -115,7 +115,7 @@ begin
   end;
 end;
 
-procedure TLastFMToolLauncher.Stop;
+procedure TSubProcessLauncher.Stop;
 begin
   if FProcess.ProcessInfo.hProcess > 0 then
   begin

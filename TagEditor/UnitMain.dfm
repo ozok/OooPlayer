@@ -1,10 +1,9 @@
 object MainForm: TMainForm
   Left = 0
   Top = 0
-  BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'OooTagEditor'
   ClientHeight = 562
-  ClientWidth = 942
+  ClientWidth = 1224
   Color = 3485741
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,6 +15,7 @@ object MainForm: TMainForm
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object PageControl1: TsPageControl
@@ -27,16 +27,10 @@ object MainForm: TMainForm
     Align = alLeft
     TabOrder = 0
     SkinData.SkinSection = 'PAGECONTROL'
-    ExplicitLeft = 8
-    ExplicitTop = 56
-    ExplicitHeight = 481
     object sTabSheet1: TsTabSheet
       Caption = 'Tags'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 8
-      ExplicitHeight = 487
       object sPanel1: TsPanel
         Left = 0
         Top = 436
@@ -45,7 +39,6 @@ object MainForm: TMainForm
         Align = alBottom
         TabOrder = 0
         SkinData.SkinSection = 'PANEL'
-        ExplicitTop = 450
         DesignSize = (
           281
           37)
@@ -55,7 +48,7 @@ object MainForm: TMainForm
           Width = 75
           Height = 25
           Anchors = [akRight, akBottom]
-          Caption = 'Apply'
+          Caption = 'Save'
           Enabled = False
           TabOrder = 0
           OnClick = ApplyBtnClick
@@ -323,7 +316,7 @@ object MainForm: TMainForm
   object FileList: TsListView
     Left = 289
     Top = 40
-    Width = 653
+    Width = 935
     Height = 501
     BoundLabel.Indent = 0
     BoundLabel.Font.Charset = DEFAULT_CHARSET
@@ -389,11 +382,12 @@ object MainForm: TMainForm
     ViewStyle = vsReport
     OnClick = FileListClick
     OnData = FileListData
+    ExplicitWidth = 653
   end
   object sStatusBar1: TsStatusBar
     Left = 0
     Top = 541
-    Width = 942
+    Width = 1224
     Height = 21
     Panels = <
       item
@@ -401,16 +395,17 @@ object MainForm: TMainForm
         Width = 50
       end>
     SkinData.SkinSection = 'STATUSBAR'
-    ExplicitTop = 543
+    ExplicitWidth = 942
   end
   object TopPanel: TsPanel
     Left = 0
     Top = 0
-    Width = 942
+    Width = 1224
     Height = 40
     Align = alTop
     TabOrder = 3
     SkinData.SkinSection = 'PANEL'
+    ExplicitWidth = 942
     object AddFileBtn: TsBitBtn
       AlignWithMargins = True
       Left = 4
@@ -420,9 +415,6 @@ object MainForm: TMainForm
       Align = alLeft
       Caption = 'Add Files'
       TabOrder = 0
-      ExplicitLeft = 432
-      ExplicitTop = 16
-      ExplicitHeight = 25
     end
     object RemoveSelectedBtn: TsBitBtn
       AlignWithMargins = True
@@ -433,9 +425,6 @@ object MainForm: TMainForm
       Align = alLeft
       Caption = 'Remove'
       TabOrder = 1
-      ExplicitLeft = 440
-      ExplicitTop = 24
-      ExplicitHeight = 25
     end
     object RemoveAllBtn: TsBitBtn
       AlignWithMargins = True
@@ -446,22 +435,17 @@ object MainForm: TMainForm
       Align = alLeft
       Caption = 'Remove All'
       TabOrder = 2
-      ExplicitLeft = 448
-      ExplicitTop = 32
-      ExplicitHeight = 25
     end
     object AboutBtn: TsBitBtn
       AlignWithMargins = True
-      Left = 863
+      Left = 1145
       Top = 4
       Width = 75
       Height = 32
       Align = alRight
       Caption = 'About...'
       TabOrder = 3
-      ExplicitLeft = 424
-      ExplicitTop = 25
-      ExplicitHeight = 25
+      ExplicitLeft = 863
     end
   end
   object sSkinManager1: TsSkinManager
@@ -1486,8 +1470,8 @@ object MainForm: TMainForm
     ThirdParty.ThirdScrollBar = ' '
     ThirdParty.ThirdStaticText = ' '
     ThirdParty.ThirdNativePaint = ' '
-    Left = 544
-    Top = 360
+    Left = 328
+    Top = 112
   end
   object sSkinProvider1: TsSkinProvider
     AddedTitle.Font.Charset = DEFAULT_CHARSET
@@ -1497,32 +1481,32 @@ object MainForm: TMainForm
     AddedTitle.Font.Style = []
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
-    Left = 544
-    Top = 448
+    Left = 416
+    Top = 120
   end
   object PipeClient1: TPipeClient
     MemoryThrottle = 10240000
     PipeName = 'OooPlayerPipe'
     OnPipeMessage = PipeClient1PipeMessage
-    Left = 540
-    Top = 400
+    Left = 332
+    Top = 272
   end
   object sAlphaImageList1: TsAlphaImageList
     Height = 22
     Width = 1
     Items = <>
-    Left = 440
-    Top = 424
+    Left = 504
+    Top = 120
   end
   object JvDragDrop1: TJvDragDrop
     DropTarget = Owner
     OnDrop = JvDragDrop1Drop
-    Left = 464
-    Top = 288
+    Left = 328
+    Top = 200
   end
   object MainMenu1: TMainMenu
-    Left = 624
-    Top = 248
+    Left = 432
+    Top = 192
     object F1: TMenuItem
       Caption = 'File'
       object A1: TMenuItem

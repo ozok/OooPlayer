@@ -19,16 +19,6 @@ type
   TFileItems = TList<TFileItem>;
 
 type
-  TTagItem = class(TCustomControl)
-    Panel: TsPanel;
-    TagEdit: TsEdit;
-    constructor Create(const ParentControl: TsScrollBox; const _Index: integer; const PreviousBottom: Integer);
-    Destructor Destroy; override;
-  end;
-
-  TTagItems = TList<TTagItem>;
-
-type
   TMainForm = class(TForm)
     sSkinManager1: TsSkinManager;
     sSkinProvider1: TsSkinProvider;
@@ -74,21 +64,18 @@ type
     procedure FileListClick(Sender: TObject);
     procedure JvDragDrop1Drop(Sender: TObject; Pos: TPoint; Value: TStrings);
     procedure TitleEditChange(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
     FTagReader: TTagReader;
     FEditedListItem: TListItem;
-    FTagItems: TTagItems;
     FTags: TGeneralTagList;
     FDisplayTags: TGeneralTagList;
     FAppData: string;
-    FId3v2TagFieldNames: TDictionary<string, string>;
-    FMp4TagFieldNames: TDictionary<string, string>;
     FSettingsFile: TStringList;
     FFileItems: TFileItems;
 
     procedure EditChange(Sender: TObject);
-    procedure LoadTagFielNames;
     procedure GetFileInfoForDisplay(const FileName: string);
   public
     { Public declarations }
@@ -168,12 +155,8 @@ begin
     ShowMessage('not ocnn');
   end;
   FTagReader := TTagReader.Create;
-  FTagItems := TTagItems.Create;
   FTags := TGeneralTagList.Create;
   FDisplayTags := TGeneralTagList.Create;
-  FId3v2TagFieldNames := TDictionary<string, string>.Create();
-  FMp4TagFieldNames := TDictionary<string, string>.Create();
-  LoadTagFielNames;
   sSkinManager1.SkinDirectory := ExtractFileDir(Application.ExeName) + '\skins\';
   FSettingsFile := TStringList.Create;
   if not MediaInfoDLL_Load(ExtractFileDir(Application.ExeName) + '\mediainfo.dll') then
@@ -189,14 +172,6 @@ var
   i: integer;
 begin
   FTagReader.Free;
-  for I := 0 to FTagItems.Count - 1 do
-  begin
-    if Assigned(FTagItems[i]) then
-    begin
-      FTagItems[i].Free;
-    end;
-  end;
-  FTagItems.Free;
   for I := 0 to FTags.Count - 1 do
   begin
     FTags[i].Free;
@@ -213,9 +188,12 @@ begin
   end;
   FFileItems.Free;
 
-  FId3v2TagFieldNames.Free;
-  FMp4TagFieldNames.Free;
   FSettingsFile.Free;
+end;
+
+procedure TMainForm.FormShow(Sender: TObject);
+begin
+  FileListClick(Self);
 end;
 
 procedure TMainForm.GetFileInfo(const FileIndex: integer);
@@ -291,47 +269,10 @@ begin
   GetFileInfo(0);
 end;
 
-procedure TMainForm.LoadTagFielNames;
-var
-  LFile: TStringList;
-  LLine: string;
-  I: Integer;
-  LPos: integer;
-begin
-  LFile := TStringList.Create;
-  try
-    // id3v1
-    LFile.LoadFromFile(ExtractFileDir(Application.ExeName) + '\tagfields\id3v2.txt');
-    if LFile.Count > 0 then
-    begin
-      for I := 0 to LFile.Count - 1 do
-      begin
-        LLine := LFile[i].Trim;
-        LPos := Pos(';', LLine);
-        FId3v2TagFieldNames.Add(LLine.Substring(0, LPos - 1), LLine.Substring(LPos));
-      end;
-    end;
-    // mp4
-    LFile.LoadFromFile(ExtractFileDir(Application.ExeName) + '\tagfields\mp4.txt', TEncoding.UTF8);
-    if LFile.Count > 0 then
-    begin
-      for I := 0 to LFile.Count - 1 do
-      begin
-        LLine := LFile[i].Trim;
-        LPos := Pos(';', LLine);
-        FMp4TagFieldNames.Add(LLine.Substring(0, LPos - 1), LLine.Substring(LPos));
-      end;
-    end;
-  finally
-    LFile.Free;
-  end;
-end;
-
 procedure TMainForm.PipeClient1PipeMessage(Sender: TObject; Pipe: HPIPE; Stream: TStream);
 var
   Msg: String;
   LSkinName: string;
-  LSettingsFile: TStringList;
   I: Integer;
 begin
   SetLength(Msg, Stream.Size div SizeOf(WideChar));
@@ -339,18 +280,9 @@ begin
   Stream.Read(Msg[1], Stream.Size);
   if Msg.StartsWith('File') then
   begin
-    LSettingsFile := TStringList.Create;
-    try
-      LSettingsFile.LoadFromFile(Msg.Replace('File:', '', []), TEncoding.UTF8);
-      for I := 0 to LSettingsFile.Count - 1 do
-      begin
-        GetFileInfoForDisplay(LSettingsFile[i]);
-      end;
-      FileList.Items.Count := FFileItems.Count;
-      GetFileInfo(0);
-    finally
-      LSettingsFile.Free;
-    end;
+    GetFileInfoForDisplay(Msg.Replace('File:', '', []));
+    FileList.Items.Count := FFileItems.Count;
+    GetFileInfo(FFileItems.Count-1);
   end
   else if Msg.StartsWith('Skin') then
   begin
@@ -386,34 +318,6 @@ end;
 procedure TMainForm.TitleEditChange(Sender: TObject);
 begin
   ApplyBtn.Enabled := True;
-end;
-
-{ TTagItem }
-
-constructor TTagItem.Create(const ParentControl: TsScrollBox; const _Index, PreviousBottom: Integer);
-begin
-  Panel := TsPanel.Create(nil);
-  TagEdit := TsEdit.Create(nil);
-  TagEdit.Tag := _Index;
-  Panel.InsertControl(TagEdit);
-  Panel.Align := alTop;
-  Panel.Height := 45;
-  Panel.Top := PreviousBottom;
-  TagEdit.Anchors := [akLeft, akTop, akRight];
-  TagEdit.BoundLabel.Active := True;
-  TagEdit.BoundLabel.Layout := sclTopLeft;
-  TagEdit.Top := 16;
-  TagEdit.Left := 10;
-  TagEdit.Width := Panel.Width - 40;
-  Panel.BevelOuter := bvNone;
-  Panel.BorderStyle := bsNone;
-  // Panel.SkinData.SkinSection := 'PANEL_LOW';
-end;
-
-destructor TTagItem.Destroy;
-begin
-
-  inherited;
 end;
 
 end.

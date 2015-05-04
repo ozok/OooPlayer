@@ -39,7 +39,7 @@ uses
   sSplitter, sSkinProvider, acProgressBar, sTrackBar, acImage, acPNG,
   acAlphaHints, acAlphaImageList, sButton, Vcl.AppEvnts,
   acShellCtrls, sComboBoxes, sTreeView, sListBox, System.Types,
-  sEdit, sGauge, UnitLastFMToolLauncher, Pipes;
+  sEdit, sGauge, UnitLastFMToolLauncher, Pipes, UnitSubProcessLauncher, GraphUtil;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -109,7 +109,6 @@ type
     PlayListMenu: TPopupMenu;
     o1: TMenuItem;
     F2: TMenuItem;
-    PlayBackImgs: TImageList;
     AppIniFileStorage: TJvAppIniFileStorage;
     FormStorage: TJvFormStorage;
     G1: TMenuItem;
@@ -179,8 +178,6 @@ type
     QueueList: TsListView;
     Splitter1: TsSplitter;
     Splitter2: TsSplitter;
-    Bevel3: TsBevel;
-    Bevel4: TsBevel;
     LyricList: TsListBox;
     QueuelistMenu: TPopupMenu;
     P8: TMenuItem;
@@ -260,6 +257,9 @@ type
     TrayIcon: TJvTrayIcon;
     UpdateChecker: TJvHttpUrlGrabber;
     PositionBar: TsTrackBar;
+    PlaybackImages: TsAlphaImageList;
+    H3: TMenuItem;
+    H4: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -284,7 +284,6 @@ type
     procedure PositionBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure S2Click(Sender: TObject);
     procedure C1Click(Sender: TObject);
-    procedure PlayListAdvancedCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
     procedure PlayListData(Sender: TObject; Item: TListItem);
     procedure G1Click(Sender: TObject);
     procedure PlaybackOrderListChange(Sender: TObject);
@@ -389,6 +388,11 @@ type
     procedure PipeServerPipeConnect(Sender: TObject; Pipe: HPIPE);
     procedure FormActivate(Sender: TObject);
     procedure sSkinManager1Activate(Sender: TObject);
+    procedure PlayListAdvancedCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
+    procedure PlaylistViewClick(Sender: TObject);
+    procedure RadiosViewClick(Sender: TObject);
+    procedure H3Click(Sender: TObject);
+    procedure H4Click(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -407,7 +411,7 @@ type
     FCurrentRadioCatName: string;
     FCurrentRadioCatIndex: integer;
     FLastFMToolLauncher: TLastFMToolLauncher;
-    FFileInfoLauncher: TLastFMToolLauncher;
+    FFileInfoLauncher: TSubProcessLauncher;
     FLastFMLaunchCounter: integer;
     FLastFMArtist, FLastFMSong: string;
 
@@ -630,6 +634,7 @@ begin
         // add to queue list
         QueueList.Items.Count := FQueueLists[FSelectedPlaylistIndex].Count;
         QueueList.Invalidate;
+        PlayList.Items[i].Update;
       end;
     end;
   end;
@@ -1605,25 +1610,38 @@ begin
           LFile.Add(FPlaylists[FSelectedPlaylistIndex][i].FullFileName);
         end;
       end;
-      if FileExists(FAppDataFolder + '\fileinfo.txt') then
+      if FFileInfoLauncher.IsRunning then
       begin
-        DeleteFile(FAppDataFolder + '\fileinfo.txt')
-      end;
-      LFile.SaveToFile(FAppDataFolder + '\fileinfo.txt', TEncoding.UTF8);
-      if sSkinManager1.Active then
-      begin
-        FFileInfoLauncher.Start('', ExtractFileDir(Application.ExeName) + '\OooTagEditor.exe');
+        for I := 0 to LFile.Count - 1 do
+        begin
+          if not PipeServer.Broadcast(PWideChar('File:' + LFile[i])^, Length('File:' + LFile[i]) * SizeOf(WideChar)) then
+          begin
+            LogForm.LogList.Lines.Add('Unable to broadcast tag editor message.')
+          end;
+        end;
       end
       else
       begin
-        FFileInfoLauncher.Start('', ExtractFileDir(Application.ExeName) + '\OooTagEditor.exe');
+        if FileExists(FAppDataFolder + '\fileinfo.txt') then
+        begin
+          DeleteFile(FAppDataFolder + '\fileinfo.txt')
+        end;
+        LFile.SaveToFile(FAppDataFolder + '\fileinfo.txt', TEncoding.UTF8);
+        if sSkinManager1.Active then
+        begin
+          FFileInfoLauncher.Start('', ExtractFileDir(Application.ExeName) + '\OooTagEditor.exe');
+        end
+        else
+        begin
+          FFileInfoLauncher.Start('', ExtractFileDir(Application.ExeName) + '\OooTagEditor.exe');
+        end;
+        if not PipeServer.Broadcast(PWideChar(FAppDataFolder + '\fileinfo.txt')^, Length(FAppDataFolder + '\fileinfo.txt') * SizeOf(WideChar)) then
+        begin
+          LogForm.LogList.Lines.Add('Unable to broadcast tag editor message.')
+        end;
       end;
     finally
       LFile.Free;
-      if not PipeServer.Broadcast(PWideChar(FAppDataFolder + '\fileinfo.txt')^, Length(FAppDataFolder + '\fileinfo.txt') * SizeOf(WideChar)) then
-      begin
-        LogForm.LogList.Lines.Add('Unable to broadcast tag editor message.')
-      end;
     end;
   end;
 end;
@@ -1660,6 +1678,7 @@ begin
         Application.Terminate;
       end;
   end;
+
   BASS_PluginLoad('bass_aac.dll', 0);
   BASS_PluginLoad('basswma.dll', 0);
   if not MediaInfoDLL_Load(ExtractFileDir(Application.ExeName) + '\mediainfo.dll') then
@@ -1746,7 +1765,7 @@ begin
   FuncPages.Pages[0].TabVisible := False;
   FuncPages.Pages[1].TabVisible := False;
   FLastFMToolLauncher := TLastFMToolLauncher.Create;
-  FFileInfoLauncher := TLastFMToolLauncher.Create;
+  FFileInfoLauncher := TSubProcessLauncher.Create;
   PipeServer.Active := True;
 
   LRadios := TStringList.Create;
@@ -1841,7 +1860,6 @@ begin
       end;
     end;
   end;
-
 end;
 
 procedure TMainForm.FormShow(Sender: TObject);
@@ -1998,8 +2016,23 @@ procedure TMainForm.H2Click(Sender: TObject);
 begin
   QueueList.Visible := not QueueList.Visible;
   H2.Checked := not QueueList.Visible;
-  Bevel3.Visible := QueueList.Visible;
   Splitter1.Visible := QueueList.Visible;
+  FormResize(Self);
+end;
+
+procedure TMainForm.H3Click(Sender: TObject);
+begin
+  CategoryPages.Visible := not CategoryPages.Visible;
+  H3.Checked := not CategoryPages.Visible;
+  sSplitter2.Visible := CategoryPages.Visible;
+  FormResize(Self);
+end;
+
+procedure TMainForm.H4Click(Sender: TObject);
+begin
+  LyricPanel.Visible := not LyricPanel.Visible;
+  H4.Checked := not LyricPanel.Visible;
+  Splitter2.Visible := LyricPanel.Visible;
   FormResize(Self);
 end;
 
@@ -2683,9 +2716,19 @@ begin
       Splitter2.Visible := LyricPanel.Visible;
       H2.Checked := not QueueList.Visible;
       Splitter1.Visible := QueueList.Visible;
+      CategoryPages.Visible := ReadBool('player', 'catvisible', True);
+      H3.Checked := not CategoryPages.Visible;
+      sSplitter2.Visible := CategoryPages.Visible;
+      LyricPanel.Visible := ReadBool('player', 'lyricvisible', True);
+      H4.Checked := not LyricPanel.Visible;
+      Splitter2.Visible := LyricPanel.Visible;
+
       LSkinIndex := SettingsFile.ReadInteger('settings', 'skin2', 33);
       CoverPanel.Height := SettingsFile.ReadInteger('settings', 'coverheight', 182);
       CategoryPages.Width := SettingsFile.ReadInteger('settings', 'categorywidth', 255);
+
+
+
 
       SettingsForm.HueBar.Position := SettingsFile.ReadInteger('settings', 'hue', 0);
       SettingsForm.SaturationBar.Position := SettingsFile.ReadInteger('settings', 'satu', 0);
@@ -2704,7 +2747,6 @@ begin
         Columns[5].Width := ReadInteger('columns', '6', 150);
         Columns[6].Width := ReadInteger('columns', '7', 150);
         Columns[7].Width := ReadInteger('columns', '8', 50);
-        Columns[8].Width := ReadInteger('columns', '9', 100);
       end;
     end;
   finally
@@ -3051,6 +3093,11 @@ begin
   end;
 end;
 
+procedure TMainForm.PlaylistViewClick(Sender: TObject);
+begin
+  FuncPages.ActivePageIndex := 0;
+end;
+
 procedure TMainForm.P8Click(Sender: TObject);
 begin
   if QueueList.ItemIndex > -1 then
@@ -3078,6 +3125,10 @@ begin
       InfoLabel.Caption := 'Paused | ' + FCurrentItemInfo.InfoStr;
 
       Taskbar.ProgressState := TTaskBarProgressState.Paused;
+      if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) then
+      begin
+        PlayList.Items[FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Update;
+      end;
       UpdateOverlayIcon(2);
     end
     else if FPlayer.PlayerStatus = psPaused then
@@ -3089,6 +3140,10 @@ begin
       InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
       Taskbar.ProgressState := TTaskBarProgressState.Normal;
+      if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) then
+      begin
+        PlayList.Items[FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Update;
+      end;
       UpdateOverlayIcon(1);
     end;
   end
@@ -3132,25 +3187,39 @@ var
   LHue: string;
   LBrightness: string;
   LSaturation: string;
+  LFile: TStringList;
+  I: Integer;
 begin
-  LFilePath := 'File:' + FAppDataFolder + '\fileinfo.txt';
-  if sSkinManager1.Active then
-  begin
-    LSkinName := 'Skin:' + sSkinManager1.SkinName;
-  end
-  else
-  begin
-    LSkinName := 'Skin:none';
-  end;
-  LHue := 'Hue:' + sSkinManager1.HueOffset.ToString();
-  LBrightness := 'Brig:' + sSkinManager1.Brightness.ToString();
-  LSaturation := 'Sat:' + sSkinManager1.Saturation.ToString();
+  LFile := TStringList.Create;
+  try
+    LFilePath := FAppDataFolder + '\fileinfo.txt';
+    if FileExists(LFilePath) then
+    begin
+      LFile.LoadFromFile(LFilePath, TEncoding.UTF8);
+    end;
+    if sSkinManager1.Active then
+    begin
+      LSkinName := 'Skin:' + sSkinManager1.SkinName;
+    end
+    else
+    begin
+      LSkinName := 'Skin:none';
+    end;
+    LHue := 'Hue:' + sSkinManager1.HueOffset.ToString();
+    LBrightness := 'Brig:' + sSkinManager1.Brightness.ToString();
+    LSaturation := 'Sat:' + sSkinManager1.Saturation.ToString();
 
-  PipeServer.Broadcast(PWideChar(LFilePath)^, Length(LFilePath) * SizeOf(WideChar));
-  PipeServer.Broadcast(PWideChar(LSkinName)^, Length(LSkinName) * SizeOf(WideChar));
-  PipeServer.Broadcast(PWideChar(LHue)^, Length(LHue) * SizeOf(WideChar));
-  PipeServer.Broadcast(PWideChar(LBrightness)^, Length(LBrightness) * SizeOf(WideChar));
-  PipeServer.Broadcast(PWideChar(LSaturation)^, Length(LSaturation) * SizeOf(WideChar));
+    for I := 0 to LFile.Count - 1 do
+    Begin
+      PipeServer.Broadcast(PWideChar('File:' + LFile[i])^, Length('File:' + LFile[i]) * SizeOf(WideChar));
+    End;
+    PipeServer.Broadcast(PWideChar(LSkinName)^, Length(LSkinName) * SizeOf(WideChar));
+    PipeServer.Broadcast(PWideChar(LHue)^, Length(LHue) * SizeOf(WideChar));
+    PipeServer.Broadcast(PWideChar(LBrightness)^, Length(LBrightness) * SizeOf(WideChar));
+    PipeServer.Broadcast(PWideChar(LSaturation)^, Length(LSaturation) * SizeOf(WideChar));
+  finally
+    LFile.Free;
+  end;
 end;
 
 procedure TMainForm.PlaybackOrderListChange(Sender: TObject);
@@ -3180,6 +3249,10 @@ begin
       InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
       Taskbar.ProgressState := TTaskBarProgressState.Normal;
+      if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) then
+      begin
+        PlayList.Items[FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Update;
+      end;
       UpdateOverlayIcon(1);
     end
     else
@@ -3618,6 +3691,10 @@ begin
   StopRadio;
   PositionTimer.Enabled := False;
   ProgressTimer.Enabled := PositionTimer.Enabled;
+  if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) then
+  begin
+    PlayList.Items[FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Update;
+  end;
 
   if FPlayer.ErrorMsg = MY_ERROR_OK then
   begin
@@ -3812,25 +3889,39 @@ begin
 end;
 
 procedure TMainForm.PlayListAdvancedCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
+var
+  L, H, S: Word;
 begin
-  if FPlayer.PlayerStatus2 = psStopped then
+  if (Item.Index mod 2) = 0 then
   begin
-    Sender.Canvas.Font.Style := []
+    Sender.Canvas.Brush.Color := (Sender as TsListView).Color;
   end
   else
   begin
-    if Item.Index = FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex then
+    if sSkinManager1.Active then
     begin
-      Sender.Canvas.Font.Style := [fsBold]
+      ColorRGBToHLS((Sender as TsListView).Color, H, L, S);
+      if L < 10 then
+      begin
+        L := 10;
+        L := (L * 120) div 100;
+      end
+      else if L > 90 then
+      begin
+        L := (L * 80) div 100;
+      end;
+      Sender.Canvas.Brush.Color := ColorHLSToRGB(H, L, S);
     end
     else
     begin
-      Sender.Canvas.Font.Style := []
+      Sender.Canvas.Brush.Color := clGradientInactiveCaption;
     end;
   end;
 end;
 
 procedure TMainForm.PlayListData(Sender: TObject; Item: TListItem);
+var
+  LItemCaption: string;
 begin
   if FPlaylists.Count > FSelectedPlaylistIndex then
   begin
@@ -3842,6 +3933,7 @@ begin
             with FPlaylists[FSelectedPlaylistIndex][Item.Index] do
             begin
               Item.Caption := FloatToStr(Item.Index + 1) + '. ' + Title;
+              LItemCaption := Item.Caption;
               Item.SubItems.Add(Album);
               Item.SubItems.Add(Artist);
             end;
@@ -3851,6 +3943,7 @@ begin
             with FPlaylists[FSelectedPlaylistIndex][Item.Index] do
             begin
               Item.Caption := FloatToStr(Item.Index + 1) + '. ' + Album;
+              LItemCaption := Item.Caption;
               Item.SubItems.Add(Title);
               Item.SubItems.Add(Artist);
             end;
@@ -3860,6 +3953,7 @@ begin
             with FPlaylists[FSelectedPlaylistIndex][Item.Index] do
             begin
               Item.Caption := FloatToStr(Item.Index + 1) + '. ' + Artist;
+              LItemCaption := Item.Caption;
               Item.SubItems.Add(Album);
               Item.SubItems.Add(Title);
             end;
@@ -3869,6 +3963,7 @@ begin
             with FPlaylists[FSelectedPlaylistIndex][Item.Index] do
             begin
               Item.Caption := FloatToStr(Item.Index + 1) + '. ' + Title;
+              LItemCaption := Item.Caption;
               Item.SubItems.Add(Artist);
               Item.SubItems.Add(Album);
             end;
@@ -3878,6 +3973,7 @@ begin
             with FPlaylists[FSelectedPlaylistIndex][Item.Index] do
             begin
               Item.Caption := FloatToStr(Item.Index + 1) + '. ' + Album;
+              LItemCaption := Item.Caption;
               Item.SubItems.Add(Artist);
               Item.SubItems.Add(Title);
             end;
@@ -3887,6 +3983,7 @@ begin
             with FPlaylists[FSelectedPlaylistIndex][Item.Index] do
             begin
               Item.Caption := FloatToStr(Item.Index + 1) + '. ' + Artist;
+              LItemCaption := Item.Caption;
               Item.SubItems.Add(Title);
               Item.SubItems.Add(Album);
             end;
@@ -3900,13 +3997,39 @@ begin
         Item.SubItems.Add(Channels);
         Item.SubItems.Add(Codec);
       end;
-      if FQueueLists[FSelectedPlaylistIndex].Contains(Item.Index) then
+      if Item.Index = FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex then
       begin
-        Item.SubItems.Add('Q')
+        if FPlayer.PlayerStatus2 = psPlaying then
+        begin
+          Item.StateIndex := 0
+        end
+        else if FPlayer.PlayerStatus2 = psPaused then
+        begin
+          Item.StateIndex := 1
+        end
+        else
+        begin
+          if FQueueLists[FSelectedPlaylistIndex].Contains(Item.Index) then
+          begin
+            Item.StateIndex := 2;
+          end
+          else
+          begin
+            Item.StateIndex := -1
+          end;
+        end;
       end
       else
       begin
-        Item.SubItems.Add('')
+        Item.StateIndex := -1;
+        if FQueueLists[FSelectedPlaylistIndex].Contains(Item.Index) then
+        begin
+          Item.StateIndex := 2;
+        end
+        else
+        begin
+          Item.StateIndex := -1;
+        end;
       end;
     end;
   end;
@@ -4513,6 +4636,11 @@ begin
   end;
 end;
 
+procedure TMainForm.RadiosViewClick(Sender: TObject);
+begin
+  FuncPages.ActivePageIndex := 1;
+end;
+
 procedure TMainForm.RadioThreadRun(Sender: TIdThreadComponent);
 var
   LCacheProgress: Integer;
@@ -5107,8 +5235,9 @@ begin
       WriteBool('search', 'close', SearchForm.chkCloseOnPlayBtn.Checked);
       WriteInteger('player', 'lyricw', LyricPanel.Width);
       WriteInteger('player', 'playlistindex', FSelectedPlaylistIndex);
-      WriteBool('player', 'lyricvisible', LyricPanel.Visible);
       WriteBool('player', 'queuevisible', QueueList.Visible);
+      WriteBool('player', 'lyricvisible', LyricPanel.Visible);
+      WriteBool('player', 'catvisible', CategoryPages.Visible);
       WriteInteger('settings', 'coverheight', CoverPanel.Height);
       WriteInteger('settings', 'categorywidth', CategoryPages.Width);
 
@@ -5122,7 +5251,6 @@ begin
         WriteInteger('columns', '6', Columns[5].Width);
         WriteInteger('columns', '7', Columns[6].Width);
         WriteInteger('columns', '8', Columns[7].Width);
-        WriteInteger('columns', '9', Columns[8].Width);
       end;
     end;
   finally

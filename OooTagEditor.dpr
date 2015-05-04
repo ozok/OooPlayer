@@ -7,7 +7,7 @@ uses
   madListProcesses,
   madListModules,
   Vcl.Forms,
-  UnitMain in 'TagEditor\UnitMain.pas' {MainForm} ,
+  UnitMain in 'TagEditor\UnitMain.pas' {MainForm},
   UnitTagReader in 'Units\UnitTagReader.pas',
   UnitTagTypes in 'Units\UnitTagTypes.pas',
   MediaInfoDLL in 'Units\MediaInfoDLL.pas',
@@ -26,7 +26,7 @@ uses
 begin
 
   Application.Initialize;
-  Application.MainFormOnTaskbar := true;
+  Application.MainFormOnTaskbar := True;
   Application.CreateForm(TMainForm, MainForm);
   Application.Run;
 

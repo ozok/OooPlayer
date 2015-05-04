@@ -64,7 +64,7 @@ object SettingsForm: TSettingsForm
         Left = 162
         Top = 86
         Width = 145
-        Height = 24
+        Height = 21
         Alignment = taLeftJustify
         BoundLabel.Active = True
         BoundLabel.Caption = 'Playlist item text:'
@@ -103,7 +103,7 @@ object SettingsForm: TSettingsForm
         Left = 162
         Top = 59
         Width = 145
-        Height = 24
+        Height = 21
         Alignment = taLeftJustify
         BoundLabel.Active = True
         BoundLabel.Caption = 'Window title layout:'
@@ -229,7 +229,7 @@ object SettingsForm: TSettingsForm
         Left = 16
         Top = 39
         Width = 201
-        Height = 24
+        Height = 21
         Alignment = taLeftJustify
         BoundLabel.Indent = 0
         BoundLabel.Font.Charset = DEFAULT_CHARSET
@@ -308,10 +308,6 @@ object SettingsForm: TSettingsForm
       Caption = 'Look'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object SkinsList: TsComboBox
         Left = 46
         Top = 16
