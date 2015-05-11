@@ -1,6 +1,6 @@
 //********************************************************************************************************************************
 //*                                                                                                                              *
-//*     ID3v1 Library 2.0.39.94 © 3delite 2010-2015                                                                              *
+//*     ID3v1 Library 2.0.41.96 © 3delite 2010-2015                                                                              *
 //*     See ID3v2 Library 2.0 ReadMe.txt for details                                                                             *
 //*                                                                                                                              *
 //* Two licenses are available for commercial usage of this component:                                                           *

@@ -1,6 +1,6 @@
 //********************************************************************************************************************************
 //*                                                                                                                              *
-//*     ID3v2 Library 2.0.39.94 © 3delite 2010-2015                                                                              *
+//*     ID3v2 Library 2.0.41.96 © 3delite 2010-2015                                                                              *
 //*     See ID3v2 Library 2.0 ReadMe.txt for details                                                                             *
 //*                                                                                                                              *
 //* Two licenses are available for commercial usage of this component:                                                           *
@@ -62,10 +62,10 @@ Uses
 {$MINENUMSIZE 4}
 
 Const
-    ID3V2LIBRARY_VERSION = $02003994;
+    ID3V2LIBRARY_VERSION = $02004196;
 
 Const
-    ID3V2LIBRARY_DEFAULT_PARSE_AUDIO_ATTRBIUTES = True;
+    ID3V2LIBRARY_DEFAULT_PARSE_AUDIO_ATTRIBUTES = True;
 
 type
     DWord = Cardinal;
@@ -698,7 +698,7 @@ var
     DSFID: TRIFFID;
     DSFfmt_ID: TRIFFID;
 
-    ID3v2LibraryDefaultParseAudioAttributes: Boolean = ID3V2LIBRARY_DEFAULT_PARSE_AUDIO_ATTRBIUTES;
+    ID3v2LibraryDefaultParseAudioAttributes: Boolean = ID3V2LIBRARY_DEFAULT_PARSE_AUDIO_ATTRIBUTES;
 
 implementation
 
@@ -2913,10 +2913,12 @@ end;
 
 function TID3v2Tag.GetUnicodeText(FrameIndex: Integer; ReturnNativeText: Boolean = False): String;
 var
+    DataBOM: Word;
     Data: Byte;
     DataWord: Word;
     Bytes: TBytes;
     ByteCounter: Integer;
+    BigEndian: Boolean;
 begin
     Result := '';
     if (FrameIndex >= FrameCount)
@@ -2928,6 +2930,7 @@ begin
         if Frames[FrameIndex].Stream.Size = 0 then begin
             Exit;
         end;
+        BigEndian := False;
         Frames[FrameIndex].Stream.Seek(0, soBeginning);
         Frames[FrameIndex].Stream.Read(Data, 1);
 
@@ -2967,39 +2970,66 @@ begin
             end;
             //* UTF-16
             1: begin
-                Frames[FrameIndex].Stream.Read(Data, 1);
-                if Data = $FF then begin
-                    Frames[FrameIndex].Stream.Read(Data, 1);
-                    if Data = $FE then begin
-                        repeat
-                            Frames[FrameIndex].Stream.Read(DataWord, 2);
-                            if (DataWord = 0)
-                            AND (Frames[FrameIndex].Stream.Position <> Frames[FrameIndex].Stream.Size)
-                            then begin
-                                Result := Result + #13#10;
-                            end else begin
-                                if DataWord <> 0 then begin
-                                    Result := Result + Char(DataWord);
-                                end;
-                            end;
-                        until Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size;
-                    end;
+                Frames[FrameIndex].Stream.Read(DataBOM, 2);
+                if DataBOM = $FEFF then begin
+                    BigEndian := False;
                 end;
-            end;
-            //* UTF-16BE
-            2: begin
+                if DataBOM = $FFFE then begin
+                    BigEndian := True;
+                end;
+                SetLength(Bytes, 0);
+                ByteCounter := 0;
                 repeat
                     Frames[FrameIndex].Stream.Read(DataWord, 2);
                     if (DataWord = 0)
                     AND (Frames[FrameIndex].Stream.Position <> Frames[FrameIndex].Stream.Size)
                     then begin
-                        Result := Result + #13#10;
+                        SetLength(Bytes, Length(Bytes) + 2);
+                        Bytes[ByteCounter] := 13;
+                        Inc(ByteCounter);
+                        Bytes[ByteCounter] := 10;
+                        Inc(ByteCounter);
                     end else begin
                         if DataWord <> 0 then begin
-                            Result := Result + Char(DataWord);
+                            SetLength(Bytes, Length(Bytes) + 2);
+                            Bytes[ByteCounter] := DataWord;
+                            Inc(ByteCounter);
+                            Bytes[ByteCounter] := DataWord SHR 8;
+                            Inc(ByteCounter);
                         end;
                     end;
                 until Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size;
+                if BigEndian then begin
+                    Result := TEncoding.BigEndianUnicode.GetString(Bytes);
+                end else begin
+                    Result := TEncoding.Unicode.GetString(Bytes);
+                end;
+            end;
+            //* UTF-16BE
+            2: begin
+                SetLength(Bytes, 0);
+                ByteCounter := 0;
+                repeat
+                    Frames[FrameIndex].Stream.Read(DataWord, 2);
+                    if (DataWord = 0)
+                    AND (Frames[FrameIndex].Stream.Position <> Frames[FrameIndex].Stream.Size)
+                    then begin
+                        SetLength(Bytes, Length(Bytes) + 2);
+                        Bytes[ByteCounter] := 13;
+                        Inc(ByteCounter);
+                        Bytes[ByteCounter] := 10;
+                        Inc(ByteCounter);
+                    end else begin
+                        if DataWord <> 0 then begin
+                            SetLength(Bytes, Length(Bytes) + 2);
+                            Bytes[ByteCounter] := DataWord;
+                            Inc(ByteCounter);
+                            Bytes[ByteCounter] := DataWord SHR 8;
+                            Inc(ByteCounter);
+                        end;
+                    end;
+                until Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size;
+                Result := TEncoding.BigEndianUnicode.GetString(Bytes);
             end;
             //* UTF-8
             3: begin
@@ -3374,9 +3404,10 @@ var
     Data: Byte;
     UData: Word;
     EncodingFormat: Byte;
-    UContent: PWideChar;
     Bytes: TBytes;
     ByteCounter: Integer;
+    DataBOM: Word;
+    BigEndian: Boolean;
 begin
     Result := '';
     FillChar(LanguageID, SizeOf(LanguageID), 0);
@@ -3390,6 +3421,7 @@ begin
         if Frames[FrameIndex].Stream.Size = 0 then begin
             Exit;
         end;
+        BigEndian := False;
         Frames[FrameIndex].Stream.Seek(0, soBeginning);
         //* Get encoding format
         Frames[FrameIndex].Stream.Read(EncodingFormat, 1);
@@ -3428,44 +3460,88 @@ begin
             1: begin
                 //* Get description
                 Description := '';
+                Frames[FrameIndex].Stream.Read(DataBOM, 2);
+                if DataBOM = $FEFF then begin
+                    BigEndian := False;
+                end;
+                if DataBOM = $FFFE then begin
+                    BigEndian := True;
+                end;
+                SetLength(Bytes, 0);
+                ByteCounter := 0;
                 repeat
                     Frames[FrameIndex].Stream.Read(UData, 2);
                     if UData <> $0 then begin
-                        Description := Description + Char(UData);
+                        SetLength(Bytes, Length(Bytes) + 2);
+                        Bytes[ByteCounter] := UData;
+                        Inc(ByteCounter);
+                        Bytes[ByteCounter] := UData SHR 8;
+                        Inc(ByteCounter);
                     end;
                 until (UData = 0)
                 OR (Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size);
-                Description := Copy(Description, 2, Length(Description));
+                if BigEndian then begin
+                    Description := TEncoding.BigEndianUnicode.GetString(Bytes);
+                end else begin
+                    Description := TEncoding.Unicode.GetString(Bytes);
+                end;
                 //* Get the content
+                Frames[FrameIndex].Stream.Read(DataBOM, 2);
+                if DataBOM = $FEFF then begin
+                    BigEndian := False;
+                end;
+                if DataBOM = $FFFE then begin
+                    BigEndian := True;
+                end;
+                SetLength(Bytes, 0);
+                ByteCounter := 0;
                 repeat
-                    Frames[FrameIndex].Stream.Read(Data, 1);
-                    if Data = $FF then begin
-                        Frames[FrameIndex].Stream.Read(Data, 1);
-                        if Data = $FE then begin
-                            Break;
-                        end;
+                    Frames[FrameIndex].Stream.Read(UData, 2);
+                    if UData <> $0 then begin
+                        SetLength(Bytes, Length(Bytes) + 2);
+                        Bytes[ByteCounter] := UData;
+                        Inc(ByteCounter);
+                        Bytes[ByteCounter] := UData SHR 8;
+                        Inc(ByteCounter);
                     end;
                 until (Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size);
-                UContent := AllocMem(Frames[FrameIndex].Stream.Size - Frames[FrameIndex].Stream.Position + 1);
-                Frames[FrameIndex].Stream.Read(UContent^, Frames[FrameIndex].Stream.Size - Frames[FrameIndex].Stream.Position);
-                Result := UContent;
-                FreeMem(UContent);
+                if BigEndian then begin
+                    Result := TEncoding.BigEndianUnicode.GetString(Bytes);
+                end else begin
+                    Result := TEncoding.Unicode.GetString(Bytes);
+                end;
             end;
             2: begin
                 //* Get description
                 Description := '';
+                SetLength(Bytes, 0);
+                ByteCounter := 0;
                 repeat
                     Frames[FrameIndex].Stream.Read(UData, 2);
                     if UData <> $0 then begin
-                        Description := Description + Char(UData);
+                        SetLength(Bytes, Length(Bytes) + 2);
+                        Bytes[ByteCounter] := UData;
+                        Inc(ByteCounter);
+                        Bytes[ByteCounter] := UData SHR 8;
+                        Inc(ByteCounter);
                     end;
                 until (UData = 0)
                 OR (Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size);
+                Description := TEncoding.BigEndianUnicode.GetString(Bytes);
                 //* Get the content
-                UContent := AllocMem(Frames[FrameIndex].Stream.Size - Frames[FrameIndex].Stream.Position + 1);
-                Frames[FrameIndex].Stream.Read(UContent^, Frames[FrameIndex].Stream.Size - Frames[FrameIndex].Stream.Position);
-                Result := UContent;
-                FreeMem(UContent);
+                SetLength(Bytes, 0);
+                ByteCounter := 0;
+                repeat
+                    Frames[FrameIndex].Stream.Read(UData, 2);
+                    if UData <> $0 then begin
+                        SetLength(Bytes, Length(Bytes) + 2);
+                        Bytes[ByteCounter] := UData;
+                        Inc(ByteCounter);
+                        Bytes[ByteCounter] := UData SHR 8;
+                        Inc(ByteCounter);
+                    end;
+                until (Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size);
+                Result := TEncoding.BigEndianUnicode.GetString(Bytes);
             end;
             3: begin
                 //* Get description
@@ -5719,14 +5795,29 @@ end;
 
 procedure StringToLanguageID(const Source: String; var Dest: TLanguageID);
 begin
+    Dest[0] := $20;
+    Dest[1] := $20;
+    Dest[2] := $20;
     {$IFDEF NEXTGEN}
-    Dest[0] := Byte(Source[0]);
-    Dest[1] := Byte(Source[1]);
-    Dest[2] := Byte(Source[2]);
+    if Length(Source) > 0 then begin
+        Dest[0] := Byte(Source[0]);
+    end;
+    if Length(Source) > 1 then begin
+        Dest[1] := Byte(Source[1]);
+    end;
+    if Length(Source) > 2 then begin
+        Dest[2] := Byte(Source[2]);
+    end;
     {$ELSE}
-    Dest[0] := Byte(Source[1]);
-    Dest[1] := Byte(Source[2]);
-    Dest[2] := Byte(Source[3]);
+    if Length(Source) > 0 then begin
+        Dest[0] := Byte(Source[1]);
+    end;
+    if Length(Source) > 1 then begin
+        Dest[1] := Byte(Source[2]);
+    end;
+    if Length(Source) > 2 then begin
+        Dest[2] := Byte(Source[3]);
+    end;
     {$ENDIF}
 end;
 
@@ -8187,10 +8278,11 @@ function TID3v2Tag.GetUnicodeUserDefinedTextInformation(FrameIndex: Integer; var
 var
     Data: Byte;
     DataWord: Word;
-    UData: Word;
     EncodingFormat: Byte;
     Bytes: TBytes;
     ByteCounter: Integer;
+    DataBOM: Word;
+    BigEndian: Boolean;
 begin
     Result := '';
     Description := '';
@@ -8203,6 +8295,7 @@ begin
         if Frames[FrameIndex].Stream.Size = 0 then begin
             Exit;
         end;
+        BigEndian := False;
         Frames[FrameIndex].Stream.Seek(0, soBeginning);
         //* Get encoding format
         Frames[FrameIndex].Stream.Read(EncodingFormat, 1);
@@ -8233,58 +8326,107 @@ begin
             end;
             1: begin
                 //* Get description
+                Frames[FrameIndex].Stream.Read(DataBOM, 2);
+                if DataBOM = $FEFF then begin
+                    BigEndian := False;
+                end;
+                if DataBOM = $FFFE then begin
+                    BigEndian := True;
+                end;
+                SetLength(Bytes, 0);
+                ByteCounter := 0;
                 repeat
-                    Frames[FrameIndex].Stream.Read(UData, 2);
-                    if UData <> $0 then begin
-                        Description := Description + Char(UData);
+                    Frames[FrameIndex].Stream.Read(DataWord, 2);
+                    if DataWord <> 0 then begin
+                        SetLength(Bytes, Length(Bytes) + 2);
+                        Bytes[ByteCounter] := DataWord;
+                        Inc(ByteCounter);
+                        Bytes[ByteCounter] := DataWord SHR 8;
+                        Inc(ByteCounter);
                     end;
-                until (UData = 0)
+                until (DataWord = 0)
                 OR (Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size);
-                Description := Copy(Description, 2, Length(Description));
+                if BigEndian then begin
+                    Description := TEncoding.BigEndianUnicode.GetString(Bytes);
+                end else begin
+                    Description := TEncoding.Unicode.GetString(Bytes);
+                end;
                 //* Get the content
-                repeat
-                    Frames[FrameIndex].Stream.Read(Data, 1);
-                    if Data = $FF then begin
-                        Frames[FrameIndex].Stream.Read(Data, 1);
-                        if Data = $FE then begin
-                            repeat
-                                Frames[FrameIndex].Stream.Read(DataWord, 2);
-                                if (DataWord = 0)
-                                AND (Frames[FrameIndex].Stream.Position <> Frames[FrameIndex].Stream.Size)
-                                then begin
-                                    Result := Result + #13#10;
-                                end else begin
-                                    if DataWord <> 0 then begin
-                                        Result := Result + Char(DataWord);
-                                    end;
-                                end;
-                            until Frames[FrameIndex].Stream.Position = Frames[FrameIndex].Stream.Size;
-                        end;
-                    end;
-                until (Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size);
-            end;
-            2: begin
-                //* Get description
-                repeat
-                    Frames[FrameIndex].Stream.Read(UData, 2);
-                    if UData <> $0 then begin
-                        Description := Description + Char(UData);
-                    end;
-                until (UData = 0)
-                OR (Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size);
-                //* Get the content
+                Frames[FrameIndex].Stream.Read(DataBOM, 2);
+                if DataBOM = $FEFF then begin
+                    BigEndian := False;
+                end;
+                if DataBOM = $FFFE then begin
+                    BigEndian := True;
+                end;
+                SetLength(Bytes, 0);
+                ByteCounter := 0;
                 repeat
                     Frames[FrameIndex].Stream.Read(DataWord, 2);
                     if (DataWord = 0)
                     AND (Frames[FrameIndex].Stream.Position <> Frames[FrameIndex].Stream.Size)
                     then begin
-                        Result := Result + #13#10;
+                        SetLength(Bytes, Length(Bytes) + 2);
+                        Bytes[ByteCounter] := 13;
+                        Inc(ByteCounter);
+                        Bytes[ByteCounter] := 10;
+                        Inc(ByteCounter);
                     end else begin
                         if DataWord <> 0 then begin
-                            Result := Result + Char(DataWord);
+                            SetLength(Bytes, Length(Bytes) + 2);
+                            Bytes[ByteCounter] := DataWord;
+                            Inc(ByteCounter);
+                            Bytes[ByteCounter] := DataWord SHR 8;
+                            Inc(ByteCounter);
                         end;
                     end;
                 until Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size;
+                if BigEndian then begin
+                    Result := TEncoding.BigEndianUnicode.GetString(Bytes);
+                end else begin
+                    Result := TEncoding.Unicode.GetString(Bytes);
+                end;
+            end;
+            2: begin
+                //* Get description
+                SetLength(Bytes, 0);
+                ByteCounter := 0;
+                repeat
+                    Frames[FrameIndex].Stream.Read(DataWord, 2);
+                    if DataWord <> 0 then begin
+                        SetLength(Bytes, Length(Bytes) + 2);
+                        Bytes[ByteCounter] := DataWord;
+                        Inc(ByteCounter);
+                        Bytes[ByteCounter] := DataWord SHR 8;
+                        Inc(ByteCounter);
+                    end;
+                until (DataWord = 0)
+                OR (Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size);
+                Description := TEncoding.BigEndianUnicode.GetString(Bytes);
+                //* Get the content
+                SetLength(Bytes, 0);
+                ByteCounter := 0;
+                repeat
+                    Frames[FrameIndex].Stream.Read(DataWord, 2);
+                    if (DataWord = 0)
+                    AND (Frames[FrameIndex].Stream.Position <> Frames[FrameIndex].Stream.Size)
+                    then begin
+                        SetLength(Bytes, Length(Bytes) + 2);
+                        Bytes[ByteCounter] := 13;
+                        Inc(ByteCounter);
+                        Bytes[ByteCounter] := 10;
+                        Inc(ByteCounter);
+                    end else begin
+                        if DataWord <> 0 then begin
+                            SetLength(Bytes, Length(Bytes) + 2);
+                            Bytes[ByteCounter] := DataWord;
+                            Inc(ByteCounter);
+                            Bytes[ByteCounter] := DataWord SHR 8;
+                            Inc(ByteCounter);
+                        end;
+                    end;
+                until Frames[FrameIndex].Stream.Position >= Frames[FrameIndex].Stream.Size;
+                Result := TEncoding.BigEndianUnicode.GetString(Bytes);
             end;
             3: begin
                 //* Get description
@@ -8305,7 +8447,7 @@ begin
                 ByteCounter := 0;
                 repeat
                     Frames[FrameIndex].Stream.Read(Data, 1);
-                    if (DataWord = 0)
+                    if (Data = 0)
                     AND (Frames[FrameIndex].Stream.Position <> Frames[FrameIndex].Stream.Size)
                     then begin
                         SetLength(Bytes, Length(Bytes) + 2);

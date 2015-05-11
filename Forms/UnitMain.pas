@@ -393,6 +393,7 @@ type
     procedure RadiosViewClick(Sender: TObject);
     procedure H3Click(Sender: TObject);
     procedure H4Click(Sender: TObject);
+    procedure sPanel5MouseEnter(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -2727,9 +2728,6 @@ begin
       CoverPanel.Height := SettingsFile.ReadInteger('settings', 'coverheight', 182);
       CategoryPages.Width := SettingsFile.ReadInteger('settings', 'categorywidth', 255);
 
-
-
-
       SettingsForm.HueBar.Position := SettingsFile.ReadInteger('settings', 'hue', 0);
       SettingsForm.SaturationBar.Position := SettingsFile.ReadInteger('settings', 'satu', 0);
       SettingsForm.BrightnessBar.Position := SettingsFile.ReadInteger('settings', 'bright', 0);
@@ -3890,7 +3888,7 @@ end;
 
 procedure TMainForm.PlayListAdvancedCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
 var
-  L, H, S: Word;
+  L, H, s: Word;
 begin
   if (Item.Index mod 2) = 0 then
   begin
@@ -3900,7 +3898,7 @@ begin
   begin
     if sSkinManager1.Active then
     begin
-      ColorRGBToHLS((Sender as TsListView).Color, H, L, S);
+      ColorRGBToHLS((Sender as TsListView).Color, H, L, s);
       if L < 10 then
       begin
         L := 10;
@@ -3910,7 +3908,7 @@ begin
       begin
         L := (L * 80) div 100;
       end;
-      Sender.Canvas.Brush.Color := ColorHLSToRGB(H, L, S);
+      Sender.Canvas.Brush.Color := ColorHLSToRGB(H, L, s);
     end
     else
     begin
@@ -5305,6 +5303,12 @@ begin
 end;
 
 procedure TMainForm.SettingsBtnMouseEnter(Sender: TObject);
+begin
+  if Self.Enabled and Self.Visible then
+    Self.FocusControl(VolumeBar);
+end;
+
+procedure TMainForm.sPanel5MouseEnter(Sender: TObject);
 begin
   if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
