@@ -165,6 +165,7 @@ begin
     Application.Terminate;
   end;
   FFileItems := TFileItems.Create;
+  sSkinManager1.SkinDirectory := ExtractFileDir(Application.ExeName) + '\skins';
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);

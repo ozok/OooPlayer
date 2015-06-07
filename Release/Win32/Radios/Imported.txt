@@ -27462,3 +27462,4 @@ Radio Choco FM 98.0 MHZ Moscow;http://laradiofm.com/download/279-en-pls/;http://
 WHCU 870 AM Ithica, NY;http://stream.liquidcompass.net/WHCUAMAAC.pls;http://stream.liquidcompass.net/WHCUAMAAC.pls
 KHUB 1340 AM Fremont, NE (may require an IP address from the USA);mms://streamer.omni-tech.net/KHUB;mms://streamer.omni-tech.net/KHUB
 KLAY 1180 AM Lakewood, WA (may require an IP address from the USA);http://rfe2-r1.alldigital.net/lmjc1915;http://rfe2-r1.alldigital.net/lmjc1915
+xradyo;http://www.xnostalji.com/;http://46.20.13.51:1140/;

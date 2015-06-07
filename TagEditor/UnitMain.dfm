@@ -382,7 +382,6 @@ object MainForm: TMainForm
     ViewStyle = vsReport
     OnClick = FileListClick
     OnData = FileListData
-    ExplicitWidth = 653
   end
   object sStatusBar1: TsStatusBar
     Left = 0
@@ -395,7 +394,6 @@ object MainForm: TMainForm
         Width = 50
       end>
     SkinData.SkinSection = 'STATUSBAR'
-    ExplicitWidth = 942
   end
   object TopPanel: TsPanel
     Left = 0
@@ -405,7 +403,6 @@ object MainForm: TMainForm
     Align = alTop
     TabOrder = 3
     SkinData.SkinSection = 'PANEL'
-    ExplicitWidth = 942
     object AddFileBtn: TsBitBtn
       AlignWithMargins = True
       Left = 4
@@ -445,7 +442,6 @@ object MainForm: TMainForm
       Align = alRight
       Caption = 'About...'
       TabOrder = 3
-      ExplicitLeft = 863
     end
   end
   object sSkinManager1: TsSkinManager
@@ -1479,6 +1475,7 @@ object MainForm: TMainForm
     AddedTitle.Font.Height = -11
     AddedTitle.Font.Name = 'Tahoma'
     AddedTitle.Font.Style = []
+    FormHeader.AdditionalHeight = 0
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
     Left = 416

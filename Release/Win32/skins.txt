@@ -110,3 +110,4 @@ WOT.asz
 XPLuna.asz
 XPSilver.asz
 Zest.asz
+Windows 10.asz

@@ -9,6 +9,7 @@
 -Fixed: [Music Player] Queue list right-click menu options were not working
 -Updated: Bassmix to 2.4.8
 -Updated: Tag libraries
+-Updated: Skin component
 
 --2.1.2
 -Added: [General] Many skins (over 100)

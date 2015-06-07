@@ -218,7 +218,7 @@ type
     PositionLabel: TsLabel;
     sPanel1: TsPanel;
     InfoPanel: TsPanel;
-    TitleLabel: TsLabelFX;
+    TitleLabel: TsLabel;
     sPanel2: TsPanel;
     NextBtn: TsBitBtn;
     PauseBtn: TsBitBtn;
@@ -260,6 +260,7 @@ type
     PlaybackImages: TsAlphaImageList;
     H3: TMenuItem;
     H4: TMenuItem;
+    F3: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -394,6 +395,7 @@ type
     procedure H3Click(Sender: TObject);
     procedure H4Click(Sender: TObject);
     procedure sPanel5MouseEnter(Sender: TObject);
+    procedure F3Click(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -412,9 +414,11 @@ type
     FCurrentRadioCatName: string;
     FCurrentRadioCatIndex: integer;
     FLastFMToolLauncher: TLastFMToolLauncher;
-    FFileInfoLauncher: TSubProcessLauncher;
+    FTagEditorLauncher: TSubProcessLauncher;
     FLastFMLaunchCounter: integer;
     FLastFMArtist, FLastFMSong: string;
+    FTagFiles: TStringList;
+    FInfoFiles: TStringList;
 
     procedure AddFile(const FileName: string);
     procedure ReScanFile(const FileIndex: integer);
@@ -761,6 +765,7 @@ begin
   begin
     Self.Enabled := False;
     NewRadioForm.RadioCategory := FCurrentRadioCatName;
+    ShowMessage(FCurrentRadioCatName);
     NewRadioForm.Portable := Portable;
     NewRadioForm.Show;
   end;
@@ -1597,52 +1602,39 @@ end;
 
 procedure TMainForm.F2Click(Sender: TObject);
 var
-  LFile: TStringList;
   I: Integer;
 begin
   if PlayList.ItemIndex > -1 then
   begin
-    LFile := TStringList.Create;
-    try
-      for I := 0 to PlayList.Items.Count - 1 do
+    FTagFiles.Clear;
+    FInfoFiles.Clear;
+    for I := 0 to PlayList.Items.Count - 1 do
+    begin
+      if PlayList.Items[i].Selected then
       begin
-        if PlayList.Items[i].Selected then
-        begin
-          LFile.Add(FPlaylists[FSelectedPlaylistIndex][i].FullFileName);
-        end;
+        FTagFiles.Add(FPlaylists[FSelectedPlaylistIndex][i].FullFileName);
       end;
-      if FFileInfoLauncher.IsRunning then
-      begin
-        for I := 0 to LFile.Count - 1 do
-        begin
-          if not PipeServer.Broadcast(PWideChar('File:' + LFile[i])^, Length('File:' + LFile[i]) * SizeOf(WideChar)) then
-          begin
-            LogForm.LogList.Lines.Add('Unable to broadcast tag editor message.')
-          end;
-        end;
-      end
-      else
-      begin
-        if FileExists(FAppDataFolder + '\fileinfo.txt') then
-        begin
-          DeleteFile(FAppDataFolder + '\fileinfo.txt')
-        end;
-        LFile.SaveToFile(FAppDataFolder + '\fileinfo.txt', TEncoding.UTF8);
-        if sSkinManager1.Active then
-        begin
-          FFileInfoLauncher.Start('', ExtractFileDir(Application.ExeName) + '\OooTagEditor.exe');
-        end
-        else
-        begin
-          FFileInfoLauncher.Start('', ExtractFileDir(Application.ExeName) + '\OooTagEditor.exe');
-        end;
-        if not PipeServer.Broadcast(PWideChar(FAppDataFolder + '\fileinfo.txt')^, Length(FAppDataFolder + '\fileinfo.txt') * SizeOf(WideChar)) then
-        begin
-          LogForm.LogList.Lines.Add('Unable to broadcast tag editor message.')
-        end;
-      end;
-    finally
-      LFile.Free;
+    end;
+    if not FTagEditorLauncher.IsRunning then
+    begin
+      FTagEditorLauncher.Start('', ExtractFileDir(Application.ExeName) + '\OooTagEditor.exe');
+    end;
+  end;
+end;
+
+procedure TMainForm.F3Click(Sender: TObject);
+var
+  LFilePath: string;
+begin
+  if PlayList.ItemIndex > -1 then
+  begin
+    FTagFiles.Clear;
+    FInfoFiles.Clear;
+    LFilePath := FPlaylists[FSelectedPlaylistIndex][PlayList.ItemIndex].FullFileName;
+    FInfoFiles.Add(LFilePath);
+    if not FTagEditorLauncher.IsRunning then
+    begin
+      FTagEditorLauncher.Start('', ExtractFileDir(Application.ExeName) + '\TFileInfo.exe');
     end;
   end;
 end;
@@ -1662,7 +1654,7 @@ begin
   TrayIcon.Active := False;
   Sleep(100);
   FLyricDownloader.Stop;
-  FFileInfoLauncher.Stop;
+  FTagEditorLauncher.Stop;
   Taskbar.OverlayIcon := nil;
 end;
 
@@ -1766,8 +1758,10 @@ begin
   FuncPages.Pages[0].TabVisible := False;
   FuncPages.Pages[1].TabVisible := False;
   FLastFMToolLauncher := TLastFMToolLauncher.Create;
-  FFileInfoLauncher := TSubProcessLauncher.Create;
+  FTagEditorLauncher := TSubProcessLauncher.Create;
   PipeServer.Active := True;
+  FTagFiles := TStringList.Create;
+  FInfoFiles := TStringList.Create;
 
   LRadios := TStringList.Create;
   try
@@ -1819,7 +1813,9 @@ begin
   FArtworkReader.Free;
   FExternalArtworkFiles.Free;
   FLastFMToolLauncher.Free;
-  FFileInfoLauncher.Free;
+  FTagEditorLauncher.Free;
+  FTagFiles.Free;
+  FInfoFiles.Free;
 end;
 
 procedure TMainForm.FormResize(Sender: TObject);
@@ -2664,7 +2660,7 @@ begin
         if Length(LLine) > 0 then
         begin
           LSplitList.DelimitedText := LLine;
-          if LSplitList.Count = 3 then
+          if LSplitList.Count >= 3 then
           begin
             LRadioStation.Name := LSplitList[0];
             LRadioStation.Web := LSplitList[1];
@@ -2672,7 +2668,7 @@ begin
 
             RadioList.Items.Count := RadioList.Items.Count + 1;
             FRadioStations.Add(LRadioStation);
-          end;
+          end
         end;
       end;
     finally
@@ -3180,44 +3176,58 @@ end;
 
 procedure TMainForm.PipeServerPipeConnect(Sender: TObject; Pipe: HPIPE);
 var
-  LFilePath: string;
   LSkinName: string;
   LHue: string;
   LBrightness: string;
   LSaturation: string;
-  LFile: TStringList;
   I: Integer;
 begin
-  LFile := TStringList.Create;
-  try
-    LFilePath := FAppDataFolder + '\fileinfo.txt';
-    if FileExists(LFilePath) then
-    begin
-      LFile.LoadFromFile(LFilePath, TEncoding.UTF8);
-    end;
-    if sSkinManager1.Active then
-    begin
-      LSkinName := 'Skin:' + sSkinManager1.SkinName;
-    end
-    else
-    begin
-      LSkinName := 'Skin:none';
-    end;
-    LHue := 'Hue:' + sSkinManager1.HueOffset.ToString();
-    LBrightness := 'Brig:' + sSkinManager1.Brightness.ToString();
-    LSaturation := 'Sat:' + sSkinManager1.Saturation.ToString();
-
-    for I := 0 to LFile.Count - 1 do
-    Begin
-      PipeServer.Broadcast(PWideChar('File:' + LFile[i])^, Length('File:' + LFile[i]) * SizeOf(WideChar));
-    End;
-    PipeServer.Broadcast(PWideChar(LSkinName)^, Length(LSkinName) * SizeOf(WideChar));
-    PipeServer.Broadcast(PWideChar(LHue)^, Length(LHue) * SizeOf(WideChar));
-    PipeServer.Broadcast(PWideChar(LBrightness)^, Length(LBrightness) * SizeOf(WideChar));
-    PipeServer.Broadcast(PWideChar(LSaturation)^, Length(LSaturation) * SizeOf(WideChar));
-  finally
-    LFile.Free;
+  if sSkinManager1.Active then
+  begin
+    LSkinName := 'Skin:' + sSkinManager1.SkinName;
+  end
+  else
+  begin
+    LSkinName := 'Skin:none';
   end;
+  LHue := 'Hue:' + sSkinManager1.HueOffset.ToString();
+  LBrightness := 'Brig:' + sSkinManager1.Brightness.ToString();
+  LSaturation := 'Sat:' + sSkinManager1.Saturation.ToString();
+
+  if FTagFiles.Count > 0 then
+  begin
+    for I := 0 to FTagFiles.Count - 1 do
+    Begin
+      if not PipeServer.Broadcast(PWideChar('File:' + FTagFiles[i])^, Length('File:' + FTagFiles[i]) * SizeOf(WideChar)) then
+      begin
+        LogForm.LogList.Lines.Add('Unable to broadcast tag editor message.');
+        if not LogForm.Visible then
+        begin
+          LogForm.Show;
+        end;
+      end;
+    End;
+  end
+  else if FInfoFiles.Count > 0 then
+  begin
+    for I := 0 to FInfoFiles.Count - 1 do
+    Begin
+      if not PipeServer.Broadcast(PWideChar('FileInfo:' + FInfoFiles[i])^, Length('FileInfo:' + FInfoFiles[i]) * SizeOf(WideChar)) then
+      begin
+        LogForm.LogList.Lines.Add('Unable to broadcast info message.');
+        if not LogForm.Visible then
+        begin
+          LogForm.Show;
+        end;
+      end;
+    End;
+  end;
+  PipeServer.Broadcast(PWideChar(LSkinName)^, Length(LSkinName) * SizeOf(WideChar));
+  PipeServer.Broadcast(PWideChar(LHue)^, Length(LHue) * SizeOf(WideChar));
+  PipeServer.Broadcast(PWideChar(LBrightness)^, Length(LBrightness) * SizeOf(WideChar));
+  PipeServer.Broadcast(PWideChar(LSaturation)^, Length(LSaturation) * SizeOf(WideChar));
+  FTagFiles.Clear;
+  FInfoFiles.Clear;
 end;
 
 procedure TMainForm.PlaybackOrderListChange(Sender: TObject);

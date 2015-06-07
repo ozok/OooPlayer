@@ -9,6 +9,9 @@
         <Projects Include="OooTagEditor.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="TFileInfo.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +38,23 @@
     <Target Name="OooTagEditor:Make">
         <MSBuild Projects="OooTagEditor.dproj" Targets="Make"/>
     </Target>
+    <Target Name="TFileInfo">
+        <MSBuild Projects="TFileInfo.dproj"/>
+    </Target>
+    <Target Name="TFileInfo:Clean">
+        <MSBuild Projects="TFileInfo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TFileInfo:Make">
+        <MSBuild Projects="TFileInfo.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="OooPlayer;OooTagEditor"/>
+        <CallTarget Targets="OooPlayer;OooTagEditor;TFileInfo"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="OooPlayer:Clean;OooTagEditor:Clean"/>
+        <CallTarget Targets="OooPlayer:Clean;OooTagEditor:Clean;TFileInfo:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="OooPlayer:Make;OooTagEditor:Make"/>
+        <CallTarget Targets="OooPlayer:Make;OooTagEditor:Make;TFileInfo:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

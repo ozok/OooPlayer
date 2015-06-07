@@ -1517,3 +1517,8 @@ Zap Fm 1;http://www.zap.fm;http://83.149.112.83:8000/
 Zen Fm;http://www.kndinteractive.eu/zenfm;http://stream4.topradio.be:8000/zenfm.mp3
 Zonafly;http://www.radionomy.com/en/radio/zonafly/index;http://listen.radionomy.com/zonafly
 zOOm95;http://www.zoom95.com/category/musica;http://74.208.163.82:8000
+X Radyo Nostalji;http://www.xnostalji.com/;http://46.20.13.51:1140/;
+xradyo;http://www.xnostalji.com/;http://46.20.13.51:1140/;
+xradyo;http://46.20.13.51:1140/;;asd
+xradyo;http://www.xnostalji.com/;http://46.20.13.51:1140/;
+http://www.xnostalji.com/;http://www.xnostalji.com/;http://46.20.13.51:1140/;

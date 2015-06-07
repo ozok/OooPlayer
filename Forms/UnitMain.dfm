@@ -197,7 +197,7 @@ object MainForm: TMainForm
             OnMouseEnter = InfoLabelMouseEnter
             ExplicitWidth = 3
           end
-          object TitleLabel: TsLabelFX
+          object TitleLabel: TsLabel
             AlignWithMargins = True
             Left = 6
             Top = 3
@@ -219,9 +219,6 @@ object MainForm: TMainForm
             Font.Height = -24
             Font.Name = 'Tahoma'
             Font.Style = []
-            Angle = 0
-            Shadow.OffsetKeeper.LeftTop = -2
-            Shadow.OffsetKeeper.RightBottom = 4
             ExplicitLeft = 8
             ExplicitTop = 8
             ExplicitWidth = 608
@@ -2018,10 +2015,6 @@ object MainForm: TMainForm
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object RadioList: TsListView
         Left = 0
         Top = 52
@@ -2584,7 +2577,7 @@ object MainForm: TMainForm
     Top = 80
     Width = 217
     Height = 602
-    ActivePage = sTabSheet2
+    ActivePage = sTabSheet4
     Align = alLeft
     Images = CategoryList
     TabOrder = 5
@@ -2688,10 +2681,6 @@ object MainForm: TMainForm
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object RadiosView: TsTreeView
         Left = 0
         Top = 0
@@ -2704,6 +2693,7 @@ object MainForm: TMainForm
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
+        HideSelection = False
         Images = CategoryList
         Indent = 25
         ParentFont = False
@@ -2951,6 +2941,10 @@ object MainForm: TMainForm
     object F2: TMenuItem
       Caption = 'Tag Editor'
       OnClick = F2Click
+    end
+    object F3: TMenuItem
+      Caption = 'File Information'
+      OnClick = F3Click
     end
   end
   object AppIniFileStorage: TJvAppIniFileStorage
@@ -3301,7 +3295,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800E00116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800F00116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4849,6 +4843,7 @@ object MainForm: TMainForm
     AddedTitle.Font.Name = 'Tahoma'
     AddedTitle.Font.Style = []
     CaptionAlignment = taCenter
+    FormHeader.AdditionalHeight = 0
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
     Left = 560
