@@ -1479,9 +1479,9 @@ object MainForm: TMainForm
             SkinData.SkinSection = 'COMBOBOX'
             VerticalAlignment = taAlignTop
             Style = csDropDownList
-            Color = 722950
+            Color = 2038810
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = 12102048
+            Font.Color = 13417908
             Font.Height = -11
             Font.Name = 'Tahoma'
             Font.Style = []
@@ -1613,7 +1613,7 @@ object MainForm: TMainForm
         OnMouseEnter = PlayListMouseEnter
         Align = alClient
         BorderStyle = bsNone
-        Color = 722950
+        Color = 2038810
         Columns = <
           item
             Caption = 'Artist'
@@ -1648,7 +1648,7 @@ object MainForm: TMainForm
           end>
         DragMode = dmAutomatic
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -1687,7 +1687,7 @@ object MainForm: TMainForm
         OnMouseEnter = QueueListMouseEnter
         OnMouseLeave = QueueListMouseLeave
         Align = alBottom
-        Color = 722950
+        Color = 2038810
         Columns = <
           item
           end
@@ -1695,7 +1695,7 @@ object MainForm: TMainForm
             Width = 100
           end>
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2034,7 +2034,7 @@ object MainForm: TMainForm
         OnMouseLeave = RadioListMouseLeave
         Align = alClient
         BorderStyle = bsNone
-        Color = 722950
+        Color = 2038810
         Columns = <
           item
           end>
@@ -2129,9 +2129,9 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'COMBOBOX'
           VerticalAlignment = taAlignTop
           Style = csDropDownList
-          Color = 722950
+          Color = 2038810
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 12102048
+          Font.Color = 13417908
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -2178,9 +2178,9 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'COMBOBOX'
           VerticalAlignment = taAlignTop
           Style = csDropDownList
-          Color = 722950
+          Color = 2038810
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 12102048
+          Font.Color = 13417908
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -2526,9 +2526,9 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2549,9 +2549,9 @@ object MainForm: TMainForm
       Height = 258
       Align = alClient
       BorderStyle = bsNone
-      Color = 722950
+      Color = 2038810
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 12102048
+      Font.Color = 13417908
       Font.Height = -13
       Font.Name = 'Tahoma'
       Font.Style = []
@@ -2593,9 +2593,9 @@ object MainForm: TMainForm
         Width = 209
         Height = 537
         Align = alClient
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2687,9 +2687,9 @@ object MainForm: TMainForm
         Width = 209
         Height = 567
         Align = alClient
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -3295,7 +3295,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800F00116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800F40116001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3807,6 +3807,7 @@ object MainForm: TMainForm
     Effects.AllowOuterEffects = True
     ExtendedBorders = True
     AnimEffects.DialogShow.Mode = atFading
+    IsDefault = False
     Brightness = -20
     InternalSkins = <
       item

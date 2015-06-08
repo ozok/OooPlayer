@@ -175,9 +175,9 @@ object SettingsForm: TSettingsForm
         Width = 75
         Height = 21
         Alignment = taCenter
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -308,6 +308,10 @@ object SettingsForm: TSettingsForm
       Caption = 'Look'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object SkinsList: TsComboBox
         Left = 46
         Top = 16

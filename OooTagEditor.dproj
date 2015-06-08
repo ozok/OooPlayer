@@ -95,8 +95,8 @@
         <DCC_MapFile>3</DCC_MapFile>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_LocalDebugSymbols>true</DCC_LocalDebugSymbols>
-        <VerInfo_Build>165</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=;FileDescription=OooPlayer TagEditor Module;FileVersion=1.0.0.165;InternalName=TagEditor;LegalCopyright=2015 (c) ozok;LegalTrademarks=;OriginalFilename=TagEditor.exe;ProductName=TagEditor;ProductVersion=1.0.0.0;Comments=OooPlayer TagEditor Module</VerInfo_Keys>
+        <VerInfo_Build>166</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=OooPlayer TagEditor Module;FileVersion=1.0.0.166;InternalName=TagEditor;LegalCopyright=2015 (c) ozok;LegalTrademarks=;OriginalFilename=TagEditor.exe;ProductName=TagEditor;ProductVersion=1.0.0.0;Comments=OooPlayer TagEditor Module</VerInfo_Keys>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

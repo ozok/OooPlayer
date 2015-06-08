@@ -539,7 +539,7 @@ var
 
 const
 {$DEFINE WRITEDEBUGLOG}
-  BuildInt = 2212;
+  BuildInt = 2975;
   Portable = True;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
@@ -1585,7 +1585,7 @@ end;
 
 procedure TMainForm.EnableEQ;
 begin
-  FPlayer.InitQE;
+//  FPlayer.InitQE;
   UpdateEQ;
 end;
 
@@ -4236,26 +4236,24 @@ var
 begin
   if FPlayer.PlayerStatus2 = psPlaying then
   begin
+    PositionTimer.Enabled := False;
+    ProgressTimer.Enabled := False;
+    // the new position on the trackbar
     NewTractBarPosition := Round((X / PositionBar.ClientWidth) * FCurrentItemInfo.DurationBass);
-
     if (NewTractBarPosition <> PositionBar.Position) then
     begin
-      PositionTimer.Enabled := False;
-      ProgressTimer.Enabled := PositionTimer.Enabled;
-      PositionBar.Position := NewTractBarPosition;
-
       FPlayer.Pause;
+      Sleep(50);
       try
-        if not FPlayer.SetPosition((FPlayer.TotalLength * PositionBar.Position) div FCurrentItemInfo.DurationBass) then
+        if FPlayer.SetPosition((FPlayer.TotalLength * NewTractBarPosition) div FCurrentItemInfo.DurationBass) then
         begin
-          PositionBar.Position := FPlayer.Position;
+          // PositionBar.Position := NewTractBarPosition;
         end;
       finally
-        Sleep(10);
-        PositionTimer.Enabled := True;
-        ProgressTimer.Enabled := PositionTimer.Enabled;
-
+        Sleep(50);
         FPlayer.Resume;
+        PositionTimer.Enabled := True;
+        ProgressTimer.Enabled := True;
       end;
     end;
   end;
@@ -4274,7 +4272,7 @@ begin
   if FPlayer.PlayerStatus2 = psPlaying then
   begin
     LPosition := (MaxInt * FPlayer.Position) div FCurrentItemInfo.DurationBass;
-    if LPosition > PositionBar.Position then
+    if LPosition <> PositionBar.Position then
     begin
       PositionBar.Position := LPosition;
       Taskbar.ProgressValue := LPosition;

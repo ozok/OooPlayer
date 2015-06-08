@@ -32,7 +32,7 @@ object EQForm: TEQForm
       AlignWithMargins = True
       Left = 4
       Top = 176
-      Width = 612
+      Width = 625
       Height = 13
       Margins.Top = 0
       Align = alBottom
@@ -40,6 +40,7 @@ object EQForm: TEQForm
         ' 31       63        87       125      175     250      350     5' +
         '00       700      1K       1.4K     2K       2.8K      4K      5' +
         '.6K      8K      11K     16K'
+      ExplicitWidth = 612
     end
     object sTrackBar1: TsTrackBar
       Left = 1
@@ -431,9 +432,9 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'COMBOBOX'
       VerticalAlignment = taAlignTop
       Style = csDropDownList
-      Color = 722950
+      Color = 2038810
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 12102048
+      Font.Color = 13417908
       Font.Height = -11
       Font.Name = 'Tahoma'
       Font.Style = []

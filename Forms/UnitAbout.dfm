@@ -28,8 +28,8 @@ object AboutForm: TAboutForm
     Height = 13
     Align = alTop
     Alignment = taCenter
-    Caption = 'OooPlayer 2.1.2.2212'
-    ExplicitWidth = 107
+    Caption = 'OooPlayer 2.2.0.2975 ALPHA2'
+    ExplicitWidth = 148
   end
   object Image1: TImage
     Left = 0

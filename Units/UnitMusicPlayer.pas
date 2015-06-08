@@ -88,7 +88,7 @@ type
     function IntToTime(IntTime: Integer): string;
     procedure SetBuffer(const Buffer: DWORD);
     procedure ChangeEQ(const EQValues: TEQValues);
-    procedure RemoveEQ;
+//    procedure RemoveEQ;
     procedure InitQE;
   end;
 
@@ -377,7 +377,7 @@ var
   LEQ: BASS_DX8_PARAMEQ;
   I: Integer;
 begin
-  RemoveEQ;
+//  RemoveEQ;
   for i := Low(EQ_FRENQ) to High(EQ_FRENQ) do
   begin
     FEQParams[i] := 0;
@@ -398,14 +398,14 @@ begin
       BASS_ERROR_UNKNOWN:
         LogForm.LogList.Lines.Add('Cant''t create equalizer because of an unkown error.');
     end;
-  end;
-  FFXHandle := BASS_ChannelSetFX(FMixHandle, BASS_FX_DX8_PARAMEQ, 0);
-  for I := Low(EQ_FRENQ) to High(EQ_FRENQ) do
-  begin
-    LEQ.fCenter := EQ_FRENQ[i];
+
     LEQ.fGain := 0;
     LEQ.fBandwidth := 3;
-    BASS_FXSetParameters(FEQParams[i], @LEQ);
+    LEQ.fCenter := EQ_FRENQ[i];
+    if not BASS_FXSetParameters(FEQParams[i], @LEQ) then
+    begin
+      LogForm.LogList.Lines.Add('EQ error: Unable to set params for freq: ' + FEQParams[i].ToString());
+    end;
   end;
 end;
 
@@ -569,11 +569,7 @@ begin
 
     if BASS_ChannelPlay(FMixHandle, False) then
     begin
-      if EQForm.EnableEQBtn.Checked then
-      begin
-        InitQE;
-        // MainForm.UpdateEQ;
-      end;
+      InitQE;
       FErrorMsg := MY_ERROR_OK;
       FPlayerStatus := psPlaying;
     end
@@ -586,17 +582,6 @@ begin
   else
   begin
     FErrorMsg := MY_ERROR_STREAM_ZERO;
-  end;
-end;
-
-procedure TMusicPlayer.RemoveEQ;
-begin
-  if FBassHandle > 0 then
-  begin
-    if not BASS_ChannelRemoveFX(FBassHandle, BASS_FX_DX8_PARAMEQ) then
-    begin
-      LogForm.LogList.Lines.Add(BASS_ErrorGetCode.ToString())
-    end;
   end;
 end;
 
