@@ -3662,7 +3662,7 @@ begin
         FPlayer.Play;
         FCurrentItemInfo.DurationBass := FPlayer.TotalLength;
         PositionBar.Max := MaxInt;
-        Taskbar2.ProgressMaxValue := High(Int64);
+        Taskbar2.ProgressMaxValue := MaxInt;
         FCurrentItemInfo.DurationAsSecInt := FPlayer.DurationAsSec;
         FPlayer.SetVolume(100 - VolumeBar.Position);
         FStoppedByUser := False;
