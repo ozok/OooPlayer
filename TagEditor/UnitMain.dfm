@@ -70,9 +70,9 @@ object MainForm: TMainForm
         Top = 24
         Width = 275
         Height = 21
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -97,9 +97,9 @@ object MainForm: TMainForm
         Top = 64
         Width = 275
         Height = 21
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -124,9 +124,9 @@ object MainForm: TMainForm
         Top = 104
         Width = 275
         Height = 21
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -151,9 +151,9 @@ object MainForm: TMainForm
         Top = 144
         Width = 275
         Height = 21
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -178,9 +178,9 @@ object MainForm: TMainForm
         Top = 184
         Width = 70
         Height = 21
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -205,9 +205,9 @@ object MainForm: TMainForm
         Top = 184
         Width = 70
         Height = 21
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -232,9 +232,9 @@ object MainForm: TMainForm
         Top = 224
         Width = 275
         Height = 21
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -259,9 +259,9 @@ object MainForm: TMainForm
         Top = 267
         Width = 275
         Height = 21
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -299,9 +299,9 @@ object MainForm: TMainForm
         BoundLabel.MaxWidth = 0
         BoundLabel.UseSkinColor = True
         VerticalAlignment = taAlignTop
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -329,7 +329,7 @@ object MainForm: TMainForm
     BoundLabel.UseSkinColor = True
     SkinData.SkinSection = 'EDIT'
     Align = alClient
-    Color = 722950
+    Color = 2038810
     Columns = <
       item
         Caption = 'File Name'
@@ -368,7 +368,7 @@ object MainForm: TMainForm
         Width = 150
       end>
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = 12102048
+    Font.Color = 13417908
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []

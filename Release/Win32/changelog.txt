@@ -2,11 +2,12 @@
 -Added: [General] New UI layout
 -Added: [Music Player] 18 band equalizer with several presets
 -Added: [Music Player] Tag editor program
+-Added: [Music Player] Detailed file info program
 -Added: [Music Player] Playlist now has columns for title, album, artist and bitrate, channel, codec and samplerate
 -Added: [Music Player] Pressing previous button in shuffle mode will return to previous random song instead playing the next random song
--Added: [Music Player] Added index info to playlist names list
 -Fixed: [Music Player] Lyric list's width was not adjusted according to the content
 -Fixed: [Music Player] Queue list right-click menu options were not working
+-Fixed: [General] Clicking on a taskbar button would make buttons disappear
 -Updated: Bassmix to 2.4.8
 -Updated: Tag libraries
 -Updated: Skin component

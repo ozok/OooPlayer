@@ -28,7 +28,7 @@ object AboutForm: TAboutForm
     Height = 13
     Align = alTop
     Alignment = taCenter
-    Caption = 'OooPlayer 2.2.0.2975 ALPHA2'
+    Caption = 'OooPlayer 2.2.0.3002 ALPHA2'
     ExplicitWidth = 148
   end
   object Image1: TImage
@@ -248,11 +248,11 @@ object AboutForm: TAboutForm
     Height = 19
     Align = alTop
     Alignment = taCenter
-    Caption = 'Thanks to my friend Alptekin for bug reports and suggestions'
+    Caption = 'Special thanks to Alptekin'
     Angle = 0
     Shadow.OffsetKeeper.LeftTop = -2
     Shadow.OffsetKeeper.RightBottom = 4
-    ExplicitWidth = 299
+    ExplicitWidth = 128
   end
   object sLabel1: TsLabel
     Left = 0

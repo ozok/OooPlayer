@@ -185,7 +185,6 @@ type
     C3: TMenuItem;
     AppInstances: TJvAppInstances;
     ProgressTimer: TTimer;
-    Taskbar: TTaskbar;
     OverlayImgs: TImageList;
     sSkinManager1: TsSkinManager;
     sSkinProvider1: TsSkinProvider;
@@ -261,6 +260,7 @@ type
     H3: TMenuItem;
     H4: TMenuItem;
     F3: TMenuItem;
+    Taskbar2: TTaskbar;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -358,7 +358,7 @@ type
     procedure AppInstancesCmdLineReceived(Sender: TObject; CmdLine: TStrings);
     procedure ProgressTimerTimer(Sender: TObject);
     procedure VolumeBarToolTip(Sender: TObject; var ToolTipText: string);
-    procedure TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
+    procedure TaskBar2ThumbButtonClick(Sender: TObject; AButtonID: Integer);
     procedure AddPlaylistBtnClick(Sender: TObject);
     procedure RemovePlaylistBtnClick(Sender: TObject);
     procedure RenamePlaylistBtnClick(Sender: TObject);
@@ -1655,7 +1655,7 @@ begin
   Sleep(100);
   FLyricDownloader.Stop;
   FTagEditorLauncher.Stop;
-  Taskbar.OverlayIcon := nil;
+  Taskbar2.OverlayIcon := nil;
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
@@ -1750,7 +1750,7 @@ begin
   FArtworkReader := TArtworkReader.Create;
   FArtworkReader.DefaultImgPath := ExtractFileDir(Application.ExeName) + '\logo.png';
   FArtworkReader.AppDataFolder := FAppDataFolder;
-  Taskbar.ProgressMaxValue := High(Int64);
+  Taskbar2.ProgressMaxValue := High(Int64);
   FPlayListFiles := TPlaylistFiles.Create;
   FStopAddFiles := True;
   sSkinManager1.SkinDirectory := ExtractFileDir(Application.ExeName) + '\skins\';
@@ -3118,7 +3118,7 @@ begin
       ProgressTimer.Enabled := PositionTimer.Enabled;
       InfoLabel.Caption := 'Paused | ' + FCurrentItemInfo.InfoStr;
 
-      Taskbar.ProgressState := TTaskBarProgressState.Paused;
+      Taskbar2.ProgressState := TTaskBarProgressState.Paused;
       if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) then
       begin
         PlayList.Items[FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Update;
@@ -3133,7 +3133,7 @@ begin
       ProgressTimer.Enabled := PositionTimer.Enabled;
       InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
-      Taskbar.ProgressState := TTaskBarProgressState.Normal;
+      Taskbar2.ProgressState := TTaskBarProgressState.Normal;
       if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) then
       begin
         PlayList.Items[FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Update;
@@ -3256,7 +3256,7 @@ begin
       ProgressTimer.Enabled := PositionTimer.Enabled;
       InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
-      Taskbar.ProgressState := TTaskBarProgressState.Normal;
+      Taskbar2.ProgressState := TTaskBarProgressState.Normal;
       if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) then
       begin
         PlayList.Items[FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Update;
@@ -3391,7 +3391,7 @@ begin
       begin
         // resume
         ResumeRadio;
-        Taskbar.ProgressState := TTaskBarProgressState.Normal;
+        Taskbar2.ProgressState := TTaskBarProgressState.Normal;
         UpdateOverlayIcon(1);
       end
       else
@@ -3457,7 +3457,7 @@ begin
             ProgressTimer.Enabled := PositionTimer.Enabled;
             InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
-            Taskbar.ProgressState := TTaskBarProgressState.Normal;
+            Taskbar2.ProgressState := TTaskBarProgressState.Normal;
             UpdateOverlayIcon(1);
           end
           else
@@ -3586,7 +3586,7 @@ begin
           begin
             // resume
             ResumeRadio;
-            Taskbar.ProgressState := TTaskBarProgressState.Normal;
+            Taskbar2.ProgressState := TTaskBarProgressState.Normal;
             UpdateOverlayIcon(1);
           end
           else
@@ -3662,7 +3662,7 @@ begin
         FPlayer.Play;
         FCurrentItemInfo.DurationBass := FPlayer.TotalLength;
         PositionBar.Max := MaxInt;
-        Taskbar.ProgressMaxValue := MaxInt;
+        Taskbar2.ProgressMaxValue := High(Int64);
         FCurrentItemInfo.DurationAsSecInt := FPlayer.DurationAsSec;
         FPlayer.SetVolume(100 - VolumeBar.Position);
         FStoppedByUser := False;
@@ -3748,7 +3748,7 @@ begin
         // reset playlist
         PlayList.ItemIndex := -1;
         PlayList.ItemIndex := FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex;
-        Taskbar.ProgressState := TTaskBarProgressState.Normal;
+        Taskbar2.ProgressState := TTaskBarProgressState.Normal;
         UpdateOverlayIcon(1);
         // PlayList.Refresh;
         // update title label
@@ -4145,8 +4145,8 @@ begin
   FAlbumLabel := '';
   PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
   LyricList.Items.Clear;
-  Taskbar.ProgressMaxValue := High(Int64);
-  Taskbar.ProgressValue := 0;
+  Taskbar2.ProgressMaxValue := High(Int64);
+  Taskbar2.ProgressValue := 0;
   UpdateOverlayIcon(3);
   // PlayList.Invalidate;
   PositionTimer.Enabled := False;
@@ -4275,7 +4275,7 @@ begin
     if LPosition <> PositionBar.Position then
     begin
       PositionBar.Position := LPosition;
-      Taskbar.ProgressValue := LPosition;
+      Taskbar2.ProgressValue := LPosition;
     end;
   end
   else
@@ -5441,8 +5441,8 @@ begin
   PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
   InfoLabel.Caption := 'Stopped';
   LyricList.Items.Clear;
-  Taskbar.ProgressMaxValue := High(Int64);
-  Taskbar.ProgressValue := 0;
+  Taskbar2.ProgressMaxValue := High(Int64);
+  Taskbar2.ProgressValue := 0;
   UpdateOverlayIcon(3);
   // PlayList.Invalidate;
   RadioList.Invalidate;
@@ -5496,7 +5496,7 @@ begin
   end;
 end;
 
-procedure TMainForm.TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
+procedure TMainForm.TaskBar2ThumbButtonClick(Sender: TObject; AButtonID: Integer);
 begin
   case AButtonID of
     0:
@@ -5557,6 +5557,7 @@ procedure TMainForm.UpdateEQ;
 var
   LEQValues: TEQValues;
 begin
+  // fill eq values list
   LEQValues[0] := EQForm.sTrackBar1.Position / 100;
   LEQValues[1] := EQForm.sTrackBar2.Position / 100;
   LEQValues[2] := EQForm.sTrackBar3.Position / 100;
@@ -5575,6 +5576,7 @@ begin
   LEQValues[15] := EQForm.sTrackBar16.Position / 100;
   LEQValues[16] := EQForm.sTrackBar17.Position / 100;
   LEQValues[17] := EQForm.sTrackBar18.Position / 100;
+  // update eq
   FPlayer.ChangeEQ(LEQValues);
 end;
 
@@ -5582,6 +5584,8 @@ procedure TMainForm.UpdateLyricBoxWidth;
 var
   i, LIntWidth, LIntMaxWidth: Integer;
 begin
+  // update the lyric box width according to the content
+  // with font in mind
   LIntMaxWidth := 0;
   LyricList.Canvas.Font.Assign(LyricList.Font);
   for i := 0 to LyricList.Items.Count - 1 do
@@ -5595,18 +5599,19 @@ end;
 
 procedure TMainForm.UpdateOverlayIcon(const Index: integer);
 begin
-  Taskbar.OverlayIcon.LoadFromFile(ExtractFileDir(Application.ExeName) + '\ico\' + FloatToStr(Index) + '.ico');
-  Taskbar.ApplyChanges;
+  // change play status icon
+  Taskbar2.OverlayIcon.LoadFromFile(ExtractFileDir(Application.ExeName) + '\ico\' + FloatToStr(Index) + '.ico');
+  Taskbar2.ApplyOverlayChanges;
 end;
 
 procedure TMainForm.UpdateThreadExecute(Sender: TObject; Params: Pointer);
 begin
+  // download version text from server
   with UpdateChecker do
   begin
     URL := 'http://sourceforge.net/projects/oooplayer/files/version.txt/download';
     Start;
   end;
-
   UpdateThread.CancelExecute;
 end;
 
