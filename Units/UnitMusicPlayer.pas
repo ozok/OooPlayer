@@ -32,11 +32,6 @@ type
   TEQValues = array [0 .. 17] of single;
 
 type
-  TLevels = record
-    Left, Right: Cardinal;
-  end;
-
-type
   TMusicPlayer = class
   private
     FBassHandle: HSTREAM;
@@ -88,7 +83,7 @@ type
     function IntToTime(IntTime: Integer): string;
     procedure SetBuffer(const Buffer: DWORD);
     procedure ChangeEQ(const EQValues: TEQValues);
-//    procedure RemoveEQ;
+    // procedure RemoveEQ;
     procedure InitQE;
   end;
 
@@ -377,7 +372,7 @@ var
   LEQ: BASS_DX8_PARAMEQ;
   I: Integer;
 begin
-//  RemoveEQ;
+  // RemoveEQ;
   for i := Low(EQ_FRENQ) to High(EQ_FRENQ) do
   begin
     FEQParams[i] := 0;
@@ -570,6 +565,7 @@ begin
     if BASS_ChannelPlay(FMixHandle, False) then
     begin
       InitQE;
+      EQForm.EnableEQBtnClick(self);
       FErrorMsg := MY_ERROR_OK;
       FPlayerStatus := psPlaying;
     end

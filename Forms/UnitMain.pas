@@ -39,7 +39,8 @@ uses
   sSplitter, sSkinProvider, acProgressBar, sTrackBar, acImage, acPNG,
   acAlphaHints, acAlphaImageList, sButton, Vcl.AppEvnts,
   acShellCtrls, sComboBoxes, sTreeView, sListBox, System.Types,
-  sEdit, sGauge, UnitLastFMToolLauncher, Pipes, UnitSubProcessLauncher, GraphUtil;
+  sEdit, sGauge, UnitLastFMToolLauncher, Pipes, UnitSubProcessLauncher, GraphUtil,
+  Vcl.XPMan;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -261,6 +262,8 @@ type
     H4: TMenuItem;
     F3: TMenuItem;
     Taskbar2: TTaskbar;
+    XPManifest1: TXPManifest;
+    ReloadLyricTitleBtn: TsBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -396,6 +399,7 @@ type
     procedure H4Click(Sender: TObject);
     procedure sPanel5MouseEnter(Sender: TObject);
     procedure F3Click(Sender: TObject);
+    procedure ReloadLyricTitleBtnClick(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -1585,7 +1589,7 @@ end;
 
 procedure TMainForm.EnableEQ;
 begin
-//  FPlayer.InitQE;
+  // FPlayer.InitQE;
   UpdateEQ;
 end;
 
@@ -1662,6 +1666,7 @@ procedure TMainForm.FormCreate(Sender: TObject);
 var
   LRadios: TStringList;
   I: Integer;
+  a: Cardinal;
 begin
   FPlayer := TMusicPlayer.Create(handle);
   case FPlayer.ErrorMsg of
@@ -1672,8 +1677,16 @@ begin
       end;
   end;
 
-  BASS_PluginLoad('bass_aac.dll', 0);
-  BASS_PluginLoad('basswma.dll', 0);
+  if BASS_PluginLoad('bass_aac.dll', BASS_UNICODE) < 1 then
+  begin
+    Application.MessageBox('Unable to load aac plugin!', 'Fatal Error', MB_ICONERROR);
+    Application.Terminate;
+  end;
+  if BASS_PluginLoad('basswma.dll', BASS_UNICODE) < 1 then
+  begin
+    Application.MessageBox('Unable to load wma plugin!', 'Fatal Error', MB_ICONERROR);
+    Application.Terminate;
+  end;
   if not MediaInfoDLL_Load(ExtractFileDir(Application.ExeName) + '\mediainfo.dll') then
   begin
     Application.MessageBox('Couldn''t load mediainfo.dll library.', 'Fatal Error', MB_ICONERROR);
@@ -1826,7 +1839,9 @@ begin
   // PlayList.Columns[2].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
   QueueList.Columns[0].Width := QueueList.ClientWidth - QueueList.Columns[1].Width;
   StatusBar.Panels[0].Width := StatusBar.ClientWidth - StatusBar.Panels[1].Width;
-  RadioList.Columns[0].Width := RadioList.ClientWidth;
+  RadioList.Columns[0].Width := (RadioList.ClientWidth - 20) div RadioList.Columns.Count;
+  RadioList.Columns[1].Width := (RadioList.ClientWidth - 20) div RadioList.Columns.Count;
+  RadioList.Columns[2].Width := (RadioList.ClientWidth - 20) div RadioList.Columns.Count;
   if FPlaybackType = music then
   begin
     if (FPlayer.PlayerStatus2 = psPlaying) or (FPlayer.PlayerStatus2 = psPaused) then
@@ -2806,6 +2821,7 @@ begin
             LyricArtistEdit.Enabled := False;
             LyricTitleEdit.Enabled := False;
             LyricSourceList.Enabled := False;
+            ReloadLyricTitleBtn.Enabled := False;
             FLyricDownloader.SongTitle := LyricTitleEdit.Text;
             FLyricDownloader.Artist := LyricArtistEdit.Text;
             FLyricDownloader.Album := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Album;
@@ -2828,6 +2844,7 @@ begin
         LyricArtistEdit.Enabled := False;
         LyricTitleEdit.Enabled := False;
         LyricSourceList.Enabled := False;
+        ReloadLyricTitleBtn.Enabled := False;
         if SettingsForm.LyricBtn.Checked then
         begin
           FLyricDownloader.Stop;
@@ -2848,6 +2865,7 @@ begin
         LyricArtistEdit.Enabled := True;
         LyricTitleEdit.Enabled := True;
         LyricSourceList.Enabled := True;
+            ReloadLyricTitleBtn.Enabled := True;
       end;
     end;
   end;
@@ -2864,6 +2882,7 @@ end;
 procedure TMainForm.M1Click(Sender: TObject);
 begin
   FuncPages.ActivePageIndex := 0;
+  CategoryPages.ActivePageIndex := 0;
 end;
 
 procedure TMainForm.MoveRadioStations;
@@ -3805,6 +3824,7 @@ begin
         LyricArtistEdit.Enabled := False;
         LyricTitleEdit.Enabled := False;
         LyricSourceList.Enabled := False;
+        ReloadLyricTitleBtn.Enabled := False;
         if SettingsForm.LyricBtn.Checked then
         begin
           // load existing lyric file
@@ -3821,6 +3841,7 @@ begin
             LyricArtistEdit.Enabled := True;
             LyricTitleEdit.Enabled := True;
             LyricSourceList.Enabled := True;
+            ReloadLyricTitleBtn.Enabled := True;
             UpdateLyricBoxWidth;
           end
           else
@@ -3844,6 +3865,7 @@ begin
           LyricArtistEdit.Enabled := True;
           LyricTitleEdit.Enabled := True;
           LyricSourceList.Enabled := True;
+          ReloadLyricTitleBtn.Enabled := True;
         end;
         // Self.Enabled := False;
         SaveSettings;
@@ -4488,6 +4510,7 @@ end;
 procedure TMainForm.R3Click(Sender: TObject);
 begin
   FuncPages.ActivePageIndex := 1;
+  CategoryPages.ActivePageIndex := 1;
 end;
 
 procedure TMainForm.R4Click(Sender: TObject);
@@ -4578,6 +4601,8 @@ begin
   if Item.Index < RadioList.Items.Count then
   begin
     Item.Caption := FRadioStations[Item.Index].Name;
+    Item.SubItems.Add(FRadioStations[Item.Index].Web);
+    Item.SubItems.Add(FRadioStations[Item.Index].URL);
   end;
 end;
 
@@ -4747,6 +4772,29 @@ end;
 procedure TMainForm.RecordRadioBtnClick(Sender: TObject);
 begin
   StartRadioRecording;
+end;
+
+procedure TMainForm.ReloadLyricTitleBtnClick(Sender: TObject);
+begin
+  if not FStopAddFiles then
+    Exit;
+  if FPlaybackType = music then
+  begin
+    if FPlayer.PlayerStatus2 <> psStopped then
+    begin
+      if SettingsForm.LyricBtn.Checked then
+      begin
+        if FPlaylists[FSelectedPlaylistIndex].Count < 1 then
+          Exit;
+
+        if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) then
+        begin
+          LyricTitleEdit.Text := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title;
+          LyricArtistEdit.Text := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist;
+        end;
+      end;
+    end;
+  end;
 end;
 
 procedure TMainForm.ReloadRadioCategory;
@@ -5649,6 +5697,7 @@ begin
     begin
       SetRadioVolume(100 - VolumeBar.Position);
     end;
+    StatusBar.Panels[1].Text := FloatToStr(VolumeBar.Position) + '%'
   end;
 
   StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
@@ -5822,6 +5871,7 @@ begin
                 LyricArtistEdit.Enabled := False;
                 LyricTitleEdit.Enabled := False;
                 LyricSourceList.Enabled := False;
+                ReloadLyricTitleBtn.Enabled := False;
                 FLyricDownloader.Stop;
                 if FPlaylists[FSelectedPlaylistIndex].Count < 1 then
                   Exit;
@@ -5839,6 +5889,7 @@ begin
                 LyricArtistEdit.Enabled := True;
                 LyricTitleEdit.Enabled := True;
                 LyricSourceList.Enabled := True;
+                ReloadLyricTitleBtn.Enabled := True;
               end;
             end
             else
@@ -5847,6 +5898,7 @@ begin
               LyricArtistEdit.Enabled := True;
               LyricTitleEdit.Enabled := True;
               LyricSourceList.Enabled := True;
+              ReloadLyricTitleBtn.Enabled := True;
             end;
           finally
             LSplitList.Free;

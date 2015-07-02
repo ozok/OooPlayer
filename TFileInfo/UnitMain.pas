@@ -199,12 +199,7 @@ begin
   SetLength(Msg, Stream.Size div SizeOf(WideChar));
   Stream.Position := 0;
   Stream.Read(Msg[1], Stream.Size);
-  if Msg.StartsWith('FileInfo') then
-  begin
-    GetFileInfo(Msg.Replace('FileInfo:', '', []));
-    FilePathEdit.Text := Msg.Replace('FileInfo:', '', []);
-  end
-  else if Msg.StartsWith('Skin') then
+  if Msg.StartsWith('Skin') then
   begin
     LSkinName := Msg.Replace('Skin:', '', []);
     if LSkinName = 'none' then
@@ -233,6 +228,11 @@ begin
   begin
     Self.BringToFront;
   end
+  else if Msg.StartsWith('FileInfo') then
+  begin
+    GetFileInfo(Msg.Replace('FileInfo:', '', []));
+    FilePathEdit.Text := Msg.Replace('FileInfo:', '', []);
+  end;
 end;
 
 procedure TMainForm.sButton1Click(Sender: TObject);

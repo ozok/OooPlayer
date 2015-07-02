@@ -320,6 +320,7 @@ begin
     LyricArtistEdit.Enabled := True;
     LyricTitleEdit.Enabled := True;
     LyricSourceList.Enabled := True;
+    ReloadLyricTitleBtn.Enabled := True;
   end;
 end;
 
@@ -359,6 +360,7 @@ begin
   Result := Trim(StringReplace(Result, 'º', 'ş', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, 'þ', 'ş', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<br>', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '&quot;', '"', [rfReplaceAll]));
 
   Result := Trim(Result)
 end;
