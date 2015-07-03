@@ -769,7 +769,6 @@ begin
   begin
     Self.Enabled := False;
     NewRadioForm.RadioCategory := FCurrentRadioCatName;
-    ShowMessage(FCurrentRadioCatName);
     NewRadioForm.Portable := Portable;
     NewRadioForm.Show;
   end;

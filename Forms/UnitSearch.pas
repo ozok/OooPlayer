@@ -233,10 +233,10 @@ begin
             for I := 0 to MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex].Count - 1 do
             begin
               Application.ProcessMessages;
-              if ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Title.ToLower(), LQuery.ToLower()) or
-                ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Artist.ToLower(), LQuery.ToLower()) or
-                ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Album.ToLower(), LQuery.ToLower()) or
-                ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].FullFileName.ToLower(), LQuery.ToLower()) then
+              if ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Title.ToUpperInvariant(), LQuery.ToUpperInvariant()) or
+                ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Artist.ToUpperInvariant(), LQuery.ToUpperInvariant()) or
+                ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Album.ToUpperInvariant(), LQuery.ToUpperInvariant()) or
+                ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].FullFileName.ToUpperInvariant(), LQuery.ToUpperInvariant()) then
               begin
                 FResultsList.Add(i);
 
@@ -252,7 +252,7 @@ begin
             for I := 0 to MainForm.FRadioStations.Count - 1 do
             begin
               Application.ProcessMessages;
-              if ContainsText(MainForm.FRadioStations[i].Name.ToLower(), LQuery.ToLower()) or ContainsText(MainForm.FRadioStations[i].URL, LQuery.ToLower()) then
+              if ContainsText(MainForm.FRadioStations[i].Name.ToUpperInvariant(), LQuery.ToUpperInvariant()) or ContainsText(MainForm.FRadioStations[i].URL, LQuery.ToUpperInvariant()) then
               begin
                 FResultsList.Add(i);
 
