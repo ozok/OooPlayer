@@ -71,6 +71,9 @@ type
     Comment: string;
     Composer: string;
     Date: string;
+    StartPos: Integer;
+    Duration: Integer;
+    EndPos: Integer;
     constructor Create;
     destructor Destroy; override;
   end;

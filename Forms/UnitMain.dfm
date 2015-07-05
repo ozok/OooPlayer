@@ -2062,6 +2062,7 @@ object MainForm: TMainForm
         OnAdvancedCustomDrawItem = RadioListAdvancedCustomDrawItem
         OnData = RadioListData
         OnDblClick = RadioListDblClick
+        ExplicitLeft = 2
       end
       object RadioRecordPanel: TsPanel
         Left = 0
@@ -2762,7 +2763,8 @@ object MainForm: TMainForm
       '*.spx'
       '*.ofr'
       '*.tak'
-      '*.wav')
+      '*.wav'
+      '*.cue')
     OnFindFile = MusicSearchFindFile
     OnProgress = MusicSearchProgress
     Left = 24
@@ -3002,7 +3004,7 @@ object MainForm: TMainForm
   object OpenDialog: TsOpenDialog
     Filter = 
       'All supported|*.mp3;*.aac;*.ogg;*.opus;*.flac;*.alac;*.ape;*.mpc' +
-      ';*.tta;*.wv;*.wma;*.ac3;*.spx;*.tak;*.ofr;*.wav'
+      ';*.tta;*.wv;*.wma;*.ac3;*.spx;*.tak;*.ofr;*.wav;*.cue'
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofEnableSizing]
     Left = 264
     Top = 216
@@ -3041,15 +3043,6 @@ object MainForm: TMainForm
     OnTimer = PositionTimerTimer
     Left = 312
     Top = 288
-  end
-  object RadioThread: TIdThreadComponent
-    Active = False
-    Loop = False
-    Priority = tpNormal
-    StopMode = smTerminate
-    OnRun = RadioThreadRun
-    Left = 792
-    Top = 224
   end
   object RadioListMenu: TPopupMenu
     Left = 264
@@ -3105,7 +3098,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800140216001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101050008002C0216001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5240,5 +5233,14 @@ object MainForm: TMainForm
   object XPManifest1: TXPManifest
     Left = 633
     Top = 519
+  end
+  object RadioThread: TIdThreadComponent
+    Active = False
+    Loop = False
+    Priority = tpNormal
+    StopMode = smTerminate
+    OnRun = RadioThreadRun
+    Left = 785
+    Top = 247
   end
 end

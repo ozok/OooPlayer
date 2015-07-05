@@ -40,7 +40,7 @@ uses
   acAlphaHints, acAlphaImageList, sButton, Vcl.AppEvnts,
   acShellCtrls, sComboBoxes, sTreeView, sListBox, System.Types,
   sEdit, sGauge, UnitLastFMToolLauncher, Pipes, UnitSubProcessLauncher, GraphUtil,
-  Vcl.XPMan;
+  Vcl.XPMan, UnitCueParser;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -146,7 +146,6 @@ type
     TabSheet1: TsTabSheet;
     TabSheet2: TsTabSheet;
     RadioList: TsListView;
-    RadioThread: TIdThreadComponent;
     RadioListMenu: TPopupMenu;
     S6: TMenuItem;
     A2: TMenuItem;
@@ -264,6 +263,7 @@ type
     Taskbar2: TTaskbar;
     XPManifest1: TXPManifest;
     ReloadLyricTitleBtn: TsBitBtn;
+    RadioThread: TIdThreadComponent;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -425,6 +425,8 @@ type
     FInfoFiles: TStringList;
 
     procedure AddFile(const FileName: string);
+    procedure AddCueSheet(const CUEPath: string);
+    function GetDurationEx(const FileName: string): integer;
     procedure ReScanFile(const FileIndex: integer);
 
     procedure LoadPlayList;
@@ -794,6 +796,155 @@ begin
   FStopAddFiles := True;
 end;
 
+procedure TMainForm.AddCueSheet(const CUEPath: string);
+var
+  LCueParser: TCueSplitter;
+  LMediaInfoHandle: Cardinal;
+  FileDuration: integer;
+  I: integer;
+  LTitle, LArtist, LAlbum, LDuration, LBitrate, LChannels, LCodec, LSampleRate: string;
+  LPlayListItem: TPlayItem;
+begin
+  LCueParser := TCueSplitter.Create(CUEPath);
+  LCueParser.FileDuration := GetDurationEx(LCueParser.SongFileName);
+  try
+    LCueParser.ParseCueSheet;
+    if LCueParser.ErrorMsg <> 0 then
+    begin
+      Log('Error with cue ' + CUEPath + '. Error code: ' + FloatToStr(LCueParser.ErrorMsg));
+    end
+    else
+    begin
+      if FileExists(LCueParser.SongFileName) then
+      begin
+        // New handle for mediainfo
+        LMediaInfoHandle := MediaInfo_New();
+        if LMediaInfoHandle <> 0 then
+        begin
+          try
+            // Open a file in complete mode
+            MediaInfo_Open(LMediaInfoHandle, PWideChar(LCueParser.SongFileName));
+            MediaInfo_Option(0, 'Complete', '1');
+
+            if LMediaInfoHandle <> 0 then
+            begin
+              FileDuration := GetDurationEx(LCueParser.SongFileName);
+
+              // get tags from cue file
+              if LCueParser.TrackCount > 0 then
+              begin
+                // each track is treated as a file
+                for I := 0 to LCueParser.TrackCount - 1 do
+                begin
+                  Application.ProcessMessages;
+
+                  // info
+                  LBitrate := MediaInfo_Get(LMediaInfoHandle, Stream_Audio, 0, 'BitRate/String', Info_Text, Info_Name);
+                  LChannels := MediaInfo_Get(LMediaInfoHandle, Stream_Audio, 0, 'Channel(s)/String', Info_Text, Info_Name);
+                  LCodec := MediaInfo_Get(LMediaInfoHandle, Stream_Audio, 0, 'Codec/String', Info_Text, Info_Name);
+                  // a workaround for ALAC being reported as "Lossless"
+                  if LCodec = 'Lossless' then
+                  begin
+                    LCodec := MediaInfo_Get(LMediaInfoHandle, Stream_Audio, 0, 'Format', Info_Text, Info_Name);
+                  end;
+                  LSampleRate := MediaInfo_Get(LMediaInfoHandle, Stream_Audio, 0, 'SamplingRate', Info_Text, Info_Name);
+                  // tags
+                  LTitle := LCueParser.CueTracksInfos[i].CueTrackTagInfo.Title;
+                  LArtist := LCueParser.CueTracksInfos[i].CueTrackTagInfo.Artist;
+                  LAlbum := LCueParser.CueTracksInfos[i].CueTrackTagInfo.Album;
+
+                  LTitle := Trim(LTitle);
+                  LArtist := Trim(LArtist);
+                  LAlbum := Trim(LAlbum);
+                  LDuration := '00:00:00.000';
+                  LCodec := Trim(LCodec);
+                  LSampleRate := Trim(LSampleRate);
+
+                  if (Length(LTitle) < 1) then
+                  begin
+                    // if cannot get title
+                    // set to file name
+                    LTitle := ChangeFileExt(ExtractFileName(LCueParser.SongFileName), '');
+                  end;
+
+                  if (Length(LArtist) < 1) then
+                  begin
+                    LArtist := 'unkown';
+                  end;
+
+                  if (Length(LAlbum) < 1) then
+                  begin
+                    LAlbum := 'unkown';
+                  end;
+
+                  if (Length(LDuration) < 1) then
+                  begin
+                    LDuration := '00:00:00.000';
+                  end;
+
+                  if (Length(LBitrate) < 1) then
+                  begin
+                    LBitrate := 'N/A';
+                  end;
+
+                  if (Length(LChannels) < 1) then
+                  begin
+                    LChannels := 'N/A';
+                  end;
+
+                  if (Length(LCodec) < 1) then
+                  begin
+                    LCodec := 'N/A';
+                  end;
+
+                  if (Length(LSampleRate) < 1) then
+                  begin
+                    LSampleRate := 'N/A';
+                  end;
+                  // increase playlist item count
+                  PlayList.Items.Count := PlayList.Items.Count + 1;
+
+                  LPlayListItem := TPlayItem.Create;
+                  LPlayListItem.FullFileName := LCueParser.SongFileName;
+                  LPlayListItem.DurationStr := LDuration;
+                  LPlayListItem.Title := LTitle;
+                  LPlayListItem.Artist := LArtist;
+                  LPlayListItem.Album := LAlbum;
+                  LPlayListItem.Bitrate := LBitrate;
+                  LPlayListItem.Channels := LChannels;
+                  LPlayListItem.Codec := LCodec;
+                  LPlayListItem.SampleRate := LSampleRate;
+                  // these two values are used for cue sheets
+                  LPlayListItem.Duration := LCueParser.CueTracksInfos[i].CueTrackDurationInfo.Duration;
+                  LPlayListItem.StartPos := LCueParser.CueTracksInfos[i].CueTrackDurationInfo.StartPos;
+                  LPlayListItem.EndPos := LCueParser.CueTracksInfos[i].CueTrackDurationInfo.StartPos;
+                  FPlaylists[FSelectedPlaylistIndex].Add(LPlayListItem);
+                end;
+              end;
+            end
+            else
+            begin
+              Log('Couldn''t add ' + LCueParser.SongFileName + ' because mediainfo can''t open it.');
+            end;
+          finally
+            MediaInfo_Close(LMediaInfoHandle);
+          end;
+        end
+        else
+        begin
+          Log('Couldn''t add ' + LCueParser.SongFileName + ' because mediainfo can''t be loaded.');
+        end;
+      end
+      else
+      begin
+        Log('Couldn''t add ' + LCueParser.SongFileName + ' because file indicated in cue sheet doesn''t exist: ' + LCueParser.SongFileName);
+      end;
+    end;
+  finally
+    LCueParser.Free;
+  end;
+end;
+
 procedure TMainForm.AddFile(const FileName: string);
 var
   MediaInfoHandle: Cardinal;
@@ -803,107 +954,114 @@ begin
 
   if (FileExists(FileName)) then
   begin
-
-    // New handle for mediainfo
-    MediaInfoHandle := MediaInfo_New();
-
-    // initial values
-    LTitle := 'unknown';
-    LArtist := 'unknown';
-    LAlbum := 'unknown';
-    LDuration := '00:00:00.000';
-
-    if (MediaInfoHandle <> 0) then
+    if ExtractFileExt(FileName).ToLower = '.cue' then
     begin
+      // cue sheet
+      AddCueSheet(FileName);
+    end
+    else
+    begin
+      // normal audio file
+      MediaInfoHandle := MediaInfo_New();
 
-      try
-        // read duration of file
-        MediaInfo_Open(MediaInfoHandle, PWideChar(FileName));
-        MediaInfo_Option(MediaInfoHandle, 'Complete', '1');
+      // initial values
+      LTitle := 'unknown';
+      LArtist := 'unknown';
+      LAlbum := 'unknown';
+      LDuration := '00:00:00.000';
 
-        // info
-        LDuration := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Duration/String3', Info_Text, Info_Name);
-        LBitrate := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'BitRate/String', Info_Text, Info_Name);
-        LChannels := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Channel(s)/String', Info_Text, Info_Name);
-        LCodec := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Codec/String', Info_Text, Info_Name);
-        // a workaround for ALAC being reported as "Lossless"
-        if LCodec = 'Lossless' then
-        begin
-          LCodec := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Format', Info_Text, Info_Name);
+      if (MediaInfoHandle <> 0) then
+      begin
+        try
+          MediaInfo_Open(MediaInfoHandle, PWideChar(FileName));
+          MediaInfo_Option(MediaInfoHandle, 'Complete', '1');
+
+          // info
+          LDuration := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Duration/String3', Info_Text, Info_Name);
+          LBitrate := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'BitRate/String', Info_Text, Info_Name);
+          LChannels := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Channel(s)/String', Info_Text, Info_Name);
+          LCodec := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Codec/String', Info_Text, Info_Name);
+          // a workaround for ALAC being reported as "Lossless"
+          if LCodec = 'Lossless' then
+          begin
+            LCodec := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'Format', Info_Text, Info_Name);
+          end;
+          LSampleRate := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'SamplingRate', Info_Text, Info_Name);
+          // tags
+          LTmpItem := FTagReader.ReadTags(FileName);
+          LTitle := LTmpItem.Title;
+          LArtist := LTmpItem.Artist;
+          LAlbum := LTmpItem.Album;
+          LTmpItem.Free;
+
+          LTitle := Trim(LTitle);
+          LArtist := Trim(LArtist);
+          LAlbum := Trim(LAlbum);
+          LDuration := Trim(LDuration);
+          LCodec := Trim(LCodec);
+          LSampleRate := Trim(LSampleRate);
+
+          if (Length(LTitle) < 1) then
+          begin
+            // if cannot get title
+            // set to file name
+            LTitle := ChangeFileExt(ExtractFileName(FileName), '');
+          end;
+
+          if (Length(LArtist) < 1) then
+          begin
+            LArtist := 'unkown';
+          end;
+
+          if (Length(LAlbum) < 1) then
+          begin
+            LAlbum := 'unkown';
+          end;
+
+          if (Length(LDuration) < 1) then
+          begin
+            LDuration := '00:00:00.000';
+          end;
+
+          if (Length(LBitrate) < 1) then
+          begin
+            LBitrate := 'N/A';
+          end;
+
+          if (Length(LChannels) < 1) then
+          begin
+            LChannels := 'N/A';
+          end;
+
+          if (Length(LCodec) < 1) then
+          begin
+            LCodec := 'N/A';
+          end;
+
+          if (Length(LSampleRate) < 1) then
+          begin
+            LSampleRate := 'N/A';
+          end;
+          // increase playlist item count
+          PlayList.Items.Count := PlayList.Items.Count + 1;
+
+          LPlayListItem := TPlayItem.Create;
+          LPlayListItem.FullFileName := FileName;
+          LPlayListItem.DurationStr := LDuration;
+          LPlayListItem.Title := LTitle;
+          LPlayListItem.Artist := LArtist;
+          LPlayListItem.Album := LAlbum;
+          LPlayListItem.Bitrate := LBitrate;
+          LPlayListItem.Channels := LChannels;
+          LPlayListItem.Codec := LCodec;
+          LPlayListItem.SampleRate := LSampleRate;
+          // these two values are used for cue sheets
+          LPlayListItem.Duration := 0;
+          LPlayListItem.StartPos := 0;
+          FPlaylists[FSelectedPlaylistIndex].Add(LPlayListItem);
+        finally
+          MediaInfo_Close(MediaInfoHandle);
         end;
-        LSampleRate := MediaInfo_Get(MediaInfoHandle, Stream_Audio, 0, 'SamplingRate', Info_Text, Info_Name);
-        // tags
-        LTmpItem := FTagReader.ReadTags(FileName);
-        LTitle := LTmpItem.Title;
-        LArtist := LTmpItem.Artist;
-        LAlbum := LTmpItem.Album;
-        LTmpItem.Free;
-
-        LTitle := Trim(LTitle);
-        LArtist := Trim(LArtist);
-        LAlbum := Trim(LAlbum);
-        LDuration := Trim(LDuration);
-        LCodec := Trim(LCodec);
-        LSampleRate := Trim(LSampleRate);
-
-        if (Length(LTitle) < 1) then
-        begin
-          // if cannot get title
-          // set to file name
-          LTitle := ChangeFileExt(ExtractFileName(FileName), '');
-        end;
-
-        if (Length(LArtist) < 1) then
-        begin
-          LArtist := 'unkown';
-        end;
-
-        if (Length(LAlbum) < 1) then
-        begin
-          LAlbum := 'unkown';
-        end;
-
-        if (Length(LDuration) < 1) then
-        begin
-          LDuration := '00:00:00.000';
-        end;
-
-        if (Length(LBitrate) < 1) then
-        begin
-          LBitrate := 'N/A';
-        end;
-
-        if (Length(LChannels) < 1) then
-        begin
-          LChannels := 'N/A';
-        end;
-
-        if (Length(LCodec) < 1) then
-        begin
-          LCodec := 'N/A';
-        end;
-
-        if (Length(LSampleRate) < 1) then
-        begin
-          LSampleRate := 'N/A';
-        end;
-        // increase playlist item count
-        PlayList.Items.Count := PlayList.Items.Count + 1;
-
-        LPlayListItem := TPlayItem.Create;
-        LPlayListItem.FullFileName := FileName;
-        LPlayListItem.DurationStr := LDuration;
-        LPlayListItem.Title := LTitle;
-        LPlayListItem.Artist := LArtist;
-        LPlayListItem.Album := LAlbum;
-        LPlayListItem.DurationStr := LDuration;
-        LPlayListItem.Bitrate := LBitrate;
-        LPlayListItem.Channels := LChannels;
-        LPlayListItem.Codec := LCodec;
-        LPlayListItem.SampleRate := LSampleRate;
-        FPlaylists[FSelectedPlaylistIndex].Add(LPlayListItem);
-      finally
-        MediaInfo_Close(MediaInfoHandle);
       end;
     end;
   end;
@@ -1524,7 +1682,7 @@ begin
         begin
           if (Extension = '.mp3') or (Extension = '.aac') or (Extension = '.ogg') or (Extension = '.opus') or (Extension = '.flac') or (Extension = '.alac') or (Extension = '.ape') or
             (Extension = '.mpc') or (Extension = '.tta') or (Extension = '.wv') or (Extension = '.wma') or (Extension = '.ac3') or (Extension = '.spx') or (Extension = '.tak') or
-            (Extension = '.ofr') or (Extension = '.wav') then
+            (Extension = '.ofr') or (Extension = '.wav') or (Extension = '.cue') then
           begin
             AddFile(Value[i]);
             FLastDir := ExtractFileDir(Value[i]);
@@ -1989,6 +2147,47 @@ var
 begin
   CreateGUID(LGUID);
   Result := GUIDToString(LGUID);
+end;
+
+function TMainForm.GetDurationEx(const FileName: string): integer;
+var
+  LMediaInfoHandle: Cardinal;
+  VDuration: string;
+begin
+  Result := 0;
+  if (FileExists(FileName)) then
+  begin
+    // New handle for mediainfo
+    LMediaInfoHandle := MediaInfo_New();
+    if LMediaInfoHandle <> 0 then
+    begin
+      try
+        // Open a file in complete mode
+        MediaInfo_Open(LMediaInfoHandle, PWideChar(FileName));
+        MediaInfo_Option(0, 'Complete', '1');
+        // get length
+        VDuration := MediaInfo_Get(LMediaInfoHandle, Stream_Video, 0, 'Duration', Info_Text, Info_Name);
+        if Length(VDuration) < 1 then
+        begin
+          if Length(Trim(VDuration)) < 1 then
+          begin
+            VDuration := MediaInfo_Get(LMediaInfoHandle, Stream_General, 0, 'Duration', Info_Text, Info_Name);
+            if Length(VDuration) < 1 then
+            begin
+              VDuration := '0';
+            end;
+          end
+          else
+          begin
+            VDuration := '0';
+          end;
+        end;
+        Result := StrToInt64(VDuration);
+      finally
+        MediaInfo_Close(LMediaInfoHandle);
+      end;
+    end;
+  end;
 end;
 
 function TMainForm.GetRecordedFileType(const FileName: string): string;
@@ -2864,7 +3063,7 @@ begin
         LyricArtistEdit.Enabled := True;
         LyricTitleEdit.Enabled := True;
         LyricSourceList.Enabled := True;
-            ReloadLyricTitleBtn.Enabled := True;
+        ReloadLyricTitleBtn.Enabled := True;
       end;
     end;
   end;

@@ -48,7 +48,8 @@ uses
   UnitArtworkInfo in 'Units\UnitArtworkInfo.pas',
   UnitLastFMToolLauncher in 'Units\UnitLastFMToolLauncher.pas',
   UnitTagReader in 'Units\UnitTagReader.pas',
-  UnitSubProcessLauncher in 'Units\UnitSubProcessLauncher.pas';
+  UnitSubProcessLauncher in 'Units\UnitSubProcessLauncher.pas',
+  UnitCueParser in 'Units\UnitCueParser.pas';
 
 {$R *.res}
 
