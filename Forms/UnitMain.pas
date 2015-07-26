@@ -243,7 +243,6 @@ type
     CategoryPages: TsPageControl;
     sTabSheet2: TsTabSheet;
     sTabSheet4: TsTabSheet;
-    PlaylistView: TsTreeView;
     PlaylistListPanel: TsPanel;
     AddPlaylistBtn: TsBitBtn;
     RemovePlaylistBtn: TsBitBtn;
@@ -264,6 +263,7 @@ type
     XPManifest1: TXPManifest;
     ReloadLyricTitleBtn: TsBitBtn;
     RadioThread: TIdThreadComponent;
+    PlaylistView: TsListView;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -379,7 +379,6 @@ type
     procedure C3Click(Sender: TObject);
     procedure PrevArtworkBtnClick(Sender: TObject);
     procedure NextArtworkBtnClick(Sender: TObject);
-    procedure PlaylistViewChange(Sender: TObject; Node: TTreeNode);
     procedure TitleLabelMouseEnter(Sender: TObject);
     procedure RadiosViewChange(Sender: TObject; Node: TTreeNode);
     procedure LastFMLaunchTimerTimer(Sender: TObject);
@@ -400,6 +399,11 @@ type
     procedure sPanel5MouseEnter(Sender: TObject);
     procedure F3Click(Sender: TObject);
     procedure ReloadLyricTitleBtnClick(Sender: TObject);
+    procedure VolumeBarMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure PlaylistViewResize(Sender: TObject);
+    procedure PlaylistViewCustomDrawItem(Sender: TCustomListView;
+      Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
   private
     { Private declarations }
     FLastDir: string;
@@ -438,8 +442,6 @@ type
 
     procedure ScrollToCurrentSong;
 
-    procedure GenerateShuffleList;
-
     procedure LoadM3UPlaylist(const PlaylistPath: string);
     procedure LoadPPFPlaylist(const PlaylistPath: string);
     procedure SaveM3UPlayList(const FileName: string; const UTF8: Boolean);
@@ -477,6 +479,7 @@ type
     PortableMode: Boolean;
     ArtworkFileName: string;
     FSelectedPlaylistIndex: integer;
+    FActivePlaylistIndex: integer;
     FArtistLabel: string;
     FAlbumLabel: string;
     FTitleLabel: string;
@@ -532,6 +535,8 @@ type
     procedure EnableEQ;
 
     procedure ChangePlaylistColumnNames;
+
+    procedure GenerateShuffleList;
   end;
 
 var
@@ -1083,7 +1088,7 @@ var
   LPlaylist: TPlaylist;
   LQueueList: TQueueList;
   LSW: TStreamWriter;
-  LPlaylistsNode: TTreeNode;
+  LListItem: TListItem;
 begin
   LName := InputBox('New playlist name', 'Name', 'Playlist' + FPlayListFiles.Count.ToString());
   if LName.Length > 0 then
@@ -1105,19 +1110,16 @@ begin
       LSW.Free;
     end;
 
-    LPlaylistsNode := PlaylistView.Items[0];
-    LPlaylistsNode.DeleteChildren;
-    for I := 0 to FPlayListFiles.Count - 1 do
-    begin
-      PlaylistView.Items.AddChild(LPlaylistsNode, (i + 1).ToString + '. ' + FPlayListFiles[i].Name);
-    end;
+    LListItem := PlaylistView.Items.Add;
+    LListItem.Caption := FPlayListFiles.Count.ToString() + '.';
+    LListItem.SubItems.Add(LPlaylistFile.Name);
     FSelectedPlaylistIndex := FPlayListFiles.Count - 1;
-    LPlaylistsNode.Expand(True);
 
     LPlaylist := TPlaylist.Create;
     FPlaylists.Add(LPlaylist);
     FQueueLists.Add(LQueueList);
     SavePlayList;
+    PlaylistViewClick(Self);
     // PlaylistListChange(Self);
   end;
 end;
@@ -2617,8 +2619,7 @@ var
   LStreamWriter: TStreamWriter;
   i: integer;
   LPlaylist: TPlaylist;
-  LPlaylistNode: TTreeNode;
-  LNewNode: TTreeNode;
+  LListItem: TListItem;
   LQueueList: TQueueList;
 begin
   // load playlists.
@@ -2657,15 +2658,12 @@ begin
       LStreamReader.Free;
       LSpltLst.Free;
 
-      LPlaylistNode := PlaylistView.Items[0];
-      LPlaylistNode.DeleteChildren;
       for I := 0 to FPlayListFiles.Count - 1 do
       begin
-        LNewNode := PlaylistView.Items.AddChild(LPlaylistNode, FPlayListFiles[i].Name);
-        LNewNode.ImageIndex := 2;
-        LNewNode.SelectedIndex := 2;
+        LListItem := PlaylistView.Items.Add;
+        LListItem.Caption := (i + 1).ToString() + '.';
+        LListItem.SubItems.Add(FPlayListFiles[i].Name);
       end;
-      LPlaylistNode.Expand(True);
       FSelectedPlaylistIndex := FPlayListFiles.Count - 1;
       PlayList.ItemIndex := FSelectedPlaylistIndex;
     end;
@@ -2685,15 +2683,12 @@ begin
     LPlaylistFile.PlaylistFile := FAppDataFolder + '\playlist.dat';
     FPlayListFiles.Add(LPlaylistFile);
 
-    LPlaylistNode := PlaylistView.Items[0];
-    LPlaylistNode.DeleteChildren;
     for I := 0 to FPlayListFiles.Count - 1 do
     begin
-      LNewNode := PlaylistView.Items.AddChild(LPlaylistNode, FPlayListFiles[i].Name);
-      LNewNode.ImageIndex := 2;
-      LNewNode.SelectedIndex := 2;
+      LListItem := PlaylistView.Items.Add;
+      LListItem.Caption := (i + 1).ToString() + '.';
+      LListItem.SubItems.Add(FPlayListFiles[i].Name);
     end;
-    LPlaylistNode.Expand(True);
     FSelectedPlaylistIndex := FPlayListFiles.Count - 1;
     PlayList.ItemIndex := FSelectedPlaylistIndex;
   end;
@@ -2920,7 +2915,8 @@ begin
       SearchForm.chkCloseOnPlayBtn.Checked := ReadBool('search', 'close', True);
       LyricPanel.Width := ReadInteger('player', 'lyricw', 250);
       FSelectedPlaylistIndex := ReadInteger('player', 'playlistindex', 0);
-      PlaylistView.Items[FSelectedPlaylistIndex + 1].Selected := True;
+      PlaylistView.Items[FSelectedPlaylistIndex].Selected := True;
+      PlaylistViewClick(Self);
 
       QueueList.Visible := ReadBool('player', 'queuevisible', True);
       Splitter2.Visible := LyricPanel.Visible;
@@ -3276,37 +3272,49 @@ begin
     Self.FocusControl(VolumeBar);
 end;
 
-procedure TMainForm.PlaylistViewChange(Sender: TObject; Node: TTreeNode);
+procedure TMainForm.PlaylistViewClick(Sender: TObject);
 begin
-  if Assigned(Node) then
+  if PlaylistView.ItemIndex > -1 then
   begin
-    if (Node.AbsoluteIndex > 0) then
-    begin
-      // a music playlist
-      PlayList.Items.Count := 0;
-      FCurrentItemInfo.FullFileName := '';
-      FShuffleIndexes.Clear;
-      FShuffleIndex := -1;
-      PlayList.Items.Count := 0;
-      QueueList.Items.Count := 0;
-      FSelectedPlaylistIndex := Node.AbsoluteIndex - 1;
-      PlayList.Items.Count := FPlaylists[FSelectedPlaylistIndex].Count;
-      QueueList.Items.Count := FQueueLists[FSelectedPlaylistIndex].Count;
-      QueueList.Invalidate;
-      GenerateShuffleList;
-      FShuffleIndex := -1;
-      PlayList.Repaint;
-      PlayList.Refresh;
-      StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
-      ScrollToCurrentSong;
-      FuncPages.ActivePageIndex := 0;
-    end;
+    FuncPages.ActivePageIndex := 0;
+
+    PlayList.Items.Count := 0;
+    FCurrentItemInfo.FullFileName := '';
+    FShuffleIndexes.Clear;
+    FShuffleIndex := -1;
+    PlayList.Items.Count := 0;
+    QueueList.Items.Count := 0;
+    FSelectedPlaylistIndex := PlaylistView.ItemIndex;
+    PlayList.Items.Count := FPlaylists[FSelectedPlaylistIndex].Count;
+    QueueList.Items.Count := FQueueLists[FSelectedPlaylistIndex].Count;
+    QueueList.Invalidate;
+    GenerateShuffleList;
+    FShuffleIndex := -1;
+    PlayList.Repaint;
+    PlayList.Refresh;
+    StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+    ScrollToCurrentSong;
+    FuncPages.ActivePageIndex := 0;
   end;
 end;
 
-procedure TMainForm.PlaylistViewClick(Sender: TObject);
+procedure TMainForm.PlaylistViewCustomDrawItem(Sender: TCustomListView;
+  Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
 begin
-  FuncPages.ActivePageIndex := 0;
+  if Item.Index = FActivePlaylistIndex then
+  begin
+    Sender.Canvas.Font.Style := [fsBold];
+  end
+  else
+  begin
+    Sender.Canvas.Font.Style := [];
+  end;
+end;
+
+procedure TMainForm.PlaylistViewResize(Sender: TObject);
+begin
+  PlaylistView.Columns[0].Width := 45;
+  PlaylistView.Columns[1].Width := PlaylistView.ClientWidth - PlaylistView.Columns[0].Width - 20;
 end;
 
 procedure TMainForm.P8Click(Sender: TObject);
@@ -3875,6 +3883,7 @@ begin
       if FileExists(FCurrentItemInfo.FullFileName) then
       begin
         FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex := FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex;
+        FActivePlaylistIndex := FSelectedPlaylistIndex;
         FPlayer.FileName := FCurrentItemInfo.FullFileName;
         FPlayer.Play;
         FCurrentItemInfo.DurationBass := FPlayer.TotalLength;
@@ -4067,6 +4076,7 @@ begin
         end;
         // Self.Enabled := False;
         SaveSettings;
+        PlaylistView.Refresh;
         Sleep(100);
         // Self.Enabled := True;
       end
@@ -5073,36 +5083,20 @@ procedure TMainForm.RemovePlaylistBtnClick(Sender: TObject);
 var
   LSW: TStreamWriter;
   i: integer;
-  LPlaylistNode: TTreeNode;
-  LNewNode: TTreeNode;
-  LSelectedNodeIndex: integer;
-  LChildNode: TTreeNode;
+  LSelectedIndex: Integer;
 begin
   // cannot delete default one
-  if PlaylistView.Items[0].Count > 1 then
+  if PlaylistView.ItemIndex > -1 then
   begin
-    LChildNode := PlaylistView.Items[0].getFirstChild;
-    LSelectedNodeIndex := 1;
-    while LChildNode <> nil do
-    begin
-      if LChildNode.Selected then
-      begin
-        Break;
-      end
-      else
-      begin
-        LChildNode := PlaylistView.Items[0].getFirstChild;
-        Inc(LSelectedNodeIndex);
-      end;
-    end;
+    LSelectedIndex := PlaylistView.ItemIndex;
     if ID_YES = Application.MessageBox('Delete selected playlist? This cannot be undone.', 'Playlist Selection', MB_ICONQUESTION or MB_YESNO) then
     begin
       // delete playlist file
-      if FileExists(FPlayListFiles[LSelectedNodeIndex].PlaylistFile) then
+      if FileExists(FPlayListFiles[LSelectedIndex].PlaylistFile) then
       begin
-        DeleteFile(FPlayListFiles[LSelectedNodeIndex].PlaylistFile)
+        DeleteFile(FPlayListFiles[LSelectedIndex].PlaylistFile)
       end;
-      FPlayListFiles.Delete(LSelectedNodeIndex);
+      FPlayListFiles.Delete(LSelectedIndex);
       LSW := TStreamWriter.Create(FAppDataFolder + '\playlists.dat', False);
       try
         for I := 0 to FPlayListFiles.Count - 1 do
@@ -5113,18 +5107,10 @@ begin
         LSW.Close;
         LSW.Free;
       end;
-      FPlaylists.Delete(LSelectedNodeIndex);
-
-      LPlaylistNode := PlaylistView.Items[0];
-      for I := 0 to FPlayListFiles.Count - 1 do
-      begin
-        LNewNode := PlaylistView.Items.AddChild(LPlaylistNode, FPlayListFiles[i].Name);
-        LNewNode.ImageIndex := 2;
-        LNewNode.SelectedIndex := 2;
-      end;
-      LPlaylistNode.Expand(True);
+      FPlaylists.Delete(LSelectedIndex);
+      PlaylistView.Items.Delete(LSelectedIndex);
       FSelectedPlaylistIndex := FPlayListFiles.Count - 1;
-
+      PlaylistViewClick(Self);
       SavePlayList;
     end;
   end;
@@ -5137,33 +5123,19 @@ var
   LSW: TStreamWriter;
   i: integer;
   LOldPlaylistIndex: integer;
-  LPlaylistNode: TTreeNode;
-  LNewNode, LChildNode: TTreeNode;
-  LSelectedNodeIndex: integer;
+  LSelectedIndex: integer;
 begin
-  if PlaylistView.Items[0].Count > 0 then
+  if PlaylistView.ItemIndex > -1 then
   begin
-    LSelectedNodeIndex := 0;
-    for I := 1 to PlaylistView.Items.Count - 1 do
-    begin
-      LChildNode := PlaylistView.Items[i];
-      if LChildNode.Selected then
-      begin
-        Break;
-      end
-      else
-      begin
-        Inc(LSelectedNodeIndex);
-      end;
-    end;
-    LNewName := InputBox('Playlist name', 'Name', LChildNode.Text);
+    LSelectedIndex := PlaylistView.ItemIndex;
+    LNewName := InputBox('Playlist name', 'Name', FPlayListFiles[LSelectedIndex].Name);
     if LNewName.Length > 0 then
     begin
       LPlaylistFile := TPlaylistFile.Create;
       LPlaylistFile.Name := LNewName;
-      LPlaylistFile.PlaylistFile := FPlayListFiles[LSelectedNodeIndex].PlaylistFile;
-      LPlaylistFile.CurrentItemIndex := FPlayListFiles[LSelectedNodeIndex].CurrentItemIndex;
-      FPlayListFiles[LSelectedNodeIndex] := LPlaylistFile;
+      LPlaylistFile.PlaylistFile := FPlayListFiles[LSelectedIndex].PlaylistFile;
+      LPlaylistFile.CurrentItemIndex := FPlayListFiles[LSelectedIndex].CurrentItemIndex;
+      FPlayListFiles[LSelectedIndex] := LPlaylistFile;
       LSW := TStreamWriter.Create(FAppDataFolder + '\playlists.dat', False);
       try
         for I := 0 to FPlayListFiles.Count - 1 do
@@ -5174,20 +5146,10 @@ begin
         LSW.Close;
         LSW.Free;
       end;
-
-      LOldPlaylistIndex := LSelectedNodeIndex;
-      LPlaylistNode := PlaylistView.Items[0];
-      LPlaylistNode.DeleteChildren;
-      for I := 0 to FPlayListFiles.Count - 1 do
-      begin
-        LNewNode := PlaylistView.Items.AddChild(LPlaylistNode, FPlayListFiles[i].Name);
-        LNewNode.ImageIndex := 2;
-        LNewNode.SelectedIndex := 2;
-      end;
-      LPlaylistNode.Expand(True);
+      PlaylistView.Items[LSelectedIndex].Caption := FloatToStr(LSelectedIndex + 1) + '. ' + LNewName;
       FSelectedPlaylistIndex := LOldPlaylistIndex;
-      PlaylistView.Items[LSelectedNodeIndex + 1].Selected := True;
-
+      PlaylistView.Items[LSelectedIndex].Selected := True;
+      PlaylistViewClick(Self);
       SavePlayList;
     end;
   end;
@@ -5899,6 +5861,12 @@ begin
   end;
 
   StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
+end;
+
+procedure TMainForm.VolumeBarMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  ShowMessage('asdasd');
 end;
 
 procedure TMainForm.VolumeBarMouseEnter(Sender: TObject);

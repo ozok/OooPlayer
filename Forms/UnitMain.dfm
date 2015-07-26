@@ -106,6 +106,7 @@ object MainForm: TMainForm
         TickMarks = tmBoth
         TickStyle = tsNone
         OnChange = VolumeBarChange
+        OnMouseDown = VolumeBarMouseDown
         SkinData.SkinSection = 'TRACKBAR'
         BarOffsetV = 0
         BarOffsetH = 0
@@ -2062,7 +2063,6 @@ object MainForm: TMainForm
         OnAdvancedCustomDrawItem = RadioListAdvancedCustomDrawItem
         OnData = RadioListData
         OnDblClick = RadioListDblClick
-        ExplicitLeft = 2
       end
       object RadioRecordPanel: TsPanel
         Left = 0
@@ -2605,42 +2605,6 @@ object MainForm: TMainForm
       Caption = 'Music'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      object PlaylistView: TsTreeView
-        Left = 0
-        Top = 30
-        Width = 209
-        Height = 537
-        Align = alClient
-        Color = 722950
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        HideSelection = False
-        Images = CategoryList
-        Indent = 25
-        ParentFont = False
-        PopupMenu = FuncListMenu
-        ReadOnly = True
-        RowSelect = True
-        TabOrder = 0
-        OnChange = PlaylistViewChange
-        OnClick = PlaylistViewClick
-        Items.NodeData = {
-          0301000000300000000000000000000000FFFFFFFFFFFFFFFF00000000000000
-          0000000000010950006C00610079006C006900730074007300}
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
-        BoundLabel.Layout = sclLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
-        SkinData.SkinSection = 'EDIT'
-      end
       object PlaylistListPanel: TsPanel
         Left = 0
         Top = 0
@@ -2648,7 +2612,7 @@ object MainForm: TMainForm
         Height = 30
         Align = alTop
         BevelOuter = bvNone
-        TabOrder = 1
+        TabOrder = 0
         SkinData.SkinSection = 'PANEL'
         object AddPlaylistBtn: TsBitBtn
           AlignWithMargins = True
@@ -2692,6 +2656,47 @@ object MainForm: TMainForm
           OnClick = RenamePlaylistBtnClick
           SkinData.SkinSection = 'BUTTON'
         end
+      end
+      object PlaylistView: TsListView
+        Left = 0
+        Top = 30
+        Width = 209
+        Height = 537
+        BoundLabel.Indent = 0
+        BoundLabel.Font.Charset = DEFAULT_CHARSET
+        BoundLabel.Font.Color = clWindowText
+        BoundLabel.Font.Height = -11
+        BoundLabel.Font.Name = 'Tahoma'
+        BoundLabel.Font.Style = []
+        BoundLabel.Layout = sclLeft
+        BoundLabel.MaxWidth = 0
+        BoundLabel.UseSkinColor = True
+        SkinData.SkinSection = 'EDIT'
+        Align = alClient
+        Color = 722950
+        Columns = <
+          item
+          end
+          item
+            Width = 150
+          end>
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 12102048
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        HideSelection = False
+        ReadOnly = True
+        RowSelect = True
+        ParentFont = False
+        StateImages = PlaybackImages
+        TabOrder = 1
+        ViewStyle = vsReport
+        OnClick = PlaylistViewClick
+        OnCustomDrawItem = PlaylistViewCustomDrawItem
+        OnResize = PlaylistViewResize
+        ExplicitLeft = 2
+        ExplicitTop = 28
       end
     end
     object sTabSheet4: TsTabSheet
@@ -3098,7 +3103,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C0101050008002C0216001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800380216001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5240,7 +5245,7 @@ object MainForm: TMainForm
     Priority = tpNormal
     StopMode = smTerminate
     OnRun = RadioThreadRun
-    Left = 785
-    Top = 247
+    Left = 505
+    Top = 519
   end
 end

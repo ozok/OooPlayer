@@ -227,7 +227,15 @@ begin
                 if FShuffleIndexes[FShuffleIndex] < FPlaylists[FSelectedPlaylistIndex].Count then
                 begin
                   PlayItem(FShuffleIndexes[FShuffleIndex]);
-                end;
+                end
+              end
+              else
+              begin
+                // if played all in shuffle list
+                // just re-generate shuffle list and start playing this new list
+                GenerateShuffleList;
+                FShuffleIndex := 0;
+                PlayItem(FShuffleIndexes[FShuffleIndex]);
               end;
             finally
               PositionTimer.Enabled := True;
