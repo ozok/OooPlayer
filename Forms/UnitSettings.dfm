@@ -35,10 +35,6 @@ object SettingsForm: TSettingsForm
       Caption = 'General'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object CheckUpdateBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -80,9 +76,9 @@ object SettingsForm: TSettingsForm
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -119,9 +115,9 @@ object SettingsForm: TSettingsForm
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -143,10 +139,6 @@ object SettingsForm: TSettingsForm
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object PlayCursorBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -175,9 +167,9 @@ object SettingsForm: TSettingsForm
         Width = 75
         Height = 21
         Alignment = taCenter
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -207,10 +199,6 @@ object SettingsForm: TSettingsForm
       ImageIndex = 2
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LoadArtBtn: TsCheckBox
         Left = 16
         Top = 16
@@ -243,9 +231,9 @@ object SettingsForm: TSettingsForm
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -269,16 +257,12 @@ object SettingsForm: TSettingsForm
       ParentFont = False
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LyricBtn: TsCheckBox
         Left = 16
         Top = 16
-        Width = 132
+        Width = 102
         Height = 19
-        Caption = 'Download/Show lyrics'
+        Caption = 'Download lyrics'
         Checked = True
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -293,8 +277,8 @@ object SettingsForm: TSettingsForm
         ImgUnchecked = 0
       end
       object LogLyricFailBtn: TsCheckBox
-        Left = 16
-        Top = 39
+        Left = 17
+        Top = 64
         Width = 157
         Height = 19
         Caption = 'Log if lyric downloader fails'
@@ -303,15 +287,21 @@ object SettingsForm: TSettingsForm
         ImgChecked = 0
         ImgUnchecked = 0
       end
+      object ShowDownloadedLyrics: TsCheckBox
+        Left = 16
+        Top = 41
+        Width = 142
+        Height = 19
+        Caption = 'Show downloaded lyrics'
+        TabOrder = 2
+        ImgChecked = 0
+        ImgUnchecked = 0
+      end
     end
     object sTabSheet1: TsTabSheet
       Caption = 'Look'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object SkinsList: TsComboBox
         Left = 46
         Top = 16
@@ -332,9 +322,9 @@ object SettingsForm: TSettingsForm
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -447,10 +437,6 @@ object SettingsForm: TSettingsForm
       Caption = 'Last.fm'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object sLabel4: TsLabel
         Left = 3
         Top = 95

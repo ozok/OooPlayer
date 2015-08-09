@@ -12,13 +12,13 @@ type
     NameEdit: TLabeledEdit;
     WebEdit: TLabeledEdit;
     StreamEdit: TLabeledEdit;
-    Button1: TsButton;
-    Button2: TsButton;
+    SaveBtn: TsButton;
+    CancelBtn: TsButton;
     sSkinProvider1: TsSkinProvider;
-    procedure Button2Click(Sender: TObject);
+    procedure CancelBtnClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure Button1Click(Sender: TObject);
+    procedure SaveBtnClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -36,7 +36,7 @@ implementation
 
 uses UnitMain;
 
-procedure TNewRadioForm.Button1Click(Sender: TObject);
+procedure TNewRadioForm.SaveBtnClick(Sender: TObject);
 var
   LStreamWriter: TStreamWriter;
 begin
@@ -87,7 +87,7 @@ begin
   end;
 end;
 
-procedure TNewRadioForm.Button2Click(Sender: TObject);
+procedure TNewRadioForm.CancelBtnClick(Sender: TObject);
 begin
   Self.Close;
 end;

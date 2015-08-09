@@ -70,6 +70,7 @@ type
     SaturationLabel: TsLabel;
     BrightnessLabel: TsLabel;
     sLabel4: TsLabel;
+    ShowDownloadedLyrics: TsCheckBox;
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LoadArtBtnClick(Sender: TObject);
@@ -215,6 +216,7 @@ begin
       LoadArtBtn.Checked := SettingsFile.ReadBool('settings', 'loadcover', True);
       CoverArtList.ItemIndex := SettingsFile.ReadInteger('settings', 'cover', 0);
       LyricBtn.Checked := SettingsFile.ReadBool('settings', 'lyric', True);
+      ShowDownloadedLyrics.Checked := SettingsFile.ReadBool('settings', 'showloyric', True);
       LogLyricFailBtn.Checked := SettingsFile.ReadBool('settings', 'loglyric', False);
       BufferEdit.Text := SettingsFile.ReadString('settings', 'buffer', '500');
       SkinsList.ItemIndex := SettingsFile.ReadInteger('settings', 'skin2', 33);
@@ -267,6 +269,7 @@ begin
       SettingsFile.WriteBool('settings', 'loadcover', LoadArtBtn.Checked);
       SettingsFile.WriteInteger('settings', 'cover', CoverArtList.ItemIndex);
       SettingsFile.WriteBool('settings', 'lyric', LyricBtn.Checked);
+      SettingsFile.WriteBool('settings', 'showloyric', ShowDownloadedLyrics.Checked);
       SettingsFile.WriteBool('settings', 'loglyric', LogLyricFailBtn.Checked);
       SettingsFile.WriteString('settings', 'buffer', BufferEdit.Text);
       SettingsFile.WriteInteger('settings', 'skin2', SkinsList.ItemIndex);

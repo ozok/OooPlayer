@@ -57,7 +57,7 @@ object NewRadioForm: TNewRadioForm
     LabelPosition = lpLeft
     TabOrder = 2
   end
-  object Button1: TsButton
+  object SaveBtn: TsButton
     Left = 511
     Top = 94
     Width = 75
@@ -65,10 +65,10 @@ object NewRadioForm: TNewRadioForm
     Anchors = [akRight, akBottom]
     Caption = 'Add'
     TabOrder = 3
-    OnClick = Button1Click
+    OnClick = SaveBtnClick
     SkinData.SkinSection = 'BUTTON'
   end
-  object Button2: TsButton
+  object CancelBtn: TsButton
     Left = 430
     Top = 94
     Width = 75
@@ -76,7 +76,7 @@ object NewRadioForm: TNewRadioForm
     Anchors = [akRight, akBottom]
     Caption = 'Cancel'
     TabOrder = 4
-    OnClick = Button2Click
+    OnClick = CancelBtnClick
     SkinData.SkinSection = 'BUTTON'
   end
   object sSkinProvider1: TsSkinProvider

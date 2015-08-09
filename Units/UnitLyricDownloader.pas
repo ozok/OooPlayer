@@ -458,6 +458,11 @@ begin
   begin
     try
       FThread.Terminate;
+      while not FThread.Terminated do
+      begin
+        FThread.TerminateAndWaitFor;
+        Sleep(50);
+      end;
     except
 
     end;

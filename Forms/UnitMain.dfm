@@ -1158,8 +1158,8 @@ object MainForm: TMainForm
             TabOrder = 1
             OnClick = EQBtnClick
             OnMouseEnter = EQBtnMouseEnter
-            SkinData.SkinSection = 'BUTTON'
             ShowCaption = False
+            SkinData.SkinSection = 'BUTTON'
           end
           object SearchBtn: TsBitBtn
             AlignWithMargins = True
@@ -1480,9 +1480,9 @@ object MainForm: TMainForm
             SkinData.SkinSection = 'COMBOBOX'
             VerticalAlignment = taAlignTop
             Style = csDropDownList
-            Color = 722950
+            Color = 2038810
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = 12102048
+            Font.Color = 13417908
             Font.Height = -11
             Font.Name = 'Tahoma'
             Font.Style = []
@@ -1614,7 +1614,7 @@ object MainForm: TMainForm
         OnMouseEnter = PlayListMouseEnter
         Align = alClient
         BorderStyle = bsNone
-        Color = 722950
+        Color = 2038810
         Columns = <
           item
             Caption = 'Artist'
@@ -1649,7 +1649,7 @@ object MainForm: TMainForm
           end>
         DragMode = dmAutomatic
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -1688,7 +1688,7 @@ object MainForm: TMainForm
         OnMouseEnter = QueueListMouseEnter
         OnMouseLeave = QueueListMouseLeave
         Align = alBottom
-        Color = 722950
+        Color = 2038810
         Columns = <
           item
           end
@@ -1696,7 +1696,7 @@ object MainForm: TMainForm
             Width = 100
           end>
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2035,7 +2035,7 @@ object MainForm: TMainForm
         OnMouseLeave = RadioListMouseLeave
         Align = alClient
         BorderStyle = bsNone
-        Color = 722950
+        Color = 2038810
         Columns = <
           item
             Caption = 'Station Name'
@@ -2048,7 +2048,7 @@ object MainForm: TMainForm
           end>
         ColumnClick = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2136,9 +2136,9 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'COMBOBOX'
           VerticalAlignment = taAlignTop
           Style = csDropDownList
-          Color = 722950
+          Color = 2038810
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 12102048
+          Font.Color = 13417908
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -2185,9 +2185,9 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'COMBOBOX'
           VerticalAlignment = taAlignTop
           Style = csDropDownList
-          Color = 722950
+          Color = 2038810
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 12102048
+          Font.Color = 13417908
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -2252,11 +2252,14 @@ object MainForm: TMainForm
       ExplicitTop = 379
     end
     object LyricStatusLabel: TsLabel
-      Left = 1
-      Top = 367
-      Width = 348
+      AlignWithMargins = True
+      Left = 4
+      Top = 364
+      Width = 342
       Height = 13
       Align = alBottom
+      ExplicitLeft = 1
+      ExplicitTop = 367
       ExplicitWidth = 3
     end
     object CoverPanel: TsPanel
@@ -2533,9 +2536,9 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 722950
+        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2564,12 +2567,12 @@ object MainForm: TMainForm
       Left = 1
       Top = 113
       Width = 348
-      Height = 254
+      Height = 248
       Align = alClient
       BorderStyle = bsNone
-      Color = 722950
+      Color = 2038810
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 12102048
+      Font.Color = 13417908
       Font.Height = -13
       Font.Name = 'Tahoma'
       Font.Style = []
@@ -2588,6 +2591,7 @@ object MainForm: TMainForm
       BoundLabel.MaxWidth = 0
       BoundLabel.UseSkinColor = True
       SkinData.SkinSection = 'EDIT'
+      ExplicitHeight = 254
     end
   end
   object CategoryPages: TsPageControl
@@ -2595,7 +2599,7 @@ object MainForm: TMainForm
     Top = 80
     Width = 217
     Height = 602
-    ActivePage = sTabSheet2
+    ActivePage = sTabSheet4
     Align = alLeft
     Images = CategoryList
     TabOrder = 5
@@ -2673,7 +2677,7 @@ object MainForm: TMainForm
         BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'EDIT'
         Align = alClient
-        Color = 722950
+        Color = 2038810
         Columns = <
           item
           end
@@ -2681,7 +2685,7 @@ object MainForm: TMainForm
             Width = 150
           end>
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = 13417908
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2695,8 +2699,6 @@ object MainForm: TMainForm
         OnClick = PlaylistViewClick
         OnCustomDrawItem = PlaylistViewCustomDrawItem
         OnResize = PlaylistViewResize
-        ExplicitLeft = 2
-        ExplicitTop = 28
       end
     end
     object sTabSheet4: TsTabSheet
@@ -2704,29 +2706,11 @@ object MainForm: TMainForm
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      object RadiosView: TsTreeView
+      object RadiosView: TsListView
         Left = 0
         Top = 0
         Width = 209
         Height = 567
-        Align = alClient
-        Color = 722950
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        HideSelection = False
-        Images = CategoryList
-        Indent = 25
-        ParentFont = False
-        ReadOnly = True
-        TabOrder = 0
-        OnChange = RadiosViewChange
-        OnClick = RadiosViewClick
-        Items.NodeData = {
-          0301000000340000000100000000000000FFFFFFFFFFFFFFFF00000000000000
-          0000000000010B52006100640069006F0020004C006900730074007300}
         BoundLabel.Indent = 0
         BoundLabel.Font.Charset = DEFAULT_CHARSET
         BoundLabel.Font.Color = clWindowText
@@ -2737,6 +2721,29 @@ object MainForm: TMainForm
         BoundLabel.MaxWidth = 0
         BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'EDIT'
+        Align = alClient
+        Color = 2038810
+        Columns = <
+          item
+          end
+          item
+            Width = 150
+          end>
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 13417908
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        HideSelection = False
+        ReadOnly = True
+        RowSelect = True
+        ParentFont = False
+        StateImages = PlaybackImages
+        TabOrder = 0
+        ViewStyle = vsReport
+        OnClick = RadiosViewClick
+        OnCustomDrawItem = RadiosViewCustomDrawItem
+        OnResize = RadiosViewResize
       end
     end
   end
@@ -2964,6 +2971,7 @@ object MainForm: TMainForm
     end
     object F2: TMenuItem
       Caption = 'Tag Editor'
+      Visible = False
       OnClick = F2Click
     end
     object F3: TMenuItem
@@ -3103,7 +3111,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800380216001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800400216001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3615,6 +3623,7 @@ object MainForm: TMainForm
     Effects.AllowOuterEffects = True
     ExtendedBorders = True
     AnimEffects.DialogShow.Mode = atFading
+    IsDefault = False
     Brightness = -20
     InternalSkins = <
       item
@@ -5245,7 +5254,7 @@ object MainForm: TMainForm
     Priority = tpNormal
     StopMode = smTerminate
     OnRun = RadioThreadRun
-    Left = 505
-    Top = 519
+    Left = 425
+    Top = 511
   end
 end

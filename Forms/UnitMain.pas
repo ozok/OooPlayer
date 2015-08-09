@@ -247,7 +247,6 @@ type
     AddPlaylistBtn: TsBitBtn;
     RemovePlaylistBtn: TsBitBtn;
     RenamePlaylistBtn: TsButton;
-    RadiosView: TsTreeView;
     sSplitter2: TsSplitter;
     LastFMLaunchTimer: TTimer;
     InfoLabel: TsLabel;
@@ -262,8 +261,9 @@ type
     Taskbar2: TTaskbar;
     XPManifest1: TXPManifest;
     ReloadLyricTitleBtn: TsBitBtn;
-    RadioThread: TIdThreadComponent;
     PlaylistView: TsListView;
+    RadioThread: TIdThreadComponent;
+    RadiosView: TsListView;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -399,11 +399,11 @@ type
     procedure sPanel5MouseEnter(Sender: TObject);
     procedure F3Click(Sender: TObject);
     procedure ReloadLyricTitleBtnClick(Sender: TObject);
-    procedure VolumeBarMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure VolumeBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure PlaylistViewResize(Sender: TObject);
-    procedure PlaylistViewCustomDrawItem(Sender: TCustomListView;
-      Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
+    procedure PlaylistViewCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
+    procedure RadiosViewCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
+    procedure RadiosViewResize(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -427,6 +427,7 @@ type
     FLastFMArtist, FLastFMSong: string;
     FTagFiles: TStringList;
     FInfoFiles: TStringList;
+    FCategoryIndex: integer;
 
     procedure AddFile(const FileName: string);
     procedure AddCueSheet(const CUEPath: string);
@@ -480,6 +481,7 @@ type
     ArtworkFileName: string;
     FSelectedPlaylistIndex: integer;
     FActivePlaylistIndex: integer;
+    FActiveRadioListIndex: integer;
     FArtistLabel: string;
     FAlbumLabel: string;
     FTitleLabel: string;
@@ -1819,6 +1821,11 @@ begin
   FLyricDownloader.Stop;
   FTagEditorLauncher.Stop;
   Taskbar2.OverlayIcon := nil;
+  while not RadioThread.Terminated do
+  begin
+    RadioThread.TerminateAndWaitFor;
+    Sleep(100)
+  end;
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
@@ -1826,6 +1833,7 @@ var
   LRadios: TStringList;
   I: Integer;
   a: Cardinal;
+  LItem: TListItem;
 begin
   FPlayer := TMusicPlayer.Create(handle);
   case FPlayer.ErrorMsg of
@@ -1942,12 +1950,13 @@ begin
       LRadios.LoadFromFile(ExtractFileDir(Application.ExeName) + '\radios.txt');
       for I := 0 to LRadios.Count - 1 do
       begin
-        RadiosView.Items.AddChild(RadiosView.Items[0], LRadios[i]);
+        LItem := RadiosView.Items.Add;
+        LItem.Caption := (I+1).ToString() + '.';
+        LItem.SubItems.Add(LRadios[i]);
       end;
     end;
   finally
     LRadios.Free;
-    RadiosView.Items[0].Expand(True);
   end;
 end;
 
@@ -2115,6 +2124,7 @@ begin
   // Self.BringToFront;
   // playlist columns
   ChangePlaylistColumnNames;
+  TrayIcon.ShowApplication;
 end;
 
 procedure TMainForm.G1Click(Sender: TObject);
@@ -2905,8 +2915,8 @@ begin
       if (ReadInteger('radio', 'cat', 0)) < RadiosView.Items.Count then
       begin
         RadiosView.Items[ReadInteger('radio', 'cat', 0)].Selected := True;
+        RadiosViewClick(Self);
       end;
-      FuncPages.ActivePageIndex := ReadInteger('general', 'func', 0);
       FCurrentRadioIndex := ReadInteger('radio', 'curr', -1);
       QueueList.Height := ReadInteger('ui', 'queueh', 120);
       RadioRecordFormatList.ItemIndex := ReadInteger('radio', 'recformat2', 0);
@@ -2917,6 +2927,10 @@ begin
       FSelectedPlaylistIndex := ReadInteger('player', 'playlistindex', 0);
       PlaylistView.Items[FSelectedPlaylistIndex].Selected := True;
       PlaylistViewClick(Self);
+
+      FCategoryIndex := ReadInteger('general', 'categoryindex', 0);
+      CategoryPages.ActivePageIndex := FCategoryIndex;
+      FuncPages.ActivePageIndex := FCategoryIndex;
 
       QueueList.Visible := ReadBool('player', 'queuevisible', True);
       Splitter2.Visible := LyricPanel.Visible;
@@ -3087,9 +3101,10 @@ begin
   begin
     if not Portable then
     begin
-      if not FileExists(FAppDataFolder + '\' + RadiosView.Items[i].Text + '.txt') then
+      if not FileExists(FAppDataFolder + '\' + RadiosView.Items[i].SubItems[0] + '.txt') then
       begin
-        CopyFile(PWideChar(ExtractFileDir(Application.ExeName) + '\Radios\' + RadiosView.Items[i].Text + '.txt'), PWideChar(FAppDataFolder + '\' + RadiosView.Items[i].Text + '.txt'), True);
+        CopyFile(PWideChar(ExtractFileDir(Application.ExeName) + '\Radios\' + RadiosView.Items[i].SubItems[0] + '.txt'),
+          PWideChar(FAppDataFolder + '\' + RadiosView.Items[i].SubItems[0] + '.txt'), True);
       end;
     end;
   end;
@@ -3298,8 +3313,7 @@ begin
   end;
 end;
 
-procedure TMainForm.PlaylistViewCustomDrawItem(Sender: TCustomListView;
-  Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
+procedure TMainForm.PlaylistViewCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
 begin
   if Item.Index = FActivePlaylistIndex then
   begin
@@ -3872,6 +3886,7 @@ procedure TMainForm.PlayItem(const ItemIndex: integer);
 begin
   FPlaybackType := music;
   FPlayer.Stop;
+  FCategoryIndex := 0;
 
   if FPlayer.ErrorMsg = MY_ERROR_OK then
   begin
@@ -4032,39 +4047,37 @@ begin
         LyricTitleEdit.Enabled := False;
         LyricSourceList.Enabled := False;
         ReloadLyricTitleBtn.Enabled := False;
-        if SettingsForm.LyricBtn.Checked then
+
+        // load existing lyric file
+        if FileExists(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title,
+          FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist,
+          FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Album)) and SettingsForm.ShowDownloadedLyrics.Checked then
         begin
-          // load existing lyric file
-          if FileExists(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title,
+          LyricList.Items.Clear;
+          LyricList.Items.LoadFromFile(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title,
             FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist,
-            FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Album)) then
-          begin
-            LyricList.Items.Clear;
-            LyricList.Items.LoadFromFile(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title,
-              FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist,
-              FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Album));
-            LyricStatusLabel.Caption := 'Loaded local lyric file';
-            LyricSearchBtn.Enabled := True;
-            LyricArtistEdit.Enabled := True;
-            LyricTitleEdit.Enabled := True;
-            LyricSourceList.Enabled := True;
-            ReloadLyricTitleBtn.Enabled := True;
-            UpdateLyricBoxWidth;
-          end
-          else
-          begin
-            // download new lyric
-            FLyricDownloader.Stop;
-            if FPlaylists[FSelectedPlaylistIndex].Count < 1 then
-              Exit;
-            FLyricDownloader.SongTitle := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title;
-            FLyricDownloader.Artist := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist;
-            FLyricDownloader.Album := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Album;
-            FLyricDownloader.ItemInfo.Title := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title;
-            FLyricDownloader.ItemInfo.Artist := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist;
-            FLyricDownloader.ItemInfo.Album := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Album;
-            FLyricDownloader.Start;
-          end;
+            FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Album));
+          LyricStatusLabel.Caption := 'Loaded local lyric file';
+          LyricSearchBtn.Enabled := True;
+          LyricArtistEdit.Enabled := True;
+          LyricTitleEdit.Enabled := True;
+          LyricSourceList.Enabled := True;
+          ReloadLyricTitleBtn.Enabled := True;
+          UpdateLyricBoxWidth;
+        end
+        else if SettingsForm.LyricBtn.Checked then
+        begin
+          // download new lyric
+          FLyricDownloader.Stop;
+          if FPlaylists[FSelectedPlaylistIndex].Count < 1 then
+            Exit;
+          FLyricDownloader.SongTitle := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title;
+          FLyricDownloader.Artist := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist;
+          FLyricDownloader.Album := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Album;
+          FLyricDownloader.ItemInfo.Title := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title;
+          FLyricDownloader.ItemInfo.Artist := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist;
+          FLyricDownloader.ItemInfo.Album := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Album;
+          FLyricDownloader.Start;
         end
         else
         begin
@@ -4361,6 +4374,7 @@ procedure TMainForm.PlayRadio(const URL: Ansistring);
 begin
   // stop music player
   FStoppedByUser := True;
+  FCategoryIndex := 1;
 
   FPlayer.Stop;
   StopRadioRecording;
@@ -4405,6 +4419,7 @@ begin
   RadioList.Invalidate;
   FRadioURL := URL;
   UpdateOverlayIcon(1);
+  RadiosView.Refresh;
   RadioThread.Start;
 end;
 
@@ -4823,12 +4838,14 @@ begin
     begin
       FCurrentRadioIndex := RadioList.ItemIndex;
       PlayRadio(FRadioStations[FCurrentRadioIndex].URL);
+      FActiveRadioListIndex := FCurrentRadioCatIndex;
     end
     else
     begin
       if IsRadioPlayerStopped or (FRadioHandle = 0) then
       begin
         PlayRadio(FRadioStations[FCurrentRadioIndex].URL);
+        FActiveRadioListIndex := FCurrentRadioCatIndex;
       end;
     end;
   end;
@@ -4877,7 +4894,34 @@ end;
 
 procedure TMainForm.RadiosViewClick(Sender: TObject);
 begin
-  FuncPages.ActivePageIndex := 1;
+  if RadiosView.ItemIndex > -1 then
+  begin
+    FuncPages.ActivePageIndex := 1;
+    FCurrentRadioCatName := RadiosView.Items[RadiosView.ItemIndex].SubItems[0];
+    LoadRadioStations;
+    FCurrentRadioIndex := -1;
+    FCurrentRadioCatIndex := RadiosView.ItemIndex;
+    RadioList.Invalidate;
+    FuncPages.ActivePageIndex := 1;
+  end;
+end;
+
+procedure TMainForm.RadiosViewCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
+begin
+  if Item.Index = FActiveRadioListIndex then
+  begin
+    Sender.Canvas.Font.Style := [fsBold];
+  end
+  else
+  begin
+    Sender.Canvas.Font.Style := [];
+  end;
+end;
+
+procedure TMainForm.RadiosViewResize(Sender: TObject);
+begin
+  RadiosView.Columns[0].Width := 45;
+  RadiosView.Columns[1].Width := RadiosView.ClientWidth - RadiosView.Columns[0].Width - 20;
 end;
 
 procedure TMainForm.RadioThreadRun(Sender: TIdThreadComponent);
@@ -4983,6 +5027,8 @@ begin
 end;
 
 procedure TMainForm.ReloadLyricTitleBtnClick(Sender: TObject);
+var
+  LSplitList: TStringList;
 begin
   if not FStopAddFiles then
     Exit;
@@ -5001,6 +5047,33 @@ begin
           LyricArtistEdit.Text := FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist;
         end;
       end;
+    end;
+  end
+  else if FPlaybackType = radio then
+  begin
+    LyricList.Items.Clear;
+    LyricStatusLabel.Caption := '';
+    LyricTitleEdit.Text := '';
+    LyricArtistEdit.Text := '';
+    LSplitList := TStringList.Create;
+    Log(FTitleLabel);
+    try
+      // try to get tags
+      // artist - title is assumed
+      LSplitList.StrictDelimiter := True;
+      LSplitList.Delimiter := '-';
+      LSplitList.DelimitedText := FTitleLabel;
+      if LSplitList.Count >= 2 then
+      begin
+        // sometimes there are no tags so we must check for them
+        if (Length(Trim(LSplitList[1])) > 0) and (Length(Trim(LSplitList[0])) > 0) then
+        begin
+          LyricTitleEdit.Text := Trim(LSplitList[1]);
+          LyricArtistEdit.Text := Trim(LSplitList[0]);
+        end;
+      end;
+    finally
+      LSplitList.Free;
     end;
   end;
 end;
@@ -5454,6 +5527,7 @@ begin
       WriteBool('player', 'catvisible', CategoryPages.Visible);
       WriteInteger('settings', 'coverheight', CoverPanel.Height);
       WriteInteger('settings', 'categorywidth', CategoryPages.Width);
+      WriteInteger('general', 'categoryindex', FCategoryIndex);
 
       with PlayList do
       begin
@@ -5863,8 +5937,7 @@ begin
   StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
 end;
 
-procedure TMainForm.VolumeBarMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.VolumeBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   ShowMessage('asdasd');
 end;
@@ -5936,9 +6009,17 @@ begin
       UPDATE_META_NAME:
         begin
           Log('update meta anme');
-          TitleLabel.Caption := String(PAnsiChar(Msg.LParam)) + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
+          FTitleLabel := String(PAnsiChar(Msg.LParam));
+          TitleLabel.Caption := FTitleLabel + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
+          if (not FTitleLabel.StartsWith('HTTP')) and (FTitleLabel.Length > 0) then
+          begin
+            Self.Caption := String(PAnsiChar(Msg.LParam)) + ' [OooPlayer]';
+          end
+          else
+          begin
+            Self.Caption := 'Radio [OooPlayer]';
+          end;
           FTitleLabel := TitleLabel.Caption;
-          Self.Caption := String(PAnsiChar(Msg.LParam)) + ' [OooPlayer]';
           FSelfCaption := Self.Caption;
           if TitleLabel.Width < TitleLabel.Canvas.TextWidth(TitleLabel.Caption) then
           begin
@@ -5963,17 +6044,17 @@ begin
       UPDATE_META:
         begin
           Log('update meta');
-          FArtistLabel := String(PAnsiChar(Msg.LParam));
-          TitleLabel.Caption := String(PAnsiChar(Msg.LParam)) + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
+          FTitleLabel := String(PAnsiChar(Msg.LParam));
+          TitleLabel.Caption := FTitleLabel + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
+          if (not FTitleLabel.StartsWith('HTTP')) and (FTitleLabel.Length > 0) then
+          begin
+            Self.Caption := String(PAnsiChar(Msg.LParam)) + ' [OooPlayer]';
+          end
+          else
+          begin
+            Self.Caption := 'Radio [OooPlayer]';
+          end;
           FTitleLabel := TitleLabel.Caption;
-          if TitleLabel.Width < TitleLabel.Canvas.TextWidth(TitleLabel.Caption) then
-          begin
-            TitleLabel.Caption := TitleLabel.Caption + ' - '
-          end;
-          if not((LyricTitleEdit.Text = '') and (LyricArtistEdit.Text = '')) then
-          begin
-            SendMessage(WinHandle, WM_INFO_UPDATE, DOWNLOAD_LYRIC, 0);
-          end;
           // radio recording
           // seperate file for each song
           if FRecordingRadio then
@@ -6019,12 +6100,13 @@ begin
           LyricTitleEdit.Text := '';
           LyricArtistEdit.Text := '';
           LSplitList := TStringList.Create;
+          Log(FTitleLabel);
           try
             // try to get tags
             // artist - title is assumed
             LSplitList.StrictDelimiter := True;
             LSplitList.Delimiter := '-';
-            LSplitList.DelimitedText := FArtistLabel;
+            LSplitList.DelimitedText := FTitleLabel;
             if LSplitList.Count >= 2 then
             begin
               // sometimes there are no tags so we must check for them
