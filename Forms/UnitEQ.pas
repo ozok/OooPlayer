@@ -3,9 +3,11 @@ unit UnitEQ;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, sSkinProvider, Vcl.StdCtrls, sLabel,
-  Vcl.ExtCtrls, sPanel, Vcl.ComCtrls, sTrackBar, sCheckBox, sComboBox, UnitMusicPlayer, Generics.Collections, IniFiles;
+  Vcl.ExtCtrls, sPanel, Vcl.ComCtrls, sTrackBar, sCheckBox, sComboBox,
+  UnitMusicPlayer, Generics.Collections, IniFiles;
 
 type
   TEQValuesArray = array [0 .. 17] of integer;

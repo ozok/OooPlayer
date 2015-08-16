@@ -43,7 +43,6 @@ type
     FTAKPluginHandle: Cardinal;
     FMixHandle: HSTREAM;
     FPosition: int64;
-    FFXHandle: Cardinal;
     FEQParams: array [0 .. 17] of HFX;
 
     function GetBassStreamStatus: TPlayerStatus;
@@ -407,7 +406,7 @@ begin
     LEQ.fCenter := EQ_FRENQ[i];
     if not BASS_FXSetParameters(FEQParams[i], @LEQ) then
     begin
-      LogForm.LogList.Lines.Add('EQ error: Unable to set params for freq: ' + FEQParams[i].ToString());
+      LogForm.LogList.Lines.Add('EQ error: Unable to set params for freq: ' + LEQ.fCenter.ToString());
     end;
   end;
 end;

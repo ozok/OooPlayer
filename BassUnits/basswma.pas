@@ -40,7 +40,8 @@ const
   BASS_WMA_ENCODE_PRO = $4000; // WMA Pro
   BASS_WMA_ENCODE_24BIT = $8000; // 24-bit
   BASS_WMA_ENCODE_PCM = $10000; // uncompressed PCM
-  BASS_WMA_ENCODE_SCRIPT = $20000; // set script (mid-stream tags) in the WMA encoding
+  BASS_WMA_ENCODE_SCRIPT = $20000;
+  // set script (mid-stream tags) in the WMA encoding
   BASS_WMA_ENCODE_QUEUE = $40000; // queue data to feed encoder asynchronously
   BASS_WMA_ENCODE_SOURCE = $80000; // use a BASS channel as source
 

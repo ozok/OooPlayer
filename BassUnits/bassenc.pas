@@ -33,10 +33,14 @@ const
 
   // BASS_Encode_Start flags
   BASS_ENCODE_NOHEAD = 1; // don't send a WAV header to the encoder
-  BASS_ENCODE_FP_8BIT = 2; // convert floating-point sample data to 8-bit integer
-  BASS_ENCODE_FP_16BIT = 4; // convert floating-point sample data to 16-bit integer
-  BASS_ENCODE_FP_24BIT = 6; // convert floating-point sample data to 24-bit integer
-  BASS_ENCODE_FP_32BIT = 8; // convert floating-point sample data to 32-bit integer
+  BASS_ENCODE_FP_8BIT = 2;
+  // convert floating-point sample data to 8-bit integer
+  BASS_ENCODE_FP_16BIT = 4;
+  // convert floating-point sample data to 16-bit integer
+  BASS_ENCODE_FP_24BIT = 6;
+  // convert floating-point sample data to 24-bit integer
+  BASS_ENCODE_FP_32BIT = 8;
+  // convert floating-point sample data to 32-bit integer
   BASS_ENCODE_BIGEND = 16; // big-endian sample data
   BASS_ENCODE_PAUSE = 32; // start encording paused
   BASS_ENCODE_PCM = 64; // write PCM sample data (no encoder)
@@ -51,8 +55,10 @@ const
 
   // BASS_Encode_GetACMFormat flags
   BASS_ACM_DEFAULT = 1; // use the format as default selection
-  BASS_ACM_RATE = 2; // only list formats with same sample rate as the source channel
-  BASS_ACM_CHANS = 4; // only list formats with same number of channels (eg. mono/stereo)
+  BASS_ACM_RATE = 2;
+  // only list formats with same sample rate as the source channel
+  BASS_ACM_CHANS = 4;
+  // only list formats with same number of channels (eg. mono/stereo)
   BASS_ACM_SUGGEST = 8; // suggest a format (HIWORD=format tag)
 
   // BASS_Encode_GetCount counts
@@ -167,15 +173,19 @@ function BASS_Encode_IsActive(handle: DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$
 external bassencdll;
 function BASS_Encode_Stop(handle: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
-function BASS_Encode_SetPaused(handle: DWORD; paused: BOOL): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Encode_SetPaused(handle: DWORD; paused: BOOL): BOOL;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
-function BASS_Encode_Write(handle: DWORD; buffer: Pointer; length: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Encode_Write(handle: DWORD; buffer: Pointer; length: DWORD): BOOL;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
 function BASS_Encode_SetNotify(handle: DWORD; proc: ENCODENOTIFYPROC; user: Pointer): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
-function BASS_Encode_GetCount(handle: HENCODE; count: DWORD): QWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Encode_GetCount(handle: HENCODE; count: DWORD): QWORD;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
-function BASS_Encode_SetChannel(handle: DWORD; channel: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Encode_SetChannel(handle: DWORD; channel: DWORD): BOOL;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
 function BASS_Encode_GetChannel(handle: HENCODE): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
@@ -194,18 +204,22 @@ external bassencdll;
 function BASS_Encode_StartCAFile(handle, ftype, atype, flags, bitrate: DWORD; filename: PChar): HENCODE; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
 {$ENDIF}
-function BASS_Encode_CastInit(handle: HENCODE; server, pass, content, name, url, genre, desc, headers: PAnsiChar; bitrate: DWORD; pub: BOOL): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Encode_CastInit(handle: HENCODE; server, pass, content, name, url, genre, desc, headers: PAnsiChar; bitrate: DWORD; pub: BOOL): BOOL;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
-function BASS_Encode_CastSetTitle(handle: HENCODE; title, url: PAnsiChar): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Encode_CastSetTitle(handle: HENCODE; title, url: PAnsiChar): BOOL;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
 function BASS_Encode_CastSendMeta(handle: HENCODE; mtype: DWORD; data: Pointer; length: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
 function BASS_Encode_CastGetStats(handle: HENCODE; stype: DWORD; pass: PAnsiChar): PAnsiChar; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
 
-function BASS_Encode_ServerInit(handle: HENCODE; port: PAnsiChar; buffer, burst, flags: DWORD; proc: ENCODECLIENTPROC; user: Pointer): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Encode_ServerInit(handle: HENCODE; port: PAnsiChar; buffer, burst, flags: DWORD; proc: ENCODECLIENTPROC; user: Pointer): DWORD;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
-function BASS_Encode_ServerKick(handle: HENCODE; client: PAnsiChar): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Encode_ServerKick(handle: HENCODE; client: PAnsiChar): BOOL;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassencdll;
 
 implementation

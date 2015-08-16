@@ -1480,9 +1480,9 @@ object MainForm: TMainForm
             SkinData.SkinSection = 'COMBOBOX'
             VerticalAlignment = taAlignTop
             Style = csDropDownList
-            Color = 2038810
+            Color = 722950
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = 13417908
+            Font.Color = 12102048
             Font.Height = -11
             Font.Name = 'Tahoma'
             Font.Style = []
@@ -1614,7 +1614,7 @@ object MainForm: TMainForm
         OnMouseEnter = PlayListMouseEnter
         Align = alClient
         BorderStyle = bsNone
-        Color = 2038810
+        Color = 722950
         Columns = <
           item
             Caption = 'Artist'
@@ -1649,7 +1649,7 @@ object MainForm: TMainForm
           end>
         DragMode = dmAutomatic
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -1688,7 +1688,7 @@ object MainForm: TMainForm
         OnMouseEnter = QueueListMouseEnter
         OnMouseLeave = QueueListMouseLeave
         Align = alBottom
-        Color = 2038810
+        Color = 722950
         Columns = <
           item
           end
@@ -1696,7 +1696,7 @@ object MainForm: TMainForm
             Width = 100
           end>
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2035,7 +2035,7 @@ object MainForm: TMainForm
         OnMouseLeave = RadioListMouseLeave
         Align = alClient
         BorderStyle = bsNone
-        Color = 2038810
+        Color = 722950
         Columns = <
           item
             Caption = 'Station Name'
@@ -2136,9 +2136,9 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'COMBOBOX'
           VerticalAlignment = taAlignTop
           Style = csDropDownList
-          Color = 2038810
+          Color = 722950
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 13417908
+          Font.Color = 12102048
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -2185,9 +2185,9 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'COMBOBOX'
           VerticalAlignment = taAlignTop
           Style = csDropDownList
-          Color = 2038810
+          Color = 722950
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 13417908
+          Font.Color = 12102048
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -2258,8 +2258,6 @@ object MainForm: TMainForm
       Width = 342
       Height = 13
       Align = alBottom
-      ExplicitLeft = 1
-      ExplicitTop = 367
       ExplicitWidth = 3
     end
     object CoverPanel: TsPanel
@@ -2536,9 +2534,9 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2570,9 +2568,9 @@ object MainForm: TMainForm
       Height = 248
       Align = alClient
       BorderStyle = bsNone
-      Color = 2038810
+      Color = 722950
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 13417908
+      Font.Color = 12102048
       Font.Height = -13
       Font.Name = 'Tahoma'
       Font.Style = []
@@ -2591,7 +2589,6 @@ object MainForm: TMainForm
       BoundLabel.MaxWidth = 0
       BoundLabel.UseSkinColor = True
       SkinData.SkinSection = 'EDIT'
-      ExplicitHeight = 254
     end
   end
   object CategoryPages: TsPageControl
@@ -2599,7 +2596,7 @@ object MainForm: TMainForm
     Top = 80
     Width = 217
     Height = 602
-    ActivePage = sTabSheet4
+    ActivePage = sTabSheet2
     Align = alLeft
     Images = CategoryList
     TabOrder = 5
@@ -2677,7 +2674,7 @@ object MainForm: TMainForm
         BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'EDIT'
         Align = alClient
-        Color = 2038810
+        Color = 722950
         Columns = <
           item
           end
@@ -2685,7 +2682,7 @@ object MainForm: TMainForm
             Width = 150
           end>
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2706,6 +2703,10 @@ object MainForm: TMainForm
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object RadiosView: TsListView
         Left = 0
         Top = 0
@@ -2722,7 +2723,7 @@ object MainForm: TMainForm
         BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'EDIT'
         Align = alClient
-        Color = 2038810
+        Color = 722950
         Columns = <
           item
           end
@@ -2730,7 +2731,7 @@ object MainForm: TMainForm
             Width = 150
           end>
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -2991,6 +2992,7 @@ object MainForm: TMainForm
   object FormStorage: TJvFormStorage
     AppStorage = AppIniFileStorage
     AppStoragePath = '%FORM_NAME%\'
+    Options = [fpSize, fpLocation]
     StoredValues = <>
     Left = 128
     Top = 232
@@ -3111,7 +3113,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800400216001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101050008004C0216001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3623,7 +3625,6 @@ object MainForm: TMainForm
     Effects.AllowOuterEffects = True
     ExtendedBorders = True
     AnimEffects.DialogShow.Mode = atFading
-    IsDefault = False
     Brightness = -20
     InternalSkins = <
       item

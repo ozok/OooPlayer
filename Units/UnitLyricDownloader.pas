@@ -21,7 +21,8 @@ unit UnitLyricDownloader;
 
 interface
 
-uses System.Classes, IdBaseComponent, IdThreadComponent, StrUtils, SysUtils, IdThread, JvComponentBase,
+uses System.Classes, IdBaseComponent, IdThreadComponent, StrUtils, SysUtils,
+  IdThread, JvComponentBase,
   JvUrlListGrabber, JvUrlGrabbers, JvTypes, Rest.Utils;
 
 type

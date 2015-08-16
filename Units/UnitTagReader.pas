@@ -22,8 +22,10 @@ unit UnitTagReader;
 
 interface
 
-uses Classes, Windows, SysUtils, Messages, StrUtils, UnitTagTypes, WMATagLibrary, APEv2Library, MP4TagLibrary,
-  FlacTagLibrary, ID3v2Library, ID3v1Library, OggVorbisAndOpusTagLibrary, WAVTagLibrary;
+uses Classes, Windows, SysUtils, Messages, StrUtils, UnitTagTypes,
+  WMATagLibrary, APEv2Library, MP4TagLibrary,
+  FlacTagLibrary, ID3v2Library, ID3v1Library, OggVorbisAndOpusTagLibrary,
+  WAVTagLibrary;
 
 type
   TTagType = (id3v2 = 0, id3v1 = 1, flac = 3, ape = 4, wma = 5, mp4 = 6, ogg = 7, wav = 8);

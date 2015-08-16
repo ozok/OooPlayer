@@ -21,7 +21,9 @@ unit UnitArtworkReader;
 
 interface
 
-uses Classes, SysUtils, IdBaseComponent, IdThreadComponent, IdThread, UnitTagTypes, Vcl.Imaging.jpeg, Vcl.Imaging.pngimage, UnitImageResize, UnitTagReader, UnitArtworkInfo;
+uses Classes, SysUtils, IdBaseComponent, IdThreadComponent, IdThread,
+  UnitTagTypes, Vcl.Imaging.jpeg, Vcl.Imaging.pngimage, UnitImageResize,
+  UnitTagReader, UnitArtworkInfo;
 
 type
   TArtworkReader = class

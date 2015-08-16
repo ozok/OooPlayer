@@ -26,12 +26,14 @@ const
   // BASS_Mixer_StreamCreate flags
   BASS_MIXER_END = $10000; // end the stream when there are no sources
   BASS_MIXER_NONSTOP = $20000; // don't stall when there are no sources
-  BASS_MIXER_RESUME = $1000; // resume stalled immediately upon new/unpaused source
+  BASS_MIXER_RESUME = $1000;
+  // resume stalled immediately upon new/unpaused source
   BASS_MIXER_POSEX = $2000; // enable BASS_Mixer_ChannelGetPositionEx support
 
   // source flags
   BASS_MIXER_BUFFER = $2000; // buffer data for BASS_Mixer_ChannelGetData/Level
-  BASS_MIXER_LIMIT = $4000; // limit mixer processing to the amount available from this source
+  BASS_MIXER_LIMIT = $4000;
+  // limit mixer processing to the amount available from this source
   BASS_MIXER_MATRIX = $10000; // matrix mixing
   BASS_MIXER_PAUSE = $20000; // don't process the source
   BASS_MIXER_DOWNMIX = $400000; // downmix to stereo/mono
@@ -76,7 +78,8 @@ const
 function BASS_Mixer_GetVersion: DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
 
-function BASS_Mixer_StreamCreate(freq, chans, flags: DWORD): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Mixer_StreamCreate(freq, chans, flags: DWORD): HSTREAM;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
 function BASS_Mixer_StreamAddChannel(handle: HSTREAM; channel, flags: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
@@ -85,15 +88,18 @@ external bassmixdll;
 
 function BASS_Mixer_ChannelGetMixer(handle: DWORD): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
-function BASS_Mixer_ChannelFlags(handle, flags, mask: DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Mixer_ChannelFlags(handle, flags, mask: DWORD): DWORD;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
 function BASS_Mixer_ChannelRemove(handle: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
 function BASS_Mixer_ChannelSetPosition(handle: DWORD; pos: QWORD; mode: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
-function BASS_Mixer_ChannelGetPosition(handle, mode: DWORD): QWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Mixer_ChannelGetPosition(handle, mode: DWORD): QWORD;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
-function BASS_Mixer_ChannelGetPositionEx(handle, mode, delay: DWORD): QWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Mixer_ChannelGetPositionEx(handle, mode, delay: DWORD): QWORD;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
 function BASS_Mixer_ChannelGetLevel(handle: DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
@@ -101,11 +107,14 @@ function BASS_Mixer_ChannelGetData(handle: DWORD; buffer: Pointer; length: DWORD
 external bassmixdll;
 function BASS_Mixer_ChannelSetSync(handle: DWORD; type_: DWORD; param: QWORD; proc: SYNCPROC; user: Pointer): HSYNC; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
-function BASS_Mixer_ChannelRemoveSync(handle: DWORD; sync: HSYNC): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Mixer_ChannelRemoveSync(handle: DWORD; sync: HSYNC): BOOL;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
-function BASS_Mixer_ChannelSetMatrix(handle: DWORD; matrix: Pointer): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Mixer_ChannelSetMatrix(handle: DWORD; matrix: Pointer): BOOL;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
-function BASS_Mixer_ChannelGetMatrix(handle: DWORD; matrix: Pointer): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Mixer_ChannelGetMatrix(handle: DWORD; matrix: Pointer): BOOL;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
 function BASS_Mixer_ChannelSetEnvelope(handle, type_: DWORD; nodes: PBASS_MIXER_NODE; count: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
@@ -122,7 +131,8 @@ function BASS_Split_StreamGetSplits(handle: DWORD; splits: Pointer; count: DWORD
 external bassmixdll;
 function BASS_Split_StreamReset(handle: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
-function BASS_Split_StreamResetEx(handle, offset: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+function BASS_Split_StreamResetEx(handle, offset: DWORD): BOOL;
+{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;
 function BASS_Split_StreamGetAvailable(handle: DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 external bassmixdll;

@@ -1,7 +1,6 @@
 --2.2.0
 -Added: [General] New UI layout
 -Added: [Music Player] 18 band equalizer with several presets
--Added: [Music Player] Tag editor program
 -Added: [Music Player] Detailed file info program
 -Added: [Music Player] Playlist now has columns for title, album, artist and bitrate, channel, codec and samplerate
 -Added: [Music Player] Pressing previous button in shuffle mode will return to previous random song instead playing the next random song
@@ -15,6 +14,7 @@
 -Fixed: [Radio Player] Metatag related bugs
 -Updated: Bassmix to 2.4.8
 -Updated: BassOpus to 2.4.1.4
+-Updated: MediaInfo to 0.7.76
 -Updated: Tag libraries
 -Updated: Skin component
 

@@ -24,23 +24,28 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  Vcl.StdCtrls,
   Vcl.ComCtrls, Vcl.ExtCtrls, Generics.Collections, Vcl.Menus, JvExControls,
   JvArrowButton, JvComponentBase, JvSearchFiles, JvBaseDlg, JvBrowseFolder,
-  MediaInfoDll, JvExComCtrls, JvComCtrls, Vcl.ImgList, JvThreadTimer, JvExStdCtrls,
+  MediaInfoDll, JvExComCtrls, JvComCtrls, Vcl.ImgList, JvThreadTimer,
+  JvExStdCtrls,
   JvListBox, IniFiles, Vcl.Buttons, JvFormPlacement, JvAppStorage,
-  JvAppIniStorage, StrUtils, ShellAPI, JvComputerInfoEx, UnitTagTypes, UnitTagReader,
+  JvAppIniStorage, StrUtils, ShellAPI, JvComputerInfoEx, UnitTagTypes,
+  UnitTagReader,
   PNGImage, JvDragDrop, JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon,
   Jpeg, UnitMusicPlayer, Bass, BASSenc, IdBaseComponent, IdThreadComponent,
-  UnitLyricDownloader, UnitTagWriter, UnitImageResize, JvAnimatedImage, JvGIFCtrl,
+  UnitLyricDownloader, UnitTagWriter, UnitImageResize, JvAnimatedImage,
+  JvGIFCtrl,
   JvExExtCtrls, JvImage, JvAppInst, UnitArtworkReader, Vcl.Taskbar,
   System.Win.TaskbarCore, sSkinManager, sDialogs, sMemo, sListView,
   sPageControl, sStatusBar, sLabel, sComboBox, sBitBtn, sPanel, sBevel,
   sSplitter, sSkinProvider, acProgressBar, sTrackBar, acImage, acPNG,
   acAlphaHints, acAlphaImageList, sButton, Vcl.AppEvnts,
   acShellCtrls, sComboBoxes, sTreeView, sListBox, System.Types,
-  sEdit, sGauge, UnitLastFMToolLauncher, Pipes, UnitSubProcessLauncher, GraphUtil,
-  Vcl.XPMan, UnitCueParser;
+  sEdit, sGauge, UnitLastFMToolLauncher, Pipes, UnitSubProcessLauncher,
+  GraphUtil,
+  Vcl.XPMan, UnitCueParser, System.ImageList;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -1832,7 +1837,6 @@ procedure TMainForm.FormCreate(Sender: TObject);
 var
   LRadios: TStringList;
   I: Integer;
-  a: Cardinal;
   LItem: TListItem;
 begin
   FPlayer := TMusicPlayer.Create(handle);
@@ -1951,7 +1955,7 @@ begin
       for I := 0 to LRadios.Count - 1 do
       begin
         LItem := RadiosView.Items.Add;
-        LItem.Caption := (I+1).ToString() + '.';
+        LItem.Caption := (I + 1).ToString() + '.';
         LItem.SubItems.Add(LRadios[i]);
       end;
     end;
@@ -1978,9 +1982,17 @@ begin
   begin
     FPlayListFiles[i].Free;
   end;
+  if FPlayListFiles <> nil then
+  begin
+    FPlayListFiles.Free;
+  end;
   for I := 0 to FQueueLists.Count - 1 do
   begin
     FQueueLists[i].Free;
+  end;
+  if FQueueLists <> nil then
+  begin
+    FQueueLists.Free;
   end;
   FPlaylists.Free;
   FShuffleIndexes.Free;
@@ -2473,15 +2485,6 @@ begin
   ScrollToCurrentSong;
 end;
 
-procedure TMainForm.VisTimerTimer(Sender: TObject);
-begin
-  // if FPlayer.PlayerStatus2 = psPlaying then
-  // begin
-  // LeftBar.Position := (20 * LoWord(FLevel)) div 32768;
-  // RightBar.Position := (20 * HiWord(FLevel)) div 32768;
-  // end;
-end;
-
 procedure TMainForm.L1Click(Sender: TObject);
 var
   LOpenDlg: TOpenDialog;
@@ -2529,8 +2532,6 @@ procedure TMainForm.LabelScrollTimerTimer(Sender: TObject);
 var
   LContent: string;
   LTextWidth: integer;
-  LContent2: string;
-  LTextWidth2: integer;
 begin
   if Length(TitleLabel.Caption) < 1 then
     Exit;
@@ -5219,7 +5220,8 @@ begin
         LSW.Close;
         LSW.Free;
       end;
-      PlaylistView.Items[LSelectedIndex].Caption := FloatToStr(LSelectedIndex + 1) + '. ' + LNewName;
+      PlaylistView.Items[LSelectedIndex].Caption := FloatToStr(LSelectedIndex + 1) + '.';
+      PlaylistView.Items[LSelectedIndex].SubItems[0] := LNewName;
       FSelectedPlaylistIndex := LOldPlaylistIndex;
       PlaylistView.Items[LSelectedIndex].Selected := True;
       PlaylistViewClick(Self);

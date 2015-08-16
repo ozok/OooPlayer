@@ -1650,11 +1650,13 @@ begin
         end
         else if (iMetaType = META_PADDING) and not bPaddingFound then
         begin // we have padding block
-          FPadding := iBlockLength; // if we find more skip & put them in metablock array
+          FPadding := iBlockLength;
+          // if we find more skip & put them in metablock array
           FPaddingLast := ((aMetaDataBlockHeader[1] and $80) <> 0);
           FPaddingIndex := iIndex;
           bPaddingFound := True;
-          Stream.Seek(FPadding, soCurrent); // advance into file till next block or audio data start
+          Stream.Seek(FPadding, soCurrent);
+          // advance into file till next block or audio data start
         end
         else
         begin // all other
@@ -1689,7 +1691,8 @@ begin
             Exit;
           end;
         end;
-      until ((aMetaDataBlockHeader[1] and $80) <> 0); // until is last flag ( first bit = 1 )
+      until ((aMetaDataBlockHeader[1] and $80) <> 0);
+      // until is last flag ( first bit = 1 )
       Loaded := True;
       Result := FLACTAGLIBRARY_SUCCESS;
     end
@@ -1737,13 +1740,15 @@ begin
               end;
               Data.Read(aMetaDataBlockHeader, 4);
               Inc(iIndex); // metadatablock index
-              iBlockLength := (aMetaDataBlockHeader[2] shl 16 or aMetaDataBlockHeader[3] shl 8 or aMetaDataBlockHeader[4]); // decode length
+              iBlockLength := (aMetaDataBlockHeader[2] shl 16 or aMetaDataBlockHeader[3] shl 8 or aMetaDataBlockHeader[4]);
+              // decode length
               if iBlockLength <= 0 then
               begin
                 FMetaBlocksSize := FMetaBlocksSize + 4;
                 Continue;
               end;
-              iMetaType := (aMetaDataBlockHeader[1] and $7F); // decode metablock type
+              iMetaType := (aMetaDataBlockHeader[1] and $7F);
+              // decode metablock type
               if iMetaType = META_VORBIS_COMMENT then
               begin // read vorbis block
                 FVCOffset := Data.Position;
@@ -1761,7 +1766,8 @@ begin
               end
               else if (iMetaType = META_PADDING) and not bPaddingFound then
               begin // we have padding block
-                FPadding := iBlockLength; // if we find more skip & put them in metablock array
+                FPadding := iBlockLength;
+                // if we find more skip & put them in metablock array
                 FPaddingLast := ((aMetaDataBlockHeader[1] and $80) <> 0);
                 FPaddingIndex := iIndex;
                 bPaddingFound := True;
@@ -1773,7 +1779,8 @@ begin
                   OGGStream.GetNextPageData(Data);
                   Data.Seek(PreviousPosition, soBeginning);
                 end;
-                Data.Seek(FPadding, soCurrent); // advance into file till next block or audio data start
+                Data.Seek(FPadding, soCurrent);
+                // advance into file till next block or audio data start
               end
               else
               begin // all other
@@ -1816,7 +1823,8 @@ begin
                   Exit;
                 end;
               end;
-            until ((aMetaDataBlockHeader[1] and $80) <> 0); // until is last flag ( first bit = 1 )
+            until ((aMetaDataBlockHeader[1] and $80) <> 0);
+            // until is last flag ( first bit = 1 )
             Loaded := True;
             Result := FLACTAGLIBRARY_SUCCESS;
           finally
@@ -1846,7 +1854,8 @@ begin
   finally
     if FIsValid then
     begin
-      FAudioOffset := Stream.Position; // we need that to rebuild the file if nedeed
+      FAudioOffset := Stream.Position;
+      // we need that to rebuild the file if nedeed
       FBitrate := Round(((FFileLength - FAudioOffset) / 1000) * 8 / FGetPlayTime); // time to calculate average bitrate
     end
     else
@@ -1911,7 +1920,8 @@ begin
   iMetaLen := Length(MetaBlocksCoverArts) + 1;
   SetLength(MetaBlocksCoverArts, iMetaLen);
   // save header
-  MetaBlocksCoverArts[iMetaLen - 1].MetaDataBlockHeader[1] := META_COVER_ART; // aMetaHeader[0];
+  MetaBlocksCoverArts[iMetaLen - 1].MetaDataBlockHeader[1] := META_COVER_ART;
+  // aMetaHeader[0];
   // save content in a stream
   MetaBlocksCoverArts[iMetaLen - 1].Data := TMemoryStream.Create;
   if Assigned(Stream) then
@@ -2336,7 +2346,8 @@ begin
         aMetaBlockOther[i].MetaDataBlockHeader[1] := (aMetaBlockOther[i].MetaDataBlockHeader[1] AND $7F); // not last
         if aMetaBlockOther[i].MetaDataBlockHeader[1] = META_PADDING then
         begin
-          iExtraPadding := iExtraPadding + aMetaBlockOther[i].Data.Size + 4; // add padding size plus 4 bytes of header block
+          iExtraPadding := iExtraPadding + aMetaBlockOther[i].Data.Size + 4;
+          // add padding size plus 4 bytes of header block
         end
         else
         begin
@@ -2371,7 +2382,8 @@ begin
           FreeAndNil(Source);
         end;
         try
-          Source := TFileStream.Create(FileName, fmOpenRead); // Set read-only and open old file, and create new
+          Source := TFileStream.Create(FileName, fmOpenRead);
+          // Set read-only and open old file, and create new
         except
           Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
           Exit;
@@ -2398,7 +2410,8 @@ begin
         Destination.CopyFrom(Source, ID3v2Size);
       end;
       Source.Read(oldHeader, SizeOf(oldHeader));
-      oldHeader.MetaDataBlockHeader[1] := (oldHeader.MetaDataBlockHeader[1] and $7F); // just in case no metadata existed
+      oldHeader.MetaDataBlockHeader[1] := (oldHeader.MetaDataBlockHeader[1] and $7F);
+      // just in case no metadata existed
       Destination.Write(oldHeader, SizeOf(oldHeader));
       Destination.CopyFrom(MetaBlocks, 0);
     end
@@ -2759,7 +2772,8 @@ begin
           end;
           // * Open source file
           try
-            Source := TFileStream.Create(FileName, fmOpenRead); // Set read-only and open old file, and create new
+            Source := TFileStream.Create(FileName, fmOpenRead);
+            // Set read-only and open old file, and create new
           except
             Result := FLACTAGLIBRARY_ERROR_OPENING_FILE;
             Exit;
@@ -2813,7 +2827,8 @@ begin
       // * Set STREAMINFO block
       Destination.Seek(ID3v2Size + $1C, soFromBeginning);
       Destination.Read(FOggFlacHeader, SizeOf(TOggFlacHeader));
-      FOggFlacHeader.StreamInfo.MetaDataBlockHeader[1] := (FOggFlacHeader.StreamInfo.MetaDataBlockHeader[1] and $7F); // just in case no metadata existed
+      FOggFlacHeader.StreamInfo.MetaDataBlockHeader[1] := (FOggFlacHeader.StreamInfo.MetaDataBlockHeader[1] and $7F);
+      // just in case no metadata existed
       FOggFlacHeader.NumberOfHeaderPackets := Swap(OggPageCount);
       Destination.Seek(ID3v2Size + $1C, soFromBeginning);
       Destination.Write(FOggFlacHeader, SizeOf(TOggFlacHeader));
