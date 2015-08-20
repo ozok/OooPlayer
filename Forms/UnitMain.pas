@@ -376,7 +376,6 @@ type
     procedure AddMenuBtnClick(Sender: TObject);
     procedure RemoveMenuBtnClick(Sender: TObject);
     procedure PlaylistMenuBtnClick(Sender: TObject);
-    procedure VisTimerTimer(Sender: TObject);
     procedure EQBtnClick(Sender: TObject);
     procedure EQBtnMouseEnter(Sender: TObject);
     procedure P8Click(Sender: TObject);
@@ -4249,39 +4248,46 @@ begin
         Item.SubItems.Add(Channels);
         Item.SubItems.Add(Codec);
       end;
-      if Item.Index = FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex then
+      if FSelectedPlaylistIndex = FActivePlaylistIndex then
       begin
-        if FPlayer.PlayerStatus2 = psPlaying then
+        if Item.Index = FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex then
         begin
-          Item.StateIndex := 0
-        end
-        else if FPlayer.PlayerStatus2 = psPaused then
-        begin
-          Item.StateIndex := 1
+          if FPlayer.PlayerStatus2 = psPlaying then
+          begin
+            Item.StateIndex := 0
+          end
+          else if FPlayer.PlayerStatus2 = psPaused then
+          begin
+            Item.StateIndex := 1
+          end
+          else
+          begin
+            if FQueueLists[FSelectedPlaylistIndex].Contains(Item.Index) then
+            begin
+              Item.StateIndex := 2;
+            end
+            else
+            begin
+              Item.StateIndex := -1
+            end;
+          end;
         end
         else
         begin
+          Item.StateIndex := -1;
           if FQueueLists[FSelectedPlaylistIndex].Contains(Item.Index) then
           begin
             Item.StateIndex := 2;
           end
           else
           begin
-            Item.StateIndex := -1
+            Item.StateIndex := -1;
           end;
         end;
       end
       else
       begin
         Item.StateIndex := -1;
-        if FQueueLists[FSelectedPlaylistIndex].Contains(Item.Index) then
-        begin
-          Item.StateIndex := 2;
-        end
-        else
-        begin
-          Item.StateIndex := -1;
-        end;
       end;
     end;
   end;
