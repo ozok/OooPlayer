@@ -2016,11 +2016,15 @@ begin
   // PlayList.Columns[0].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
   // PlayList.Columns[1].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
   // PlayList.Columns[2].Width := (PlayList.ClientWidth - PlayList.Columns[3].Width - PlayList.Columns[4].Width) div 3;
-  QueueList.Columns[0].Width := QueueList.ClientWidth - QueueList.Columns[1].Width;
-  StatusBar.Panels[0].Width := StatusBar.ClientWidth - StatusBar.Panels[1].Width;
-  RadioList.Columns[0].Width := (RadioList.ClientWidth - 20) div RadioList.Columns.Count;
-  RadioList.Columns[1].Width := (RadioList.ClientWidth - 20) div RadioList.Columns.Count;
-  RadioList.Columns[2].Width := (RadioList.ClientWidth - 20) div RadioList.Columns.Count;
+  try
+    RadioList.Columns[0].Width := (RadioList.ClientWidth - 20) div RadioList.Columns.Count;
+    RadioList.Columns[1].Width := (RadioList.ClientWidth - 20) div RadioList.Columns.Count;
+    RadioList.Columns[2].Width := (RadioList.ClientWidth - 20) div RadioList.Columns.Count;
+    QueueList.Columns[0].Width := QueueList.ClientWidth - QueueList.Columns[1].Width;
+    StatusBar.Panels[0].Width := StatusBar.ClientWidth - StatusBar.Panels[1].Width;
+  except on E: Exception do
+    Log(E.Message);
+  end;
   if FPlaybackType = music then
   begin
     if (FPlayer.PlayerStatus2 = psPlaying) or (FPlayer.PlayerStatus2 = psPaused) then
