@@ -270,6 +270,8 @@ type
     RadioThread: TIdThreadComponent;
     RadiosView: TsListView;
     R7: TMenuItem;
+    LeftPanelBtn: TsBitBtn;
+    RightPanelBtn: TsBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -2263,6 +2265,7 @@ procedure TMainForm.H3Click(Sender: TObject);
 begin
   CategoryPages.Visible := not CategoryPages.Visible;
   H3.Checked := not CategoryPages.Visible;
+  LeftPanelBtn.Down := H3.Checked;
   sSplitter2.Visible := CategoryPages.Visible;
   FormResize(Self);
 end;
@@ -2271,6 +2274,7 @@ procedure TMainForm.H4Click(Sender: TObject);
 begin
   LyricPanel.Visible := not LyricPanel.Visible;
   H4.Checked := not LyricPanel.Visible;
+  RightPanelBtn.Down := H4.Checked;
   Splitter2.Visible := LyricPanel.Visible;
   FormResize(Self);
 end;
@@ -2944,9 +2948,11 @@ begin
       Splitter1.Visible := QueueList.Visible;
       CategoryPages.Visible := ReadBool('player', 'catvisible', True);
       H3.Checked := not CategoryPages.Visible;
+      LeftPanelBtn.Down := H3.Checked;
       sSplitter2.Visible := CategoryPages.Visible;
       LyricPanel.Visible := ReadBool('player', 'lyricvisible', True);
       H4.Checked := not LyricPanel.Visible;
+      RightPanelBtn.Down := H4.Checked;
       Splitter2.Visible := LyricPanel.Visible;
 
       LSkinIndex := SettingsFile.ReadInteger('settings', 'skin2', 33);
