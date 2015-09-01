@@ -39,6 +39,7 @@ type
     { Private declarations }
   public
     { Public declarations }
+    ESCCanClose: Boolean;
   end;
 
 var
@@ -50,7 +51,7 @@ implementation
 
 procedure TLogForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if Key = VK_ESCAPE then
+  if (Key = VK_ESCAPE) and ESCCanClose then
     Self.Close;
 end;
 
@@ -59,6 +60,7 @@ begin
   Self.Color := clBtnFace;
   LogList.Color := clBtnFace;
   LogList.Font.Color := clBlack;
+  ESCCanClose := True;
 end;
 
 procedure TLogForm.LogListChange(Sender: TObject);

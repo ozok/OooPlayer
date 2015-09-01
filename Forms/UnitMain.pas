@@ -269,6 +269,7 @@ type
     PlaylistView: TsListView;
     RadioThread: TIdThreadComponent;
     RadiosView: TsListView;
+    R7: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -408,6 +409,7 @@ type
     procedure PlaylistViewCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure RadiosViewCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure RadiosViewResize(Sender: TObject);
+    procedure R7Click(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -4801,6 +4803,47 @@ begin
     QueueList.Items.Count := FQueueLists[FSelectedPlaylistIndex].Count;
     QueueList.Invalidate;
     // PlayList.Invalidate;
+  end;
+end;
+
+procedure TMainForm.R7Click(Sender: TObject);
+var
+  I: Integer;
+  LCounter: integer;
+begin
+  if ProgressPanel.Visible then Exit;
+
+  if ID_YES = Application.MessageBox('This will remove items that no longer exist on your disk from active playlist. Do you wish to continue?', 'Question', MB_ICONQUESTION or MB_YESNO) then
+  begin
+    Self.Enabled := False;
+    StopBtnClick(self);
+    LogForm.Show;
+    LogForm.ESCCanClose := False;
+    LCounter := 0;
+
+    LogForm.LogList.Lines.Add('Starting to remove files that no longer exist from ' + PlaylistView.Items[FSelectedPlaylistIndex].SubItems[0]);
+
+    for I := FPlaylists[FSelectedPlaylistIndex].Count-1 downto 0 do
+    begin
+      Application.ProcessMessages;
+      if not FileExists(FPlaylists[FSelectedPlaylistIndex][i].FullFileName) then
+      begin
+        LogForm.LogList.Lines.Add('Deleted ' + FPlaylists[FSelectedPlaylistIndex][i].FullFileName);
+        FPlaylists[FSelectedPlaylistIndex].Delete(i);
+        PlayList.Items.Delete(i);
+        Inc(LCounter);
+      end;
+    end;
+
+    SavePlayList;
+    PlayList.Items.Count := FPlaylists[FSelectedPlaylistIndex].Count;
+    PlayList.Repaint;
+
+    LogForm.LogList.Lines.Add('Deleted ' + FloatToStr(LCounter) + ' items.');
+    LogForm.ESCCanClose := True;
+
+    Self.Enabled := True;
+    Self.BringToFront;
   end;
 end;
 
