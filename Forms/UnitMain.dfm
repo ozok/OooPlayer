@@ -97,8 +97,10 @@ object MainForm: TMainForm
         Margins.Right = 0
         Margins.Bottom = 0
         Align = alClient
+        DoubleBuffered = False
         Max = 100
         Orientation = trVertical
+        ParentDoubleBuffered = False
         PageSize = 1
         PositionToolTip = ptTop
         ShowSelRange = False
@@ -158,6 +160,8 @@ object MainForm: TMainForm
           Width = 1013
           Height = 24
           Align = alClient
+          DoubleBuffered = False
+          ParentDoubleBuffered = False
           ShowSelRange = False
           TabOrder = 0
           TickMarks = tmBoth
@@ -1468,15 +1472,6 @@ object MainForm: TMainForm
             Hint = 'Playback order'
             Anchors = [akTop, akRight]
             Alignment = taLeftJustify
-            BoundLabel.Indent = 0
-            BoundLabel.Font.Charset = DEFAULT_CHARSET
-            BoundLabel.Font.Color = clWindowText
-            BoundLabel.Font.Height = -11
-            BoundLabel.Font.Name = 'Tahoma'
-            BoundLabel.Font.Style = []
-            BoundLabel.Layout = sclLeft
-            BoundLabel.MaxWidth = 0
-            BoundLabel.UseSkinColor = True
             SkinData.SkinSection = 'COMBOBOX'
             VerticalAlignment = taAlignTop
             Style = csDropDownList
@@ -1601,15 +1596,6 @@ object MainForm: TMainForm
         Margins.Bottom = 0
         BevelInner = bvNone
         BevelOuter = bvNone
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
-        BoundLabel.Layout = sclLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'EDIT'
         OnMouseEnter = PlayListMouseEnter
         Align = alClient
@@ -1675,15 +1661,6 @@ object MainForm: TMainForm
         Top = 411
         Width = 641
         Height = 121
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
-        BoundLabel.Layout = sclLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'EDIT'
         OnMouseEnter = QueueListMouseEnter
         OnMouseLeave = QueueListMouseLeave
@@ -2184,24 +2161,11 @@ object MainForm: TMainForm
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object RadioList: TsListView
         Left = 0
         Top = 52
         Width = 641
         Height = 495
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
-        BoundLabel.Layout = sclLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'EDIT'
         OnMouseEnter = RadioListMouseEnter
         OnMouseLeave = RadioListMouseLeave
@@ -2296,15 +2260,6 @@ object MainForm: TMainForm
           Hint = 'Radio recording format'
           Anchors = [akTop, akRight]
           Alignment = taLeftJustify
-          BoundLabel.Indent = 0
-          BoundLabel.Font.Charset = DEFAULT_CHARSET
-          BoundLabel.Font.Color = clWindowText
-          BoundLabel.Font.Height = -11
-          BoundLabel.Font.Name = 'Tahoma'
-          BoundLabel.Font.Style = []
-          BoundLabel.Layout = sclLeft
-          BoundLabel.MaxWidth = 0
-          BoundLabel.UseSkinColor = True
           SkinData.SkinSection = 'COMBOBOX'
           VerticalAlignment = taAlignTop
           Style = csDropDownList
@@ -2345,15 +2300,6 @@ object MainForm: TMainForm
           Hint = 'File creation method'
           Anchors = [akTop, akRight]
           Alignment = taLeftJustify
-          BoundLabel.Indent = 0
-          BoundLabel.Font.Charset = DEFAULT_CHARSET
-          BoundLabel.Font.Color = clWindowText
-          BoundLabel.Font.Height = -11
-          BoundLabel.Font.Name = 'Tahoma'
-          BoundLabel.Font.Style = []
-          BoundLabel.Layout = sclLeft
-          BoundLabel.MaxWidth = 0
-          BoundLabel.UseSkinColor = True
           SkinData.SkinSection = 'COMBOBOX'
           VerticalAlignment = taAlignTop
           Style = csDropDownList
@@ -2694,15 +2640,6 @@ object MainForm: TMainForm
         Align = alTop
         Alignment = taLeftJustify
         BoundLabel.Caption = 'LyricSourceList'
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
-        BoundLabel.Layout = sclLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csDropDownList
@@ -2751,15 +2688,6 @@ object MainForm: TMainForm
       TabOrder = 2
       OnMouseEnter = LyricListMouseEnter
       OnMouseLeave = LyricListMouseLeave
-      BoundLabel.Indent = 0
-      BoundLabel.Font.Charset = DEFAULT_CHARSET
-      BoundLabel.Font.Color = clWindowText
-      BoundLabel.Font.Height = -11
-      BoundLabel.Font.Name = 'Tahoma'
-      BoundLabel.Font.Style = []
-      BoundLabel.Layout = sclLeft
-      BoundLabel.MaxWidth = 0
-      BoundLabel.UseSkinColor = True
       SkinData.SkinSection = 'EDIT'
     end
   end
@@ -2835,15 +2763,6 @@ object MainForm: TMainForm
         Top = 30
         Width = 209
         Height = 537
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
-        BoundLabel.Layout = sclLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'EDIT'
         Align = alClient
         Color = 722950
@@ -2875,24 +2794,11 @@ object MainForm: TMainForm
       ImageIndex = 1
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object RadiosView: TsListView
         Left = 0
         Top = 0
         Width = 209
         Height = 567
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
-        BoundLabel.Layout = sclLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'EDIT'
         Align = alClient
         Color = 722950
@@ -3289,7 +3195,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800700216001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800740216001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

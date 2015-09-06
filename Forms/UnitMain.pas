@@ -2026,8 +2026,9 @@ begin
     RadioList.Columns[2].Width := (RadioList.ClientWidth - 20) div RadioList.Columns.Count;
     QueueList.Columns[0].Width := QueueList.ClientWidth - QueueList.Columns[1].Width;
     StatusBar.Panels[0].Width := StatusBar.ClientWidth - StatusBar.Panels[1].Width;
-  except on E: Exception do
-    Log(E.Message);
+  except
+    on E: Exception do
+      Log(E.Message);
   end;
   if FPlaybackType = music then
   begin
@@ -4817,19 +4818,20 @@ var
   I: Integer;
   LCounter: integer;
 begin
-  if ProgressPanel.Visible then Exit;
+  if ProgressPanel.Visible then
+    Exit;
 
   if ID_YES = Application.MessageBox('This will remove items that no longer exist on your disk from active playlist. Do you wish to continue?', 'Question', MB_ICONQUESTION or MB_YESNO) then
   begin
     Self.Enabled := False;
-    StopBtnClick(self);
+    StopBtnClick(Self);
     LogForm.Show;
     LogForm.ESCCanClose := False;
     LCounter := 0;
 
     LogForm.LogList.Lines.Add('Starting to remove files that no longer exist from ' + PlaylistView.Items[FSelectedPlaylistIndex].SubItems[0]);
 
-    for I := FPlaylists[FSelectedPlaylistIndex].Count-1 downto 0 do
+    for I := FPlaylists[FSelectedPlaylistIndex].Count - 1 downto 0 do
     begin
       Application.ProcessMessages;
       if not FileExists(FPlaylists[FSelectedPlaylistIndex][i].FullFileName) then
