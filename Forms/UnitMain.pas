@@ -406,12 +406,12 @@ type
     procedure sPanel5MouseEnter(Sender: TObject);
     procedure F3Click(Sender: TObject);
     procedure ReloadLyricTitleBtnClick(Sender: TObject);
-    procedure VolumeBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure PlaylistViewResize(Sender: TObject);
     procedure PlaylistViewCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure RadiosViewCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure RadiosViewResize(Sender: TObject);
     procedure R7Click(Sender: TObject);
+    procedure VolumeBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   private
     { Private declarations }
     FLastDir: string;
@@ -496,6 +496,7 @@ type
     FSelfCaption: string;
     FWinHandle: HWND;
     FActivelyPlayedPlaylistIndex: integer;
+    FLevels: TLevel;
 
     procedure Log(s: string);
 
@@ -706,7 +707,7 @@ begin
       Self.Width := Self.Width - 1;
       GenerateShuffleList;
       FShuffleIndex := -1;
-      StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+      StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files/' + FPlayListFiles[FSelectedPlaylistIndex].Name;
       FStopAddFiles := True;
     end;
   end;
@@ -739,7 +740,7 @@ begin
       Self.Width := Self.Width - 1;
       GenerateShuffleList;
       FShuffleIndex := -1;
-      StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+      StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files/' + FPlayListFiles[FSelectedPlaylistIndex].Name;
     end;
   end;
 end;
@@ -806,7 +807,7 @@ begin
     Self.Width := Self.Width - 1;
     GenerateShuffleList;
     FShuffleIndex := -1;
-    StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+    StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files / ' + FPlayListFiles[FSelectedPlaylistIndex].Name;
   end;
   FStopAddFiles := True;
 end;
@@ -1175,7 +1176,7 @@ begin
       Self.Width := Self.Width - 1;
       GenerateShuffleList;
       FShuffleIndex := -1;
-      StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+      StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files / ' + FPlayListFiles[FSelectedPlaylistIndex].Name;
       FStopAddFiles := True;
       if PlayList.Items.Count > 0 then
       begin
@@ -1304,7 +1305,7 @@ begin
   FShuffleIndexes.Clear;
   FShuffleIndex := -1;
   SavePlayList;
-  StatusBar.Panels[0].Text := '0 files';
+  StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files / ' + FPlayListFiles[FSelectedPlaylistIndex].Name;
 end;
 
 procedure TMainForm.C2Click(Sender: TObject);
@@ -1727,7 +1728,7 @@ begin
     Self.Width := Self.Width - 1;
     GenerateShuffleList;
     FShuffleIndex := -1;
-    StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+    StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files / ' + FPlayListFiles[FSelectedPlaylistIndex].Name;
     FStopAddFiles := True;
   end;
 end;
@@ -2074,7 +2075,7 @@ begin
   LoadRadioStations;
   GenerateShuffleList;
   FShuffleIndex := -1;
-  StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+  StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files / ' + FPlayListFiles[FSelectedPlaylistIndex].Name;
 
   // FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex is reseted to -1 above so we need to
   // re-read it from ini file
@@ -2128,7 +2129,7 @@ begin
       // FLastDir := OpenFolder.Directory;
       GenerateShuffleList;
       FShuffleIndex := -1;
-      StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+      StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files / ' + FPlayListFiles[FSelectedPlaylistIndex].Name;
       FStopAddFiles := True;
       if PlayList.Items.Count > 0 then
       begin
@@ -2145,6 +2146,7 @@ begin
   // playlist columns
   ChangePlaylistColumnNames;
   TrayIcon.ShowApplication;
+  // IdThreadComponent1.Start;
 end;
 
 procedure TMainForm.G1Click(Sender: TObject);
@@ -3320,7 +3322,7 @@ begin
     FShuffleIndex := -1;
     PlayList.Repaint;
     PlayList.Refresh;
-    StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+    StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files / ' + FPlayListFiles[FSelectedPlaylistIndex].Name;
     ScrollToCurrentSong;
     FuncPages.ActivePageIndex := 0;
   end;
@@ -4150,6 +4152,7 @@ begin
     end;
   end;
 
+  StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files / ' + FPlayListFiles[FSelectedPlaylistIndex].Name;
 end;
 
 procedure TMainForm.PlayListAdvancedCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
@@ -4746,7 +4749,7 @@ begin
     FPlaylists[FSelectedPlaylistIndex].Delete(PlayList.ItemIndex);
     PlayList.Items.Count := PlayList.Items.Count - 1;
     PlayList.Repaint;
-    StatusBar.Panels[0].Text := Format('%d files', [PlayList.Items.Count]);
+    StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files / ' + FPlayListFiles[FSelectedPlaylistIndex].Name;
   end;
 end;
 
@@ -5978,7 +5981,6 @@ end;
 
 procedure TMainForm.VolumeBarChange(Sender: TObject);
 begin
-
   if FPlaybackType = music then
   begin
     if (FPlayer.PlayerStatus = psPlaying) or (FPlayer.PlayerStatus = psPaused) then
@@ -6001,8 +6003,34 @@ begin
 end;
 
 procedure TMainForm.VolumeBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  NewTractBarPosition: Integer;
 begin
-  ShowMessage('asdasd');
+  // the new position on the trackbar
+  NewTractBarPosition := Round((Y / VolumeBar.ClientHeight) * 100);
+  if (NewTractBarPosition <> VolumeBar.Position) then
+  begin
+    VolumeBar.Position := NewTractBarPosition;
+    if FPlaybackType = music then
+    begin
+      if (FPlayer.PlayerStatus = psPlaying) or (FPlayer.PlayerStatus = psPaused) then
+      begin
+        FPlayer.SetVolume(100 - VolumeBar.Position);
+      end;
+      StatusBar.Panels[1].Text := FloatToStr(VolumeBar.Position) + '%'
+    end
+    else if FPlaybackType = radio then
+    begin
+      // radio
+      if not IsRadioPlayerStopped then
+      begin
+        SetRadioVolume(100 - VolumeBar.Position);
+      end;
+      StatusBar.Panels[1].Text := FloatToStr(VolumeBar.Position) + '%'
+    end;
+
+    StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
+  end;
 end;
 
 procedure TMainForm.VolumeBarMouseEnter(Sender: TObject);
@@ -6220,10 +6248,10 @@ begin
           Log('play next file');
           HandlePlaybackFromBassThread;
         end;
-      UPDATE_LEVEL:
-        begin
-          // FLevel := Cardinal(Msg.LParam);
-        end;
+      // UPDATE_LEVEL:
+      // begin
+      // Log('left: ' + FloatToStr(FLevels.Left));
+      // end;
     end;
   end
 end;

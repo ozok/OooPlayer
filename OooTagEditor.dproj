@@ -95,8 +95,8 @@
         <DCC_MapFile>3</DCC_MapFile>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_LocalDebugSymbols>true</DCC_LocalDebugSymbols>
-        <VerInfo_Build>178</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=;FileDescription=OooPlayer TagEditor Module;FileVersion=1.0.0.178;InternalName=TagEditor;LegalCopyright=2015 (c) ozok;LegalTrademarks=;OriginalFilename=TagEditor.exe;ProductName=TagEditor;ProductVersion=1.0.0.0;Comments=OooPlayer TagEditor Module</VerInfo_Keys>
+        <VerInfo_Build>179</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=OooPlayer TagEditor Module;FileVersion=1.0.0.179;InternalName=TagEditor;LegalCopyright=2015 (c) ozok;LegalTrademarks=;OriginalFilename=TagEditor.exe;ProductName=TagEditor;ProductVersion=1.0.0.0;Comments=OooPlayer TagEditor Module</VerInfo_Keys>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -539,13 +539,13 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <Platforms>
                 <Platform value="Win32">True</Platform>

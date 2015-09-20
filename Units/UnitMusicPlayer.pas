@@ -32,6 +32,11 @@ type
   TEQValues = array [0 .. 17] of single;
 
 type
+  TLevel = record
+    Left, Right: Cardinal;
+  end;
+
+type
   TMusicPlayer = class
   private
     FBassHandle: HSTREAM;
@@ -95,6 +100,7 @@ const
   LEVEL_MAX = 32768;
   UPDATE_LEVEL = 14;
   WM_COPYDATA = 74;
+  UI_LEVEL_MAX = 20;
   EQ_FRENQ: array [0 .. 17] of integer = (31, 63, 87, 125, 175, 250, 350, 500, 700, 1000, 1400, 2000, 2800, 4000, 5600, 8000, 11000, 16000);
 
 implementation
@@ -102,6 +108,19 @@ implementation
 { TMusicPlayer }
 
 uses UnitMain, UnitSettings, UnitLog, UnitEQ;
+
+procedure DSPProc(Handle: Thandle; Channel: HSTREAM; Buffer: Pointer; Length: DWORD; user: Pointer); stdcall;
+var
+  LLevel: Cardinal;
+begin
+  try
+    LLevel := BASS_ChannelGetLevel(Channel);
+    MainForm.FLevels.Left := (LOWORD(LLevel) * UI_LEVEL_MAX) div LEVEL_MAX;
+    MainForm.FLevels.Right := (HIWORD(LLevel) * UI_LEVEL_MAX) div LEVEL_MAX;
+  except
+    on E: Exception do
+  end;
+end;
 
 // procedure SyncProc(hSync: Thandle; hChan: THandle; NotUsed: DWord; MyObject: DWord); stdcall;
 procedure SyncProc(hSync: Thandle; hChan: HSTREAM; NotUsed: DWORD; MyObject: DWORD); stdcall;
