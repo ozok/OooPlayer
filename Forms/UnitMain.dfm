@@ -20,6 +20,8 @@ object MainForm: TMainForm
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnMouseWheelDown = FormMouseWheelDown
+  OnMouseWheelUp = FormMouseWheelUp
   OnResize = FormResize
   OnShow = FormShow
   PixelsPerInch = 96
@@ -102,13 +104,13 @@ object MainForm: TMainForm
         Orientation = trVertical
         ParentDoubleBuffered = False
         PageSize = 1
-        PositionToolTip = ptTop
         ShowSelRange = False
         TabOrder = 0
         TickMarks = tmBoth
         TickStyle = tsNone
         OnChange = VolumeBarChange
         OnMouseDown = VolumeBarMouseDown
+        AnimatEvents = [aeMouseEnter, aeMouseLeave, aeMouseDown, aeMouseUp, aeGlobalDef]
         SkinData.SkinSection = 'TRACKBAR'
         BarOffsetV = 0
         BarOffsetH = 0
@@ -159,14 +161,21 @@ object MainForm: TMainForm
           Top = 0
           Width = 1013
           Height = 24
+          Margins.Left = 0
+          Margins.Top = 0
+          Margins.Right = 0
+          Margins.Bottom = 0
           Align = alClient
           DoubleBuffered = False
+          Max = 100
           ParentDoubleBuffered = False
+          PageSize = 1
           ShowSelRange = False
           TabOrder = 0
           TickMarks = tmBoth
           TickStyle = tsNone
           OnMouseDown = PositionBarMouseDown
+          AnimatEvents = [aeMouseEnter, aeMouseLeave, aeMouseDown, aeMouseUp, aeGlobalDef]
           SkinData.SkinSection = 'TRACKBAR'
           BarOffsetV = 0
           BarOffsetH = 0
@@ -3195,7 +3204,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800880216001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800940216001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

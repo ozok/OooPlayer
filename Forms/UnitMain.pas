@@ -45,7 +45,7 @@ uses
   acShellCtrls, sComboBoxes, sTreeView, sListBox, System.Types,
   sEdit, sGauge, UnitLastFMToolLauncher, Pipes, UnitSubProcessLauncher,
   GraphUtil,
-  Vcl.XPMan, UnitCueParser, System.ImageList;
+  Vcl.XPMan, UnitCueParser, System.ImageList, uKBDynamic;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -258,7 +258,6 @@ type
     PipeServer: TPipeServer;
     TrayIcon: TJvTrayIcon;
     UpdateChecker: TJvHttpUrlGrabber;
-    PositionBar: TsTrackBar;
     PlaybackImages: TsAlphaImageList;
     H3: TMenuItem;
     H4: TMenuItem;
@@ -272,6 +271,7 @@ type
     R7: TMenuItem;
     LeftPanelBtn: TsBitBtn;
     RightPanelBtn: TsBitBtn;
+    PositionBar: TsTrackBar;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -412,6 +412,10 @@ type
     procedure RadiosViewResize(Sender: TObject);
     procedure R7Click(Sender: TObject);
     procedure VolumeBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+    procedure FormMouseWheelDown(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
   private
     { Private declarations }
     FLastDir: string;
@@ -2015,6 +2019,26 @@ begin
   FInfoFiles.Free;
 end;
 
+procedure TMainForm.FormMouseWheelDown(Sender: TObject; Shift: TShiftState;
+  MousePos: TPoint; var Handled: Boolean);
+begin
+  if VolumeBar.Focused then
+  begin
+    V2Click(Self);
+    Handled := True;
+  end;
+end;
+
+procedure TMainForm.FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
+  MousePos: TPoint; var Handled: Boolean);
+begin
+  if VolumeBar.Focused then
+  begin
+    V1Click(Self);
+    Handled := True;
+  end;
+end;
+
 procedure TMainForm.FormResize(Sender: TObject);
 begin
   // PlayList.Columns[4].Width := 100;
@@ -2749,7 +2773,7 @@ begin
             LPlayListItem.PlayCount := 0;
             LPlayListItem.Stars := 0;
             // play count and star.
-            // this values are added later so in onder to keep compability with
+            // this values are added later so in order to keep compability with
             // older versions we must check the size.
             if LSpltLst.Count >= 11 then
             begin
@@ -5055,7 +5079,7 @@ begin
     BASS_ChannelSetSync(FRadioHandle, BASS_SYNC_META, 0, @MetaSync, nil);
     // play it!
     BASS_ChannelPlay(FRadioHandle, False);
-    SetRadioVolume(100 - VolumeBar.Position);
+    SetRadioVolume(VolumeBar.Position);
     // re-paint radio list
     SendMessage(WinHandle, WM_INFO_UPDATE, REPAINT_RADIO_LIST, 0);
     // stop-loading animation
@@ -5987,19 +6011,19 @@ begin
     begin
       FPlayer.SetVolume(100 - VolumeBar.Position);
     end;
-    StatusBar.Panels[1].Text := FloatToStr(VolumeBar.Position) + '%'
+    StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
   end
   else if FPlaybackType = radio then
   begin
     // radio
     if not IsRadioPlayerStopped then
     begin
-      SetRadioVolume(100 - VolumeBar.Position);
+      SetRadioVolume(VolumeBar.Position);
     end;
-    StatusBar.Panels[1].Text := FloatToStr(VolumeBar.Position) + '%'
   end;
 
-  StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
+  StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%';
+  VolumeBar.Hint := FloatToStr(100 - VolumeBar.Position) + '%';
 end;
 
 procedure TMainForm.VolumeBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -6017,16 +6041,15 @@ begin
       begin
         FPlayer.SetVolume(100 - VolumeBar.Position);
       end;
-      StatusBar.Panels[1].Text := FloatToStr(VolumeBar.Position) + '%'
+      StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
     end
     else if FPlaybackType = radio then
     begin
       // radio
       if not IsRadioPlayerStopped then
       begin
-        SetRadioVolume(100 - VolumeBar.Position);
+        SetRadioVolume(VolumeBar.Position);
       end;
-      StatusBar.Panels[1].Text := FloatToStr(VolumeBar.Position) + '%'
     end;
 
     StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
@@ -6041,7 +6064,7 @@ end;
 
 procedure TMainForm.VolumeBarToolTip(Sender: TObject; var ToolTipText: string);
 begin
-  ToolTipText := FloatToStr(100 - VolumeBar.Position)
+  ToolTipText := FloatToStr(VolumeBar.Position)
 end;
 
 procedure TMainForm.WndProc(var Msg: TMessage);
