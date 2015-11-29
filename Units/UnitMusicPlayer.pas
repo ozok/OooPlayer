@@ -79,6 +79,7 @@ type
     destructor Destroy; override;
 
     procedure Play;
+    procedure PlayUrl(const URL: string);
     procedure Stop;
     procedure Pause;
     procedure Resume;
@@ -589,6 +590,32 @@ begin
     BASS_ChannelSetPosition(FMixHandle, 0, BASS_POS_BYTE);
 
     if BASS_ChannelPlay(FMixHandle, False) then
+    begin
+      InitQE;
+      EQForm.EnableEQBtnClick(self);
+      FErrorMsg := MY_ERROR_OK;
+      FPlayerStatus := psPlaying;
+    end
+    else
+    begin
+      FErrorMsg := MY_ERROR_STREAM_ZERO;
+      FPlayerStatus := psStopped;
+    end;
+  end
+  else
+  begin
+    FErrorMsg := MY_ERROR_STREAM_ZERO;
+  end;
+end;
+
+procedure TMusicPlayer.PlayUrl(const URL: string);
+begin
+  begin
+    FBassHandle := BASS_StreamCreateURL(PAnsiChar(URL), 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX, nil, nil);
+  end;
+  if FBassHandle > 0 then
+  begin
+    if BASS_ChannelPlay(FBassHandle, False) then
     begin
       InitQE;
       EQForm.EnableEQBtnClick(self);

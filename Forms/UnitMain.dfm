@@ -57,11 +57,12 @@ object MainForm: TMainForm
     HoverFont.Style = []
   end
   object sSplitter2: TsSplitter
-    Left = 217
+    Left = 250
     Top = 80
     Width = 4
     Height = 602
     SkinData.SkinSection = 'SPLITTER'
+    ExplicitLeft = 217
     ExplicitTop = 83
     ExplicitHeight = 599
   end
@@ -1560,9 +1561,9 @@ object MainForm: TMainForm
     end
   end
   object FuncPages: TsPageControl
-    Left = 221
+    Left = 254
     Top = 80
-    Width = 649
+    Width = 616
     Height = 602
     ActivePage = TabSheet1
     Align = alClient
@@ -1584,7 +1585,7 @@ object MainForm: TMainForm
       object Splitter1: TsSplitter
         Left = 0
         Top = 407
-        Width = 641
+        Width = 608
         Height = 4
         Cursor = crVSplit
         Align = alBottom
@@ -1596,7 +1597,7 @@ object MainForm: TMainForm
       object PlayList: TsListView
         Left = 0
         Top = 0
-        Width = 641
+        Width = 608
         Height = 407
         Hint = 'Playlist'
         Margins.Left = 0
@@ -1668,7 +1669,7 @@ object MainForm: TMainForm
       object QueueList: TsListView
         Left = 0
         Top = 411
-        Width = 641
+        Width = 608
         Height = 121
         SkinData.SkinSection = 'EDIT'
         OnMouseEnter = QueueListMouseEnter
@@ -1702,7 +1703,7 @@ object MainForm: TMainForm
       object ShortcutPanel: TsPanel
         Left = 0
         Top = 532
-        Width = 641
+        Width = 608
         Height = 35
         Align = alBottom
         TabOrder = 2
@@ -1858,7 +1859,7 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'BUTTON'
         end
         object SearchMenuBtn: TsBitBtn
-          Left = 541
+          Left = 508
           Top = 1
           Width = 33
           Height = 33
@@ -1933,7 +1934,7 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'BUTTON'
         end
         object PlaylistMenuBtn: TsBitBtn
-          Left = 574
+          Left = 541
           Top = 1
           Width = 33
           Height = 33
@@ -2080,7 +2081,7 @@ object MainForm: TMainForm
           OnClick = H3Click
         end
         object RightPanelBtn: TsBitBtn
-          Left = 607
+          Left = 574
           Top = 1
           Width = 33
           Height = 33
@@ -2173,7 +2174,7 @@ object MainForm: TMainForm
       object RadioList: TsListView
         Left = 0
         Top = 52
-        Width = 641
+        Width = 608
         Height = 495
         SkinData.SkinSection = 'EDIT'
         OnMouseEnter = RadioListMouseEnter
@@ -2212,16 +2213,16 @@ object MainForm: TMainForm
       object RadioRecordPanel: TsPanel
         Left = 0
         Top = 0
-        Width = 641
+        Width = 608
         Height = 52
         Align = alTop
         TabOrder = 1
         SkinData.SkinSection = 'PANEL'
         DesignSize = (
-          641
+          608
           52)
         object Label1: TsLabel
-          Left = 154
+          Left = 121
           Top = 6
           Width = 77
           Height = 13
@@ -2230,7 +2231,7 @@ object MainForm: TMainForm
           ExplicitLeft = 176
         end
         object Label2: TsLabel
-          Left = 276
+          Left = 243
           Top = 6
           Width = 67
           Height = 13
@@ -2262,7 +2263,7 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'BUTTON'
         end
         object RadioRecordFormatList: TsComboBox
-          Left = 154
+          Left = 121
           Top = 25
           Width = 114
           Height = 21
@@ -2290,7 +2291,7 @@ object MainForm: TMainForm
             'Without encode')
         end
         object RadioRecordingOptionsBtn: TsBitBtn
-          Left = 470
+          Left = 437
           Top = 6
           Width = 104
           Height = 40
@@ -2302,7 +2303,7 @@ object MainForm: TMainForm
           SkinData.SkinSection = 'BUTTON'
         end
         object RadioRecordModeList: TsComboBox
-          Left = 274
+          Left = 241
           Top = 25
           Width = 190
           Height = 21
@@ -2327,7 +2328,7 @@ object MainForm: TMainForm
             'Save recording as a single long file')
         end
         object RadioRecordOutputFolderBtn: TsBitBtn
-          Left = 580
+          Left = 547
           Top = 6
           Width = 55
           Height = 40
@@ -2342,7 +2343,7 @@ object MainForm: TMainForm
       object RadioConnectionBar: TsProgressBar
         Left = 0
         Top = 547
-        Width = 641
+        Width = 608
         Height = 20
         Align = alBottom
         DoubleBuffered = False
@@ -2703,7 +2704,7 @@ object MainForm: TMainForm
   object CategoryPages: TsPageControl
     Left = 0
     Top = 80
-    Width = 217
+    Width = 250
     Height = 602
     ActivePage = sTabSheet2
     Align = alLeft
@@ -2718,7 +2719,7 @@ object MainForm: TMainForm
       object PlaylistListPanel: TsPanel
         Left = 0
         Top = 0
-        Width = 209
+        Width = 242
         Height = 30
         Align = alTop
         BevelOuter = bvNone
@@ -2770,7 +2771,7 @@ object MainForm: TMainForm
       object PlaylistView: TsListView
         Left = 0
         Top = 30
-        Width = 209
+        Width = 242
         Height = 537
         SkinData.SkinSection = 'EDIT'
         Align = alClient
@@ -2806,7 +2807,7 @@ object MainForm: TMainForm
       object RadiosView: TsListView
         Left = 0
         Top = 0
-        Width = 209
+        Width = 242
         Height = 567
         SkinData.SkinSection = 'EDIT'
         Align = alClient
@@ -2871,8 +2872,8 @@ object MainForm: TMainForm
     Top = 304
   end
   object MainMenu1: TMainMenu
-    Left = 112
-    Top = 376
+    Left = 104
+    Top = 368
     object F1: TMenuItem
       Caption = 'File'
       object A3: TMenuItem
@@ -3204,7 +3205,7 @@ object MainForm: TMainForm
     Left = 680
     Top = 256
     Bitmap = {
-      494C010105000800940216001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105000800A80216001600FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

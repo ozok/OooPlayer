@@ -45,7 +45,7 @@ uses
   acShellCtrls, sComboBoxes, sTreeView, sListBox, System.Types,
   sEdit, sGauge, UnitLastFMToolLauncher, Pipes, UnitSubProcessLauncher,
   GraphUtil,
-  Vcl.XPMan, UnitCueParser, System.ImageList, uKBDynamic;
+  Vcl.XPMan, UnitCueParser, System.ImageList;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -412,10 +412,9 @@ type
     procedure RadiosViewResize(Sender: TObject);
     procedure R7Click(Sender: TObject);
     procedure VolumeBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
-      MousePos: TPoint; var Handled: Boolean);
-    procedure FormMouseWheelDown(Sender: TObject; Shift: TShiftState;
-      MousePos: TPoint; var Handled: Boolean);
+    procedure FormMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+    procedure FormMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+    procedure DirectoryListClick(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -474,7 +473,6 @@ type
     { Public declarations }
     // encoder paths
     FLamePath, FOggEncPath, FOpusEncPath, FFDKPath: string;
-    // encoder paths
 
     FPlayListFiles: TPlaylistFiles;
     FStoppedByUser: Boolean;
@@ -566,7 +564,7 @@ var
 const
 {$DEFINE WRITEDEBUGLOG}
   BuildInt = 2975;
-  Portable = True;
+  Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
   SHOW_ERROR = 1;
@@ -1642,6 +1640,11 @@ begin
   ShellExecute(0, 'open', 'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SQXZVLR553H64', nil, nil, SW_SHOWNORMAL);
 end;
 
+procedure TMainForm.DirectoryListClick(Sender: TObject);
+begin
+  FuncPages.ActivePageIndex := 2;
+end;
+
 procedure TMainForm.DisableEQ;
 var
   LEQValues: TEQValues;
@@ -2019,8 +2022,7 @@ begin
   FInfoFiles.Free;
 end;
 
-procedure TMainForm.FormMouseWheelDown(Sender: TObject; Shift: TShiftState;
-  MousePos: TPoint; var Handled: Boolean);
+procedure TMainForm.FormMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
   if VolumeBar.Focused then
   begin
@@ -2029,8 +2031,7 @@ begin
   end;
 end;
 
-procedure TMainForm.FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
-  MousePos: TPoint; var Handled: Boolean);
+procedure TMainForm.FormMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
   if VolumeBar.Focused then
   begin
