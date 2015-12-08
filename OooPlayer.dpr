@@ -49,7 +49,8 @@ uses
   UnitLastFMToolLauncher in 'Units\UnitLastFMToolLauncher.pas',
   UnitTagReader in 'Units\UnitTagReader.pas',
   UnitSubProcessLauncher in 'Units\UnitSubProcessLauncher.pas',
-  UnitCueParser in 'Units\UnitCueParser.pas';
+  UnitCueParser in 'Units\UnitCueParser.pas',
+  bass_fx in 'BassUnits\bass_fx.pas';
 
 {$R *.res}
 

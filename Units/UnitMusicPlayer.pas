@@ -23,7 +23,7 @@ interface
 
 uses System.Classes, BASS, BASS_AAC, BASSFLAC, BassWMA, BASSWV, BASS_AC3,
   BASS_ALAC, BASS_APE, BASS_MPC, BASS_OFR, BASS_SPX, BASS_TTA, BassOPUS,
-  Windows, SysUtils, StrUtils, Generics.Collections, MediaInfoDll, Bassmix;
+  Windows, SysUtils, StrUtils, Generics.Collections, MediaInfoDll, Bassmix, BASS_FX;
 
 type
   TPlayerStatus = (psPlaying = 0, psPaused = 1, psStopped = 2, psStalled = 3, psUnkown = 4);
@@ -49,6 +49,7 @@ type
     FMixHandle: HSTREAM;
     FPosition: int64;
     FEQParams: array [0 .. 17] of HFX;
+    FDSPHandle: Cardinal;
 
     function GetBassStreamStatus: TPlayerStatus;
     function GetTotalLength(): int64;
@@ -88,6 +89,7 @@ type
     function IntToTime(IntTime: Integer): string;
     procedure SetBuffer(const Buffer: DWORD);
     procedure ChangeEQ(const EQValues: TEQValues);
+    procedure UpdatePreAmp(const PreAmpValue: single);
     // procedure RemoveEQ;
     procedure InitQE;
   end;
@@ -301,6 +303,7 @@ begin
   end;
 
   BASS_SetConfig(BASS_CONFIG_FLOATDSP, 1);
+  BASS_FX_GetVersion;
   // BASS_SetConfig(BASS_CONFIG_ASYNCFILE_BUFFER, 131072);
   // BASS_SetConfig(BASS_CONFIG_BUFFER, 2000);
 
@@ -520,6 +523,7 @@ end;
 procedure TMusicPlayer.Play;
 var
   LExt: string;
+  LPreAmp: BASS_BFX_VOLUME;
 begin
   // free the stream first
   if FBassHandle <> 0 then
@@ -585,6 +589,8 @@ begin
   end;
   if FBassHandle > 0 then
   begin
+    UpdatePreAmp(2.0);
+
     BASS_ChannelSetAttribute(FBassHandle, BASS_ATTRIB_VOL, (100 - MainForm.VolumeBar.Position) / 100.0);
     BASS_Mixer_StreamAddChannel(FMixHandle, FBassHandle, BASS_STREAM_AUTOFREE or BASS_MIXER_NORAMPIN or BASS_MIXER_BUFFER);
     BASS_ChannelSetPosition(FMixHandle, 0, BASS_POS_BYTE);
@@ -672,6 +678,20 @@ begin
       FPlayerStatus := psStopped;
     end;
   end;
+end;
+
+procedure TMusicPlayer.UpdatePreAmp(const PreAmpValue: single);
+var
+  LPreAmp: BASS_BFX_VOLUME;
+begin
+  BASS_ChannelRemoveFX(FBassHandle, BASS_FX_BFX_VOLUME);
+  LPreAmp.fVolume := PreAmpValue;
+  LPreAmp.lChannel := 0;
+  FDSPHandle := BASS_ChannelSetFX(FBassHandle, BASS_FX_BFX_VOLUME, 1);
+  LogForm.LogList.Lines.Add('handle: ' + FloatToStr(FDSPHandle));
+  LogForm.LogList.Lines.Add('error: ' + FloatToStr(BASS_ErrorGetCode));
+  LogForm.LogList.Lines.Add('val: ' + FloatToStr(PreAmpValue));
+  BASS_FXSetParameters(FDSPHandle, @LPreAmp);
 end;
 
 end.

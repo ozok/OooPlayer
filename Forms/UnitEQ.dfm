@@ -3,7 +3,7 @@ object EQForm: TEQForm
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Equalizer'
-  ClientHeight = 314
+  ClientHeight = 246
   ClientWidth = 633
   Color = 3485741
   DoubleBuffered = True
@@ -20,370 +20,6 @@ object EQForm: TEQForm
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object sPanel1: TsPanel
-    Left = 0
-    Top = 49
-    Width = 633
-    Height = 193
-    Align = alTop
-    TabOrder = 0
-    SkinData.SkinSection = 'PANEL'
-    object sLabel1: TsLabel
-      AlignWithMargins = True
-      Left = 4
-      Top = 176
-      Width = 612
-      Height = 13
-      Margins.Top = 0
-      Align = alBottom
-      Caption = 
-        ' 31       63        87       125      175     250      350     5' +
-        '00       700      1K       1.4K     2K       2.8K      4K      5' +
-        '.6K      8K      11K     16K'
-    end
-    object sTrackBar1: TsTrackBar
-      Left = 1
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 0
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar10: TsTrackBar
-      Left = 36
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 1
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar11: TsTrackBar
-      Left = 106
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 2
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar12: TsTrackBar
-      Left = 211
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 3
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar13: TsTrackBar
-      Left = 351
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 4
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar14: TsTrackBar
-      Left = 456
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 5
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar15: TsTrackBar
-      Left = 491
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 6
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar16: TsTrackBar
-      Left = 526
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 7
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar17: TsTrackBar
-      Left = 561
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 8
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar18: TsTrackBar
-      Left = 596
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 9
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar2: TsTrackBar
-      Left = 71
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 10
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar3: TsTrackBar
-      Left = 141
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 11
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar4: TsTrackBar
-      Left = 176
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 12
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar5: TsTrackBar
-      Left = 246
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 13
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar6: TsTrackBar
-      Left = 281
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 14
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar7: TsTrackBar
-      Left = 316
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 15
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar8: TsTrackBar
-      Left = 386
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 16
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-    object sTrackBar9: TsTrackBar
-      Left = 421
-      Top = 1
-      Width = 35
-      Height = 175
-      Align = alLeft
-      Max = 1500
-      Min = -1500
-      Orientation = trVertical
-      ParentShowHint = False
-      ShowHint = True
-      ShowSelRange = False
-      TabOrder = 17
-      TickStyle = tsNone
-      OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
-    end
-  end
   object sPanel2: TsPanel
     Left = 0
     Top = 0
@@ -391,7 +27,7 @@ object EQForm: TEQForm
     Height = 49
     Align = alTop
     ParentColor = True
-    TabOrder = 1
+    TabOrder = 0
     SkinData.SkinSection = 'PANEL'
     DesignSize = (
       633
@@ -422,9 +58,9 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'COMBOBOX'
       VerticalAlignment = taAlignTop
       Style = csDropDownList
-      Color = 2038810
+      Color = 722950
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 13417908
+      Font.Color = 12102048
       Font.Height = -11
       Font.Name = 'Tahoma'
       Font.Style = []
@@ -432,6 +68,428 @@ object EQForm: TEQForm
       ParentFont = False
       TabOrder = 1
       OnChange = EQPresetsListChange
+    end
+  end
+  object sPanel1: TsPanel
+    Left = 0
+    Top = 49
+    Width = 633
+    Height = 197
+    Align = alClient
+    TabOrder = 1
+    SkinData.SkinSection = 'PANEL'
+    ExplicitLeft = 1
+    ExplicitTop = 1
+    ExplicitWidth = 631
+    ExplicitHeight = 195
+    object sLabel1: TsLabel
+      AlignWithMargins = True
+      Left = 4
+      Top = 180
+      Width = 612
+      Height = 13
+      Margins.Top = 0
+      Align = alBottom
+      Caption = 
+        ' 31       63        87       125      175     250      350     5' +
+        '00       700      1K       1.4K     2K       2.8K      4K      5' +
+        '.6K      8K      11K     16K'
+    end
+    object sTrackBar1: TsTrackBar
+      Left = 1
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 0
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar10: TsTrackBar
+      Left = 36
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 1
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar11: TsTrackBar
+      Left = 106
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 2
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar12: TsTrackBar
+      Left = 211
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 3
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar13: TsTrackBar
+      Left = 351
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 4
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar14: TsTrackBar
+      Left = 456
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 5
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar15: TsTrackBar
+      Left = 491
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 6
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar16: TsTrackBar
+      Left = 526
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 7
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar17: TsTrackBar
+      Left = 561
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 8
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar18: TsTrackBar
+      Left = 596
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 9
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar2: TsTrackBar
+      Left = 71
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 10
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar3: TsTrackBar
+      Left = 141
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 11
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar4: TsTrackBar
+      Left = 176
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 12
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar5: TsTrackBar
+      Left = 246
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 13
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar6: TsTrackBar
+      Left = 281
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 14
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar7: TsTrackBar
+      Left = 316
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 15
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar8: TsTrackBar
+      Left = 386
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 16
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
+    end
+    object sTrackBar9: TsTrackBar
+      Left = 421
+      Top = 1
+      Width = 35
+      Height = 179
+      Align = alLeft
+      DoubleBuffered = False
+      Max = 1500
+      Min = -1500
+      Orientation = trVertical
+      ParentDoubleBuffered = False
+      ParentShowHint = False
+      ShowHint = True
+      ShowSelRange = False
+      TabOrder = 17
+      TickStyle = tsNone
+      OnChange = sTrackBar1Change
+      SkinData.SkinSection = 'TRACKBAR'
+      BarOffsetV = 0
+      BarOffsetH = 0
+      ExplicitHeight = 177
     end
   end
   object sSkinProvider1: TsSkinProvider

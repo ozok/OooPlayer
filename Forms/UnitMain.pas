@@ -4209,6 +4209,21 @@ begin
       Sender.Canvas.Brush.Color := clGradientInactiveCaption;
     end;
   end;
+  if FPlayer.PlayerStatus2 <> psStopped then
+  begin
+    if Item.Index = FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex then
+    begin
+      Sender.Canvas.Font.Style := [fsBold];
+    end
+    else
+    begin
+      Sender.Canvas.Font.Style := [];
+    end;
+  end
+  else
+  begin
+    Sender.Canvas.Font.Style := [];
+  end;
 end;
 
 procedure TMainForm.PlayListData(Sender: TObject; Item: TListItem);
@@ -6023,8 +6038,8 @@ begin
     end;
   end;
 
-  StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%';
-  VolumeBar.Hint := FloatToStr(100 - VolumeBar.Position) + '%';
+  StatusBar.Panels[1].Text := FloatToStr((100 - VolumeBar.Position) * 2) + '%';
+  VolumeBar.Hint := FloatToStr((100 - VolumeBar.Position) * 2) + '%';
 end;
 
 procedure TMainForm.VolumeBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -6042,7 +6057,7 @@ begin
       begin
         FPlayer.SetVolume(100 - VolumeBar.Position);
       end;
-      StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
+      StatusBar.Panels[1].Text := FloatToStr((100 - VolumeBar.Position) * 2) + '%'
     end
     else if FPlaybackType = radio then
     begin
@@ -6053,7 +6068,7 @@ begin
       end;
     end;
 
-    StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
+    StatusBar.Panels[1].Text := FloatToStr((100 - VolumeBar.Position) * 2) + '%'
   end;
 end;
 
