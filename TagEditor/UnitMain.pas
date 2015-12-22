@@ -3,13 +3,14 @@ unit UnitMain;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, sTreeView, Vcl.StdCtrls,
-  sButton, Vcl.ExtCtrls, sPanel, sScrollBox, sPageControl, sSkinProvider,
-  sSkinManager, UnitTagReader, Generics.Collections, sEdit, UnitTagTypes, MediaInfoDll,
-  Pipes, Vcl.Mask, sMaskEdit, sCustomComboEdit, sToolEdit, sListView, sConst,
-  Vcl.ImgList, acAlphaImageList, JvComponentBase, JvDragDrop, sComboBox,
-  Vcl.Buttons, sBitBtn, sStatusBar, Vcl.Menus;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, sTreeView,
+  Vcl.StdCtrls, sButton, Vcl.ExtCtrls, sPanel, sScrollBox, sPageControl,
+  sSkinProvider, sSkinManager, UnitTagReader, Generics.Collections, sEdit,
+  UnitTagTypes, MediaInfoDll, Pipes, Vcl.Mask, sMaskEdit, sCustomComboEdit,
+  sToolEdit, sListView, sConst, Vcl.ImgList, acAlphaImageList, JvComponentBase,
+  JvDragDrop, sComboBox, Vcl.Buttons, sBitBtn, sStatusBar, Vcl.Menus,
+  System.ImageList;
 
 type
   TFileItem = class
@@ -74,7 +75,6 @@ type
     FAppData: string;
     FSettingsFile: TStringList;
     FFileItems: TFileItems;
-
     procedure EditChange(Sender: TObject);
     procedure GetFileInfoForDisplay(const FileName: string);
   public
@@ -272,7 +272,7 @@ end;
 
 procedure TMainForm.PipeClient1PipeMessage(Sender: TObject; Pipe: HPIPE; Stream: TStream);
 var
-  Msg: String;
+  Msg: string;
   LSkinName: string;
   I: Integer;
 begin
@@ -283,7 +283,7 @@ begin
   begin
     GetFileInfoForDisplay(Msg.Replace('File:', '', []));
     FileList.Items.Count := FFileItems.Count;
-    GetFileInfo(FFileItems.Count-1);
+    GetFileInfo(FFileItems.Count - 1);
   end
   else if Msg.StartsWith('Skin') then
   begin
@@ -322,3 +322,4 @@ begin
 end;
 
 end.
+

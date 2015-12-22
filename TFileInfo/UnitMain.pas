@@ -3,10 +3,11 @@ unit UnitMain;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, sSkinProvider, sSkinManager,
-  Vcl.ComCtrls, sListView, Vcl.StdCtrls, Vcl.Mask, sMaskEdit, sCustomComboEdit,
-  sToolEdit, MediaInfoDll, Pipes, JvComponentBase, JvDragDrop, sButton, sDialogs;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, sSkinProvider,
+  sSkinManager, Vcl.ComCtrls, sListView, Vcl.StdCtrls, Vcl.Mask, sMaskEdit,
+  sCustomComboEdit, sToolEdit, MediaInfoDll, Pipes, JvComponentBase, JvDragDrop,
+  sButton, sDialogs;
 
 type
   TMainForm = class(TForm)
@@ -60,7 +61,7 @@ begin
             LSaveFileName := ChangeFileExt(LSaveFileName, '.txt');
             LFile := TStringList.Create;
             try
-              for I := 0 to InfoList.Items.Count-1 do
+              for I := 0 to InfoList.Items.Count - 1 do
               begin
                 LFile.Add(InfoList.Items[i].Caption.Trim + ':' + InfoList.Items[i].SubItems[0].Trim);
               end;
@@ -75,7 +76,7 @@ begin
             LFile := TStringList.Create;
             try
               LFile.Add('Field;Value');
-              for I := 0 to InfoList.Items.Count-1 do
+              for I := 0 to InfoList.Items.Count - 1 do
               begin
                 LFile.Add(InfoList.Items[i].Caption.Trim + ';' + InfoList.Items[i].SubItems[0].Trim);
               end;
@@ -183,8 +184,7 @@ begin
   end;
 end;
 
-procedure TMainForm.JvDragDrop1Drop(Sender: TObject; Pos: TPoint;
-  Value: TStrings);
+procedure TMainForm.JvDragDrop1Drop(Sender: TObject; Pos: TPoint; Value: TStrings);
 begin
   FilePathEdit.Text := Value[0];
   GetFileInfo(Value[0]);
@@ -192,7 +192,7 @@ end;
 
 procedure TMainForm.PipeClient1PipeMessage(Sender: TObject; Pipe: HPIPE; Stream: TStream);
 var
-  Msg: String;
+  Msg: string;
   LSkinName: string;
   I: Integer;
 begin
@@ -241,3 +241,4 @@ begin
 end;
 
 end.
+

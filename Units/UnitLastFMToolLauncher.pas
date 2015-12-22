@@ -21,7 +21,8 @@ unit UnitLastFMToolLauncher;
 
 interface
 
-uses Classes, Windows, SysUtils, JvCreateProcess, Messages, StrUtils, ComCtrls;
+uses
+  Classes, Windows, SysUtils, JvCreateProcess, Messages, StrUtils, ComCtrls;
 
 type
   TLastFMToolLauncher = class(TObject)
@@ -33,7 +34,6 @@ type
     property IsRunning: Boolean read GetRunning;
     constructor Create();
     destructor Destroy(); override;
-
     procedure Start(const SettingsFilePath: string; const ProcessPath: string);
     procedure Stop();
   end;
@@ -42,7 +42,8 @@ implementation
 
 { TLastFMToolLauncher }
 
-uses UnitLog;
+uses
+  UnitLog;
 
 constructor TLastFMToolLauncher.Create;
 begin
@@ -124,3 +125,4 @@ begin
 end;
 
 end.
+

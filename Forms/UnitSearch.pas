@@ -23,11 +23,10 @@ unit UnitSearch;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  Vcl.ComCtrls,
-  Vcl.StdCtrls, Vcl.ExtCtrls, Generics.Collections, StrUtils, Vcl.Menus,
-  sCheckBox, sListView, sButton, sLabel, sSkinProvider;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.StdCtrls,
+  Vcl.ExtCtrls, Generics.Collections, StrUtils, Vcl.Menus, sCheckBox, sListView,
+  sButton, sLabel, sSkinProvider;
 
 type
   TSearchType = (stmusic = 0, stradio = 1);
@@ -69,7 +68,8 @@ implementation
 
 {$R *.dfm}
 
-uses UnitMain;
+uses
+  UnitMain;
 
 procedure TSearchForm.A1Click(Sender: TObject);
 var
@@ -84,15 +84,14 @@ begin
       with MainForm do
       begin
         // add if not already in the queue
-        if not FQueueLists[FSelectedPlaylistIndex].Contains(LItemIndex) then
+        if not FQueueLists[FSelectedPlaylistIndex].contains(LItemIndex) then
         begin
           // add to queue list
           FQueueLists[FSelectedPlaylistIndex].Add(LItemIndex);
           PlayList.Invalidate;
           // add to queue list
           LItem := QueueList.Items.Add;
-          LItem.Caption := FPlaylists[FSelectedPlaylistIndex][LItemIndex].Artist + ' - ' + FPlaylists[FSelectedPlaylistIndex][LItemIndex].Album + ' - ' + FPlaylists[FSelectedPlaylistIndex]
-            [LItemIndex].Title;
+          LItem.Caption := FPlaylists[FSelectedPlaylistIndex][LItemIndex].Artist + ' - ' + FPlaylists[FSelectedPlaylistIndex][LItemIndex].Album + ' - ' + FPlaylists[FSelectedPlaylistIndex][LItemIndex].Title;
           LItem.SubItems.Add(FPlaylists[FSelectedPlaylistIndex][LItemIndex].DurationStr);
           PlayList.Items[LItemIndex].Update;
         end;
@@ -234,16 +233,12 @@ begin
             for I := 0 to MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex].Count - 1 do
             begin
               Application.ProcessMessages;
-              if ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Title.ToUpperInvariant(), LQuery.ToUpperInvariant()) or
-                ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Artist.ToUpperInvariant(), LQuery.ToUpperInvariant()) or
-                ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Album.ToUpperInvariant(), LQuery.ToUpperInvariant()) or
-                ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].FullFileName.ToUpperInvariant(), LQuery.ToUpperInvariant()) then
+              if ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Title.ToUpperInvariant(), LQuery.ToUpperInvariant()) or ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Artist.ToUpperInvariant(), LQuery.ToUpperInvariant()) or ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Album.ToUpperInvariant(), LQuery.ToUpperInvariant()) or ContainsText(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].FullFileName.ToUpperInvariant(), LQuery.ToUpperInvariant()) then
               begin
                 FResultsList.Add(i);
 
                 LListItem := ResultsList.Items.Add;
-                LListItem.Caption := MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Artist + ' - ' + MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Album + ' - ' +
-                  MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Title;
+                LListItem.Caption := MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Artist + ' - ' + MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Album + ' - ' + MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].Title;
                 LListItem.SubItems.Add(MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][i].DurationStr);
               end;
             end;
@@ -272,3 +267,4 @@ begin
 end;
 
 end.
+

@@ -78,15 +78,11 @@ object EQForm: TEQForm
     Align = alClient
     TabOrder = 1
     SkinData.SkinSection = 'PANEL'
-    ExplicitLeft = 1
-    ExplicitTop = 1
-    ExplicitWidth = 631
-    ExplicitHeight = 195
     object sLabel1: TsLabel
       AlignWithMargins = True
       Left = 4
       Top = 180
-      Width = 612
+      Width = 625
       Height = 13
       Margins.Top = 0
       Align = alBottom
@@ -94,6 +90,7 @@ object EQForm: TEQForm
         ' 31       63        87       125      175     250      350     5' +
         '00       700      1K       1.4K     2K       2.8K      4K      5' +
         '.6K      8K      11K     16K'
+      ExplicitWidth = 612
     end
     object sTrackBar1: TsTrackBar
       Left = 1
@@ -115,7 +112,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar10: TsTrackBar
       Left = 36
@@ -137,7 +133,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar11: TsTrackBar
       Left = 106
@@ -159,7 +154,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar12: TsTrackBar
       Left = 211
@@ -181,7 +175,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar13: TsTrackBar
       Left = 351
@@ -203,7 +196,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar14: TsTrackBar
       Left = 456
@@ -225,7 +217,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar15: TsTrackBar
       Left = 491
@@ -247,7 +238,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar16: TsTrackBar
       Left = 526
@@ -269,7 +259,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar17: TsTrackBar
       Left = 561
@@ -291,7 +280,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar18: TsTrackBar
       Left = 596
@@ -313,7 +301,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar2: TsTrackBar
       Left = 71
@@ -335,7 +322,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar3: TsTrackBar
       Left = 141
@@ -357,7 +343,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar4: TsTrackBar
       Left = 176
@@ -379,7 +364,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar5: TsTrackBar
       Left = 246
@@ -401,7 +385,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar6: TsTrackBar
       Left = 281
@@ -423,7 +406,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar7: TsTrackBar
       Left = 316
@@ -445,7 +427,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar8: TsTrackBar
       Left = 386
@@ -467,7 +448,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
     object sTrackBar9: TsTrackBar
       Left = 421
@@ -489,7 +469,6 @@ object EQForm: TEQForm
       SkinData.SkinSection = 'TRACKBAR'
       BarOffsetV = 0
       BarOffsetH = 0
-      ExplicitHeight = 177
     end
   end
   object sSkinProvider1: TsSkinProvider

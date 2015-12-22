@@ -21,15 +21,16 @@ unit UnitMusicPlayer;
 
 interface
 
-uses System.Classes, BASS, BASS_AAC, BASSFLAC, BassWMA, BASSWV, BASS_AC3,
-  BASS_ALAC, BASS_APE, BASS_MPC, BASS_OFR, BASS_SPX, BASS_TTA, BassOPUS,
-  Windows, SysUtils, StrUtils, Generics.Collections, MediaInfoDll, Bassmix, BASS_FX;
+uses
+  System.Classes, BASS, BASS_AAC, BASSFLAC, BassWMA, BASSWV, BASS_AC3, BASS_ALAC,
+  BASS_APE, BASS_MPC, BASS_OFR, BASS_SPX, BASS_TTA, BassOPUS, Windows, SysUtils,
+  StrUtils, Generics.Collections, MediaInfoDll, Bassmix, BASS_FX, CommonTypes;
 
 type
   TPlayerStatus = (psPlaying = 0, psPaused = 1, psStopped = 2, psStalled = 3, psUnkown = 4);
 
 type
-  TEQValues = array [0 .. 17] of single;
+  TEQValues = array[0..17] of single;
 
 type
   TLevel = record
@@ -48,15 +49,13 @@ type
     FTAKPluginHandle: Cardinal;
     FMixHandle: HSTREAM;
     FPosition: int64;
-    FEQParams: array [0 .. 17] of HFX;
+    FEQParams: array[0..17] of HFX;
     FDSPHandle: Cardinal;
-
     function GetBassStreamStatus: TPlayerStatus;
     function GetTotalLength(): int64;
     function GetPosition(): int64;
     function GetPositionStr: string;
     function GetSecondDuration: Integer;
-
     function IsM4AALAC: Boolean;
     function GetBassErrorCode: Integer;
     function GetMixerPlayStatus: TPlayerStatus;
@@ -78,7 +77,6 @@ type
 
     constructor Create(const WinHandle: Cardinal);
     destructor Destroy; override;
-
     procedure Play;
     procedure PlayUrl(const URL: string);
     procedure Stop;
@@ -90,6 +88,7 @@ type
     procedure SetBuffer(const Buffer: DWORD);
     procedure ChangeEQ(const EQValues: TEQValues);
     procedure UpdatePreAmp(const PreAmpValue: single);
+    function GetData: TFFTData;
     // procedure RemoveEQ;
     procedure InitQE;
   end;
@@ -104,13 +103,14 @@ const
   UPDATE_LEVEL = 14;
   WM_COPYDATA = 74;
   UI_LEVEL_MAX = 20;
-  EQ_FRENQ: array [0 .. 17] of integer = (31, 63, 87, 125, 175, 250, 350, 500, 700, 1000, 1400, 2000, 2800, 4000, 5600, 8000, 11000, 16000);
+  EQ_FRENQ: array[0..17] of integer = (31, 63, 87, 125, 175, 250, 350, 500, 700, 1000, 1400, 2000, 2800, 4000, 5600, 8000, 11000, 16000);
 
 implementation
 
 { TMusicPlayer }
 
-uses UnitMain, UnitSettings, UnitLog, UnitEQ;
+uses
+  UnitMain, UnitSettings, UnitLog, UnitEQ;
 
 procedure DSPProc(Handle: Thandle; Channel: HSTREAM; Buffer: Pointer; Length: DWORD; user: Pointer); stdcall;
 var
@@ -122,6 +122,8 @@ begin
     MainForm.FLevels.Right := (HIWORD(LLevel) * UI_LEVEL_MAX) div LEVEL_MAX;
   except
     on E: Exception do
+
+
   end;
 end;
 
@@ -137,6 +139,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+          VisTimer.Enabled := PositionTimer.Enabled;
           // if playlist is not empty
           if PlayList.Items.Count > 0 then
           begin
@@ -205,6 +208,7 @@ begin
             LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
             PositionTimer.Enabled := False;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
             PlayItem(LRndIndex);
           end
           else
@@ -219,6 +223,7 @@ begin
           begin
             PositionTimer.Enabled := False;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
             try
               if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
               begin
@@ -227,6 +232,7 @@ begin
             finally
               PositionTimer.Enabled := True;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+              VisTimer.Enabled := PositionTimer.Enabled;
             end;
           end
           else
@@ -241,6 +247,7 @@ begin
           begin
             PositionTimer.Enabled := False;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
             try
               if FShuffleIndex + 1 < FShuffleIndexes.Count then
               begin
@@ -261,6 +268,7 @@ begin
             finally
               PositionTimer.Enabled := True;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+              VisTimer.Enabled := PositionTimer.Enabled;
             end;
           end
           else
@@ -342,6 +350,14 @@ begin
   else
     Result := psUnkown;
   end;
+end;
+
+function TMusicPlayer.GetData: TFFTData;
+var
+  LFFTData: TFFTData;
+begin
+  BASS_Mixer_ChannelGetData(FBassHandle, @LFFTData, BASS_DATA_FFT1024);
+  Result := LFFTData;
 end;
 
 function TMusicPlayer.GetMixerPlayStatus: TPlayerStatus;
@@ -441,7 +457,7 @@ var
   minute: Integer;
   strhour: string;
   strminute: string;
-  strsecond: String;
+  strsecond: string;
 begin
 
   if (Time > 0) then
@@ -695,3 +711,4 @@ begin
 end;
 
 end.
+

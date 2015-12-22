@@ -22,10 +22,10 @@ unit UnitTagReader;
 
 interface
 
-uses Classes, Windows, SysUtils, Messages, StrUtils, UnitTagTypes,
-  WMATagLibrary, APEv2Library, MP4TagLibrary,
-  FlacTagLibrary, ID3v2Library, ID3v1Library, OggVorbisAndOpusTagLibrary,
-  WAVTagLibrary;
+uses
+  Classes, Windows, SysUtils, Messages, StrUtils, UnitTagTypes, WMATagLibrary,
+  APEv2Library, MP4TagLibrary, FlacTagLibrary, ID3v2Library, ID3v1Library,
+  OggVorbisAndOpusTagLibrary, WAVTagLibrary;
 
 type
   TTagType = (id3v2 = 0, id3v1 = 1, flac = 3, ape = 4, wma = 5, mp4 = 6, ogg = 7, wav = 8);
@@ -45,18 +45,15 @@ type
     FPicType: TCoverArtType;
     FIsBusy: Boolean;
     FTagType: TTagType;
-
-    function ConvertFrameID2String(FrameID: TFrameID): String;
-    function AtomNameToString(ID: TAtomName): String;
+    function ConvertFrameID2String(FrameID: TFrameID): string;
+    function AtomNameToString(ID: TAtomName): string;
   public
     property PicStream: TStream read FPicStream;
     property PicType: TCoverArtType read FPicType;
     property IsBusy: Boolean read FIsBusy;
     property TagType: TTagType read FTagType;
-
     constructor Create;
     destructor Destroy(); override;
-
     function ReadTags(const FileName: string): TPlayItem;
     function ReadTags2(const FileName: string): TGeneralTagList;
     function ReadTagsForTagEditorList(const FileName: string): TPlayItem;
@@ -68,7 +65,7 @@ implementation
 
 { TTagReader }
 
-function TTagReader.AtomNameToString(ID: TAtomName): String;
+function TTagReader.AtomNameToString(ID: TAtomName): string;
 begin
   Result := Char(ID[0]) + Char(ID[1]) + Char(ID[2]) + Char(ID[3]);
 end;
@@ -78,7 +75,7 @@ begin
   FPicType := none;
 end;
 
-function TTagReader.ConvertFrameID2String(FrameID: TFrameID): String;
+function TTagReader.ConvertFrameID2String(FrameID: TFrameID): string;
 begin
   Result := Char(FrameID[0]) + Char(FrameID[1]) + Char(FrameID[2]) + Char(FrameID[3]);
 end;
@@ -141,6 +138,8 @@ begin
       FPicStream.Size := 0;
     except
       on E: Exception do
+
+
     end;
 
     if FID3v2Tag.LoadFromFile(FileName) = 0 then
@@ -804,3 +803,4 @@ begin
 end;
 
 end.
+

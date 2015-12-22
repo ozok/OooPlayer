@@ -22,7 +22,8 @@ unit UnitTagTypes;
 
 interface
 
-uses Classes, Generics.Collections, uKBDynamic;
+uses
+  Classes, Generics.Collections, uKBDynamic;
 
 type
   TGeneralTag = class
@@ -79,6 +80,7 @@ type
   end;
 
   TPlaylist = TList<TPlayItem>;
+
   TQueueList = TList<integer>;
 
 implementation
@@ -96,3 +98,4 @@ begin
 end;
 
 end.
+

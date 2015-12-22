@@ -3,10 +3,9 @@ unit UnitRadioRecordOptions;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  Vcl.StdCtrls,
-  Vcl.Mask, JvExMask, JvToolEdit, Vcl.ComCtrls, IniFiles, JvComponentBase,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask,
+  JvExMask, JvToolEdit, Vcl.ComCtrls, IniFiles, JvComponentBase,
   JvComputerInfoEx, ShellAPI, sComboBox, sButton, sLabel, sSkinProvider,
   sMaskEdit, sCustomComboEdit, sToolEdit;
 
@@ -41,7 +40,8 @@ implementation
 
 {$R *.dfm}
 
-uses UnitMain;
+uses
+  UnitMain;
 
 procedure TRadioRecordOptionsForm.Button1Click(Sender: TObject);
 begin
@@ -110,3 +110,4 @@ begin
 end;
 
 end.
+

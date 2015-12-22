@@ -102,9 +102,9 @@ object RadioRecordOptionsForm: TRadioRecordOptionsForm
     Width = 424
     Height = 21
     AutoSize = False
-    Color = 2038810
+    Color = 722950
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = 13417908
+    Font.Color = 12102048
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []

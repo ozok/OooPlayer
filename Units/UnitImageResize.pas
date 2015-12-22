@@ -21,7 +21,9 @@ unit UnitImageResize;
 
 interface
 
-uses Classes, Windows, SysUtils, Messages, StrUtils, Jpeg, Graphics, madGraphics, PNGImage;
+uses
+  Classes, Windows, SysUtils, Messages, StrUtils, Jpeg, Graphics, madGraphics,
+  PNGImage;
 
 type
   TImageResizer = class(TObject)
@@ -31,7 +33,6 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-
     function ResizeJpgEx(const inFile, outFile: string): Boolean;
     function ResizeJpgStream(const inFile: TStream; const TmpFile: string): Boolean;
     function ResizePNGEx(const inFile, outFile: string): Boolean;
@@ -98,7 +99,7 @@ begin
     // bitmap to hold data from jpeg
     LJpegBMP.PixelFormat := pf8bit;
     LJpegBMP.Width := LJpeg.Width;
-    LJpegBMP.Height :=LJpeg.Height;
+    LJpegBMP.Height := LJpeg.Height;
     LJpegBMP.Assign(LJpeg);
 
     try
@@ -152,12 +153,17 @@ begin
     // bitmap to hold data from jpeg
     LJpegBMP.PixelFormat := pf8bit;
     LJpegBMP.Width := LJpeg.Width;
-    LJpegBMP.Height :=LJpeg.Height;
+    LJpegBMP.Height := LJpeg.Height;
     LJpegBMP.Assign(LJpeg);
 
     try
       StretchBitmap(LJpegBMP, LBMP, nil, nil, sqVeryHigh);
     except
+      try
+        LJpeg.Free;
+        LBMP.Free;
+      except on E: Exception do
+      end;
       Exit;
     end;
 
@@ -288,3 +294,4 @@ begin
 end;
 
 end.
+

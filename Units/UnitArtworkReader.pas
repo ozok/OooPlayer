@@ -21,9 +21,10 @@ unit UnitArtworkReader;
 
 interface
 
-uses Classes, SysUtils, IdBaseComponent, IdThreadComponent, IdThread,
-  UnitTagTypes, Vcl.Imaging.jpeg, Vcl.Imaging.pngimage, UnitImageResize,
-  UnitTagReader, UnitArtworkInfo;
+uses
+  Classes, SysUtils, IdBaseComponent, IdThreadComponent, IdThread, UnitTagTypes,
+  Vcl.Imaging.jpeg, Vcl.Imaging.pngimage, UnitImageResize, UnitTagReader,
+  UnitArtworkInfo;
 
 type
   TArtworkReader = class
@@ -46,19 +47,15 @@ type
     FCoverStream: TStream;
     FCoverArtInfoStr: string;
     FArtworkInfo: TArtworkInfo;
-
     procedure ThreadRun(Sender: TIdThreadComponent);
     procedure ThreadStopped(Sender: TIdThreadComponent);
     procedure ThreadTerminate(Sender: TIdThreadComponent);
-
     procedure ResizeThreadRun(Sender: TIdThreadComponent);
     procedure ResizeThreadStopped(Sender: TIdThreadComponent);
     procedure ResizeThreadTerminate(Sender: TIdThreadComponent);
-
     procedure InfoThreadRun(Sender: TIdThreadComponent);
     procedure InfoThreadStopped(Sender: TIdThreadComponent);
     procedure InfoThreadTerminate(Sender: TIdThreadComponent);
-
     procedure LoadCoverArt;
     function LoadExternalCoverArt(const FileName: string): Boolean;
     function LoadInternalCoverArt(const FileName: string): Boolean;
@@ -68,7 +65,6 @@ type
     procedure LoadCoverFromMemory;
     procedure ResizeCoverArtToLoad(const CoverArtPath: string);
     procedure SetAppData(const Value: string);
-
     procedure UpdateInfo;
   public
     property IsBusy: Boolean read FBusy;
@@ -76,18 +72,17 @@ type
     property ExternalArtworkFiles: TStringList read FExternalArtworkFiles;
     property DefaultImgPath: string read FDefaultImgPath write FDefaultImgPath;
     property AppDataFolder: string read FAppDataFolder write SetAppData;
-
     constructor Create;
     destructor Destroy; override;
     procedure Start;
-
     procedure LoadNextExternalCoverArt;
     procedure LoadPrevExternalCoverArt;
   end;
 
 implementation
 
-uses UnitMain, UnitSettings, UnitLog;
+uses
+  UnitMain, UnitSettings, UnitLog;
 
 { TArtworkReader }
 
@@ -156,14 +151,14 @@ end;
 function TArtworkReader.ListExternalArtworkFiles(const Dir: string): string;
 var
   Search: TSearchRec;
-  FileName: String;
-  Extension: String;
+  FileName: string;
+  Extension: string;
 begin
   Result := '';
   if DirectoryExists(Dir) then
   begin
     if (FindFirst(Dir + '\*.*', faAnyFile, Search) = 0) then
-    Begin
+    begin
       repeat
         if (Search.Name <> '.') and (Search.Name <> '..') then
         begin
@@ -561,3 +556,4 @@ begin
 end;
 
 end.
+

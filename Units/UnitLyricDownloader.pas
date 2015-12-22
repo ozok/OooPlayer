@@ -21,9 +21,9 @@ unit UnitLyricDownloader;
 
 interface
 
-uses System.Classes, IdBaseComponent, IdThreadComponent, StrUtils, SysUtils,
-  IdThread, JvComponentBase,
-  JvUrlListGrabber, JvUrlGrabbers, JvTypes, Rest.Utils;
+uses
+  System.Classes, IdBaseComponent, IdThreadComponent, StrUtils, SysUtils,
+  IdThread, JvComponentBase, JvUrlListGrabber, JvUrlGrabbers, JvTypes, Rest.Utils;
 
 type
   TLyricDownloaderStatus = (lsDownloading = 0, lsDone = 1, lsError = 2, lsIdle = 3);
@@ -54,10 +54,8 @@ type
     procedure ThreadRun(Sender: TIdThreadComponent);
     procedure ThreadStopped(Sender: TIdThreadComponent);
     procedure ThreadTerminate(Sender: TIdThreadComponent);
-
     procedure DoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string);
     procedure Error(Sender: TObject; ErrorMsg: string);
-
     function FixStrings(const Str: string): string;
     function FixLine(const Str: string): string;
     procedure UpdateMainUI;
@@ -71,10 +69,8 @@ type
     property Status: TLyricDownloaderStatus read FStatus;
     property Lyrics: TStringList read FLyricFile;
     property ItemInfo: TItemInfo read FItemInfo write FItemInfo;
-
     procedure Start;
     procedure Stop;
-
     constructor Create(const LyricFolder: string);
     destructor Destroy; override;
   end;
@@ -83,7 +79,8 @@ implementation
 
 { TLyricDownloader }
 
-uses UnitMain, UnitLog, UnitSettings;
+uses
+  UnitMain, UnitLog, UnitSettings;
 
 procedure TLyricDownloader.AddToLog;
 begin
@@ -551,3 +548,4 @@ begin
 end;
 
 end.
+

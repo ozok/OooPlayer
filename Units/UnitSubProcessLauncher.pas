@@ -21,7 +21,8 @@ unit UnitSubProcessLauncher;
 
 interface
 
-uses Classes, Windows, SysUtils, JvCreateProcess, Messages, StrUtils, ComCtrls;
+uses
+  Classes, Windows, SysUtils, JvCreateProcess, Messages, StrUtils, ComCtrls;
 
 type
   TSubProcessLauncher = class(TObject)
@@ -33,14 +34,14 @@ type
     property IsRunning: Boolean read GetRunning;
     constructor Create();
     destructor Destroy(); override;
-
     procedure Start(const SettingsFilePath: string; const ProcessPath: string);
     procedure Stop();
   end;
 
 implementation
 
-uses UnitLog;
+uses
+  UnitLog;
 
 { TSubProcessLauncher }
 
@@ -124,3 +125,4 @@ begin
 end;
 
 end.
+

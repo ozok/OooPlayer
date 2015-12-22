@@ -23,14 +23,12 @@ unit UnitSettings;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  Vcl.StdCtrls,
-  Vcl.ComCtrls, IniFiles, Vcl.Mask, JvExMask, JvSpin, JvThread, JvComponentBase,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
+  IniFiles, Vcl.Mask, JvExMask, JvSpin, JvThread, JvComponentBase,
   JvUrlListGrabber, JvUrlGrabbers, ShellAPI, sComboBox, sLabel, sButton,
   sCheckBox, sPageControl, sSkinProvider, sEdit, sSpinEdit, IdGlobal, IdHash,
-  IdHashMessageDigest,
-  sTrackBar, sGroupBox;
+  IdHashMessageDigest, sTrackBar, sGroupBox;
 
 type
   TSettingsForm = class(TForm)
@@ -95,7 +93,6 @@ type
     { Public declarations }
     LastFMUser: string;
     LastFMHashedPass: string;
-
     procedure LoadSettings;
     procedure SaveSettings;
   end;
@@ -107,7 +104,8 @@ implementation
 
 {$R *.dfm}
 
-uses UnitMain, UnitAbout, UnitLog;
+uses
+  UnitMain, UnitAbout, UnitLog;
 
 procedure TSettingsForm.BrightnessBarChange(Sender: TObject);
 begin
@@ -350,3 +348,4 @@ begin
 end;
 
 end.
+

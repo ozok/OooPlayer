@@ -3,10 +3,9 @@ unit UnitAbout;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  Vcl.StdCtrls,
-  Vcl.ExtCtrls, ShellAPI, sButton, sLabel, sSkinProvider;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  ShellAPI, sButton, sLabel, sSkinProvider;
 
 type
   TAboutForm = class(TForm)
@@ -46,7 +45,8 @@ implementation
 
 {$R *.dfm}
 
-uses UnitMain;
+uses
+  UnitMain;
 
 procedure TAboutForm.Button1Click(Sender: TObject);
 begin
@@ -100,3 +100,4 @@ begin
 end;
 
 end.
+

@@ -23,29 +23,24 @@ unit UnitMain;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  Vcl.StdCtrls,
-  Vcl.ComCtrls, Vcl.ExtCtrls, Generics.Collections, Vcl.Menus, JvExControls,
-  JvArrowButton, JvComponentBase, JvSearchFiles, JvBaseDlg, JvBrowseFolder,
-  MediaInfoDll, JvExComCtrls, JvComCtrls, Vcl.ImgList, JvThreadTimer,
-  JvExStdCtrls,
-  JvListBox, IniFiles, Vcl.Buttons, JvFormPlacement, JvAppStorage,
-  JvAppIniStorage, StrUtils, ShellAPI, JvComputerInfoEx, UnitTagTypes,
-  UnitTagReader,
-  PNGImage, JvDragDrop, JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon,
-  Jpeg, UnitMusicPlayer, Bass, BASSenc, IdBaseComponent, IdThreadComponent,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
+  Vcl.ExtCtrls, Generics.Collections, Vcl.Menus, JvExControls, JvArrowButton,
+  JvComponentBase, JvSearchFiles, JvBaseDlg, JvBrowseFolder, MediaInfoDll,
+  JvExComCtrls, JvComCtrls, Vcl.ImgList, JvThreadTimer, JvExStdCtrls, JvListBox,
+  IniFiles, Vcl.Buttons, JvFormPlacement, JvAppStorage, JvAppIniStorage,
+  StrUtils, ShellAPI, JvComputerInfoEx, UnitTagTypes, UnitTagReader, PNGImage,
+  JvDragDrop, JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon, Jpeg,
+  UnitMusicPlayer, Bass, BASSenc, IdBaseComponent, IdThreadComponent,
   UnitLyricDownloader, UnitTagWriter, UnitImageResize, JvAnimatedImage,
-  JvGIFCtrl,
-  JvExExtCtrls, JvImage, JvAppInst, UnitArtworkReader, Vcl.Taskbar,
-  System.Win.TaskbarCore, sSkinManager, sDialogs, sMemo, sListView,
-  sPageControl, sStatusBar, sLabel, sComboBox, sBitBtn, sPanel, sBevel,
-  sSplitter, sSkinProvider, acProgressBar, sTrackBar, acImage, acPNG,
-  acAlphaHints, acAlphaImageList, sButton, Vcl.AppEvnts,
-  acShellCtrls, sComboBoxes, sTreeView, sListBox, System.Types,
-  sEdit, sGauge, UnitLastFMToolLauncher, Pipes, UnitSubProcessLauncher,
-  GraphUtil,
-  Vcl.XPMan, UnitCueParser, System.ImageList;
+  JvGIFCtrl, JvExExtCtrls, JvImage, JvAppInst, UnitArtworkReader, Vcl.Taskbar,
+  System.Win.TaskbarCore, sSkinManager, sDialogs, sMemo, sListView, sPageControl,
+  sStatusBar, sLabel, sComboBox, sBitBtn, sPanel, sBevel, sSplitter,
+  sSkinProvider, acProgressBar, sTrackBar, acImage, acPNG, acAlphaHints,
+  acAlphaImageList, sButton, Vcl.AppEvnts, acShellCtrls, sComboBoxes, sTreeView,
+  sListBox, System.Types, sEdit, sGauge, UnitLastFMToolLauncher, Pipes,
+  UnitSubProcessLauncher, GraphUtil, Vcl.XPMan, UnitCueParser, System.ImageList,
+  spectrum_vis, CommonTypes;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -217,19 +212,19 @@ type
     CoverImage: TJvImage;
     VolumePnl: TsPanel;
     VolumeBar: TsTrackBar;
-    sPanel5: TsPanel;
-    Panel1: TsPanel;
+    PlaybackPanel: TsPanel;
+    PositionPanel: TsPanel;
     PositionLabel: TsLabel;
-    sPanel1: TsPanel;
+    ControlsPanel: TsPanel;
     InfoPanel: TsPanel;
     TitleLabel: TsLabel;
-    sPanel2: TsPanel;
+    PlayControlsPanel: TsPanel;
     NextBtn: TsBitBtn;
     PauseBtn: TsBitBtn;
     PlayBtn: TsBitBtn;
     PrevBtn: TsBitBtn;
     StopBtn: TsBitBtn;
-    sPanel3: TsPanel;
+    SettingsPanel: TsPanel;
     LogsBtn: TsBitBtn;
     EQBtn: TsBitBtn;
     SearchBtn: TsBitBtn;
@@ -254,7 +249,6 @@ type
     RenamePlaylistBtn: TsButton;
     sSplitter2: TsSplitter;
     LastFMLaunchTimer: TTimer;
-    InfoLabel: TsLabel;
     PipeServer: TPipeServer;
     TrayIcon: TJvTrayIcon;
     UpdateChecker: TJvHttpUrlGrabber;
@@ -272,6 +266,8 @@ type
     LeftPanelBtn: TsBitBtn;
     RightPanelBtn: TsBitBtn;
     PositionBar: TsTrackBar;
+    VisTimer: TJvThreadTimer;
+    PaintFrame: TPaintBox;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -403,7 +399,7 @@ type
     procedure RadiosViewClick(Sender: TObject);
     procedure H3Click(Sender: TObject);
     procedure H4Click(Sender: TObject);
-    procedure sPanel5MouseEnter(Sender: TObject);
+    procedure PlaybackPanelMouseEnter(Sender: TObject);
     procedure F3Click(Sender: TObject);
     procedure ReloadLyricTitleBtnClick(Sender: TObject);
     procedure PlaylistViewResize(Sender: TObject);
@@ -415,6 +411,7 @@ type
     procedure FormMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure FormMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure DirectoryListClick(Sender: TObject);
+    procedure VisTimerTimer(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -439,41 +436,30 @@ type
     FTagFiles: TStringList;
     FInfoFiles: TStringList;
     FCategoryIndex: integer;
-
     procedure AddFile(const FileName: string);
     procedure AddCueSheet(const CUEPath: string);
     function GetDurationEx(const FileName: string): integer;
     procedure ReScanFile(const FileIndex: integer);
-
     procedure LoadPlayList;
     procedure SavePlayList;
     function GeneratePlaylistFileName: string;
-
     procedure LoadSettings;
     procedure SaveSettings;
-
     procedure ScrollToCurrentSong;
-
     procedure LoadM3UPlaylist(const PlaylistPath: string);
     procedure LoadPPFPlaylist(const PlaylistPath: string);
     procedure SaveM3UPlayList(const FileName: string; const UTF8: Boolean);
     procedure SavePPFPlaylist(const FileName: string);
-
     procedure CreateUserRadioLists;
     procedure MoveRadioStations;
-
     procedure WriteTagsToRecordFile;
-
     procedure UpdateOverlayIcon(const Index: integer);
-
     procedure ChangeSkin(const SkinIndex: integer);
-
     procedure LastFMScrobble;
   public
     { Public declarations }
     // encoder paths
     FLamePath, FOggEncPath, FOpusEncPath, FFDKPath: string;
-
     FPlayListFiles: TPlaylistFiles;
     FStoppedByUser: Boolean;
     FPlaylists: TList<TPlaylist>;
@@ -499,15 +485,11 @@ type
     FWinHandle: HWND;
     FActivelyPlayedPlaylistIndex: integer;
     FLevels: TLevel;
-
     procedure Log(s: string);
-
     procedure ScrollToItem(const ItemIndex: integer);
-
     procedure PlayItem(const ItemIndex: integer);
     procedure PlayItemUIUpdate;
     function PlayWindowTitle(const Song, Artist, Album: string): string;
-
     function RemoveInvalidChars(const Title: string): string;
 
     // handles msgessent from radio thread
@@ -516,7 +498,6 @@ type
     // Radio player funcs
     function IsRadioPlayerPaused: Boolean;
     function IsRadioPlayerStopped: Boolean;
-
     procedure LoadRadioStations;
     procedure ReloadRadioCategory;
     procedure PlayRadio(const URL: Ansistring);
@@ -538,17 +519,12 @@ type
     function CreateLyricFileName(const Title, Artist, Album: string): string;
     function BassErrorCodeToString(const ErrorCode: integer): string;
     procedure SetPlayerBuffer(const Buffer: DWORD);
-
     procedure HandlePlaybackFromBassThread;
-
     procedure UpdateLyricBoxWidth;
-
     procedure UpdateEQ;
     procedure DisableEQ;
     procedure EnableEQ;
-
     procedure ChangePlaylistColumnNames;
-
     procedure GenerateShuffleList;
   end;
 
@@ -584,8 +560,9 @@ implementation
 
 {$R *.dfm}
 
-uses UnitSearch, UnitSettings, UnitLog, UnitAbout, UnitRadioInfo,
-  UnitNewRadio, UnitRadioRecordOptions, UnitEQ;
+uses
+  UnitSearch, UnitSettings, UnitLog, UnitAbout, UnitRadioInfo, UnitNewRadio,
+  UnitRadioRecordOptions, UnitEQ;
 
 // radio sync func
 procedure StatusProc(Buffer: Pointer; len: DWORD; user: Pointer); stdcall;
@@ -627,11 +604,11 @@ begin
   meta := BASS_ChannelGetTags(FRadioHandle, BASS_TAG_META);
   if (meta <> nil) then
   begin
-    p := Pos('StreamTitle=', String(Ansistring(meta)));
+    p := Pos('StreamTitle=', string(Ansistring(meta)));
     if (p = 0) then
       Exit;
     p := p + 13;
-    SendMessage(WinHandle, WM_INFO_UPDATE, UPDATE_META, DWORD(PAnsiChar(Ansistring(Copy(meta, p, Pos(';', String(meta)) - p - 1)))));
+    SendMessage(WinHandle, WM_INFO_UPDATE, UPDATE_META, DWORD(PAnsiChar(Ansistring(Copy(meta, p, Pos(';', string(meta)) - p - 1)))));
   end;
 end;
 
@@ -655,7 +632,7 @@ begin
     if PlayList.Items[i].Selected then
     begin
       // add if not already in the queue
-      if not FQueueLists[FSelectedPlaylistIndex].Contains(i) then
+      if not FQueueLists[FSelectedPlaylistIndex].contains(i) then
       begin
         // add to queue list
         FQueueLists[FSelectedPlaylistIndex].Add(i);
@@ -1192,7 +1169,7 @@ end;
 function TMainForm.BassErrorCodeToString(const ErrorCode: integer): string;
 begin
   case ErrorCode of
-    - 1:
+    -1:
       Result := 'Unkown error';
     1:
       Result := 'Not enough memory';
@@ -1472,7 +1449,7 @@ end;
 
 function TMainForm.CreateLyricFileName(const Title, Artist, Album: string): string;
 const
-  InvalidChars: array [0 .. 7] of char = ('<', '>', ':', '"', '|', '/', '?', '*');
+  InvalidChars: array[0..7] of char = ('<', '>', ':', '"', '|', '/', '?', '*');
 var
   I: Integer;
 begin
@@ -1700,9 +1677,7 @@ begin
         end
         else
         begin
-          if (Extension = '.mp3') or (Extension = '.aac') or (Extension = '.ogg') or (Extension = '.opus') or (Extension = '.flac') or (Extension = '.alac') or (Extension = '.ape') or
-            (Extension = '.mpc') or (Extension = '.tta') or (Extension = '.wv') or (Extension = '.wma') or (Extension = '.ac3') or (Extension = '.spx') or (Extension = '.tak') or
-            (Extension = '.ofr') or (Extension = '.wav') or (Extension = '.cue') then
+          if (Extension = '.mp3') or (Extension = '.aac') or (Extension = '.ogg') or (Extension = '.opus') or (Extension = '.flac') or (Extension = '.alac') or (Extension = '.ape') or (Extension = '.mpc') or (Extension = '.tta') or (Extension = '.wv') or (Extension = '.wma') or (Extension = '.ac3') or (Extension = '.spx') or (Extension = '.tak') or (Extension = '.ofr') or (Extension = '.wav') or (Extension = '.cue') then
           begin
             AddFile(Value[i]);
             FLastDir := ExtractFileDir(Value[i]);
@@ -1958,6 +1933,14 @@ begin
   FTagFiles := TStringList.Create;
   FInfoFiles := TStringList.Create;
 
+  Spectrum := TSpectrum.Create(PaintFrame.Width, PaintFrame.Height);
+  Spectrum.Pen := clGrayText;
+  Spectrum.Peak := clGrayText;
+  Spectrum.Mode := 1;
+  Spectrum.DrawPeak := True;
+  Spectrum.PeakFallOff := 3;
+  Spectrum.Width := (PaintFrame.Width - 127) div 128;
+
   LRadios := TStringList.Create;
   try
     if FileExists(ExtractFileDir(Application.ExeName) + '\radios.txt') then
@@ -2051,7 +2034,8 @@ begin
     RadioList.Columns[1].Width := (RadioList.ClientWidth - 20) div RadioList.Columns.Count;
     RadioList.Columns[2].Width := (RadioList.ClientWidth - 20) div RadioList.Columns.Count;
     QueueList.Columns[0].Width := QueueList.ClientWidth - QueueList.Columns[1].Width;
-    StatusBar.Panels[0].Width := StatusBar.ClientWidth - StatusBar.Panels[1].Width;
+    StatusBar.Panels[1].Width := StatusBar.ClientWidth - StatusBar.Panels[2].Width - StatusBar.Panels[0].Width;
+    Spectrum.Width := PaintFrame.Width div 130;
   except
     on E: Exception do
       Log(E.Message);
@@ -2397,6 +2381,7 @@ begin
           LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+          VisTimer.Enabled := PositionTimer.Enabled;
         end
         else
         begin
@@ -2422,6 +2407,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+          VisTimer.Enabled := PositionTimer.Enabled;
 
           try
             if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
@@ -2431,6 +2417,7 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
 
           end;
         end
@@ -2458,6 +2445,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+          VisTimer.Enabled := PositionTimer.Enabled;
 
           try
             if FShuffleIndex + 1 < FShuffleIndexes.Count then
@@ -2471,6 +2459,7 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
 
           end;
         end
@@ -2598,6 +2587,8 @@ begin
 
   except
     on E: Exception do
+
+
   end;
 
 end;
@@ -2624,8 +2615,7 @@ begin
       if (Length(FLastFMArtist) > 0) and (Length(FLastFMSong) > 0) then
       begin
         FLastFMToolLauncher.Stop;
-        FLastFMToolLauncher.Start('" " "' + SettingsForm.LastFMUser.Trim + '" "' + SettingsForm.LastFMHashedPass + '" "' + FLastFMArtist + '" "' + FLastFMSong + '"',
-          ExtractFileDir(Application.ExeName) + '\lastfm\lastfmscrobble.exe');
+        FLastFMToolLauncher.Start('" " "' + SettingsForm.LastFMUser.Trim + '" "' + SettingsForm.LastFMHashedPass + '" "' + FLastFMArtist + '" "' + FLastFMSong + '"', ExtractFileDir(Application.ExeName) + '\lastfm\lastfmscrobble.exe');
       end;
     end;
   end;
@@ -3143,8 +3133,7 @@ begin
     begin
       if not FileExists(FAppDataFolder + '\' + RadiosView.Items[i].SubItems[0] + '.txt') then
       begin
-        CopyFile(PWideChar(ExtractFileDir(Application.ExeName) + '\Radios\' + RadiosView.Items[i].SubItems[0] + '.txt'),
-          PWideChar(FAppDataFolder + '\' + RadiosView.Items[i].SubItems[0] + '.txt'), True);
+        CopyFile(PWideChar(ExtractFileDir(Application.ExeName) + '\Radios\' + RadiosView.Items[i].SubItems[0] + '.txt'), PWideChar(FAppDataFolder + '\' + RadiosView.Items[i].SubItems[0] + '.txt'), True);
       end;
     end;
   end;
@@ -3180,6 +3169,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+          VisTimer.Enabled := PositionTimer.Enabled;
 
           // first try queue
           if FQueueLists[FSelectedPlaylistIndex].Count > 0 then
@@ -3242,6 +3232,7 @@ begin
           LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+          VisTimer.Enabled := PositionTimer.Enabled;
 
           PlayItem(LRndIndex);
           PlayItemUIUpdate;
@@ -3250,6 +3241,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+          VisTimer.Enabled := PositionTimer.Enabled;
 
           try
             if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
@@ -3260,6 +3252,7 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
 
           end;
         end;
@@ -3267,6 +3260,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+          VisTimer.Enabled := PositionTimer.Enabled;
           try
             if FShuffleIndex + 1 < FShuffleIndexes.Count then
             begin
@@ -3280,6 +3274,7 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
           end;
         end;
     end;
@@ -3395,7 +3390,8 @@ begin
       FPlayer.Pause;
       PositionTimer.Enabled := False;
       ProgressTimer.Enabled := PositionTimer.Enabled;
-      InfoLabel.Caption := 'Paused | ' + FCurrentItemInfo.InfoStr;
+      VisTimer.Enabled := PositionTimer.Enabled;
+      StatusBar.Panels[1].Text := 'Paused | ' + FCurrentItemInfo.InfoStr;
 
       Taskbar2.ProgressState := TTaskBarProgressState.Paused;
       if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) then
@@ -3410,7 +3406,8 @@ begin
       FPlayer.SetVolume(100 - VolumeBar.Position);
       PositionTimer.Enabled := True;
       ProgressTimer.Enabled := PositionTimer.Enabled;
-      InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
+      VisTimer.Enabled := PositionTimer.Enabled;
+      StatusBar.Panels[1].Text := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
       Taskbar2.ProgressState := TTaskBarProgressState.Normal;
       if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) then
@@ -3476,7 +3473,7 @@ begin
   if FTagFiles.Count > 0 then
   begin
     for I := 0 to FTagFiles.Count - 1 do
-    Begin
+    begin
       if not PipeServer.Broadcast(PWideChar('File:' + FTagFiles[i])^, Length('File:' + FTagFiles[i]) * SizeOf(WideChar)) then
       begin
         LogForm.LogList.Lines.Add('Unable to broadcast tag editor message.');
@@ -3485,12 +3482,12 @@ begin
           LogForm.Show;
         end;
       end;
-    End;
+    end;
   end
   else if FInfoFiles.Count > 0 then
   begin
     for I := 0 to FInfoFiles.Count - 1 do
-    Begin
+    begin
       if not PipeServer.Broadcast(PWideChar('FileInfo:' + FInfoFiles[i])^, Length('FileInfo:' + FInfoFiles[i]) * SizeOf(WideChar)) then
       begin
         LogForm.LogList.Lines.Add('Unable to broadcast info message.');
@@ -3499,7 +3496,7 @@ begin
           LogForm.Show;
         end;
       end;
-    End;
+    end;
   end;
   PipeServer.Broadcast(PWideChar(LSkinName)^, Length(LSkinName) * SizeOf(WideChar));
   PipeServer.Broadcast(PWideChar(LHue)^, Length(LHue) * SizeOf(WideChar));
@@ -3533,7 +3530,8 @@ begin
       FPlayer.SetVolume(100 - VolumeBar.Position);
       PositionTimer.Enabled := True;
       ProgressTimer.Enabled := PositionTimer.Enabled;
-      InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
+      VisTimer.Enabled := PositionTimer.Enabled;
+      StatusBar.Panels[1].Text := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
       Taskbar2.ProgressState := TTaskBarProgressState.Normal;
       if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) then
@@ -3564,6 +3562,7 @@ begin
                 begin
                   PositionTimer.Enabled := False;
                   ProgressTimer.Enabled := PositionTimer.Enabled;
+                  VisTimer.Enabled := PositionTimer.Enabled;
 
                   PlayItem(PlayList.ItemIndex);
                   PlayItemUIUpdate;
@@ -3581,6 +3580,7 @@ begin
                     // if stopped start platyng
                     PositionTimer.Enabled := False;
                     ProgressTimer.Enabled := PositionTimer.Enabled;
+                    VisTimer.Enabled := PositionTimer.Enabled;
 
                     PlayItem(PlayList.ItemIndex);
                     PlayItemUIUpdate;
@@ -3612,6 +3612,7 @@ begin
               LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
               PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+              VisTimer.Enabled := PositionTimer.Enabled;
 
               PlayItem(LRndIndex);
               PlayItemUIUpdate;
@@ -3620,6 +3621,7 @@ begin
             begin
               PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+              VisTimer.Enabled := PositionTimer.Enabled;
 
               try
                 if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
@@ -3630,6 +3632,7 @@ begin
               finally
                 PositionTimer.Enabled := True;
                 ProgressTimer.Enabled := PositionTimer.Enabled;
+                VisTimer.Enabled := PositionTimer.Enabled;
 
               end;
             end;
@@ -3637,6 +3640,7 @@ begin
             begin
               PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+              VisTimer.Enabled := PositionTimer.Enabled;
 
               try
                 if FShuffleIndex + 1 < FShuffleIndexes.Count then
@@ -3651,6 +3655,7 @@ begin
               finally
                 PositionTimer.Enabled := True;
                 ProgressTimer.Enabled := PositionTimer.Enabled;
+                VisTimer.Enabled := PositionTimer.Enabled;
 
               end;
             end;
@@ -3734,7 +3739,8 @@ begin
             FPlayer.SetVolume(100 - VolumeBar.Position);
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
-            InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
+            VisTimer.Enabled := PositionTimer.Enabled;
+            StatusBar.Panels[1].Text := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
             Taskbar2.ProgressState := TTaskBarProgressState.Normal;
             UpdateOverlayIcon(1);
@@ -3761,6 +3767,7 @@ begin
                       begin
                         PositionTimer.Enabled := False;
                         ProgressTimer.Enabled := PositionTimer.Enabled;
+                        VisTimer.Enabled := PositionTimer.Enabled;
 
                         PlayItem(PlayList.ItemIndex);
                         PlayItemUIUpdate;
@@ -3778,6 +3785,7 @@ begin
                           // if stopped start platyng
                           PositionTimer.Enabled := False;
                           ProgressTimer.Enabled := PositionTimer.Enabled;
+                          VisTimer.Enabled := PositionTimer.Enabled;
 
                           PlayItem(PlayList.ItemIndex);
                           PlayItemUIUpdate;
@@ -3809,6 +3817,7 @@ begin
                     LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
                     PositionTimer.Enabled := False;
                     ProgressTimer.Enabled := PositionTimer.Enabled;
+                    VisTimer.Enabled := PositionTimer.Enabled;
 
                     PlayItem(LRndIndex);
                     PlayItemUIUpdate;
@@ -3817,6 +3826,7 @@ begin
                   begin
                     PositionTimer.Enabled := False;
                     ProgressTimer.Enabled := PositionTimer.Enabled;
+                    VisTimer.Enabled := PositionTimer.Enabled;
 
                     try
                       if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
@@ -3827,6 +3837,7 @@ begin
                     finally
                       PositionTimer.Enabled := True;
                       ProgressTimer.Enabled := PositionTimer.Enabled;
+                      VisTimer.Enabled := PositionTimer.Enabled;
 
                     end;
                   end;
@@ -3834,6 +3845,7 @@ begin
                   begin
                     PositionTimer.Enabled := False;
                     ProgressTimer.Enabled := PositionTimer.Enabled;
+                    VisTimer.Enabled := PositionTimer.Enabled;
 
                     try
                       if FShuffleIndex + 1 < FShuffleIndexes.Count then
@@ -3848,6 +3860,7 @@ begin
                     finally
                       PositionTimer.Enabled := True;
                       ProgressTimer.Enabled := PositionTimer.Enabled;
+                      VisTimer.Enabled := PositionTimer.Enabled;
 
                     end;
                   end;
@@ -3980,6 +3993,7 @@ begin
   StopRadio;
   PositionTimer.Enabled := False;
   ProgressTimer.Enabled := PositionTimer.Enabled;
+  VisTimer.Enabled := PositionTimer.Enabled;
   if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < FPlaylists[FSelectedPlaylistIndex].Count) then
   begin
     PlayList.Items[FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Update;
@@ -4019,13 +4033,14 @@ begin
         with FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex] do
         begin
           FCurrentItemInfo.InfoStr := Bitrate + ' | ' + Channels + ' | ' + Codec + ' | ' + SampleRate + ' hz | ' + LPlayCountStr + ' | ' + DurationStr;
-          InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
+          StatusBar.Panels[1].Text := 'Playing | ' + FCurrentItemInfo.InfoStr;
         end;
 
         // position to default
         PositionBar.Position := 0;
         PositionTimer.Enabled := True;
         ProgressTimer.Enabled := PositionTimer.Enabled;
+        VisTimer.Enabled := PositionTimer.Enabled;
         // reset playlist
         PlayList.ItemIndex := -1;
         PlayList.ItemIndex := FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex;
@@ -4089,14 +4104,10 @@ begin
         ReloadLyricTitleBtn.Enabled := False;
 
         // load existing lyric file
-        if FileExists(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title,
-          FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist,
-          FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Album)) and SettingsForm.ShowDownloadedLyrics.Checked then
+        if FileExists(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title, FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist, FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Album)) and SettingsForm.ShowDownloadedLyrics.Checked then
         begin
           LyricList.Items.Clear;
-          LyricList.Items.LoadFromFile(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title,
-            FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist,
-            FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Album));
+          LyricList.Items.LoadFromFile(FAppDataFolder + '\lyric\' + CreateLyricFileName(FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Title, FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Artist, FPlaylists[FSelectedPlaylistIndex][FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex].Album));
           LyricStatusLabel.Caption := 'Loaded local lyric file';
           LyricSearchBtn.Enabled := True;
           LyricArtistEdit.Enabled := True;
@@ -4318,7 +4329,7 @@ begin
           end
           else
           begin
-            if FQueueLists[FSelectedPlaylistIndex].Contains(Item.Index) then
+            if FQueueLists[FSelectedPlaylistIndex].contains(Item.Index) then
             begin
               Item.StateIndex := 2;
             end
@@ -4331,7 +4342,7 @@ begin
         else
         begin
           Item.StateIndex := -1;
-          if FQueueLists[FSelectedPlaylistIndex].Contains(Item.Index) then
+          if FQueueLists[FSelectedPlaylistIndex].contains(Item.Index) then
           begin
             Item.StateIndex := 2;
           end
@@ -4355,6 +4366,7 @@ begin
   begin
     PositionTimer.Enabled := False;
     ProgressTimer.Enabled := PositionTimer.Enabled;
+    VisTimer.Enabled := PositionTimer.Enabled;
 
     PlayItem(PlayList.ItemIndex);
     PlayItemUIUpdate;
@@ -4458,7 +4470,8 @@ begin
   // PlayList.Invalidate;
   PositionTimer.Enabled := False;
   ProgressTimer.Enabled := PositionTimer.Enabled;
-  InfoLabel.Caption := '';
+  VisTimer.Enabled := PositionTimer.Enabled;
+  StatusBar.Panels[1].Text := '';
 
   FPlaybackType := radio;
   RadioConnectionBar.Visible := True;
@@ -4522,6 +4535,7 @@ begin
   begin
     PositionTimer.Enabled := False;
     ProgressTimer.Enabled := PositionTimer.Enabled;
+    VisTimer.Enabled := PositionTimer.Enabled;
 
     try
       if not FPlayer.SetPosition((FPlayer.TotalLength * PositionBar.Position) div High(Int64)) then
@@ -4531,6 +4545,7 @@ begin
     finally
       PositionTimer.Enabled := True;
       ProgressTimer.Enabled := PositionTimer.Enabled;
+      VisTimer.Enabled := PositionTimer.Enabled;
 
     end;
   end;
@@ -4546,6 +4561,7 @@ begin
   begin
     PositionTimer.Enabled := False;
     ProgressTimer.Enabled := False;
+    VisTimer.Enabled := PositionTimer.Enabled;
     // the new position on the trackbar
     NewTractBarPosition := Round((X / PositionBar.ClientWidth) * FCurrentItemInfo.DurationBass);
     if (NewTractBarPosition <> PositionBar.Position) then
@@ -4562,6 +4578,7 @@ begin
         FPlayer.Resume;
         PositionTimer.Enabled := True;
         ProgressTimer.Enabled := True;
+        VisTimer.Enabled := PositionTimer.Enabled;
       end;
     end;
   end;
@@ -4593,6 +4610,7 @@ begin
     begin
       PositionTimer.Enabled := False;
       ProgressTimer.Enabled := PositionTimer.Enabled;
+      VisTimer.Enabled := PositionTimer.Enabled;
     end;
   end;
 end;
@@ -4616,6 +4634,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+          VisTimer.Enabled := PositionTimer.Enabled;
 
           if FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > 0 then
           begin
@@ -4637,6 +4656,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+          VisTimer.Enabled := PositionTimer.Enabled;
 
           try
             if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
@@ -4647,6 +4667,7 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
 
           end;
         end;
@@ -4654,6 +4675,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+          VisTimer.Enabled := PositionTimer.Enabled;
           try
             if FShuffleIndex > 0 then
             begin
@@ -4667,6 +4689,7 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
           end;
         end;
     end;
@@ -4704,8 +4727,7 @@ procedure TMainForm.QueueListData(Sender: TObject; Item: TListItem);
 begin
   if Item.Index < FQueueLists[FSelectedPlaylistIndex].Count then
   begin
-    Item.Caption := FPlaylists[FSelectedPlaylistIndex][FQueueLists[FSelectedPlaylistIndex][Item.Index]].Artist + ' - ' + FPlaylists[FSelectedPlaylistIndex]
-      [FQueueLists[FSelectedPlaylistIndex][Item.Index]].Album + ' - ' + FPlaylists[FSelectedPlaylistIndex][FQueueLists[FSelectedPlaylistIndex][Item.Index]].Title;
+    Item.Caption := FPlaylists[FSelectedPlaylistIndex][FQueueLists[FSelectedPlaylistIndex][Item.Index]].Artist + ' - ' + FPlaylists[FSelectedPlaylistIndex][FQueueLists[FSelectedPlaylistIndex][Item.Index]].Album + ' - ' + FPlaylists[FSelectedPlaylistIndex][FQueueLists[FSelectedPlaylistIndex][Item.Index]].Title;
     Item.SubItems.Add(FPlaylists[FSelectedPlaylistIndex][FQueueLists[FSelectedPlaylistIndex][Item.Index]].DurationStr);
   end;
 end;
@@ -5053,6 +5075,7 @@ begin
       RadioThread.Synchronize(RadioResetUI);
     except
       on E: Exception do
+
 
     end;
     SendMessage(WinHandle, WM_INFO_UPDATE, STOP_IMG_ANIM, LCacheProgress);
@@ -5507,8 +5530,7 @@ procedure TMainForm.S7Click(Sender: TObject);
 begin
   if PlayList.ItemIndex > -1 then
   begin
-    ShellExecute(handle, 'open', PChar('http://www.youtube.com/results?search_query=' + FPlaylists[FSelectedPlaylistIndex][PlayList.ItemIndex].Artist + '+' + FPlaylists[FSelectedPlaylistIndex]
-      [PlayList.ItemIndex].Title), nil, nil, SW_SHOWNORMAL);
+    ShellExecute(handle, 'open', PChar('http://www.youtube.com/results?search_query=' + FPlaylists[FSelectedPlaylistIndex][PlayList.ItemIndex].Artist + '+' + FPlaylists[FSelectedPlaylistIndex][PlayList.ItemIndex].Title), nil, nil, SW_SHOWNORMAL);
   end;
 end;
 
@@ -5516,8 +5538,7 @@ procedure TMainForm.S8Click(Sender: TObject);
 begin
   if PlayList.ItemIndex > -1 then
   begin
-    ShellExecute(handle, 'open', PChar('https://www.google.com.tr/search?q=' + StringReplace(FPlaylists[FSelectedPlaylistIndex][PlayList.ItemIndex].Artist, ' ', '+', [rfReplaceAll]) + '+' +
-      StringReplace(FPlaylists[FSelectedPlaylistIndex][PlayList.ItemIndex].Title, ' ', '+', [rfReplaceAll])), nil, nil, SW_SHOWNORMAL);
+    ShellExecute(handle, 'open', PChar('https://www.google.com.tr/search?q=' + StringReplace(FPlaylists[FSelectedPlaylistIndex][PlayList.ItemIndex].Artist, ' ', '+', [rfReplaceAll]) + '+' + StringReplace(FPlaylists[FSelectedPlaylistIndex][PlayList.ItemIndex].Title, ' ', '+', [rfReplaceAll])), nil, nil, SW_SHOWNORMAL);
   end;
 end;
 
@@ -5570,8 +5591,7 @@ begin
       begin
         with FPlaylists[j][i] do
         begin
-          LStreamWriter.WriteLine(FullFileName + '|' + Artist + '|' + Album + '|' + Title + '|' + DurationStr + '|' + Bitrate + '|' + Channels + '|' + Codec + '|' + SampleRate + '|' +
-            FloatToStr(PlayCount) + '|' + FloatToStr(Stars));
+          LStreamWriter.WriteLine(FullFileName + '|' + Artist + '|' + Album + '|' + Title + '|' + DurationStr + '|' + Bitrate + '|' + Channels + '|' + Codec + '|' + SampleRate + '|' + FloatToStr(PlayCount) + '|' + FloatToStr(Stars));
         end;
       end;
       for I := 0 to FQueueLists[j].Count - 1 do
@@ -5704,7 +5724,7 @@ begin
     Self.FocusControl(VolumeBar);
 end;
 
-procedure TMainForm.sPanel5MouseEnter(Sender: TObject);
+procedure TMainForm.PlaybackPanelMouseEnter(Sender: TObject);
 begin
   if Self.Enabled and Self.Visible then
     Self.FocusControl(VolumeBar);
@@ -5760,17 +5780,13 @@ begin
           LEncodeCMD := '';
           case RadioRecordFormatList.ItemIndex of
             0: // mp3
-              LEncodeCMD := PWideChar('"' + FLamePath + '" -r -s ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' --tt ' + LRadioInfo.Title + ' --ta ' +
-                LRadioInfo.Artist + ' - -o ' + LRadioInfo.FileName);
+              LEncodeCMD := PWideChar('"' + FLamePath + '" -r -s ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' --tt ' + LRadioInfo.Title + ' --ta ' + LRadioInfo.Artist + ' - -o ' + LRadioInfo.FileName);
             1: // ogg
-              LEncodeCMD := PWideChar('"' + FOggEncPath + '" --ignorelength -r -R ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' -t ' + LRadioInfo.Title + ' -a '
-                + LRadioInfo.Artist + ' - -o ' + LRadioInfo.FileName);
+              LEncodeCMD := PWideChar('"' + FOggEncPath + '" --ignorelength -r -R ' + FloatToStr(LChanInfo.freq) + ' -b ' + RadioRecordOptionsForm.BitrateList.Text + ' -t ' + LRadioInfo.Title + ' -a ' + LRadioInfo.Artist + ' - -o ' + LRadioInfo.FileName);
             2: // opus
-              LEncodeCMD := PWideChar('"' + FOpusEncPath + '" --hard-cbr --bitrate ' + RadioRecordOptionsForm.BitrateList.Text + ' --title ' + LRadioInfo.Title + ' --artist ' + LRadioInfo.Artist +
-                ' --raw --raw-rate ' + FloatToStr(LChanInfo.freq) + ' - ' + LRadioInfo.FileName);
+              LEncodeCMD := PWideChar('"' + FOpusEncPath + '" --hard-cbr --bitrate ' + RadioRecordOptionsForm.BitrateList.Text + ' --title ' + LRadioInfo.Title + ' --artist ' + LRadioInfo.Artist + ' --raw --raw-rate ' + FloatToStr(LChanInfo.freq) + ' - ' + LRadioInfo.FileName);
             3: // aac
-              LEncodeCMD := PWideChar('"' + FFDKPath + '" -m 0 -b ' + RadioRecordOptionsForm.BitrateList.Text + ' --title ' + LRadioInfo.Title + ' --artist ' + LRadioInfo.Artist +
-                ' --moov-before-mdat --ignorelength -R --raw-rate ' + FloatToStr(LChanInfo.freq) + ' - -o ' + LRadioInfo.FileName);
+              LEncodeCMD := PWideChar('"' + FFDKPath + '" -m 0 -b ' + RadioRecordOptionsForm.BitrateList.Text + ' --title ' + LRadioInfo.Title + ' --artist ' + LRadioInfo.Artist + ' --moov-before-mdat --ignorelength -R --raw-rate ' + FloatToStr(LChanInfo.freq) + ' - -o ' + LRadioInfo.FileName);
           end;
           FRadioRecordProcessID := BASS_Encode_Start(FRadioHandle, LEncodeCMD, BASS_UNICODE, nil, nil);
           if FRadioRecordProcessID > 0 then
@@ -5827,7 +5843,7 @@ begin
   FArtistLabel := '';
   FAlbumLabel := '';
   PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
-  InfoLabel.Caption := 'Stopped';
+  StatusBar.Panels[1].Text := 'Stopped';
   LyricList.Items.Clear;
   Taskbar2.ProgressMaxValue := High(Int64);
   Taskbar2.ProgressValue := 0;
@@ -6019,6 +6035,19 @@ begin
   end;
 end;
 
+procedure TMainForm.VisTimerTimer(Sender: TObject);
+begin
+  if FPlayer.PlayerStatus2 = psPlaying then
+  begin
+    try
+      Spectrum.Draw(PaintFrame.Canvas.Handle, FPlayer.GetData, 0, 0);
+    except
+      on E: Exception do
+
+    end;
+  end;
+end;
+
 procedure TMainForm.VolumeBarChange(Sender: TObject);
 begin
   if FPlaybackType = music then
@@ -6027,7 +6056,7 @@ begin
     begin
       FPlayer.SetVolume(100 - VolumeBar.Position);
     end;
-    StatusBar.Panels[1].Text := FloatToStr(100 - VolumeBar.Position) + '%'
+    StatusBar.Panels[2].Text := FloatToStr(100 - VolumeBar.Position) + '%'
   end
   else if FPlaybackType = radio then
   begin
@@ -6038,7 +6067,7 @@ begin
     end;
   end;
 
-  StatusBar.Panels[1].Text := FloatToStr((100 - VolumeBar.Position) * 2) + '%';
+  StatusBar.Panels[2].Text := FloatToStr((100 - VolumeBar.Position) * 2) + '%';
   VolumeBar.Hint := FloatToStr((100 - VolumeBar.Position) * 2) + '%';
 end;
 
@@ -6057,7 +6086,7 @@ begin
       begin
         FPlayer.SetVolume(100 - VolumeBar.Position);
       end;
-      StatusBar.Panels[1].Text := FloatToStr((100 - VolumeBar.Position) * 2) + '%'
+      StatusBar.Panels[2].Text := FloatToStr((100 - VolumeBar.Position) * 2) + '%'
     end
     else if FPlaybackType = radio then
     begin
@@ -6068,7 +6097,7 @@ begin
       end;
     end;
 
-    StatusBar.Panels[1].Text := FloatToStr((100 - VolumeBar.Position) * 2) + '%'
+    StatusBar.Panels[2].Text := FloatToStr((100 - VolumeBar.Position) * 2) + '%'
   end;
 end;
 
@@ -6139,11 +6168,11 @@ begin
       UPDATE_META_NAME:
         begin
           Log('update meta anme');
-          FTitleLabel := String(PAnsiChar(Msg.LParam));
+          FTitleLabel := string(PAnsiChar(Msg.LParam));
           TitleLabel.Caption := FTitleLabel + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
           if (not FTitleLabel.StartsWith('HTTP')) and (FTitleLabel.Length > 0) then
           begin
-            Self.Caption := String(PAnsiChar(Msg.LParam)) + ' [OooPlayer]';
+            Self.Caption := string(PAnsiChar(Msg.LParam)) + ' [OooPlayer]';
           end
           else
           begin
@@ -6159,8 +6188,8 @@ begin
       UPDATE_META_BITRATE:
         begin
           Log('update bitrate');
-          FAlbumLabel := String(PAnsiChar(Msg.LParam)) + ' kbps';
-          TitleLabel.Caption := String(PAnsiChar(Msg.LParam)) + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
+          FAlbumLabel := string(PAnsiChar(Msg.LParam)) + ' kbps';
+          TitleLabel.Caption := string(PAnsiChar(Msg.LParam)) + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
           FTitleLabel := TitleLabel.Caption;
           if TitleLabel.Width < TitleLabel.Canvas.TextWidth(TitleLabel.Caption) then
           begin
@@ -6174,11 +6203,11 @@ begin
       UPDATE_META:
         begin
           Log('update meta');
-          FTitleLabel := String(PAnsiChar(Msg.LParam));
+          FTitleLabel := string(PAnsiChar(Msg.LParam));
           TitleLabel.Caption := FTitleLabel + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
           if (not FTitleLabel.StartsWith('HTTP')) and (FTitleLabel.Length > 0) then
           begin
-            Self.Caption := String(PAnsiChar(Msg.LParam)) + ' [OooPlayer]';
+            Self.Caption := string(PAnsiChar(Msg.LParam)) + ' [OooPlayer]';
           end
           else
           begin
@@ -6204,13 +6233,13 @@ begin
       STATUS_UPDATE:
         begin
           Log('status update');
-          if (String(PAnsiChar(Msg.LParam)) = 'ICY 200 OK') or (String(PAnsiChar(Msg.LParam)) = 'HTTP/1.0 200 OK') then
+          if (string(PAnsiChar(Msg.LParam)) = 'ICY 200 OK') or (string(PAnsiChar(Msg.LParam)) = 'HTTP/1.0 200 OK') then
           begin
-            InfoLabel.Caption := 'Playing';
+            StatusBar.Panels[1].Text := 'Playing';
           end
           else
           begin
-            InfoLabel.Caption := String(PAnsiChar(Msg.LParam));
+            StatusBar.Panels[1].Text := string(PAnsiChar(Msg.LParam));
           end;
         end;
       REPAINT_RADIO_LIST:
@@ -6311,3 +6340,4 @@ begin
 end;
 
 end.
+

@@ -22,10 +22,10 @@ unit UnitTagWriter;
 
 interface
 
-uses Classes, Windows, SysUtils, Messages, StrUtils, UnitTagTypes,
-  WMATagLibrary, APEv2Library, MP4TagLibrary,
-  FlacTagLibrary, ID3v2Library, ID3v1Library, OggVorbisAndOpusTagLibrary,
-  WAVTagLibrary, Dialogs;
+uses
+  Classes, Windows, SysUtils, Messages, StrUtils, UnitTagTypes, WMATagLibrary,
+  APEv2Library, MP4TagLibrary, FlacTagLibrary, ID3v2Library, ID3v1Library,
+  OggVorbisAndOpusTagLibrary, WAVTagLibrary, Dialogs;
 
 type
   TTagWriter = class(TObject)
@@ -46,13 +46,13 @@ type
   public
     constructor Create;
     destructor Destroy(); override;
-
     procedure WriteTags(const FileName: string; const Tags: PTag; const EncoderIndex: integer; const SourceFile: string);
   end;
 
 implementation
 
-uses UnitLog;
+uses
+  UnitLog;
 
 { TTagWriter }
 
@@ -86,6 +86,7 @@ begin
     FPicStream.Free;
   except
     on E: Exception do
+
   end;
 end;
 
@@ -682,3 +683,4 @@ begin
 end;
 
 end.
+

@@ -70,9 +70,9 @@ object MainForm: TMainForm
         Top = 24
         Width = 275
         Height = 21
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -82,24 +82,16 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'EDIT'
         BoundLabel.Active = True
         BoundLabel.Caption = 'Title:'
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
         BoundLabel.Layout = sclTopLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
       end
       object ArtistEdit: TsEdit
         Left = 3
         Top = 64
         Width = 275
         Height = 21
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -109,24 +101,16 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'EDIT'
         BoundLabel.Active = True
         BoundLabel.Caption = 'Artist:'
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
         BoundLabel.Layout = sclTopLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
       end
       object AlbumArtistEdit: TsEdit
         Left = 3
         Top = 104
         Width = 275
         Height = 21
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -136,24 +120,16 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'EDIT'
         BoundLabel.Active = True
         BoundLabel.Caption = 'Album Artist:'
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
         BoundLabel.Layout = sclTopLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
       end
       object AlbumEdit: TsEdit
         Left = 3
         Top = 144
         Width = 275
         Height = 21
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -163,24 +139,16 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'EDIT'
         BoundLabel.Active = True
         BoundLabel.Caption = 'Album:'
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
         BoundLabel.Layout = sclTopLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
       end
       object DateEdit: TsEdit
         Left = 3
         Top = 184
         Width = 70
         Height = 21
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -190,24 +158,16 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'EDIT'
         BoundLabel.Active = True
         BoundLabel.Caption = 'Year:'
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
         BoundLabel.Layout = sclTopLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
       end
       object TrackEdit: TsEdit
         Left = 79
         Top = 184
         Width = 70
         Height = 21
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -217,24 +177,16 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'EDIT'
         BoundLabel.Active = True
         BoundLabel.Caption = 'Track:'
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
         BoundLabel.Layout = sclTopLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
       end
       object ComposerEdit: TsEdit
         Left = 3
         Top = 224
         Width = 275
         Height = 21
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -244,24 +196,16 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'EDIT'
         BoundLabel.Active = True
         BoundLabel.Caption = 'Composer:'
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
         BoundLabel.Layout = sclTopLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
       end
       object CommentEdit: TsEdit
         Left = 3
         Top = 267
         Width = 275
         Height = 21
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -271,15 +215,7 @@ object MainForm: TMainForm
         SkinData.SkinSection = 'EDIT'
         BoundLabel.Active = True
         BoundLabel.Caption = 'Comment:'
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
         BoundLabel.Layout = sclTopLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
       end
       object GenreList: TsComboBox
         Left = 155
@@ -289,19 +225,11 @@ object MainForm: TMainForm
         Alignment = taLeftJustify
         BoundLabel.Active = True
         BoundLabel.Caption = 'Genre:'
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
         BoundLabel.Layout = sclTopLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
         VerticalAlignment = taAlignTop
-        Color = 2038810
+        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -318,18 +246,9 @@ object MainForm: TMainForm
     Top = 40
     Width = 935
     Height = 501
-    BoundLabel.Indent = 0
-    BoundLabel.Font.Charset = DEFAULT_CHARSET
-    BoundLabel.Font.Color = clWindowText
-    BoundLabel.Font.Height = -11
-    BoundLabel.Font.Name = 'Tahoma'
-    BoundLabel.Font.Style = []
-    BoundLabel.Layout = sclLeft
-    BoundLabel.MaxWidth = 0
-    BoundLabel.UseSkinColor = True
     SkinData.SkinSection = 'EDIT'
     Align = alClient
-    Color = 2038810
+    Color = 722950
     Columns = <
       item
         Caption = 'File Name'
@@ -368,7 +287,7 @@ object MainForm: TMainForm
         Width = 150
       end>
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = 13417908
+    Font.Color = 12102048
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
