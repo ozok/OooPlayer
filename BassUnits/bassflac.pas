@@ -9,7 +9,8 @@ unit BassFLAC;
 
 interface
 
-uses Windows, Bass;
+uses
+  Windows, Bass;
 
 const
   // BASS_CHANNELINFO type
@@ -38,9 +39,12 @@ const
   bassflacdll = 'bassflac.dll';
 
 function BASS_FLAC_StreamCreateFile(mem: BOOL; f: Pointer; offset, length: QWORD; flags: DWORD): HSTREAM; stdcall; external bassflacdll;
+
 function BASS_FLAC_StreamCreateURL(URL: PAnsiChar; offset: DWORD; flags: DWORD; proc: DOWNLOADPROC; user: Pointer): HSTREAM; stdcall; external bassflacdll;
+
 function BASS_FLAC_StreamCreateFileUser(system, flags: DWORD; var procs: BASS_FILEPROCS; user: Pointer): HSTREAM; stdcall; external bassflacdll;
 
 implementation
 
 end.
+

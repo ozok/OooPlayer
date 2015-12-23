@@ -27,7 +27,8 @@ unit BASS_FX;
 
 interface
 
-uses BASS, Math; // Math is used for BASS_BFX_Linear2dB/dB2Linear functions below
+uses
+  BASS, Math; // Math is used for BASS_BFX_Linear2dB/dB2Linear functions below
 
 const
   // BASS_CHANNELINFO types
@@ -43,8 +44,8 @@ const
   bass_fxdll = 'libbass_fx.so';
 {$ENDIF}
   // BASS_FX Version
-function BASS_FX_GetVersion(): DWORD; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
+
+function BASS_FX_GetVersion(): DWORD; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
 
 { =============================================================================
   DSP (Digital Signal Processing)
@@ -73,6 +74,7 @@ const
   BASS_BFX_CHAN8 = 128; // see above info
 
   // if you have more than 8 channels (7.1), use this function below
+
 function BASS_BFX_CHANNEL_N(n: DWORD): DWORD;
 
 // DSP effects
@@ -180,7 +182,8 @@ type
 
   // Swap, remap and mix
   PTlChannel = ^TlChannel;
-  TlChannel = array [0 .. maxInt div sizeOf(DWORD) - 1] of DWORD;
+
+  TlChannel = array[0..maxInt div sizeOf(DWORD) - 1] of DWORD;
 
   BASS_BFX_MIX = record
     lChannel: PTlChannel; // a pointer to an array of channels to mix using BASS_BFX_CHANxxx flag/s (lChannel[0] is left channel...)
@@ -288,7 +291,8 @@ type
   end;
 
   PBASS_BFX_ENV_NODES = ^TBASS_BFX_ENV_NODES;
-  TBASS_BFX_ENV_NODES = array [0 .. maxInt div sizeOf(BASS_BFX_ENV_NODE) - 1] of BASS_BFX_ENV_NODE;
+
+  TBASS_BFX_ENV_NODES = array[0..maxInt div sizeOf(BASS_BFX_ENV_NODE) - 1] of BASS_BFX_ENV_NODE;
 
   BASS_BFX_VOLUME_ENV = record
     lChannel: Integer; // BASS_BFX_CHANxxx flag/s
@@ -379,12 +383,11 @@ const
   BASS_FX_TEMPO_ALGO_CUBIC = $400; // default
   BASS_FX_TEMPO_ALGO_SHANNON = $800;
 
-function BASS_FX_TempoCreate(chan, flags: DWORD): HSTREAM; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
-function BASS_FX_TempoGetSource(chan: HSTREAM): DWORD; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
-function BASS_FX_TempoGetRateRatio(chan: HSTREAM): Single; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
+function BASS_FX_TempoCreate(chan, flags: DWORD): HSTREAM; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
+
+function BASS_FX_TempoGetSource(chan: HSTREAM): DWORD; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
+
+function BASS_FX_TempoGetRateRatio(chan: HSTREAM): Single; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
 
 { =============================================================================
   Reverse playback
@@ -401,10 +404,9 @@ const
   BASS_FX_RVS_REVERSE = -1;
   BASS_FX_RVS_FORWARD = 1;
 
-function BASS_FX_ReverseCreate(chan: DWORD; dec_block: Single; flags: DWORD): HSTREAM; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
-function BASS_FX_ReverseGetSource(chan: HSTREAM): DWORD; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
+function BASS_FX_ReverseCreate(chan: DWORD; dec_block: Single; flags: DWORD): HSTREAM; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
+
+function BASS_FX_ReverseGetSource(chan: HSTREAM): DWORD; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
 
 { =============================================================================
   BPM (Beats Per Minute)
@@ -424,20 +426,20 @@ const
 
 type
   BPMPROC = procedure(chan: DWORD; bpm: Single; user: Pointer); {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-BPMPROGRESSPROC =
-procedure(chan: DWORD; percent: Single; user: Pointer); {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-BPMPROCESSPROC = BPMPROGRESSPROC; // back-compatibility
 
-function BASS_FX_BPM_DecodeGet(chan: DWORD; startSec, endSec: Double; minMaxBPM, flags: DWORD; proc: BPMPROGRESSPROC; user: Pointer): Single; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
-function BASS_FX_BPM_CallbackSet(handle: DWORD; proc: BPMPROC; period: Double; minMaxBPM, flags: DWORD; user: Pointer): BOOL; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
-function BASS_FX_BPM_CallbackReset(handle: DWORD): BOOL; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
-function BASS_FX_BPM_Translate(handle: DWORD; val2tran: Single; trans: DWORD): Single; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll; // deprecated
-function BASS_FX_BPM_Free(handle: DWORD): BOOL; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
+  BPMPROGRESSPROC = procedure(chan: DWORD; percent: Single; user: Pointer); {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
+
+  BPMPROCESSPROC = BPMPROGRESSPROC; // back-compatibility
+
+function BASS_FX_BPM_DecodeGet(chan: DWORD; startSec, endSec: Double; minMaxBPM, flags: DWORD; proc: BPMPROGRESSPROC; user: Pointer): Single; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
+
+function BASS_FX_BPM_CallbackSet(handle: DWORD; proc: BPMPROC; period: Double; minMaxBPM, flags: DWORD; user: Pointer): BOOL; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
+
+function BASS_FX_BPM_CallbackReset(handle: DWORD): BOOL; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
+
+function BASS_FX_BPM_Translate(handle: DWORD; val2tran: Single; trans: DWORD): Single; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll; // deprecated
+
+function BASS_FX_BPM_Free(handle: DWORD): BOOL; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
 
 { =============================================================================
   Beat position trigger
@@ -446,18 +448,17 @@ external bass_fxdll;
 type
   BPMBEATPROC = procedure(chan: DWORD; beatpos: Double; user: Pointer); {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
 
-function BASS_FX_BPM_BeatCallbackSet(handle: DWORD; proc: BPMBEATPROC; user: Pointer): BOOL; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
-function BASS_FX_BPM_BeatCallbackReset(handle: DWORD): BOOL; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
-function BASS_FX_BPM_BeatDecodeGet(chan: DWORD; startSec, endSec: Double; flags: DWORD; proc: BPMBEATPROC; user: Pointer): BOOL; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
-function BASS_FX_BPM_BeatSetParameters(handle: DWORD; bandwidth, centerfreq, beat_rtime: Single): BOOL; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
-function BASS_FX_BPM_BeatGetParameters(handle: DWORD; var bandwidth, centerfreq, beat_rtime: Single): BOOL; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
-function BASS_FX_BPM_BeatFree(handle: DWORD): BOOL; {$IFDEF WIN32}stdcall{$ELSE}cdecl{$ENDIF};
-external bass_fxdll;
+function BASS_FX_BPM_BeatCallbackSet(handle: DWORD; proc: BPMBEATPROC; user: Pointer): BOOL; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
+
+function BASS_FX_BPM_BeatCallbackReset(handle: DWORD): BOOL; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
+
+function BASS_FX_BPM_BeatDecodeGet(chan: DWORD; startSec, endSec: Double; flags: DWORD; proc: BPMBEATPROC; user: Pointer): BOOL; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
+
+function BASS_FX_BPM_BeatSetParameters(handle: DWORD; bandwidth, centerfreq, beat_rtime: Single): BOOL; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
+
+function BASS_FX_BPM_BeatGetParameters(handle: DWORD; var bandwidth, centerfreq, beat_rtime: Single): BOOL; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
+
+function BASS_FX_BPM_BeatFree(handle: DWORD): BOOL; {$IFDEF WIN32} stdcall{$ELSE} cdecl{$ENDIF}; external bass_fxdll;
 
 implementation
 
@@ -484,3 +485,4 @@ begin
 end;
 
 end.
+

@@ -11,10 +11,12 @@ interface
 
 {$IFDEF MSWINDOWS}
 
-uses BASS, Windows;
+uses
+  BASS, Windows;
 {$ELSE}
 
-uses BASS;
+uses
+  BASS;
 {$ENDIF}
 
 const
@@ -34,13 +36,14 @@ const
 {$IFDEF MACOS}
   bassopusdll = 'libbassopus.dylib';
 {$ENDIF}
-function BASS_OPUS_StreamCreateFile(mem: BOOL; fl: pointer; offset, length: QWORD; flags: DWORD): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassopusdll;
-function BASS_OPUS_StreamCreateURL(url: PAnsiChar; offset: DWORD; flags: DWORD; proc: DOWNLOADPROC; user: pointer): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassopusdll;
-function BASS_OPUS_StreamCreateFileUser(system, flags: DWORD; var procs: BASS_FILEPROCS; user: pointer): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassopusdll;
+
+function BASS_OPUS_StreamCreateFile(mem: BOOL; fl: pointer; offset, length: QWORD; flags: DWORD): HSTREAM; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassopusdll;
+
+function BASS_OPUS_StreamCreateURL(url: PAnsiChar; offset: DWORD; flags: DWORD; proc: DOWNLOADPROC; user: pointer): HSTREAM; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassopusdll;
+
+function BASS_OPUS_StreamCreateFileUser(system, flags: DWORD; var procs: BASS_FILEPROCS; user: pointer): HSTREAM; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassopusdll;
 
 implementation
 
 end.
+

@@ -1,8 +1,9 @@
-Unit BASS_AC3;
+unit BASS_AC3;
 
 interface
 
-uses windows, bass;
+uses
+  windows, bass;
 
 const
   // BASS_Set/GetConfig options
@@ -18,9 +19,12 @@ const
   bassac3dll = 'bass_ac3.dll';
 
 function BASS_AC3_StreamCreateFile(mem: BOOL; f: Pointer; offset, length: QWORD; flags: DWORD): HSTREAM; stdcall; external bassac3dll;
+
 function BASS_AC3_StreamCreateURL(URL: PChar; offset: DWORD; flags: DWORD; proc: DOWNLOADPROC; user: Pointer): HSTREAM; stdcall; external bassac3dll;
+
 function BASS_AC3_StreamCreateFileUser(system, flags: DWORD; var procs: BASS_FILEPROCS; user: Pointer): HSTREAM; stdcall; external bassac3dll;
 
 implementation
 
 end.
+

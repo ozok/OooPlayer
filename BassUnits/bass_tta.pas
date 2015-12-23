@@ -1,8 +1,9 @@
-Unit BASS_TTA;
+unit BASS_TTA;
 
 interface
 
-uses windows, bass;
+uses
+  windows, bass;
 
 const
   // BASS_CHANNELINFO type
@@ -12,8 +13,10 @@ const
   bassttadll = 'bass_tta.dll';
 
 function BASS_TTA_StreamCreateFile(mem: BOOL; f: Pointer; offset, length: QWORD; flags: DWORD): HSTREAM; stdcall; external bassttadll;
+
 function BASS_TTA_StreamCreateFileUser(system, flags: DWORD; var procs: BASS_FILEPROCS; user: Pointer): HSTREAM; stdcall; external bassttadll;
 
 implementation
 
 end.
+

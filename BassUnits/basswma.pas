@@ -9,7 +9,8 @@ unit BassWMA;
 
 interface
 
-uses Windows, Bass;
+uses
+  Windows, Bass;
 
 const
   // Additional error codes returned by BASS_ErrorGetCode
@@ -94,23 +95,37 @@ const
   basswmadll = 'basswma.dll';
 
 function BASS_WMA_StreamCreateFile(mem: BOOL; fl: Pointer; offset, length: QWORD; flags: DWORD): HSTREAM; stdcall; external basswmadll;
+
 function BASS_WMA_StreamCreateFileAuth(mem: BOOL; fl: Pointer; offset, length: QWORD; flags: DWORD; user, pass: PChar): HSTREAM; stdcall; external basswmadll;
+
 function BASS_WMA_StreamCreateFileUser(system, flags: DWORD; var procs: BASS_FILEPROCS; user: Pointer): HSTREAM; stdcall; external basswmadll;
 
 function BASS_WMA_GetTags(fname: PChar; flags: DWORD): PAnsiChar; stdcall; external basswmadll;
 
 function BASS_WMA_EncodeGetRates(freq, chans, flags: DWORD): PDWORD; stdcall; external basswmadll;
+
 function BASS_WMA_EncodeOpen(freq, chans, flags, bitrate: DWORD; proc: WMENCODEPROC; user: Pointer): HWMENCODE; stdcall; external basswmadll;
+
 function BASS_WMA_EncodeOpenFile(freq, chans, flags, bitrate: DWORD; fname: PChar): HWMENCODE; stdcall; external basswmadll;
+
 function BASS_WMA_EncodeOpenNetwork(freq, chans, flags, bitrate, port, clients: DWORD): HWMENCODE; stdcall; external basswmadll;
+
 function BASS_WMA_EncodeOpenNetworkMulti(freq, chans, flags: DWORD; bitrates: PDWORD; port, clients: DWORD): HWMENCODE; stdcall; external basswmadll;
+
 function BASS_WMA_EncodeOpenPublish(freq, chans, flags, bitrate: DWORD; url, user, pass: PChar): HWMENCODE; stdcall; external basswmadll;
+
 function BASS_WMA_EncodeOpenPublishMulti(freq, chans, flags: DWORD; bitrates: PDWORD; url, user, pass: PChar): HWMENCODE; stdcall; external basswmadll;
+
 function BASS_WMA_EncodeGetPort(handle: HWMENCODE): DWORD; stdcall; external basswmadll;
+
 function BASS_WMA_EncodeSetNotify(handle: HWMENCODE; proc: CLIENTCONNECTPROC; user: Pointer): BOOL; stdcall; external basswmadll;
+
 function BASS_WMA_EncodeGetClients(handle: HWMENCODE): DWORD; stdcall; external basswmadll;
+
 function BASS_WMA_EncodeSetTag(handle: HWMENCODE; tag, text: PChar; form: DWORD): BOOL; stdcall; external basswmadll;
+
 function BASS_WMA_EncodeWrite(handle: HWMENCODE; buffer: Pointer; length: DWORD): BOOL; stdcall; external basswmadll;
+
 function BASS_WMA_EncodeClose(handle: HWMENCODE): BOOL; stdcall; external basswmadll;
 
 function BASS_WMA_GetWMObject(handle: DWORD): Pointer; stdcall; external basswmadll;
@@ -118,3 +133,4 @@ function BASS_WMA_GetWMObject(handle: DWORD): Pointer; stdcall; external basswma
 implementation
 
 end.
+

@@ -1,13 +1,15 @@
-Unit BASS_ALAC;
+unit BASS_ALAC;
 
 interface
 
 {$IFDEF MSWINDOWS}
 
-uses BASS, Windows;
+uses
+  BASS, Windows;
 {$ELSE}
 
-uses BASS;
+uses
+  BASS;
 {$ENDIF}
 
 const
@@ -26,13 +28,14 @@ const
 {$IFDEF MACOS}
   bassalacdll = 'libbass_alac.dylib';
 {$ENDIF}
-function BASS_ALAC_StreamCreateFile(mem: BOOL; f: Pointer; offset, length: QWORD; flags: DWORD): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassalacdll;
-function BASS_ALAC_StreamCreateURL(url: PAnsiChar; offset: DWORD; flags: DWORD; proc: DOWNLOADPROC; user: Pointer): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassalacdll;
-function BASS_ALAC_StreamCreateFileUser(system, flags: DWORD; var procs: BASS_FILEPROCS; user: Pointer): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassalacdll;
+
+function BASS_ALAC_StreamCreateFile(mem: BOOL; f: Pointer; offset, length: QWORD; flags: DWORD): HSTREAM; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassalacdll;
+
+function BASS_ALAC_StreamCreateURL(url: PAnsiChar; offset: DWORD; flags: DWORD; proc: DOWNLOADPROC; user: Pointer): HSTREAM; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassalacdll;
+
+function BASS_ALAC_StreamCreateFileUser(system, flags: DWORD; var procs: BASS_FILEPROCS; user: Pointer): HSTREAM; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassalacdll;
 
 implementation
 
 end.
+

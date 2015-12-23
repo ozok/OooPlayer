@@ -11,10 +11,12 @@ interface
 
 {$IFDEF MSWINDOWS}
 
-uses BASS, Windows;
+uses
+  BASS, Windows;
 {$ELSE}
 
-uses BASS;
+uses
+  BASS;
 {$ENDIF}
 
 const
@@ -31,13 +33,14 @@ const
 {$IFDEF MACOS}
   basswvdll = 'libbasswv.dylib';
 {$ENDIF}
-function BASS_WV_StreamCreateFile(mem: BOOL; fl: pointer; offset, length: QWORD; flags: DWORD): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external basswvdll;
-function BASS_WV_StreamCreateURL(url: PAnsiChar; offset: DWORD; flags: DWORD; proc: DOWNLOADPROC; user: pointer): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external basswvdll;
-function BASS_WV_StreamCreateFileUser(system, flags: DWORD; var procs: BASS_FILEPROCS; user: pointer): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external basswvdll;
+
+function BASS_WV_StreamCreateFile(mem: BOOL; fl: pointer; offset, length: QWORD; flags: DWORD): HSTREAM; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external basswvdll;
+
+function BASS_WV_StreamCreateURL(url: PAnsiChar; offset: DWORD; flags: DWORD; proc: DOWNLOADPROC; user: pointer): HSTREAM; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external basswvdll;
+
+function BASS_WV_StreamCreateFileUser(system, flags: DWORD; var procs: BASS_FILEPROCS; user: pointer): HSTREAM; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external basswvdll;
 
 implementation
 
 end.
+

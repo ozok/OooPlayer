@@ -5,16 +5,18 @@
   See the BASSENC.CHM file for more detailed documentation
 }
 
-Unit BASSenc;
+unit BASSenc;
 
 interface
 
 {$IFDEF MSWINDOWS}
 
-uses BASS, Windows;
+uses
+  BASS, Windows;
 {$ELSE}
 
-uses BASS;
+uses
+  BASS;
 {$ENDIF}
 
 const
@@ -102,8 +104,7 @@ type
   user   : The 'user' parameter value given when calling BASS_EncodeStart
 }
 
-ENCODEPROCEX =
-procedure(handle: HENCODE; channel: DWORD; buffer: Pointer; length: DWORD; offset: QWORD; user: Pointer); {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+  ENCODEPROCEX = procedure(handle: HENCODE; channel: DWORD; buffer: Pointer; length: DWORD; offset: QWORD; user: Pointer); {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 {
   Encoding callback function with offset info.
   handle : The encoder
@@ -114,8 +115,7 @@ procedure(handle: HENCODE; channel: DWORD; buffer: Pointer; length: DWORD; offse
   user   : The 'user' parameter value given when calling BASS_Encode_StartCA
 }
 
-ENCODERPROC =
-function(handle: HENCODE; channel: DWORD; buffer: Pointer; length: DWORD; maxout: DWORD; user: Pointer): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+  ENCODERPROC = function(handle: HENCODE; channel: DWORD; buffer: Pointer; length: DWORD; maxout: DWORD; user: Pointer): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 {
   Encoder callback function.
   handle : The encoder
@@ -127,8 +127,7 @@ function(handle: HENCODE; channel: DWORD; buffer: Pointer; length: DWORD; maxout
   RETURN : The amount of encoded data (-1=stop)
 }
 
-ENCODECLIENTPROC =
-function(handle: HENCODE; connect: BOOL; client: PAnsiChar; headers: PAnsiChar; user: Pointer): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+  ENCODECLIENTPROC = function(handle: HENCODE; connect: BOOL; client: PAnsiChar; headers: PAnsiChar; user: Pointer): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 {
   Client connection notification callback function.
   handle : The encoder
@@ -139,8 +138,7 @@ function(handle: HENCODE; connect: BOOL; client: PAnsiChar; headers: PAnsiChar; 
   RETURN : TRUE/FALSE=accept/reject connection (ignored if connect=FALSE)
 }
 
-ENCODENOTIFYPROC =
-procedure(handle: HENCODE; status: DWORD; user: Pointer); {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+  ENCODENOTIFYPROC = procedure(handle: HENCODE; status: DWORD; user: Pointer); {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 {
   Encoder death notification callback function.
   handle : The encoder
@@ -158,70 +156,68 @@ const
 {$IFDEF MACOS}
   bassencdll = 'libbassenc.dylib';
 {$ENDIF}
-function BASS_Encode_GetVersion: DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
 
-function BASS_Encode_Start(handle: DWORD; cmdline: PChar; flags: DWORD; proc: ENCODEPROC; user: Pointer): HENCODE; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
-function BASS_Encode_StartLimit(handle: DWORD; cmdline: PChar; flags: DWORD; proc: ENCODEPROC; user: Pointer; limit: DWORD): HENCODE; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
-function BASS_Encode_StartUser(handle: DWORD; filename: PChar; flags: DWORD; proc: ENCODERPROC; user: Pointer): HENCODE; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
-function BASS_Encode_AddChunk(handle: HENCODE; id: PAnsiChar; buffer: Pointer; length: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
-function BASS_Encode_IsActive(handle: DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
-function BASS_Encode_Stop(handle: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
+function BASS_Encode_GetVersion: DWORD; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
+function BASS_Encode_Start(handle: DWORD; cmdline: PChar; flags: DWORD; proc: ENCODEPROC; user: Pointer): HENCODE; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
+function BASS_Encode_StartLimit(handle: DWORD; cmdline: PChar; flags: DWORD; proc: ENCODEPROC; user: Pointer; limit: DWORD): HENCODE; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
+function BASS_Encode_StartUser(handle: DWORD; filename: PChar; flags: DWORD; proc: ENCODERPROC; user: Pointer): HENCODE; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
+function BASS_Encode_AddChunk(handle: HENCODE; id: PAnsiChar; buffer: Pointer; length: DWORD): BOOL; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
+function BASS_Encode_IsActive(handle: DWORD): DWORD; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
+function BASS_Encode_Stop(handle: DWORD): BOOL; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
 function BASS_Encode_SetPaused(handle: DWORD; paused: BOOL): BOOL;
-{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
+{$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
 function BASS_Encode_Write(handle: DWORD; buffer: Pointer; length: DWORD): BOOL;
-{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
-function BASS_Encode_SetNotify(handle: DWORD; proc: ENCODENOTIFYPROC; user: Pointer): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
+{$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
+function BASS_Encode_SetNotify(handle: DWORD; proc: ENCODENOTIFYPROC; user: Pointer): BOOL; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
 function BASS_Encode_GetCount(handle: HENCODE; count: DWORD): QWORD;
-{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
+{$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
 function BASS_Encode_SetChannel(handle: DWORD; channel: DWORD): BOOL;
-{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
-function BASS_Encode_GetChannel(handle: HENCODE): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
+{$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
+function BASS_Encode_GetChannel(handle: HENCODE): DWORD; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
 
 {$IFDEF MSWINDOWS}
-function BASS_Encode_GetACMFormat(handle: DWORD; form: Pointer; formlen: DWORD; title: PChar; flags: DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
-function BASS_Encode_StartACM(handle: DWORD; form: Pointer; flags: DWORD; proc: ENCODEPROC; user: Pointer): HENCODE; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
-function BASS_Encode_StartACMFile(handle: DWORD; form: Pointer; flags: DWORD; filename: PChar): HENCODE; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
+function BASS_Encode_GetACMFormat(handle: DWORD; form: Pointer; formlen: DWORD; title: PChar; flags: DWORD): DWORD; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
+function BASS_Encode_StartACM(handle: DWORD; form: Pointer; flags: DWORD; proc: ENCODEPROC; user: Pointer): HENCODE; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
+function BASS_Encode_StartACMFile(handle: DWORD; form: Pointer; flags: DWORD; filename: PChar): HENCODE; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
 {$ENDIF}
 {$IFDEF MACOS}
-function BASS_Encode_StartCA(handle, ftype, atype, flags, bitrate: DWORD; proc: ENCODEPROCEX; user: Pointer): HENCODE; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
-function BASS_Encode_StartCAFile(handle, ftype, atype, flags, bitrate: DWORD; filename: PChar): HENCODE; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
+
+function BASS_Encode_StartCA(handle, ftype, atype, flags, bitrate: DWORD; proc: ENCODEPROCEX; user: Pointer): HENCODE; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
+function BASS_Encode_StartCAFile(handle, ftype, atype, flags, bitrate: DWORD; filename: PChar): HENCODE; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
 {$ENDIF}
+
 function BASS_Encode_CastInit(handle: HENCODE; server, pass, content, name, url, genre, desc, headers: PAnsiChar; bitrate: DWORD; pub: BOOL): BOOL;
-{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
+{$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
 function BASS_Encode_CastSetTitle(handle: HENCODE; title, url: PAnsiChar): BOOL;
-{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
-function BASS_Encode_CastSendMeta(handle: HENCODE; mtype: DWORD; data: Pointer; length: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
-function BASS_Encode_CastGetStats(handle: HENCODE; stype: DWORD; pass: PAnsiChar): PAnsiChar; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
+{$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
+function BASS_Encode_CastSendMeta(handle: HENCODE; mtype: DWORD; data: Pointer; length: DWORD): BOOL; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
+function BASS_Encode_CastGetStats(handle: HENCODE; stype: DWORD; pass: PAnsiChar): PAnsiChar; {$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
 
 function BASS_Encode_ServerInit(handle: HENCODE; port: PAnsiChar; buffer, burst, flags: DWORD; proc: ENCODECLIENTPROC; user: Pointer): DWORD;
-{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
+{$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
+
 function BASS_Encode_ServerKick(handle: HENCODE; client: PAnsiChar): BOOL;
-{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
-external bassencdll;
+{$IFDEF MSWINDOWS} stdcall{$ELSE} cdecl{$ENDIF}; external bassencdll;
 
 implementation
 
 end.
+
