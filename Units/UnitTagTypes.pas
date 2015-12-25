@@ -23,7 +23,7 @@ unit UnitTagTypes;
 interface
 
 uses
-  Classes, Generics.Collections, uKBDynamic;
+  Classes, Generics.Collections;
 
 type
   TGeneralTag = class
