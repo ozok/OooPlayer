@@ -3,9 +3,9 @@ object AboutForm: TAboutForm
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'About OooPlayer'
-  ClientHeight = 219
+  ClientHeight = 190
   ClientWidth = 304
-  Color = 3485741
+  Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,10 +18,10 @@ object AboutForm: TAboutForm
   OnShow = FormShow
   DesignSize = (
     304
-    219)
+    190)
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TsLabel
+  object Label1: TLabel
     Left = 0
     Top = 50
     Width = 304
@@ -148,7 +148,7 @@ object AboutForm: TAboutForm
       7F7F}
     ExplicitWidth = 645
   end
-  object Label2: TsLabel
+  object Label2: TLabel
     Left = 0
     Top = 63
     Width = 304
@@ -158,7 +158,7 @@ object AboutForm: TAboutForm
     Caption = '2014-2015 (C) ozok - ozok26@gmail.com GPLv2'
     ExplicitWidth = 229
   end
-  object Label3: TsLabel
+  object Label3: TLabel
     Left = 0
     Top = 76
     Width = 304
@@ -168,17 +168,17 @@ object AboutForm: TAboutForm
     Alignment = taCenter
     AutoSize = False
     Caption = 'Icon by sbstnblnd'
-    ParentFont = False
-    Layout = tlCenter
-    OnClick = Label3Click
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clHotLight
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
+    ParentFont = False
+    Layout = tlCenter
+    OnClick = Label3Click
     ExplicitWidth = 262
   end
-  object Label4: TsLabel
+  object Label4: TLabel
     Left = 0
     Top = 91
     Width = 304
@@ -188,18 +188,18 @@ object AboutForm: TAboutForm
     Alignment = taCenter
     AutoSize = False
     Caption = 'Bass library and plugins'
-    ParentFont = False
-    Layout = tlCenter
-    OnClick = Label4Click
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clHotLight
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
+    ParentFont = False
+    Layout = tlCenter
+    OnClick = Label4Click
     ExplicitTop = 97
     ExplicitWidth = 262
   end
-  object Label5: TsLabel
+  object Label5: TLabel
     Left = 0
     Top = 119
     Width = 304
@@ -209,18 +209,18 @@ object AboutForm: TAboutForm
     Alignment = taCenter
     AutoSize = False
     Caption = 'Tag libraries'
-    ParentFont = False
-    Layout = tlCenter
-    OnClick = Label5Click
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clHotLight
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
+    ParentFont = False
+    Layout = tlCenter
+    OnClick = Label5Click
     ExplicitTop = 106
     ExplicitWidth = 262
   end
-  object Label6: TsLabel
+  object Label6: TLabel
     Left = 0
     Top = 106
     Width = 304
@@ -230,49 +230,18 @@ object AboutForm: TAboutForm
     Alignment = taCenter
     AutoSize = False
     Caption = 'MediaInfo'
-    ParentFont = False
-    Layout = tlCenter
-    OnClick = Label6Click
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clHotLight
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
+    ParentFont = False
+    Layout = tlCenter
+    OnClick = Label6Click
     ExplicitTop = 100
     ExplicitWidth = 262
   end
-  object sLabelFX1: TsLabelFX
-    Left = 0
-    Top = 160
-    Width = 304
-    Height = 19
-    Align = alTop
-    Alignment = taCenter
-    Caption = 'Special thanks to Alptekin'
-    Angle = 0
-    Shadow.OffsetKeeper.LeftTop = -2
-    Shadow.OffsetKeeper.RightBottom = 4
-    ExplicitWidth = 128
-  end
-  object sLabel1: TsLabel
-    Left = 0
-    Top = 147
-    Width = 304
-    Height = 13
-    Cursor = crHandPoint
-    Align = alTop
-    Alignment = taCenter
-    Caption = 'pylast'
-    ParentFont = False
-    OnClick = sLabel1Click
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = [fsUnderline]
-    ExplicitWidth = 29
-  end
-  object sLabel2: TsLabel
+  object sLabel1: TLabel
     Left = 0
     Top = 134
     Width = 304
@@ -280,48 +249,36 @@ object AboutForm: TAboutForm
     Cursor = crHandPoint
     Align = alTop
     Alignment = taCenter
-    Caption = 'alphaskins'
-    ParentFont = False
-    OnClick = sLabel2Click
+    Caption = 'pylast'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
+    Font.Color = clHotLight
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
-    ExplicitWidth = 49
+    ParentFont = False
+    OnClick = sLabel1Click
+    ExplicitWidth = 29
   end
-  object Button1: TsButton
+  object Button1: TButton
     Left = 221
-    Top = 186
+    Top = 157
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'Close'
     TabOrder = 0
     OnClick = Button1Click
-    SkinData.SkinSection = 'BUTTON'
+    ExplicitTop = 186
   end
-  object Button2: TsButton
+  object Button2: TButton
     Left = 8
-    Top = 186
+    Top = 157
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Home page'
     TabOrder = 1
     OnClick = Button2Click
-    SkinData.SkinSection = 'BUTTON'
-  end
-  object sSkinProvider1: TsSkinProvider
-    AddedTitle.Font.Charset = DEFAULT_CHARSET
-    AddedTitle.Font.Color = clNone
-    AddedTitle.Font.Height = -11
-    AddedTitle.Font.Name = 'Tahoma'
-    AddedTitle.Font.Style = []
-    FormHeader.AdditionalHeight = 0
-    SkinData.SkinSection = 'FORM'
-    TitleButtons = <>
-    Left = 16
-    Top = 88
+    ExplicitTop = 186
   end
 end

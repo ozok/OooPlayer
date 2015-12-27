@@ -5,7 +5,7 @@ object RadioInfoForm: TRadioInfoForm
   Caption = 'Radio Station'
   ClientHeight = 99
   ClientWidth = 594
-  Color = 3485741
+  Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,65 +21,65 @@ object RadioInfoForm: TRadioInfoForm
     99)
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TsLabel
+  object Label1: TLabel
     Left = 8
     Top = 8
     Width = 67
     Height = 13
     Caption = 'Station name:'
   end
-  object Label2: TsLabel
+  object Label2: TLabel
     Left = 29
     Top = 27
     Width = 46
     Height = 13
     Caption = 'Web site:'
   end
-  object Label3: TsLabel
+  object Label3: TLabel
     Left = 19
     Top = 46
     Width = 56
     Height = 13
     Caption = 'Stream link:'
   end
-  object NameLabel: TsLabel
+  object NameLabel: TLabel
     Left = 81
     Top = 8
     Width = 52
     Height = 13
     Caption = 'NameLabel'
   end
-  object WebLabel: TsLabel
+  object WebLabel: TLabel
     Left = 81
     Top = 27
     Width = 47
     Height = 13
     Cursor = crHandPoint
     Caption = 'WebLabel'
-    ParentFont = False
-    OnClick = WebLabelClick
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlue
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
+    ParentFont = False
+    OnClick = WebLabelClick
   end
-  object StreamLabel: TsLabel
+  object StreamLabel: TLabel
     Left = 81
     Top = 46
     Width = 59
     Height = 13
     Cursor = crHandPoint
     Caption = 'StreamLabel'
-    ParentFont = False
-    OnClick = StreamLabelClick
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlue
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = [fsUnderline]
+    ParentFont = False
+    OnClick = StreamLabelClick
   end
-  object Button1: TsButton
+  object Button1: TButton
     Left = 511
     Top = 66
     Width = 75
@@ -94,18 +94,5 @@ object RadioInfoForm: TRadioInfoForm
     ParentFont = False
     TabOrder = 0
     OnClick = Button1Click
-    SkinData.SkinSection = 'BUTTON'
-  end
-  object sSkinProvider1: TsSkinProvider
-    AddedTitle.Font.Charset = DEFAULT_CHARSET
-    AddedTitle.Font.Color = clNone
-    AddedTitle.Font.Height = -11
-    AddedTitle.Font.Name = 'Tahoma'
-    AddedTitle.Font.Style = []
-    FormHeader.AdditionalHeight = 0
-    SkinData.SkinSection = 'FORM'
-    TitleButtons = <>
-    Left = 288
-    Top = 48
   end
 end

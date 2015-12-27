@@ -5,7 +5,7 @@ object SearchForm: TSearchForm
   Caption = 'Search'
   ClientHeight = 478
   ClientWidth = 787
-  Color = 3485741
+  Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -26,7 +26,7 @@ object SearchForm: TSearchForm
     478)
   PixelsPerInch = 96
   TextHeight = 13
-  object ResultsLbl: TsLabel
+  object ResultsLbl: TLabel
     Left = 0
     Top = 465
     Width = 787
@@ -49,7 +49,7 @@ object SearchForm: TSearchForm
     OnKeyDown = QueryEditKeyDown
     OnMouseEnter = QueryEditMouseEnter
   end
-  object SearchBtn: TsButton
+  object SearchBtn: TButton
     Left = 704
     Top = 8
     Width = 75
@@ -58,16 +58,13 @@ object SearchForm: TSearchForm
     Caption = 'Search'
     TabOrder = 1
     OnClick = SearchBtnClick
-    SkinData.SkinSection = 'BUTTON'
   end
-  object ResultsList: TsListView
+  object ResultsList: TListView
     Left = 8
     Top = 39
     Width = 771
     Height = 397
-    SkinData.SkinSection = 'EDIT'
     Anchors = [akLeft, akTop, akRight, akBottom]
-    Color = 722950
     Columns = <
       item
         Caption = 'Title'
@@ -78,7 +75,7 @@ object SearchForm: TSearchForm
         Width = 80
       end>
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = 12102048
+    Font.Color = clWindowText
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
@@ -92,19 +89,16 @@ object SearchForm: TSearchForm
     OnClick = ResultsListClick
     OnDblClick = ResultsListDblClick
   end
-  object chkCloseOnPlayBtn: TsCheckBox
+  object chkCloseOnPlayBtn: TCheckBox
     Left = 8
     Top = 440
     Width = 250
     Height = 19
-    Caption = 'Close this window if a result is selected to play'
     Anchors = [akLeft, akBottom]
+    Caption = 'Close this window if a result is selected to play'
     Checked = True
     State = cbChecked
     TabOrder = 3
-    SkinData.SkinSection = 'CHECKBOX'
-    ImgChecked = 0
-    ImgUnchecked = 0
   end
   object ListMenu: TPopupMenu
     Left = 312
@@ -113,17 +107,5 @@ object SearchForm: TSearchForm
       Caption = 'Add to queue'
       OnClick = A1Click
     end
-  end
-  object sSkinProvider1: TsSkinProvider
-    AddedTitle.Font.Charset = DEFAULT_CHARSET
-    AddedTitle.Font.Color = clNone
-    AddedTitle.Font.Height = -11
-    AddedTitle.Font.Name = 'Tahoma'
-    AddedTitle.Font.Style = []
-    FormHeader.AdditionalHeight = 0
-    SkinData.SkinSection = 'FORM'
-    TitleButtons = <>
-    Left = 456
-    Top = 144
   end
 end

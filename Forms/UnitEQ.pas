@@ -3,14 +3,12 @@ unit UnitEQ;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, sSkinProvider, Vcl.StdCtrls, sLabel,
-  Vcl.ExtCtrls, sPanel, Vcl.ComCtrls, sTrackBar, sCheckBox, sComboBox,
-  UnitMusicPlayer, Generics.Collections, IniFiles;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.ComCtrls, UnitMusicPlayer, Generics.Collections, IniFiles;
 
 type
-  TEQValuesArray = array [0 .. 17] of integer;
+  TEQValuesArray = array[0..17] of integer;
 
 type
   TEQFile = record
@@ -22,30 +20,29 @@ type
 
 type
   TEQForm = class(TForm)
-    sSkinProvider1: TsSkinProvider;
-    sTrackBar1: TsTrackBar;
-    sTrackBar2: TsTrackBar;
-    sTrackBar3: TsTrackBar;
-    sTrackBar4: TsTrackBar;
-    sTrackBar5: TsTrackBar;
-    sTrackBar6: TsTrackBar;
-    sTrackBar7: TsTrackBar;
-    sTrackBar8: TsTrackBar;
-    sTrackBar9: TsTrackBar;
-    sTrackBar10: TsTrackBar;
-    sTrackBar11: TsTrackBar;
-    sTrackBar12: TsTrackBar;
-    sTrackBar13: TsTrackBar;
-    sTrackBar14: TsTrackBar;
-    sTrackBar15: TsTrackBar;
-    sTrackBar16: TsTrackBar;
-    sTrackBar17: TsTrackBar;
-    sTrackBar18: TsTrackBar;
-    sPanel1: TsPanel;
-    sPanel2: TsPanel;
-    sLabel1: TsLabel;
-    EnableEQBtn: TsCheckBox;
-    EQPresetsList: TsComboBox;
+    sTrackBar1: TTrackBar;
+    sTrackBar2: TTrackBar;
+    sTrackBar3: TTrackBar;
+    sTrackBar4: TTrackBar;
+    sTrackBar5: TTrackBar;
+    sTrackBar6: TTrackBar;
+    sTrackBar7: TTrackBar;
+    sTrackBar8: TTrackBar;
+    sTrackBar9: TTrackBar;
+    sTrackBar10: TTrackBar;
+    sTrackBar11: TTrackBar;
+    sTrackBar12: TTrackBar;
+    sTrackBar13: TTrackBar;
+    sTrackBar14: TTrackBar;
+    sTrackBar15: TTrackBar;
+    sTrackBar16: TTrackBar;
+    sTrackBar17: TTrackBar;
+    sTrackBar18: TTrackBar;
+    sPanel1: TPanel;
+    sPanel2: TPanel;
+    sLabel1: TLabel;
+    EnableEQBtn: TCheckBox;
+    EQPresetsList: TComboBox;
     procedure EnableEQBtnClick(Sender: TObject);
     procedure sTrackBar1Change(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -56,7 +53,6 @@ type
   private
     { Private declarations }
     FEQFiles: TEQFiles;
-
     procedure SaveSettings;
     procedure LoadSettings;
   public
@@ -70,7 +66,8 @@ implementation
 
 {$R *.dfm}
 
-uses UnitMain;
+uses
+  UnitMain;
 
 procedure TEQForm.EnableEQBtnClick(Sender: TObject);
 begin
@@ -228,8 +225,9 @@ end;
 
 procedure TEQForm.sTrackBar1Change(Sender: TObject);
 begin
-  TsTrackBar(Sender).Hint := (15 - (TsTrackBar(Sender).Position / 100) - 15).ToString;
+  TTrackBar(Sender).Hint := (15 - (TTrackBar(Sender).Position / 100) - 15).ToString;
   MainForm.UpdateEQ;
 end;
 
 end.
+

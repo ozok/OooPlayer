@@ -6,20 +6,18 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask,
   JvExMask, JvToolEdit, Vcl.ComCtrls, IniFiles, JvComponentBase,
-  JvComputerInfoEx, ShellAPI, sComboBox, sButton, sLabel, sSkinProvider,
-  sMaskEdit, sCustomComboEdit, sToolEdit;
+  JvComputerInfoEx, ShellAPI;
 
 type
   TRadioRecordOptionsForm = class(TForm)
-    Label1: TsLabel;
-    Button1: TsButton;
-    Button2: TsButton;
-    Label2: TsLabel;
-    BitrateList: TsComboBox;
+    Label1: TLabel;
+    Button1: TButton;
+    Button2: TButton;
+    Label2: TLabel;
+    BitrateList: TComboBox;
     Info: TJvComputerInfoEx;
-    Label3: TsLabel;
-    sSkinProvider1: TsSkinProvider;
-    RecordSaveEdit: TsDirectoryEdit;
+    Label3: TLabel;
+    RecordSaveEdit: TJvDirectoryEdit;
     procedure Button2Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);

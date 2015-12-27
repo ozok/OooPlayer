@@ -4,12 +4,9 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
-  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, sTreeView,
-  Vcl.StdCtrls, sButton, Vcl.ExtCtrls, sPanel, sScrollBox, sPageControl,
-  sSkinProvider, sSkinManager, UnitTagReader, Generics.Collections, sEdit,
-  UnitTagTypes, MediaInfoDll, Pipes, Vcl.Mask, sMaskEdit, sCustomComboEdit,
-  sToolEdit, sListView, sConst, Vcl.ImgList, acAlphaImageList, JvComponentBase,
-  JvDragDrop, sComboBox, Vcl.Buttons, sBitBtn, sStatusBar, Vcl.Menus,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.StdCtrls,
+  Vcl.ExtCtrls, UnitTagReader, Generics.Collections, UnitTagTypes, MediaInfoDll,
+  Pipes, Vcl.Mask, Vcl.ImgList, JvComponentBase, JvDragDrop, Vcl.Buttons, Vcl.Menus,
   System.ImageList;
 
 type
@@ -21,32 +18,29 @@ type
 
 type
   TMainForm = class(TForm)
-    sSkinManager1: TsSkinManager;
-    sSkinProvider1: TsSkinProvider;
-    PageControl1: TsPageControl;
-    sTabSheet1: TsTabSheet;
-    sPanel1: TsPanel;
-    ApplyBtn: TsButton;
-    ReloadBtn: TsButton;
+    PageControl1: TPageControl;
+    sTabSheet1: TTabSheet;
+    sPanel1: TPanel;
+    ApplyBtn: TButton;
+    ReloadBtn: TButton;
     PipeClient1: TPipeClient;
-    FileList: TsListView;
-    sAlphaImageList1: TsAlphaImageList;
-    TitleEdit: TsEdit;
-    ArtistEdit: TsEdit;
-    AlbumArtistEdit: TsEdit;
-    AlbumEdit: TsEdit;
-    DateEdit: TsEdit;
-    TrackEdit: TsEdit;
-    ComposerEdit: TsEdit;
-    CommentEdit: TsEdit;
-    GenreList: TsComboBox;
+    FileList: TListView;
+    TitleEdit: TEdit;
+    ArtistEdit: TEdit;
+    AlbumArtistEdit: TEdit;
+    AlbumEdit: TEdit;
+    DateEdit: TEdit;
+    TrackEdit: TEdit;
+    ComposerEdit: TEdit;
+    CommentEdit: TEdit;
+    GenreList: TComboBox;
     JvDragDrop1: TJvDragDrop;
-    sStatusBar1: TsStatusBar;
-    TopPanel: TsPanel;
-    AddFileBtn: TsBitBtn;
-    RemoveSelectedBtn: TsBitBtn;
-    RemoveAllBtn: TsBitBtn;
-    AboutBtn: TsBitBtn;
+    sStatusBar1: TStatusBar;
+    TopPanel: TPanel;
+    AddFileBtn: TBitBtn;
+    RemoveSelectedBtn: TBitBtn;
+    RemoveAllBtn: TBitBtn;
+    AboutBtn: TBitBtn;
     MainMenu1: TMainMenu;
     F1: TMenuItem;
     T1: TMenuItem;
@@ -56,6 +50,7 @@ type
     S1: TMenuItem;
     R3: TMenuItem;
     A2: TMenuItem;
+    ImageList1: TImageList;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Button1Click(Sender: TObject);
@@ -121,7 +116,7 @@ end;
 procedure TMainForm.EditChange(Sender: TObject);
 begin
   ApplyBtn.Enabled := True;
-  FTags[TsEdit(Sender).Tag].Edited := True;
+  FTags[TEdit(Sender).Tag].Edited := True;
 end;
 
 procedure TMainForm.FileListClick(Sender: TObject);
@@ -157,7 +152,6 @@ begin
   FTagReader := TTagReader.Create;
   FTags := TGeneralTagList.Create;
   FDisplayTags := TGeneralTagList.Create;
-  sSkinManager1.SkinDirectory := ExtractFileDir(Application.ExeName) + '\skins\';
   FSettingsFile := TStringList.Create;
   if not MediaInfoDLL_Load(ExtractFileDir(Application.ExeName) + '\mediainfo.dll') then
   begin
@@ -165,7 +159,6 @@ begin
     Application.Terminate;
   end;
   FFileItems := TFileItems.Create;
-  sSkinManager1.SkinDirectory := ExtractFileDir(Application.ExeName) + '\skins';
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -284,31 +277,6 @@ begin
     GetFileInfoForDisplay(Msg.Replace('File:', '', []));
     FileList.Items.Count := FFileItems.Count;
     GetFileInfo(FFileItems.Count - 1);
-  end
-  else if Msg.StartsWith('Skin') then
-  begin
-    LSkinName := Msg.Replace('Skin:', '', []);
-    if LSkinName = 'none' then
-    begin
-      sSkinManager1.Active := False;
-    end
-    else
-    begin
-      sSkinManager1.Active := True;
-      sSkinManager1.SkinName := LSkinName;
-    end;
-  end
-  else if Msg.StartsWith('Hue') then
-  begin
-    sSkinManager1.HueOffset := Msg.Replace('Hue:', '', []).ToInteger;
-  end
-  else if Msg.StartsWith('Brig') then
-  begin
-    sSkinManager1.Brightness := Msg.Replace('Brig:', '', []).ToInteger;
-  end
-  else if Msg.StartsWith('Sat') then
-  begin
-    sSkinManager1.Saturation := Msg.Replace('Sat:', '', []).ToInteger;
   end
   else if Msg.StartsWith('Active') then
   begin

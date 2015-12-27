@@ -26,51 +26,42 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
   IniFiles, Vcl.Mask, JvExMask, JvSpin, JvThread, JvComponentBase,
-  JvUrlListGrabber, JvUrlGrabbers, ShellAPI, sComboBox, sLabel, sButton,
-  sCheckBox, sPageControl, sSkinProvider, sEdit, sSpinEdit, IdGlobal, IdHash,
-  IdHashMessageDigest, sTrackBar, sGroupBox;
+  JvUrlListGrabber, JvUrlGrabbers, ShellAPI, IdGlobal, IdHash,
+  IdHashMessageDigest, Vcl.Samples.Spin;
 
 type
   TSettingsForm = class(TForm)
-    PageControl1: TsPageControl;
-    Button1: TsButton;
-    TabSheet1: TsTabSheet;
-    TabSheet2: TsTabSheet;
-    PlayCursorBtn: TsCheckBox;
-    PlayJumpBtn: TsCheckBox;
-    CheckUpdateBtn: TsCheckBox;
-    TabSheet3: TsTabSheet;
-    LoadArtBtn: TsCheckBox;
-    CoverArtList: TsComboBox;
-    TabSheet5: TsTabSheet;
-    LyricBtn: TsCheckBox;
-    LogLyricFailBtn: TsCheckBox;
+    PageControl1: TPageControl;
+    Button1: TButton;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    PlayCursorBtn: TCheckBox;
+    PlayJumpBtn: TCheckBox;
+    CheckUpdateBtn: TCheckBox;
+    TabSheet3: TTabSheet;
+    LoadArtBtn: TCheckBox;
+    CoverArtList: TComboBox;
+    TabSheet5: TTabSheet;
+    LyricBtn: TCheckBox;
+    LogLyricFailBtn: TCheckBox;
     UpdateChecker: TJvHttpUrlGrabber;
     UpdateThread: TJvThread;
-    Button2: TsButton;
-    sSkinProvider1: TsSkinProvider;
-    sTabSheet1: TsTabSheet;
-    SkinsList: TsComboBox;
-    BufferEdit: TsSpinEdit;
-    PlaylistItemTextList: TsComboBox;
-    WindowTitleList: TsComboBox;
-    sTabSheet2: TsTabSheet;
-    LastFMUserEdit: TsEdit;
-    LastFMPassEdit: TsEdit;
-    LastFMSaveBtn: TsButton;
-    LastFMEnableBtn: TsCheckBox;
-    sGroupBox1: TsGroupBox;
-    sLabel2: TsLabel;
-    SaturationBar: TsTrackBar;
-    BrightnessBar: TsTrackBar;
-    sLabel3: TsLabel;
-    sLabel1: TsLabel;
-    HueBar: TsTrackBar;
-    HueLabel: TsLabel;
-    SaturationLabel: TsLabel;
-    BrightnessLabel: TsLabel;
-    sLabel4: TsLabel;
-    ShowDownloadedLyrics: TsCheckBox;
+    Button2: TButton;
+    BufferEdit: TSpinEdit;
+    PlaylistItemTextList: TComboBox;
+    WindowTitleList: TComboBox;
+    sTabSheet2: TTabSheet;
+    LastFMUserEdit: TEdit;
+    LastFMPassEdit: TEdit;
+    LastFMSaveBtn: TButton;
+    LastFMEnableBtn: TCheckBox;
+    sLabel4: TLabel;
+    ShowDownloadedLyrics: TCheckBox;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LoadArtBtnClick(Sender: TObject);
@@ -79,16 +70,11 @@ type
     procedure Button2Click(Sender: TObject);
     procedure UpdateCheckerDoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string);
     procedure FormShow(Sender: TObject);
-    procedure SkinsListChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure PlaylistItemTextListChange(Sender: TObject);
     procedure LastFMSaveBtnClick(Sender: TObject);
-    procedure HueBarChange(Sender: TObject);
-    procedure SaturationBarChange(Sender: TObject);
-    procedure BrightnessBarChange(Sender: TObject);
   private
     { Private declarations }
-    procedure GetAllSkins;
   public
     { Public declarations }
     LastFMUser: string;
@@ -107,17 +93,9 @@ implementation
 uses
   UnitMain, UnitAbout, UnitLog;
 
-procedure TSettingsForm.BrightnessBarChange(Sender: TObject);
-begin
-  MainForm.sSkinManager1.BeginUpdate;
-  MainForm.sSkinManager1.Brightness := BrightnessBar.Position;
-  BrightnessLabel.Caption := BrightnessBar.Position.ToString();
-  MainForm.sSkinManager1.EndUpdate(True, False);
-end;
-
 procedure TSettingsForm.BufferEditChange(Sender: TObject);
 begin
-  MainForm.SetPlayerBuffer(Round(BufferEdit.Value));
+  MainForm.SetPlayerBuffer(BufferEdit.Value);
 end;
 
 procedure TSettingsForm.Button1Click(Sender: TObject);
@@ -137,32 +115,12 @@ end;
 
 procedure TSettingsForm.FormCreate(Sender: TObject);
 begin
-  GetAllSkins;
   LoadSettings;
 end;
 
 procedure TSettingsForm.FormShow(Sender: TObject);
 begin
   LoadSettings;
-end;
-
-procedure TSettingsForm.GetAllSkins;
-var
-  I: Integer;
-begin
-  SkinsList.Items.LoadFromFile(ExtractFileDir(Application.ExeName) + '\skins.txt');
-  for I := 0 to SkinsList.Items.Count - 1 do
-  begin
-    SkinsList.Items[i] := ChangeFileExt(SkinsList.Items[i], '');
-  end;
-end;
-
-procedure TSettingsForm.HueBarChange(Sender: TObject);
-begin
-  MainForm.sSkinManager1.BeginUpdate;
-  MainForm.sSkinManager1.HueOffset := HueBar.Position;
-  HueLabel.Caption := HueBar.Position.ToString();
-  MainForm.sSkinManager1.EndUpdate(True, False);
 end;
 
 procedure TSettingsForm.LastFMSaveBtnClick(Sender: TObject);
@@ -219,7 +177,6 @@ begin
       ShowDownloadedLyrics.Checked := SettingsFile.ReadBool('settings', 'showloyric', True);
       LogLyricFailBtn.Checked := SettingsFile.ReadBool('settings', 'loglyric', False);
       BufferEdit.Text := SettingsFile.ReadString('settings', 'buffer', '500');
-      SkinsList.ItemIndex := SettingsFile.ReadInteger('settings', 'skin2', 33);
       WindowTitleList.ItemIndex := SettingsFile.ReadInteger('settings', 'windowtitle', 0);
       PlaylistItemTextList.ItemIndex := SettingsFile.ReadInteger('settings', 'playlistitemtext', 2);
       LastFMEnableBtn.Checked := SettingsFile.ReadBool('settings', 'lastfm', True);
@@ -227,7 +184,6 @@ begin
   finally
     SettingsFile.Free;
     LoadArtBtnClick(Self);
-    SkinsListChange(Self);
   end;
   SettingsFile := TIniFile.Create(MainForm.FAppDataFolder + '\lastfm.ini');
   try
@@ -247,14 +203,6 @@ begin
   MainForm.PlayList.Invalidate;
 end;
 
-procedure TSettingsForm.SaturationBarChange(Sender: TObject);
-begin
-  MainForm.sSkinManager1.BeginUpdate;
-  MainForm.sSkinManager1.Saturation := SaturationBar.Position;
-  SaturationLabel.Caption := SaturationBar.Position.ToString();
-  MainForm.sSkinManager1.EndUpdate(True, False);
-end;
-
 procedure TSettingsForm.SaveSettings;
 var
   SettingsFile: TIniFile;
@@ -272,34 +220,12 @@ begin
       SettingsFile.WriteBool('settings', 'showloyric', ShowDownloadedLyrics.Checked);
       SettingsFile.WriteBool('settings', 'loglyric', LogLyricFailBtn.Checked);
       SettingsFile.WriteString('settings', 'buffer', BufferEdit.Text);
-      SettingsFile.WriteInteger('settings', 'skin2', SkinsList.ItemIndex);
       SettingsFile.WriteInteger('settings', 'windowtitle', WindowTitleList.ItemIndex);
       SettingsFile.WriteInteger('settings', 'playlistitemtext', PlaylistItemTextList.ItemIndex);
       SettingsFile.WriteBool('settings', 'lastfm', LastFMEnableBtn.Checked);
-      SettingsFile.WriteInteger('settings', 'hue', HueBar.Position);
-      SettingsFile.WriteInteger('settings', 'satu', SaturationBar.Position);
-      SettingsFile.WriteInteger('settings', 'bright', BrightnessBar.Position);
     end;
   finally
     SettingsFile.Free;
-  end;
-end;
-
-procedure TSettingsForm.SkinsListChange(Sender: TObject);
-begin
-  if SkinsList.ItemIndex > 0 then
-  begin
-    MainForm.sSkinManager1.BeginUpdate;
-    MainForm.sSkinManager1.SkinName := SkinsList.Text + '.asz';
-    MainForm.sSkinManager1.Active := True;
-    MainForm.sSkinManager1.EndUpdate(True);
-  end
-  else
-  begin
-    MainForm.sSkinManager1.Active := False;
-    MainForm.PlayList.Font.Color := clBlack;
-    MainForm.RadioList.Font.Color := clBlack;
-    MainForm.QueueList.Font.Color := clBlack;
   end;
 end;
 

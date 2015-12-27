@@ -4,17 +4,15 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
-  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  sButton, sSkinProvider;
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls;
 
 type
   TNewRadioForm = class(TForm)
     NameEdit: TLabeledEdit;
     WebEdit: TLabeledEdit;
     StreamEdit: TLabeledEdit;
-    SaveBtn: TsButton;
-    CancelBtn: TsButton;
-    sSkinProvider1: TsSkinProvider;
+    SaveBtn: TButton;
+    CancelBtn: TButton;
     procedure CancelBtnClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);

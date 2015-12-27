@@ -5,7 +5,7 @@ object NewRadioForm: TNewRadioForm
   Caption = 'New radio station'
   ClientHeight = 127
   ClientWidth = 594
-  Color = 3485741
+  Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -57,7 +57,7 @@ object NewRadioForm: TNewRadioForm
     LabelPosition = lpLeft
     TabOrder = 2
   end
-  object SaveBtn: TsButton
+  object SaveBtn: TButton
     Left = 511
     Top = 94
     Width = 75
@@ -66,9 +66,8 @@ object NewRadioForm: TNewRadioForm
     Caption = 'Add'
     TabOrder = 3
     OnClick = SaveBtnClick
-    SkinData.SkinSection = 'BUTTON'
   end
-  object CancelBtn: TsButton
+  object CancelBtn: TButton
     Left = 430
     Top = 94
     Width = 75
@@ -77,18 +76,5 @@ object NewRadioForm: TNewRadioForm
     Caption = 'Cancel'
     TabOrder = 4
     OnClick = CancelBtnClick
-    SkinData.SkinSection = 'BUTTON'
-  end
-  object sSkinProvider1: TsSkinProvider
-    AddedTitle.Font.Charset = DEFAULT_CHARSET
-    AddedTitle.Font.Color = clNone
-    AddedTitle.Font.Height = -11
-    AddedTitle.Font.Name = 'Tahoma'
-    AddedTitle.Font.Style = []
-    FormHeader.AdditionalHeight = 0
-    SkinData.SkinSection = 'FORM'
-    TitleButtons = <>
-    Left = 288
-    Top = 64
   end
 end

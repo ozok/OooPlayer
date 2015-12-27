@@ -18,15 +18,14 @@ object LogForm: TLogForm
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object LogList: TsMemo
+  object LogList: TMemo
     Left = 0
     Top = 0
     Width = 635
     Height = 300
     Align = alClient
-    Color = 722950
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = 12102048
+    Font.Color = clBlack
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
@@ -35,18 +34,5 @@ object LogForm: TLogForm
     ScrollBars = ssBoth
     TabOrder = 0
     OnChange = LogListChange
-    SkinData.SkinSection = 'EDIT'
-  end
-  object sSkinProvider1: TsSkinProvider
-    AddedTitle.Font.Charset = DEFAULT_CHARSET
-    AddedTitle.Font.Color = clNone
-    AddedTitle.Font.Height = -11
-    AddedTitle.Font.Name = 'Tahoma'
-    AddedTitle.Font.Style = []
-    FormHeader.AdditionalHeight = 0
-    SkinData.SkinSection = 'FORM'
-    TitleButtons = <>
-    Left = 312
-    Top = 152
   end
 end

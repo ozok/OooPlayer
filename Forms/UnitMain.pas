@@ -34,13 +34,8 @@ uses
   UnitMusicPlayer, Bass, BASSenc, IdBaseComponent, IdThreadComponent,
   UnitLyricDownloader, UnitTagWriter, UnitImageResize, JvAnimatedImage,
   JvGIFCtrl, JvExExtCtrls, JvImage, JvAppInst, UnitArtworkReader, Vcl.Taskbar,
-  System.Win.TaskbarCore, sSkinManager, sDialogs, sMemo, sListView, sPageControl,
-  sStatusBar, sLabel, sComboBox, sBitBtn, sPanel, sBevel, sSplitter,
-  sSkinProvider, acProgressBar, sTrackBar, acImage, acPNG, acAlphaHints,
-  acAlphaImageList, sButton, Vcl.AppEvnts, acShellCtrls, sComboBoxes, sTreeView,
-  sListBox, System.Types, sEdit, sGauge, UnitLastFMToolLauncher, Pipes,
-  UnitSubProcessLauncher, GraphUtil, Vcl.XPMan, UnitCueParser, System.ImageList,
-  CommonTypes;
+  System.Win.TaskbarCore, Vcl.AppEvnts, System.Types, UnitLastFMToolLauncher,
+  Pipes, UnitSubProcessLauncher, GraphUtil, Vcl.XPMan, UnitCueParser, System.ImageList;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -86,7 +81,7 @@ type
 
 type
   TMainForm = class(TForm)
-    TopBarPnl: TsPanel;
+    TopBarPnl: TPanel;
     OpenFolder: TJvBrowseForFolderDialog;
     MusicSearch: TJvSearchFiles;
     MainMenu1: TMainMenu;
@@ -115,16 +110,16 @@ type
     G1: TMenuItem;
     SysInfo: TJvComputerInfoEx;
     R1: TMenuItem;
-    StatusBar: TsStatusBar;
+    StatusBar: TStatusBar;
     N1: TMenuItem;
     s3: TMenuItem;
     L1: TMenuItem;
     N4: TMenuItem;
     E2: TMenuItem;
     L2: TMenuItem;
-    ProgressPanel: TsPanel;
-    AbortBtn: TsBitBtn;
-    ProgressLabel: TsLabel;
+    ProgressPanel: TPanel;
+    AbortBtn: TButton;
+    ProgressLabel: TLabel;
     R2: TMenuItem;
     DragDrop: TJvDragDrop;
     H1: TMenuItem;
@@ -132,7 +127,7 @@ type
     E3: TMenuItem;
     A1: TMenuItem;
     UpdateThread: TJvThread;
-    OpenDialog: TsOpenDialog;
+    OpenDialog: TOpenDialog;
     S4: TMenuItem;
     D1: TMenuItem;
     TrayMenu: TPopupMenu;
@@ -142,10 +137,10 @@ type
     v3: TMenuItem;
     V4: TMenuItem;
     PositionTimer: TTimer;
-    FuncPages: TsPageControl;
-    TabSheet1: TsTabSheet;
-    TabSheet2: TsTabSheet;
-    RadioList: TsListView;
+    FuncPages: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    RadioList: TListView;
     RadioListMenu: TPopupMenu;
     S6: TMenuItem;
     A2: TMenuItem;
@@ -155,30 +150,30 @@ type
     A5: TMenuItem;
     A6: TMenuItem;
     R4: TMenuItem;
-    RadioRecordPanel: TsPanel;
-    RecordRadioBtn: TsBitBtn;
-    StopRadioRecordBtn: TsBitBtn;
-    RadioRecordFormatList: TsComboBox;
-    Label1: TsLabel;
-    RadioRecordingOptionsBtn: TsBitBtn;
-    RadioRecordModeList: TsComboBox;
-    Label2: TsLabel;
-    RadioRecordOutputFolderBtn: TsBitBtn;
+    RadioRecordPanel: TPanel;
+    RecordRadioBtn: TButton;
+    StopRadioRecordBtn: TButton;
+    RadioRecordFormatList: TComboBox;
+    Label1: TLabel;
+    RadioRecordingOptionsBtn: TButton;
+    RadioRecordModeList: TComboBox;
+    Label2: TLabel;
+    RadioRecordOutputFolderBtn: TButton;
     D2: TMenuItem;
     S7: TMenuItem;
     S8: TMenuItem;
-    LyricPanel: TsPanel;
-    LyricStatusLabel: TsLabel;
-    pnl3: TsPanel;
+    LyricPanel: TPanel;
+    LyricStatusLabel: TLabel;
+    pnl3: TPanel;
     LyricTitleEdit: TLabeledEdit;
     LyricArtistEdit: TLabeledEdit;
-    LyricSearchBtn: TsBitBtn;
-    LyricSourceList: TsComboBox;
-    PlayList: TsListView;
-    QueueList: TsListView;
-    Splitter1: TsSplitter;
-    Splitter2: TsSplitter;
-    LyricList: TsListBox;
+    LyricSearchBtn: TButton;
+    LyricSourceList: TComboBox;
+    PlayList: TListView;
+    QueueList: TListView;
+    Splitter1: TSplitter;
+    Splitter2: TSplitter;
+    LyricList: TListBox;
     QueuelistMenu: TPopupMenu;
     P8: TMenuItem;
     R5: TMenuItem;
@@ -186,19 +181,13 @@ type
     AppInstances: TJvAppInstances;
     ProgressTimer: TTimer;
     OverlayImgs: TImageList;
-    sSkinManager1: TsSkinManager;
-    sSkinProvider1: TsSkinProvider;
-    sAlphaHints1: TsAlphaHints;
-    CategoryList: TsAlphaImageList;
     LabelScrollTimer: TJvThreadTimer;
     E4: TMenuItem;
     AddMenu: TPopupMenu;
     H2: TMenuItem;
-    ShortcutPanel: TsPanel;
-    AddMenuBtn: TsBitBtn;
-    RemoveMenuBtn: TsBitBtn;
-    SearchMenuBtn: TsBitBtn;
-    PlaylistMenuBtn: TsBitBtn;
+    ShortcutPanel: TPanel;
+    AddMenuBtn: TButton;
+    RemoveMenuBtn: TButton;
     A7: TMenuItem;
     A8: TMenuItem;
     RemoveMenu: TPopupMenu;
@@ -207,66 +196,67 @@ type
     Playlist2Menu: TPopupMenu;
     S10: TMenuItem;
     L3: TMenuItem;
-    RadioConnectionBar: TsProgressBar;
-    CoverPanel: TsPanel;
+    RadioConnectionBar: TProgressBar;
+    CoverPanel: TPanel;
     CoverImage: TJvImage;
-    VolumePnl: TsPanel;
-    VolumeBar: TsTrackBar;
-    PlaybackPanel: TsPanel;
-    PositionPanel: TsPanel;
-    PositionLabel: TsLabel;
-    ControlsPanel: TsPanel;
-    InfoPanel: TsPanel;
-    TitleLabel: TsLabel;
-    PlayControlsPanel: TsPanel;
-    NextBtn: TsBitBtn;
-    PauseBtn: TsBitBtn;
-    PlayBtn: TsBitBtn;
-    PrevBtn: TsBitBtn;
-    StopBtn: TsBitBtn;
-    SettingsPanel: TsPanel;
-    LogsBtn: TsBitBtn;
-    EQBtn: TsBitBtn;
-    SearchBtn: TsBitBtn;
-    SettingsBtn: TsBitBtn;
-    PlaybackOrderList: TsComboBox;
-    sWebLabel1: TsWebLabel;
-    PrevArtworkBtn: TsBitBtn;
-    NextArtworkBtn: TsBitBtn;
-    sPanel7: TsPanel;
-    CoverArtInfoLabel: TsLabel;
-    sSplitter1: TsSplitter;
+    VolumePnl: TPanel;
+    VolumeBar: TJvTrackBar;
+    PlaybackPanel: TPanel;
+    PositionPanel: TPanel;
+    PositionLabel: TLabel;
+    ControlsPanel: TPanel;
+    InfoPanel: TPanel;
+    TitleLabel: TLabel;
+    PlayControlsPanel: TPanel;
+    NextBtn: TButton;
+    PauseBtn: TButton;
+    PlayBtn: TButton;
+    PrevBtn: TButton;
+    StopBtn: TButton;
+    SettingsPanel: TPanel;
+    LogsBtn: TButton;
+    EQBtn: TButton;
+    SearchBtn: TButton;
+    SettingsBtn: TButton;
+    PlaybackOrderList: TComboBox;
+    PrevArtworkBtn: TButton;
+    NextArtworkBtn: TButton;
+    sPanel7: TPanel;
+    CoverArtInfoLabel: TLabel;
+    sSplitter1: TSplitter;
     FuncListMenu: TPopupMenu;
     N5: TMenuItem;
     D5: TMenuItem;
     R6: TMenuItem;
-    CategoryPages: TsPageControl;
-    sTabSheet2: TsTabSheet;
-    sTabSheet4: TsTabSheet;
-    PlaylistListPanel: TsPanel;
-    AddPlaylistBtn: TsBitBtn;
-    RemovePlaylistBtn: TsBitBtn;
-    RenamePlaylistBtn: TsButton;
-    sSplitter2: TsSplitter;
+    CategoryPages: TPageControl;
+    sTabSheet2: TTabSheet;
+    sTabSheet4: TTabSheet;
+    PlaylistListPanel: TPanel;
+    AddPlaylistBtn: TButton;
+    RemovePlaylistBtn: TButton;
+    RenamePlaylistBtn: TButton;
+    sSplitter2: TSplitter;
     LastFMLaunchTimer: TTimer;
     PipeServer: TPipeServer;
     TrayIcon: TJvTrayIcon;
     UpdateChecker: TJvHttpUrlGrabber;
-    PlaybackImages: TsAlphaImageList;
     H3: TMenuItem;
     H4: TMenuItem;
     F3: TMenuItem;
     Taskbar2: TTaskbar;
-    XPManifest1: TXPManifest;
-    ReloadLyricTitleBtn: TsBitBtn;
-    PlaylistView: TsListView;
+    ReloadLyricTitleBtn: TButton;
+    PlaylistView: TListView;
     RadioThread: TIdThreadComponent;
-    RadiosView: TsListView;
+    RadiosView: TListView;
     R7: TMenuItem;
-    LeftPanelBtn: TsBitBtn;
-    RightPanelBtn: TsBitBtn;
-    PositionBar: TsTrackBar;
-    InfoLabel: TsLabel;
+    LeftPanelBtn: TButton;
+    RightPanelBtn: TButton;
+    PositionBar: TJvTrackBar;
+    InfoLabel: TLabel;
+    CategoryList: TImageList;
+    PlaybackImages: TImageList;
+    TopBtnImages: TImageList;
+    BottomBtnImages: TImageList;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -373,7 +363,6 @@ type
     procedure H2Click(Sender: TObject);
     procedure AddMenuBtnClick(Sender: TObject);
     procedure RemoveMenuBtnClick(Sender: TObject);
-    procedure PlaylistMenuBtnClick(Sender: TObject);
     procedure EQBtnClick(Sender: TObject);
     procedure EQBtnMouseEnter(Sender: TObject);
     procedure P8Click(Sender: TObject);
@@ -452,7 +441,6 @@ type
     procedure MoveRadioStations;
     procedure WriteTagsToRecordFile;
     procedure UpdateOverlayIcon(const Index: integer);
-    procedure ChangeSkin(const SkinIndex: integer);
     procedure LastFMScrobble;
   public
     { Public declarations }
@@ -1368,22 +1356,6 @@ begin
   end;
 end;
 
-procedure TMainForm.ChangeSkin(const SkinIndex: integer);
-var
-  LSkins: TStringList;
-begin
-  LSkins := TStringList.Create;
-  try
-    LSkins.LoadFromFile(ExtractFileDir(Application.ExeName) + '\skins.txt');
-    if LSkins.Count < SkinIndex then
-    begin
-      sSkinManager1.SkinName := LSkins[SkinIndex];
-    end;
-  finally
-    LSkins.Free;
-  end;
-end;
-
 function TMainForm.CodecToExtension(const AudioCodec: string): string;
 var
   LCodecStr: string;
@@ -1920,7 +1892,6 @@ begin
   Taskbar2.ProgressMaxValue := High(Int64);
   FPlayListFiles := TPlaylistFiles.Create;
   FStopAddFiles := True;
-  sSkinManager1.SkinDirectory := ExtractFileDir(Application.ExeName) + '\skins\';
   FExternalArtworkFiles := TStringList.Create;
   FuncPages.Pages[0].TabVisible := False;
   FuncPages.Pages[1].TabVisible := False;
@@ -2265,7 +2236,6 @@ procedure TMainForm.H3Click(Sender: TObject);
 begin
   CategoryPages.Visible := not CategoryPages.Visible;
   H3.Checked := not CategoryPages.Visible;
-  LeftPanelBtn.Down := H3.Checked;
   sSplitter2.Visible := CategoryPages.Visible;
   FormResize(Self);
 end;
@@ -2274,7 +2244,6 @@ procedure TMainForm.H4Click(Sender: TObject);
 begin
   LyricPanel.Visible := not LyricPanel.Visible;
   H4.Checked := not LyricPanel.Visible;
-  RightPanelBtn.Down := H4.Checked;
   Splitter2.Visible := LyricPanel.Visible;
   FormResize(Self);
 end;
@@ -2396,7 +2365,6 @@ begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
 
-
           try
             if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
             begin
@@ -2405,7 +2373,6 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
-
 
           end;
         end
@@ -2434,7 +2401,6 @@ begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
 
-
           try
             if FShuffleIndex + 1 < FShuffleIndexes.Count then
             begin
@@ -2447,7 +2413,6 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
-
 
           end;
         end
@@ -2954,23 +2919,14 @@ begin
       Splitter1.Visible := QueueList.Visible;
       CategoryPages.Visible := ReadBool('player', 'catvisible', True);
       H3.Checked := not CategoryPages.Visible;
-      LeftPanelBtn.Down := H3.Checked;
       sSplitter2.Visible := CategoryPages.Visible;
       LyricPanel.Visible := ReadBool('player', 'lyricvisible', True);
       H4.Checked := not LyricPanel.Visible;
-      RightPanelBtn.Down := H4.Checked;
       Splitter2.Visible := LyricPanel.Visible;
 
       LSkinIndex := SettingsFile.ReadInteger('settings', 'skin2', 33);
       CoverPanel.Height := SettingsFile.ReadInteger('settings', 'coverheight', 182);
       CategoryPages.Width := SettingsFile.ReadInteger('settings', 'categorywidth', 255);
-
-      SettingsForm.HueBar.Position := SettingsFile.ReadInteger('settings', 'hue', 0);
-      SettingsForm.SaturationBar.Position := SettingsFile.ReadInteger('settings', 'satu', 0);
-      SettingsForm.BrightnessBar.Position := SettingsFile.ReadInteger('settings', 'bright', 0);
-      SettingsForm.HueBarChange(Self);
-      SettingsForm.SaturationBarChange(Self);
-      SettingsForm.BrightnessBarChange(Self);
 
       with PlayList do
       begin
@@ -2986,17 +2942,6 @@ begin
     end;
   finally
     SettingsFile.Free;
-    if (LSkinIndex > 0) and (LSkinIndex < 111) then
-    begin
-      MainForm.sSkinManager1.BeginUpdate;
-      ChangeSkin(LSkinIndex - 1);
-      MainForm.sSkinManager1.Active := True;
-      MainForm.sSkinManager1.EndUpdate(False);
-    end
-    else
-    begin
-      MainForm.sSkinManager1.Active := False;
-    end;
   end;
 end;
 
@@ -3221,7 +3166,6 @@ begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
 
-
           PlayItem(LRndIndex);
           PlayItemUIUpdate;
         end;
@@ -3229,7 +3173,6 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
-
 
           try
             if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
@@ -3240,7 +3183,6 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
-
 
           end;
         end;
@@ -3446,18 +3388,6 @@ var
   LSaturation: string;
   I: Integer;
 begin
-  if sSkinManager1.Active then
-  begin
-    LSkinName := 'Skin:' + sSkinManager1.SkinName;
-  end
-  else
-  begin
-    LSkinName := 'Skin:none';
-  end;
-  LHue := 'Hue:' + sSkinManager1.HueOffset.ToString();
-  LBrightness := 'Brig:' + sSkinManager1.Brightness.ToString();
-  LSaturation := 'Sat:' + sSkinManager1.Saturation.ToString();
-
   if FTagFiles.Count > 0 then
   begin
     for I := 0 to FTagFiles.Count - 1 do
@@ -3551,7 +3481,6 @@ begin
                   PositionTimer.Enabled := False;
                   ProgressTimer.Enabled := PositionTimer.Enabled;
 
-
                   PlayItem(PlayList.ItemIndex);
                   PlayItemUIUpdate;
                 end
@@ -3568,7 +3497,6 @@ begin
                     // if stopped start platyng
                     PositionTimer.Enabled := False;
                     ProgressTimer.Enabled := PositionTimer.Enabled;
-
 
                     PlayItem(PlayList.ItemIndex);
                     PlayItemUIUpdate;
@@ -3601,7 +3529,6 @@ begin
               PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
 
-
               PlayItem(LRndIndex);
               PlayItemUIUpdate;
             end;
@@ -3609,7 +3536,6 @@ begin
             begin
               PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
-
 
               try
                 if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
@@ -3621,14 +3547,12 @@ begin
                 PositionTimer.Enabled := True;
                 ProgressTimer.Enabled := PositionTimer.Enabled;
 
-
               end;
             end;
           3: // shuffle
             begin
               PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
-
 
               try
                 if FShuffleIndex + 1 < FShuffleIndexes.Count then
@@ -3643,7 +3567,6 @@ begin
               finally
                 PositionTimer.Enabled := True;
                 ProgressTimer.Enabled := PositionTimer.Enabled;
-
 
               end;
             end;
@@ -3756,7 +3679,6 @@ begin
                         PositionTimer.Enabled := False;
                         ProgressTimer.Enabled := PositionTimer.Enabled;
 
-
                         PlayItem(PlayList.ItemIndex);
                         PlayItemUIUpdate;
                       end
@@ -3773,7 +3695,6 @@ begin
                           // if stopped start platyng
                           PositionTimer.Enabled := False;
                           ProgressTimer.Enabled := PositionTimer.Enabled;
-
 
                           PlayItem(PlayList.ItemIndex);
                           PlayItemUIUpdate;
@@ -3806,7 +3727,6 @@ begin
                     PositionTimer.Enabled := False;
                     ProgressTimer.Enabled := PositionTimer.Enabled;
 
-
                     PlayItem(LRndIndex);
                     PlayItemUIUpdate;
                   end;
@@ -3814,7 +3734,6 @@ begin
                   begin
                     PositionTimer.Enabled := False;
                     ProgressTimer.Enabled := PositionTimer.Enabled;
-
 
                     try
                       if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
@@ -3826,14 +3745,12 @@ begin
                       PositionTimer.Enabled := True;
                       ProgressTimer.Enabled := PositionTimer.Enabled;
 
-
                     end;
                   end;
                 3: // shuffle
                   begin
                     PositionTimer.Enabled := False;
                     ProgressTimer.Enabled := PositionTimer.Enabled;
-
 
                     try
                       if FShuffleIndex + 1 < FShuffleIndexes.Count then
@@ -3848,7 +3765,6 @@ begin
                     finally
                       PositionTimer.Enabled := True;
                       ProgressTimer.Enabled := PositionTimer.Enabled;
-
 
                     end;
                   end;
@@ -4185,28 +4101,11 @@ var
 begin
   if (Item.Index mod 2) = 0 then
   begin
-    Sender.Canvas.Brush.Color := (Sender as TsListView).Color;
+    Sender.Canvas.Brush.Color := (Sender as TListView).Color;
   end
   else
   begin
-    if sSkinManager1.Active then
-    begin
-      ColorRGBToHLS((Sender as TsListView).Color, H, L, s);
-      if L < 10 then
-      begin
-        L := 10;
-        L := (L * 120) div 100;
-      end
-      else if L > 90 then
-      begin
-        L := (L * 80) div 100;
-      end;
-      Sender.Canvas.Brush.Color := ColorHLSToRGB(H, L, s);
-    end
-    else
-    begin
-      Sender.Canvas.Brush.Color := clGradientInactiveCaption;
-    end;
+    Sender.Canvas.Brush.Color := clGradientInactiveCaption;
   end;
   if FPlayer.PlayerStatus2 <> psStopped then
   begin
@@ -4355,7 +4254,6 @@ begin
     PositionTimer.Enabled := False;
     ProgressTimer.Enabled := PositionTimer.Enabled;
 
-
     PlayItem(PlayList.ItemIndex);
     PlayItemUIUpdate;
   end;
@@ -4386,14 +4284,6 @@ end;
 procedure TMainForm.PlayListDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
 begin
   Accept := (Source is TMyDragObject);
-end;
-
-procedure TMainForm.PlaylistMenuBtnClick(Sender: TObject);
-var
-  p: TPoint;
-begin
-  p := PlaylistMenuBtn.ClientToScreen(Point(0, 0));
-  Playlist2Menu.Popup(p.X, p.Y + PlaylistMenuBtn.Height)
 end;
 
 procedure TMainForm.PlayListMouseEnter(Sender: TObject);
@@ -4524,7 +4414,6 @@ begin
     PositionTimer.Enabled := False;
     ProgressTimer.Enabled := PositionTimer.Enabled;
 
-
     try
       if not FPlayer.SetPosition((FPlayer.TotalLength * PositionBar.Position) div High(Int64)) then
       begin
@@ -4533,7 +4422,6 @@ begin
     finally
       PositionTimer.Enabled := True;
       ProgressTimer.Enabled := PositionTimer.Enabled;
-
 
     end;
   end;
@@ -4623,7 +4511,6 @@ begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
 
-
           if FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > 0 then
           begin
             PlayItem(FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex - 1);
@@ -4645,7 +4532,6 @@ begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
 
-
           try
             if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
             begin
@@ -4655,7 +4541,6 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
-
 
           end;
         end;

@@ -5,7 +5,7 @@ object SettingsForm: TSettingsForm
   Caption = 'Settings'
   ClientHeight = 325
   ClientWidth = 560
-  Color = 3485741
+  Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,7 +22,7 @@ object SettingsForm: TSettingsForm
     325)
   PixelsPerInch = 96
   TextHeight = 13
-  object PageControl1: TsPageControl
+  object PageControl1: TPageControl
     Left = 8
     Top = 8
     Width = 544
@@ -30,23 +30,31 @@ object SettingsForm: TSettingsForm
     ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
-    SkinData.SkinSection = 'PAGECONTROL'
-    object TabSheet1: TsTabSheet
+    object TabSheet1: TTabSheet
       Caption = 'General'
-      SkinData.CustomColor = False
-      SkinData.CustomFont = False
-      object CheckUpdateBtn: TsCheckBox
+      object Label2: TLabel
+        Left = 54
+        Top = 62
+        Width = 102
+        Height = 13
+        Caption = 'Window title pattern:'
+      end
+      object Label3: TLabel
+        Left = 57
+        Top = 89
+        Width = 99
+        Height = 13
+        Caption = 'Playlist item pattern:'
+      end
+      object CheckUpdateBtn: TCheckBox
         Left = 16
         Top = 16
         Width = 140
         Height = 19
         Caption = 'Check updates on start'
         TabOrder = 0
-        SkinData.SkinSection = 'CHECKBOX'
-        ImgChecked = 0
-        ImgUnchecked = 0
       end
-      object Button2: TsButton
+      object Button2: TButton
         Left = 162
         Top = 13
         Width = 75
@@ -54,29 +62,20 @@ object SettingsForm: TSettingsForm
         Caption = 'Check now'
         TabOrder = 1
         OnClick = Button2Click
-        SkinData.SkinSection = 'BUTTON'
       end
-      object PlaylistItemTextList: TsComboBox
+      object PlaylistItemTextList: TComboBox
         Left = 162
         Top = 86
         Width = 145
         Height = 21
-        Alignment = taLeftJustify
-        BoundLabel.Active = True
-        BoundLabel.Caption = 'Playlist item text:'
-        SkinData.SkinSection = 'COMBOBOX'
-        VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 722950
         Font.Charset = DEFAULT_CHARSET
         Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        ItemIndex = 0
         ParentFont = False
         TabOrder = 2
-        Text = 'Song - Album - Artist'
         OnChange = PlaylistItemTextListChange
         Items.Strings = (
           'Song - Album - Artist'
@@ -86,27 +85,19 @@ object SettingsForm: TSettingsForm
           'Album - Artist - Song'
           'Artist - Song - Album')
       end
-      object WindowTitleList: TsComboBox
+      object WindowTitleList: TComboBox
         Left = 162
         Top = 59
         Width = 145
         Height = 21
-        Alignment = taLeftJustify
-        BoundLabel.Active = True
-        BoundLabel.Caption = 'Window title layout:'
-        SkinData.SkinSection = 'COMBOBOX'
-        VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 722950
         Font.Charset = DEFAULT_CHARSET
         Font.Color = 12102048
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        ItemIndex = 0
         ParentFont = False
         TabOrder = 3
-        Text = 'Song - Album - Artist'
         Items.Strings = (
           'Song - Album - Artist'
           'Album - Song - Artist'
@@ -116,71 +107,53 @@ object SettingsForm: TSettingsForm
           'Artist - Song - Album')
       end
     end
-    object TabSheet2: TsTabSheet
+    object TabSheet2: TTabSheet
       Caption = 'Playback'
       ImageIndex = 1
-      SkinData.CustomColor = False
-      SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object PlayCursorBtn: TsCheckBox
+      object Label1: TLabel
+        Left = 17
+        Top = 69
+        Width = 106
+        Height = 13
+        Caption = 'Playback buffer in ms:'
+      end
+      object PlayCursorBtn: TCheckBox
         Left = 16
         Top = 16
         Width = 139
         Height = 19
         Caption = 'Playback follows cursor'
         TabOrder = 0
-        SkinData.SkinSection = 'CHECKBOX'
-        ImgChecked = 0
-        ImgUnchecked = 0
       end
-      object PlayJumpBtn: TsCheckBox
+      object PlayJumpBtn: TCheckBox
         Left = 16
         Top = 39
         Width = 121
         Height = 19
         Caption = 'Jump to current file'
         TabOrder = 1
-        SkinData.SkinSection = 'CHECKBOX'
-        ImgChecked = 0
-        ImgUnchecked = 0
       end
-      object BufferEdit: TsSpinEdit
-        Left = 180
-        Top = 64
+      object BufferEdit: TSpinEdit
+        Left = 129
+        Top = 66
         Width = 75
-        Height = 21
-        Alignment = taCenter
-        Color = 722950
+        Height = 22
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = clWindowText
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        NumbersOnly = True
-        ParentFont = False
-        TabOrder = 2
-        Text = '1000'
-        SkinData.SkinSection = 'EDIT'
-        BoundLabel.Active = True
-        BoundLabel.Caption = 'Buffer length in ms:'
         MaxValue = 5000
         MinValue = 500
+        ParentFont = False
+        TabOrder = 2
         Value = 1000
       end
     end
-    object TabSheet3: TsTabSheet
+    object TabSheet3: TTabSheet
       Caption = 'Cover'
       ImageIndex = 2
-      SkinData.CustomColor = False
-      SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object LoadArtBtn: TsCheckBox
+      object LoadArtBtn: TCheckBox
         Left = 16
         Top = 16
         Width = 203
@@ -190,35 +163,26 @@ object SettingsForm: TSettingsForm
         State = cbChecked
         TabOrder = 0
         OnClick = LoadArtBtnClick
-        SkinData.SkinSection = 'CHECKBOX'
-        ImgChecked = 0
-        ImgUnchecked = 0
       end
-      object CoverArtList: TsComboBox
+      object CoverArtList: TComboBox
         Left = 16
         Top = 39
         Width = 201
         Height = 21
-        Alignment = taLeftJustify
-        SkinData.SkinSection = 'COMBOBOX'
-        VerticalAlignment = taAlignTop
         Style = csDropDownList
-        Color = 2038810
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
+        Font.Color = clWindowText
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        ItemIndex = 0
         ParentFont = False
         TabOrder = 1
-        Text = 'External cover art first'
         Items.Strings = (
           'External cover art first'
           'Internal cover art first')
       end
     end
-    object TabSheet5: TsTabSheet
+    object TabSheet5: TTabSheet
       Caption = 'Lyric'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -227,13 +191,7 @@ object SettingsForm: TSettingsForm
       Font.Style = []
       ImageIndex = 4
       ParentFont = False
-      SkinData.CustomColor = False
-      SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object LyricBtn: TsCheckBox
+      object LyricBtn: TCheckBox
         Left = 16
         Top = 16
         Width = 102
@@ -248,171 +206,27 @@ object SettingsForm: TSettingsForm
         ParentFont = False
         State = cbChecked
         TabOrder = 0
-        SkinData.SkinSection = 'CHECKBOX'
-        ImgChecked = 0
-        ImgUnchecked = 0
       end
-      object LogLyricFailBtn: TsCheckBox
+      object LogLyricFailBtn: TCheckBox
         Left = 17
         Top = 64
         Width = 157
         Height = 19
         Caption = 'Log if lyric downloader fails'
         TabOrder = 1
-        SkinData.SkinSection = 'CHECKBOX'
-        ImgChecked = 0
-        ImgUnchecked = 0
       end
-      object ShowDownloadedLyrics: TsCheckBox
+      object ShowDownloadedLyrics: TCheckBox
         Left = 16
         Top = 41
         Width = 142
         Height = 19
         Caption = 'Show downloaded lyrics'
         TabOrder = 2
-        ImgChecked = 0
-        ImgUnchecked = 0
       end
     end
-    object sTabSheet1: TsTabSheet
-      Caption = 'Look'
-      SkinData.CustomColor = False
-      SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object SkinsList: TsComboBox
-        Left = 46
-        Top = 16
-        Width = 200
-        Height = 21
-        Alignment = taLeftJustify
-        BoundLabel.Active = True
-        BoundLabel.Caption = 'Skins:'
-        SkinData.SkinSection = 'COMBOBOX'
-        VerticalAlignment = taAlignTop
-        Style = csDropDownList
-        Color = 2038810
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = 13417908
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ItemIndex = -1
-        ParentFont = False
-        TabOrder = 0
-        OnChange = SkinsListChange
-      end
-      object sGroupBox1: TsGroupBox
-        Left = 10
-        Top = 43
-        Width = 359
-        Height = 118
-        Caption = 'Skin Colors'
-        TabOrder = 1
-        SkinData.SkinSection = 'GROUPBOX'
-        Checked = False
-        object sLabel2: TsLabel
-          Left = 26
-          Top = 60
-          Width = 115
-          Height = 13
-          Caption = 'Saturation (-100 - 100):'
-        end
-        object sLabel3: TsLabel
-          Left = 38
-          Top = 91
-          Width = 103
-          Height = 13
-          Caption = 'Brightness (-40 - 15):'
-        end
-        object sLabel1: TsLabel
-          Left = 79
-          Top = 29
-          Width = 62
-          Height = 13
-          Caption = 'Hue (0-360):'
-        end
-        object HueLabel: TsLabel
-          Left = 330
-          Top = 29
-          Width = 6
-          Height = 13
-          Caption = '0'
-        end
-        object SaturationLabel: TsLabel
-          Left = 330
-          Top = 60
-          Width = 6
-          Height = 13
-          Caption = '0'
-        end
-        object BrightnessLabel: TsLabel
-          Left = 330
-          Top = 91
-          Width = 6
-          Height = 13
-          Caption = '0'
-        end
-        object SaturationBar: TsTrackBar
-          Left = 147
-          Top = 54
-          Width = 174
-          Height = 25
-          Max = 100
-          Min = -100
-          ShowSelRange = False
-          TabOrder = 0
-          TickMarks = tmBoth
-          TickStyle = tsNone
-          OnChange = SaturationBarChange
-          SkinData.SkinSection = 'TRACKBAR'
-          BarOffsetV = 0
-          BarOffsetH = 0
-        end
-        object BrightnessBar: TsTrackBar
-          Left = 147
-          Top = 85
-          Width = 174
-          Height = 25
-          Max = 15
-          Min = -40
-          ShowSelRange = False
-          TabOrder = 1
-          TickMarks = tmBoth
-          TickStyle = tsNone
-          OnChange = BrightnessBarChange
-          SkinData.SkinSection = 'TRACKBAR'
-          BarOffsetV = 0
-          BarOffsetH = 0
-        end
-        object HueBar: TsTrackBar
-          Left = 147
-          Top = 23
-          Width = 174
-          Height = 25
-          Max = 360
-          ShowSelRange = False
-          TabOrder = 2
-          TickMarks = tmBoth
-          TickStyle = tsNone
-          OnChange = HueBarChange
-          SkinData.SkinSection = 'TRACKBAR'
-          BarOffsetV = 0
-          BarOffsetH = 0
-        end
-      end
-    end
-    object sTabSheet2: TsTabSheet
+    object sTabSheet2: TTabSheet
       Caption = 'Last.fm'
-      SkinData.CustomColor = False
-      SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object sLabel4: TsLabel
+      object sLabel4: TLabel
         Left = 3
         Top = 95
         Width = 475
@@ -421,42 +235,48 @@ object SettingsForm: TSettingsForm
           'Once you'#39've entered your password, it won'#39't be shown here. You c' +
           'an enter a new password here.'
       end
-      object LastFMUserEdit: TsEdit
+      object Label4: TLabel
+        Left = 48
+        Top = 44
+        Width = 26
+        Height = 13
+        Caption = 'User:'
+      end
+      object Label5: TLabel
+        Left = 24
+        Top = 72
+        Width = 50
+        Height = 13
+        Caption = 'Password:'
+      end
+      object LastFMUserEdit: TEdit
         Left = 80
         Top = 41
         Width = 121
         Height = 21
-        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = clWindowText
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        SkinData.SkinSection = 'EDIT'
-        BoundLabel.Active = True
-        BoundLabel.Caption = 'User name:'
       end
-      object LastFMPassEdit: TsEdit
+      object LastFMPassEdit: TEdit
         Left = 80
         Top = 68
         Width = 121
         Height = 21
-        Color = 722950
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 12102048
+        Font.Color = clWindowText
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
         PasswordChar = '*'
         TabOrder = 1
-        SkinData.SkinSection = 'EDIT'
-        BoundLabel.Active = True
-        BoundLabel.Caption = 'Password:'
       end
-      object LastFMSaveBtn: TsButton
+      object LastFMSaveBtn: TButton
         Left = 207
         Top = 41
         Width = 75
@@ -464,22 +284,18 @@ object SettingsForm: TSettingsForm
         Caption = 'Save'
         TabOrder = 2
         OnClick = LastFMSaveBtnClick
-        SkinData.SkinSection = 'BUTTON'
       end
-      object LastFMEnableBtn: TsCheckBox
+      object LastFMEnableBtn: TCheckBox
         Left = 16
         Top = 16
         Width = 147
         Height = 19
         Caption = 'Enable last.fm scrobbling'
         TabOrder = 3
-        SkinData.SkinSection = 'CHECKBOX'
-        ImgChecked = 0
-        ImgUnchecked = 0
       end
     end
   end
-  object Button1: TsButton
+  object Button1: TButton
     Left = 477
     Top = 292
     Width = 75
@@ -488,7 +304,6 @@ object SettingsForm: TSettingsForm
     Caption = 'OK'
     TabOrder = 1
     OnClick = Button1Click
-    SkinData.SkinSection = 'BUTTON'
   end
   object UpdateChecker: TJvHttpUrlGrabber
     FileName = 'output.txt'
@@ -509,17 +324,5 @@ object SettingsForm: TSettingsForm
     OnExecute = UpdateThreadExecute
     Left = 220
     Top = 262
-  end
-  object sSkinProvider1: TsSkinProvider
-    AddedTitle.Font.Charset = DEFAULT_CHARSET
-    AddedTitle.Font.Color = clNone
-    AddedTitle.Font.Height = -11
-    AddedTitle.Font.Name = 'Tahoma'
-    AddedTitle.Font.Style = []
-    FormHeader.AdditionalHeight = 0
-    SkinData.SkinSection = 'FORM'
-    TitleButtons = <>
-    Left = 296
-    Top = 264
   end
 end

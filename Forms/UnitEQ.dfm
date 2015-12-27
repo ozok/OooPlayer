@@ -5,7 +5,7 @@ object EQForm: TEQForm
   Caption = 'Equalizer'
   ClientHeight = 246
   ClientWidth = 633
-  Color = 3485741
+  Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,7 +20,7 @@ object EQForm: TEQForm
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object sPanel2: TsPanel
+  object sPanel2: TPanel
     Left = 0
     Top = 0
     Width = 633
@@ -28,11 +28,10 @@ object EQForm: TEQForm
     Align = alTop
     ParentColor = True
     TabOrder = 0
-    SkinData.SkinSection = 'PANEL'
     DesignSize = (
       633
       49)
-    object EnableEQBtn: TsCheckBox
+    object EnableEQBtn: TCheckBox
       Left = 4
       Top = 16
       Width = 106
@@ -42,43 +41,32 @@ object EQForm: TEQForm
       State = cbChecked
       TabOrder = 0
       OnClick = EnableEQBtnClick
-      SkinData.SkinSection = 'CHECKBOX'
-      ImgChecked = 0
-      ImgUnchecked = 0
     end
-    object EQPresetsList: TsComboBox
+    object EQPresetsList: TComboBox
       Left = 396
       Top = 15
       Width = 233
       Height = 21
-      Anchors = [akTop, akRight]
-      Alignment = taLeftJustify
-      BoundLabel.Active = True
-      BoundLabel.Caption = 'Presets'
-      SkinData.SkinSection = 'COMBOBOX'
-      VerticalAlignment = taAlignTop
       Style = csDropDownList
-      Color = 722950
+      Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 12102048
+      Font.Color = clWindowText
       Font.Height = -11
       Font.Name = 'Tahoma'
       Font.Style = []
-      ItemIndex = -1
       ParentFont = False
       TabOrder = 1
       OnChange = EQPresetsListChange
     end
   end
-  object sPanel1: TsPanel
+  object sPanel1: TPanel
     Left = 0
     Top = 49
     Width = 633
     Height = 197
     Align = alClient
     TabOrder = 1
-    SkinData.SkinSection = 'PANEL'
-    object sLabel1: TsLabel
+    object sLabel1: TLabel
       AlignWithMargins = True
       Left = 4
       Top = 180
@@ -92,7 +80,7 @@ object EQForm: TEQForm
         '.6K      8K      11K     16K'
       ExplicitWidth = 612
     end
-    object sTrackBar1: TsTrackBar
+    object sTrackBar1: TTrackBar
       Left = 1
       Top = 1
       Width = 35
@@ -109,11 +97,8 @@ object EQForm: TEQForm
       TabOrder = 0
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar10: TsTrackBar
+    object sTrackBar10: TTrackBar
       Left = 36
       Top = 1
       Width = 35
@@ -130,11 +115,8 @@ object EQForm: TEQForm
       TabOrder = 1
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar11: TsTrackBar
+    object sTrackBar11: TTrackBar
       Left = 106
       Top = 1
       Width = 35
@@ -151,11 +133,8 @@ object EQForm: TEQForm
       TabOrder = 2
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar12: TsTrackBar
+    object sTrackBar12: TTrackBar
       Left = 211
       Top = 1
       Width = 35
@@ -172,11 +151,8 @@ object EQForm: TEQForm
       TabOrder = 3
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar13: TsTrackBar
+    object sTrackBar13: TTrackBar
       Left = 351
       Top = 1
       Width = 35
@@ -193,11 +169,8 @@ object EQForm: TEQForm
       TabOrder = 4
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar14: TsTrackBar
+    object sTrackBar14: TTrackBar
       Left = 456
       Top = 1
       Width = 35
@@ -214,11 +187,8 @@ object EQForm: TEQForm
       TabOrder = 5
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar15: TsTrackBar
+    object sTrackBar15: TTrackBar
       Left = 491
       Top = 1
       Width = 35
@@ -235,11 +205,8 @@ object EQForm: TEQForm
       TabOrder = 6
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar16: TsTrackBar
+    object sTrackBar16: TTrackBar
       Left = 526
       Top = 1
       Width = 35
@@ -256,11 +223,8 @@ object EQForm: TEQForm
       TabOrder = 7
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar17: TsTrackBar
+    object sTrackBar17: TTrackBar
       Left = 561
       Top = 1
       Width = 35
@@ -277,11 +241,8 @@ object EQForm: TEQForm
       TabOrder = 8
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar18: TsTrackBar
+    object sTrackBar18: TTrackBar
       Left = 596
       Top = 1
       Width = 35
@@ -298,11 +259,8 @@ object EQForm: TEQForm
       TabOrder = 9
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar2: TsTrackBar
+    object sTrackBar2: TTrackBar
       Left = 71
       Top = 1
       Width = 35
@@ -319,11 +277,8 @@ object EQForm: TEQForm
       TabOrder = 10
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar3: TsTrackBar
+    object sTrackBar3: TTrackBar
       Left = 141
       Top = 1
       Width = 35
@@ -340,11 +295,8 @@ object EQForm: TEQForm
       TabOrder = 11
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar4: TsTrackBar
+    object sTrackBar4: TTrackBar
       Left = 176
       Top = 1
       Width = 35
@@ -361,11 +313,8 @@ object EQForm: TEQForm
       TabOrder = 12
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar5: TsTrackBar
+    object sTrackBar5: TTrackBar
       Left = 246
       Top = 1
       Width = 35
@@ -382,11 +331,8 @@ object EQForm: TEQForm
       TabOrder = 13
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar6: TsTrackBar
+    object sTrackBar6: TTrackBar
       Left = 281
       Top = 1
       Width = 35
@@ -403,11 +349,8 @@ object EQForm: TEQForm
       TabOrder = 14
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar7: TsTrackBar
+    object sTrackBar7: TTrackBar
       Left = 316
       Top = 1
       Width = 35
@@ -424,11 +367,8 @@ object EQForm: TEQForm
       TabOrder = 15
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar8: TsTrackBar
+    object sTrackBar8: TTrackBar
       Left = 386
       Top = 1
       Width = 35
@@ -445,11 +385,8 @@ object EQForm: TEQForm
       TabOrder = 16
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-    object sTrackBar9: TsTrackBar
+    object sTrackBar9: TTrackBar
       Left = 421
       Top = 1
       Width = 35
@@ -466,21 +403,6 @@ object EQForm: TEQForm
       TabOrder = 17
       TickStyle = tsNone
       OnChange = sTrackBar1Change
-      SkinData.SkinSection = 'TRACKBAR'
-      BarOffsetV = 0
-      BarOffsetH = 0
     end
-  end
-  object sSkinProvider1: TsSkinProvider
-    AddedTitle.Font.Charset = DEFAULT_CHARSET
-    AddedTitle.Font.Color = clNone
-    AddedTitle.Font.Height = -11
-    AddedTitle.Font.Name = 'Tahoma'
-    AddedTitle.Font.Style = []
-    FormHeader.AdditionalHeight = 0
-    SkinData.SkinSection = 'FORM'
-    TitleButtons = <>
-    Left = 264
-    Top = 8
   end
 end

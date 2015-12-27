@@ -4,22 +4,19 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
-  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, sSkinProvider,
-  sSkinManager, Vcl.ComCtrls, sListView, Vcl.StdCtrls, Vcl.Mask, sMaskEdit,
-  sCustomComboEdit, sToolEdit, MediaInfoDll, Pipes, JvComponentBase, JvDragDrop,
-  sButton, sDialogs;
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.StdCtrls,
+  Vcl.Mask, MediaInfoDll, Pipes, JvComponentBase, JvDragDrop,
+  JvExMask, JvToolEdit;
 
 type
   TMainForm = class(TForm)
-    sSkinManager1: TsSkinManager;
-    sSkinProvider1: TsSkinProvider;
-    FilePathEdit: TsFilenameEdit;
-    InfoList: TsListView;
+    InfoList: TListView;
     PipeClient1: TPipeClient;
     JvDragDrop1: TJvDragDrop;
-    sButton1: TsButton;
-    ExportBtn: TsButton;
-    ExportDialog: TsSaveDialog;
+    sButton1: TButton;
+    ExportBtn: TButton;
+    ExportDialog: TSaveDialog;
+    FilePathEdit: TJvFilenameEdit;
     procedure PipeClient1PipeMessage(Sender: TObject; Pipe: HPIPE; Stream: TStream);
     procedure FilePathEditAfterDialog(Sender: TObject; var Name: string; var Action: Boolean);
     procedure FormCreate(Sender: TObject);
@@ -106,7 +103,6 @@ begin
     Application.MessageBox('Unable to load mediainfo.dll!', 'Fatal Error', MB_ICONERROR);
     Application.Terminate;
   end;
-  sSkinManager1.SkinDirectory := ExtractFileDir(Application.ExeName) + '\skins';
 end;
 
 procedure TMainForm.FormResize(Sender: TObject);
@@ -126,6 +122,7 @@ var
 begin
   if (FileExists(FilePath)) then
   begin
+    InfoList.Items.Clear;
     LInfoLines := TStringList.Create;
     try
       // New handle for mediainfo
@@ -199,32 +196,7 @@ begin
   SetLength(Msg, Stream.Size div SizeOf(WideChar));
   Stream.Position := 0;
   Stream.Read(Msg[1], Stream.Size);
-  if Msg.StartsWith('Skin') then
-  begin
-    LSkinName := Msg.Replace('Skin:', '', []);
-    if LSkinName = 'none' then
-    begin
-      sSkinManager1.Active := False;
-    end
-    else
-    begin
-      sSkinManager1.Active := True;
-      sSkinManager1.SkinName := LSkinName;
-    end;
-  end
-  else if Msg.StartsWith('Hue') then
-  begin
-    sSkinManager1.HueOffset := Msg.Replace('Hue:', '', []).ToInteger;
-  end
-  else if Msg.StartsWith('Brig') then
-  begin
-    sSkinManager1.Brightness := Msg.Replace('Brig:', '', []).ToInteger;
-  end
-  else if Msg.StartsWith('Sat') then
-  begin
-    sSkinManager1.Saturation := Msg.Replace('Sat:', '', []).ToInteger;
-  end
-  else if Msg.StartsWith('Active') then
+  if Msg.StartsWith('Active') then
   begin
     Self.BringToFront;
   end
