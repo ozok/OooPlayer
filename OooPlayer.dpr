@@ -50,9 +50,7 @@ uses
   UnitTagReader in 'Units\UnitTagReader.pas',
   UnitSubProcessLauncher in 'Units\UnitSubProcessLauncher.pas',
   UnitCueParser in 'Units\UnitCueParser.pas',
-  bass_fx in 'BassUnits\bass_fx.pas',
-  spectrum_vis in 'Units\spectrum_vis.pas',
-  CommonTypes in 'Units\CommonTypes.pas';
+  bass_fx in 'BassUnits\bass_fx.pas';
 
 {$R *.res}
 
