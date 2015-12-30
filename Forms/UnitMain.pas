@@ -249,8 +249,6 @@ type
     RadioThread: TIdThreadComponent;
     RadiosView: TListView;
     R7: TMenuItem;
-    LeftPanelBtn: TButton;
-    RightPanelBtn: TButton;
     PositionBar: TJvTrackBar;
     InfoLabel: TLabel;
     CategoryList: TImageList;
@@ -4991,7 +4989,7 @@ begin
     BASS_ChannelSetSync(FRadioHandle, BASS_SYNC_META, 0, @MetaSync, nil);
     // play it!
     BASS_ChannelPlay(FRadioHandle, False);
-    SetRadioVolume(VolumeBar.Position);
+    SetRadioVolume(100 - VolumeBar.Position);
     // re-paint radio list
     SendMessage(WinHandle, WM_INFO_UPDATE, REPAINT_RADIO_LIST, 0);
     // stop-loading animation
@@ -5916,19 +5914,20 @@ begin
     begin
       FPlayer.SetVolume(100 - VolumeBar.Position);
     end;
-    StatusBar.Panels[2].Text := FloatToStr(100 - VolumeBar.Position) + '%'
+    StatusBar.Panels[2].Text := FloatToStr((100 - VolumeBar.Position) * 2) + '%';
+    VolumeBar.Hint := FloatToStr((100 - VolumeBar.Position) * 2) + '%';
   end
   else if FPlaybackType = radio then
   begin
     // radio
     if not IsRadioPlayerStopped then
     begin
-      SetRadioVolume(VolumeBar.Position);
+      SetRadioVolume(100 - VolumeBar.Position);
     end;
+    StatusBar.Panels[2].Text := FloatToStr(100 - VolumeBar.Position) + '%';
+    VolumeBar.Hint := FloatToStr(100 - VolumeBar.Position) + '%';
   end;
 
-  StatusBar.Panels[2].Text := FloatToStr((100 - VolumeBar.Position) * 2) + '%';
-  VolumeBar.Hint := FloatToStr((100 - VolumeBar.Position) * 2) + '%';
 end;
 
 procedure TMainForm.VolumeBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);

@@ -16,7 +16,7 @@
 -Updated: BassOpus to 2.4.1.4
 -Updated: MediaInfo to 0.7.76
 -Updated: Tag libraries
--Updated: Skin component
+-Removed: Skin component
 
 --2.1.2
 -Added: [General] Many skins (over 100)
