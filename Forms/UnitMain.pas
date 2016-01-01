@@ -1757,7 +1757,8 @@ begin
     FInfoFiles.Add(LFilePath);
     if not FTagEditorLauncher.IsRunning then
     begin
-      FTagEditorLauncher.Start('', ExtractFileDir(Application.ExeName) + '\TFileInfo.exe');
+      ShellExecute(Handle, 'open', PWideChar(ExtractFileDir(Application.ExeName) + '\TFileInfo.exe'), PWideChar('"' + LFilePath + '"'), nil, SW_SHOWNORMAL);
+      //FTagEditorLauncher.Start(LFilePath, ExtractFileDir(Application.ExeName) + '\TFileInfo.exe');
     end;
   end;
 end;
