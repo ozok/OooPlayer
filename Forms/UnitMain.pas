@@ -266,7 +266,6 @@ type
     procedure VolumeBarChange(Sender: TObject);
     procedure PositionTimerTimer(Sender: TObject);
     procedure PlayListMouseEnter(Sender: TObject);
-    procedure PositionBarChanged(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure V1Click(Sender: TObject);
     procedure V2Click(Sender: TObject);
@@ -2236,6 +2235,7 @@ begin
   CategoryPages.Visible := not CategoryPages.Visible;
   H3.Checked := not CategoryPages.Visible;
   sSplitter2.Visible := CategoryPages.Visible;
+  sSplitter2.Left := CategoryPages.Width;
   FormResize(Self);
 end;
 
@@ -4406,28 +4406,6 @@ begin
   end;
 end;
 
-procedure TMainForm.PositionBarChanged(Sender: TObject);
-begin
-  if (FPlayer.PlayerStatus2 = psPlaying) or (FPlayer.PlayerStatus2 = psPaused) then
-  begin
-    PositionTimer.Enabled := False;
-    ProgressTimer.Enabled := PositionTimer.Enabled;
-
-    try
-      if not FPlayer.SetPosition((FPlayer.TotalLength * PositionBar.Position) div High(Int64)) then
-      begin
-        PositionBar.Position := FPlayer.Position;
-      end;
-    finally
-      PositionTimer.Enabled := True;
-      ProgressTimer.Enabled := PositionTimer.Enabled;
-
-    end;
-  end;
-  if Self.Enabled and Self.Visible then
-    Self.FocusControl(VolumeBar);
-end;
-
 procedure TMainForm.PositionBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   NewTractBarPosition: Integer;
@@ -4446,7 +4424,7 @@ begin
       try
         if FPlayer.SetPosition((FPlayer.TotalLength * NewTractBarPosition) div FCurrentItemInfo.DurationBass) then
         begin
-          // PositionBar.Position := NewTractBarPosition;
+           PositionBar.Position := NewTractBarPosition;
         end;
       finally
         Sleep(50);

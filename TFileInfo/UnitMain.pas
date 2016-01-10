@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.StdCtrls,
   Vcl.Mask, MediaInfoDll, JvComponentBase, JvDragDrop, JvExMask, JvToolEdit,
-  System.IniFiles, Registry;
+  System.IniFiles, Registry, ShellAPI, JvComputerInfoEx, JvThread,
+  JvUrlListGrabber, JvUrlGrabbers;
 
 type
   TMainForm = class(TForm)
@@ -29,6 +30,9 @@ type
     Button2: TButton;
     Button3: TButton;
     Button4: TButton;
+    Info: TJvComputerInfoEx;
+    UpdateChecker: TJvHttpUrlGrabber;
+    UpdateThread: TJvThread;
     procedure FilePathEditAfterDialog(Sender: TObject; var Name: string; var Action: Boolean);
     procedure FormCreate(Sender: TObject);
     procedure InfoListAdvancedCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
@@ -43,6 +47,10 @@ type
     procedure FullInfoModeBtnClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure UpdateThreadExecute(Sender: TObject; Params: Pointer);
+    procedure UpdateCheckerDoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string);
   private
     { Private declarations }
     FFileInfoText: TStringList;
@@ -66,16 +74,29 @@ type
     // shell extension
     procedure ShellExtensionRegister();
     procedure ShellExtensionUnRegister();
+
+    // checks if a parameter is passed to the program
+    function CheckIfArgumentExists(const Param: string): Boolean;
   public
     { Public declarations }
   end;
 
 var
   MainForm: TMainForm;
+  Portable: Boolean;
+  CheckUpdate: Boolean;
+  AppDataFolder: string;
+  RegisterRigthClick: Boolean;
+
+const
+  BuildInt = 1;
 
 implementation
 
 {$R *.dfm}
+
+uses
+  UnitAbout;
 { TMainForm }
 
 procedure TMainForm.Button1Click(Sender: TObject);
@@ -86,6 +107,32 @@ end;
 procedure TMainForm.Button2Click(Sender: TObject);
 begin
   ShellExtensionUnRegister;
+end;
+
+procedure TMainForm.Button3Click(Sender: TObject);
+begin
+  Self.Enabled := False;
+  AboutForm.Show;
+end;
+
+procedure TMainForm.Button4Click(Sender: TObject);
+begin
+  ShellExecute(0, 'open', 'http://www.ozok26.com/tflenfo-12', nil, nil, SW_SHOWNORMAL);
+end;
+
+function TMainForm.CheckIfArgumentExists(const Param: string): Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I := 0 to ParamCount do
+  begin
+    if Param = ParamStr(i).ToLower then
+    begin
+      Result := True;
+      Break;
+    end;
+  end;
 end;
 
 procedure TMainForm.DisplayModeListChange(Sender: TObject);
@@ -182,11 +229,36 @@ end;
 
 procedure TMainForm.FormShow(Sender: TObject);
 begin
+  Portable := CheckIfArgumentExists('/portable');
+  CheckUpdate := not CheckIfArgumentExists('/nocheckupdate');
+  if Portable then
+  begin
+    AppDataFolder := ExtractFileDir(Application.ExeName);
+  end
+  else
+  begin
+    AppDataFolder := Info.Folders.AppData + '\TFileInfo\';
+  end;
+  if not DirectoryExists(AppDataFolder) then
+  begin
+    ForceDirectories(AppDataFolder);
+  end;
+  RegisterRigthClick := CheckIfArgumentExists('/register');
+  if RegisterRigthClick then
+  begin
+    Button1Click(Self);
+  end;
+
   LoadSettings;
   if ParamCount > 0 then
   begin
     FFileInfoText.Text := ReadFileInfo(ParamStr(1));
     LoadFile;
+  end;
+
+  if CheckUpdate then
+  begin
+    UpdateThread.Execute(nil);
   end;
 end;
 
@@ -231,6 +303,7 @@ begin
             end;
           end;
         end;
+        InfoList.Items[0].MakeVisible(False);
       end;
     finally
       Self.Caption := ExtractFileName(FilePath) + ' - TFileInfo';
@@ -253,6 +326,8 @@ begin
       if FFileInfoText.Count > 0 then
       begin
         InfoMemo.Lines.Text := FFileInfoText.Text;
+        InfoMemo.SelStart := 0;
+        InfoMemo.SelLength := 0;
       end;
     finally
       Self.Caption := ExtractFileName(FilePath) + ' - TFileInfo';
@@ -296,6 +371,7 @@ begin
     finally
       InfoTree.FullExpand;
       Self.Caption := ExtractFileName(FilePath) + ' - TFileInfo';
+      InfoTree.Items[0].MakeVisible;
     end;
   end;
 end;
@@ -340,8 +416,7 @@ procedure TMainForm.LoadSettings;
 var
   LSetFile: TIniFile;
 begin
-  // todo: portable
-  LSetFile := TIniFile.Create(ExtractFilePath(Application.ExeName) + '\tfileinfo.settings.ini');
+  LSetFile := TIniFile.Create(AppDataFolder + '\tfileinfo.settings.ini');
   try
     with LSetFile do
     begin
@@ -388,8 +463,7 @@ procedure TMainForm.SaveSettings;
 var
   LSetFile: TIniFile;
 begin
-  // todo: portable
-  LSetFile := TIniFile.Create(ExtractFilePath(Application.ExeName) + '\tfileinfo.settings.ini');
+  LSetFile := TIniFile.Create(AppDataFolder + '\tfileinfo.settings.ini');
   try
     with LSetFile do
     begin
@@ -399,7 +473,6 @@ begin
   finally
     LSetFile.Free;
   end;
-
 end;
 
 procedure TMainForm.sButton1Click(Sender: TObject);
@@ -427,21 +500,33 @@ begin
               if OpenKey('command', True) then
               begin
                 WriteString('', '"' + Application.ExeName + '" "%1"');
-                Application.MessageBox('Register successful.', 'Info', MB_ICONINFORMATION);
+                if not RegisterRigthClick then
+                begin
+                  Application.MessageBox('Register successful.', 'Info', MB_ICONINFORMATION);
+                end;
               end
               else
               begin
-                Application.MessageBox('Cannot register. Error:3', 'Error', MB_ICONERROR);
+                if not RegisterRigthClick then
+                begin
+                  Application.MessageBox('Cannot register. Error:3', 'Error', MB_ICONERROR);
+                end;
               end;
             end
             else
             begin
-              Application.MessageBox('Cannot register. Error:2', 'Error', MB_ICONERROR);
+              if not RegisterRigthClick then
+              begin
+                Application.MessageBox('Cannot register. Error:2', 'Error', MB_ICONERROR);
+              end;
             end;
           end
           else
           begin
-            Application.MessageBox('Cannot register. Error:1', 'Error', MB_ICONERROR);
+            if not RegisterRigthClick then
+            begin
+              Application.MessageBox('Cannot register. Error:1', 'Error', MB_ICONERROR);
+            end;
           end;
         finally
           CloseKey;
@@ -449,11 +534,18 @@ begin
       end
       else
       begin
-        Application.MessageBox('Cannot register. Error:0', 'Error', MB_ICONERROR);
+        if not RegisterRigthClick then
+        begin
+          Application.MessageBox('Cannot register. Error:0', 'Error', MB_ICONERROR);
+        end;
       end;
     finally
       Free;
     end;
+  end;
+  if RegisterRigthClick then
+  begin
+    Close;
   end;
 end;
 
@@ -493,6 +585,46 @@ begin
       Free;
     end;
   end;
+end;
+
+procedure TMainForm.UpdateCheckerDoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string);
+var
+  LVersionFile: TStringList;
+  LLatestVersion: Integer;
+begin
+  LVersionFile := TStringList.Create;
+  try
+    if StreamSize > 0 then
+    begin
+      LVersionFile.LoadFromStream(Stream);
+      if LVersionFile.Count = 1 then
+      begin
+        if TryStrToInt(LVersionFile.Strings[0], LLatestVersion) then
+        begin
+          if LLatestVersion > BuildInt then
+          begin
+            if ID_YES = Application.MessageBox('There is a new version. Would you like to go homepage and download it?', 'New Version', MB_ICONQUESTION or MB_YESNO) then
+            begin
+              ShellExecute(handle, 'open', 'http://www.ozok26.com/tflenfo-12', nil, nil, SW_NORMAL);
+            end;
+          end;
+        end;
+      end;
+    end;
+  finally
+    FreeAndNil(LVersionFile);
+  end;
+end;
+
+procedure TMainForm.UpdateThreadExecute(Sender: TObject; Params: Pointer);
+begin
+  // download version text from server
+  with UpdateChecker do
+  begin
+    URL := 'http://sourceforge.net/projects/tfileinfonfo/files/version.txt/download';
+    Start;
+  end;
+  UpdateThread.CancelExecute;
 end;
 
 end.

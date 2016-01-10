@@ -39,7 +39,6 @@ object MainForm: TMainForm
     Caption = 'Close'
     TabOrder = 1
     OnClick = sButton1Click
-    ExplicitLeft = 552
   end
   object ExportBtn: TButton
     Left = 8
@@ -60,7 +59,6 @@ object MainForm: TMainForm
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 2
     Text = ''
-    ExplicitWidth = 619
   end
   object DisplayModeList: TComboBox
     Left = 79
@@ -86,7 +84,6 @@ object MainForm: TMainForm
     Caption = 'Full info mode'
     TabOrder = 4
     OnClick = FullInfoModeBtnClick
-    ExplicitLeft = 530
   end
   object DisplayPages: TPageControl
     Left = 8
@@ -97,11 +94,8 @@ object MainForm: TMainForm
     Anchors = [akLeft, akTop, akRight, akBottom]
     Style = tsFlatButtons
     TabOrder = 5
-    ExplicitWidth = 619
     object TabSheet1: TTabSheet
       Caption = 'TabSheet1'
-      ExplicitWidth = 611
-      ExplicitHeight = 496
       object InfoList: TListView
         Left = 0
         Top = 0
@@ -126,17 +120,11 @@ object MainForm: TMainForm
         TabOrder = 0
         ViewStyle = vsReport
         OnAdvancedCustomDrawItem = InfoListAdvancedCustomDrawItem
-        ExplicitLeft = -338
-        ExplicitTop = -362
-        ExplicitWidth = 619
-        ExplicitHeight = 527
       end
     end
     object TabSheet2: TTabSheet
       Caption = 'TabSheet2'
       ImageIndex = 1
-      ExplicitWidth = 611
-      ExplicitHeight = 496
       object InfoMemo: TMemo
         Left = 0
         Top = 0
@@ -146,14 +134,11 @@ object MainForm: TMainForm
         ReadOnly = True
         ScrollBars = ssHorizontal
         TabOrder = 0
-        ExplicitWidth = 611
       end
     end
     object TabSheet3: TTabSheet
       Caption = 'TabSheet3'
       ImageIndex = 2
-      ExplicitWidth = 611
-      ExplicitHeight = 496
       object InfoTree: TTreeView
         Left = 0
         Top = 0
@@ -165,10 +150,7 @@ object MainForm: TMainForm
         RightClickSelect = True
         RowSelect = True
         TabOrder = 0
-        ExplicitLeft = 248
-        ExplicitTop = 200
-        ExplicitWidth = 121
-        ExplicitHeight = 97
+        ExplicitTop = 4
       end
     end
   end
@@ -200,6 +182,7 @@ object MainForm: TMainForm
     Anchors = [akLeft, akBottom]
     Caption = 'About'
     TabOrder = 8
+    OnClick = Button3Click
   end
   object Button4: TButton
     Left = 502
@@ -209,18 +192,43 @@ object MainForm: TMainForm
     Anchors = [akLeft, akBottom]
     Caption = 'Home'
     TabOrder = 9
+    OnClick = Button4Click
   end
   object JvDragDrop1: TJvDragDrop
     AcceptDrag = False
     DropTarget = Owner
     OnDrop = JvDragDrop1Drop
-    Left = 368
-    Top = 384
+    Left = 128
+    Top = 136
   end
   object ExportDialog: TSaveDialog
     Filter = 'Text Files|*.txt|CSV Files|*.csv'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-    Left = 128
-    Top = 224
+    Left = 48
+    Top = 136
+  end
+  object Info: TJvComputerInfoEx
+    Left = 228
+    Top = 132
+  end
+  object UpdateChecker: TJvHttpUrlGrabber
+    FileName = 'output.txt'
+    OutputMode = omStream
+    Agent = 'JEDI-VCL'
+    Port = 0
+    ProxyAddresses = 'proxyserver'
+    ProxyIgnoreList = '<local>'
+    OnDoneStream = UpdateCheckerDoneStream
+    Left = 387
+    Top = 138
+  end
+  object UpdateThread: TJvThread
+    Exclusive = True
+    MaxCount = 0
+    RunOnCreate = True
+    FreeOnTerminate = True
+    OnExecute = UpdateThreadExecute
+    Left = 304
+    Top = 136
   end
 end

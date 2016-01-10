@@ -147,7 +147,6 @@ object MainForm: TMainForm
           TabOrder = 0
           TickMarks = tmBoth
           TickStyle = tsNone
-          OnChanged = PositionBarChanged
           OnMouseDown = PositionBarMouseDown
         end
       end
@@ -816,6 +815,7 @@ object MainForm: TMainForm
     Width = 350
     Height = 602
     Align = alRight
+    BevelOuter = bvNone
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -825,35 +825,42 @@ object MainForm: TMainForm
     TabOrder = 4
     OnResize = LyricPanelResize
     object sSplitter1: TSplitter
-      Left = 1
-      Top = 380
-      Width = 348
+      Left = 0
+      Top = 381
+      Width = 350
       Height = 4
       Cursor = crVSplit
       Align = alBottom
+      ExplicitLeft = 1
       ExplicitTop = 379
+      ExplicitWidth = 348
     end
     object LyricStatusLabel: TLabel
       AlignWithMargins = True
-      Left = 4
-      Top = 364
-      Width = 342
+      Left = 3
+      Top = 365
+      Width = 344
       Height = 13
       Align = alBottom
+      ExplicitLeft = 4
+      ExplicitTop = 364
       ExplicitWidth = 3
     end
     object CoverPanel: TPanel
-      Left = 1
-      Top = 384
-      Width = 348
+      Left = 0
+      Top = 385
+      Width = 350
       Height = 217
       Align = alBottom
       TabOrder = 0
+      ExplicitLeft = 1
+      ExplicitTop = 384
+      ExplicitWidth = 348
       object CoverImage: TJvImage
         AlignWithMargins = True
         Left = 3
         Top = 3
-        Width = 342
+        Width = 344
         Height = 181
         Margins.Left = 2
         Margins.Top = 2
@@ -871,14 +878,15 @@ object MainForm: TMainForm
       object sPanel7: TPanel
         Left = 1
         Top = 186
-        Width = 346
+        Width = 348
         Height = 30
         Align = alBottom
         TabOrder = 0
+        ExplicitWidth = 346
         object CoverArtInfoLabel: TLabel
           Left = 41
           Top = 1
-          Width = 264
+          Width = 266
           Height = 28
           Align = alClient
           Alignment = taCenter
@@ -888,7 +896,7 @@ object MainForm: TMainForm
           ExplicitHeight = 13
         end
         object NextArtworkBtn: TButton
-          Left = 305
+          Left = 307
           Top = 1
           Width = 40
           Height = 28
@@ -898,6 +906,7 @@ object MainForm: TMainForm
           Images = BottomBtnImages
           TabOrder = 0
           OnClick = NextArtworkBtnClick
+          ExplicitLeft = 305
         end
         object PrevArtworkBtn: TButton
           Left = 1
@@ -914,20 +923,23 @@ object MainForm: TMainForm
       end
     end
     object pnl3: TPanel
-      Left = 1
-      Top = 1
-      Width = 348
+      Left = 0
+      Top = 0
+      Width = 350
       Height = 112
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitLeft = 1
+      ExplicitTop = 1
+      ExplicitWidth = 348
       DesignSize = (
-        348
+        350
         112)
       object LyricTitleEdit: TLabeledEdit
         Left = 5
         Top = 43
-        Width = 258
+        Width = 260
         Height = 21
         Anchors = [akLeft, akTop, akRight]
         EditLabel.Width = 24
@@ -942,11 +954,12 @@ object MainForm: TMainForm
         ParentFont = False
         TabOrder = 0
         OnKeyDown = LyricTitleEditKeyDown
+        ExplicitWidth = 258
       end
       object LyricArtistEdit: TLabeledEdit
         Left = 5
         Top = 81
-        Width = 260
+        Width = 262
         Height = 21
         Anchors = [akLeft, akTop, akRight]
         EditLabel.Width = 30
@@ -955,9 +968,10 @@ object MainForm: TMainForm
         Enabled = False
         TabOrder = 1
         OnKeyDown = LyricTitleEditKeyDown
+        ExplicitWidth = 260
       end
       object LyricSearchBtn: TButton
-        Left = 271
+        Left = 273
         Top = 81
         Width = 75
         Height = 21
@@ -966,12 +980,13 @@ object MainForm: TMainForm
         Enabled = False
         TabOrder = 2
         OnClick = LyricSearchBtnClick
+        ExplicitLeft = 271
       end
       object LyricSourceList: TComboBox
         AlignWithMargins = True
         Left = 3
         Top = 3
-        Width = 342
+        Width = 344
         Height = 21
         Align = alTop
         Style = csDropDownList
@@ -986,9 +1001,10 @@ object MainForm: TMainForm
           'azlyrics.com'
           'batlyrics.net'
           'metrolyrics.com')
+        ExplicitWidth = 342
       end
       object ReloadLyricTitleBtn: TButton
-        Left = 269
+        Left = 271
         Top = 43
         Width = 75
         Height = 21
@@ -997,13 +1013,14 @@ object MainForm: TMainForm
         Enabled = False
         TabOrder = 4
         OnClick = ReloadLyricTitleBtnClick
+        ExplicitLeft = 269
       end
     end
     object LyricList: TListBox
-      Left = 1
-      Top = 113
-      Width = 348
-      Height = 248
+      Left = 0
+      Top = 112
+      Width = 350
+      Height = 250
       Align = alClient
       BorderStyle = bsNone
       Font.Charset = DEFAULT_CHARSET
@@ -1015,6 +1032,10 @@ object MainForm: TMainForm
       TabOrder = 2
       OnMouseEnter = LyricListMouseEnter
       OnMouseLeave = LyricListMouseLeave
+      ExplicitLeft = 1
+      ExplicitTop = 113
+      ExplicitWidth = 348
+      ExplicitHeight = 248
     end
   end
   object CategoryPages: TPageControl
@@ -1405,8 +1426,8 @@ object MainForm: TMainForm
     RunOnCreate = True
     FreeOnTerminate = True
     OnExecute = UpdateThreadExecute
-    Left = 464
-    Top = 216
+    Left = 720
+    Top = 184
   end
   object OpenDialog: TOpenDialog
     Filter = 
@@ -1506,7 +1527,7 @@ object MainForm: TMainForm
     Left = 456
     Top = 448
     Bitmap = {
-      494C0101050008001C0016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010105000800280016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000404040E171717492929297E3A3A3AB24B4B4BE54B4B
@@ -2100,8 +2121,8 @@ object MainForm: TMainForm
     ProxyAddresses = 'proxyserver'
     ProxyIgnoreList = '<local>'
     OnDoneStream = UpdateCheckerDoneStream
-    Left = 699
-    Top = 210
+    Left = 707
+    Top = 250
   end
   object Taskbar2: TTaskbar
     TaskBarButtons = <
@@ -2326,7 +2347,7 @@ object MainForm: TMainForm
     Left = 634
     Top = 453
     Bitmap = {
-      494C010102000800300016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101020008003C0016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000160000000100200000000000401E
       0000000000000000000000000000000000000000000000000000000000020000
       0004000000090000000E0000000E0000000B0000000800000008000000090000
@@ -2590,7 +2611,7 @@ object MainForm: TMainForm
     Left = 536
     Top = 456
     Bitmap = {
-      494C010103003400480016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010103003400540016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000058000000160000000100200000000000401E
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000404040E171717492929297E3A3A3AB24B4B4BE54B4B
@@ -2854,7 +2875,7 @@ object MainForm: TMainForm
     Left = 722
     Top = 469
     Bitmap = {
-      494C010109002800340020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010109002800400020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000008000000060000000010020000000000000C0
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000300000004000000040000000400000004000000040000
@@ -4452,7 +4473,7 @@ object MainForm: TMainForm
     Left = 336
     Top = 440
     Bitmap = {
-      494C010106000800240016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010106000800300016001600FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000580000002C0000000100200000000000803C
       0000000000000000000000000000000000000000000000000001000000010000
       0001000000010000000100000001000000010000000100000001000000010000
