@@ -203,7 +203,6 @@ type
     VolumeBar: TJvTrackBar;
     PlaybackPanel: TPanel;
     PositionPanel: TPanel;
-    PositionLabel: TLabel;
     ControlsPanel: TPanel;
     InfoPanel: TPanel;
     TitleLabel: TLabel;
@@ -255,6 +254,7 @@ type
     PlaybackImages: TImageList;
     TopBtnImages: TImageList;
     BottomBtnImages: TImageList;
+    PositionLabel: TEdit;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -2035,8 +2035,8 @@ var
   LSF: TIniFile;
 begin
   LoadPlayList;
-  LoadSettings;
   MoveRadioStations;
+  LoadSettings;
   CreateUserRadioLists;
   LoadRadioStations;
   GenerateShuffleList;
@@ -2323,7 +2323,7 @@ begin
           FSelfCaption := Self.Caption;
           FArtistLabel := '';
           FAlbumLabel := '';
-          PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
+          PositionLabel.Text := '00:00:00/00:00:00/00:00:00';
           LyricList.Items.Clear;
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
@@ -2351,7 +2351,7 @@ begin
           FSelfCaption := Self.Caption;
           FArtistLabel := '';
           FAlbumLabel := '';
-          PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
+          PositionLabel.Text := '00:00:00/00:00:00/00:00:00';
           LyricList.Items.Clear;
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
@@ -2387,7 +2387,7 @@ begin
           FSelfCaption := Self.Caption;
           FArtistLabel := '';
           FAlbumLabel := '';
-          PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
+          PositionLabel.Text := '00:00:00/00:00:00/00:00:00';
           LyricList.Items.Clear;
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
@@ -2427,7 +2427,7 @@ begin
           FSelfCaption := Self.Caption;
           FArtistLabel := '';
           FAlbumLabel := '';
-          PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
+          PositionLabel.Text := '00:00:00/00:00:00/00:00:00';
           LyricList.Items.Clear;
           if MainForm.Enabled and MainForm.Visible then
             MainForm.FocusControl(VolumeBar);
@@ -3058,16 +3058,23 @@ end;
 procedure TMainForm.MoveRadioStations;
 var
   I: Integer;
+  LRadios: TStringList;
 begin
-  for I := 1 to RadiosView.Items.Count - 1 do
-  begin
+  LRadios := TStringList.Create;
+  try
+    LRadios.LoadFromFile(ExtractFileDir(Application.ExeName) + '\radios.txt');
     if not Portable then
     begin
-      if not FileExists(FAppDataFolder + '\' + RadiosView.Items[i].SubItems[0] + '.txt') then
+      for I := 0 to LRadios.Count - 1 do
       begin
-        CopyFile(PWideChar(ExtractFileDir(Application.ExeName) + '\Radios\' + RadiosView.Items[i].SubItems[0] + '.txt'), PWideChar(FAppDataFolder + '\' + RadiosView.Items[i].SubItems[0] + '.txt'), True);
+        if not FileExists(FAppDataFolder + '\' + LRadios[i] + '.txt') then
+        begin
+          CopyFile(PWideChar(ExtractFileDir(Application.ExeName) + '\Radios\' + LRadios[i] + '.txt'), PWideChar(FAppDataFolder + '\' + LRadios[i] + '.txt'), True);
+        end;
       end;
     end;
+  finally
+    LRadios.Free;
   end;
 end;
 
@@ -4332,14 +4339,14 @@ begin
   StopRadioRecording;
   PositionBar.Position := 0;
   Self.Caption := 'OooPlayer';
-  PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
+  PositionLabel.Text := '00:00:00/00:00:00/00:00:00';
   CoverImage.Picture.LoadFromFile(ExtractFileDir(Application.ExeName) + '\logo.png');
   TitleLabel.Caption := 'Trying to connect to the radio station...';
   FTitleLabel := TitleLabel.Caption;
   FSelfCaption := Self.Caption;
   FArtistLabel := '';
   FAlbumLabel := '';
-  PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
+  PositionLabel.Text := '00:00:00/00:00:00/00:00:00';
   LyricList.Items.Clear;
   Taskbar2.ProgressMaxValue := High(Int64);
   Taskbar2.ProgressValue := 0;
@@ -4424,7 +4431,7 @@ begin
       try
         if FPlayer.SetPosition((FPlayer.TotalLength * NewTractBarPosition) div FCurrentItemInfo.DurationBass) then
         begin
-           PositionBar.Position := NewTractBarPosition;
+          PositionBar.Position := NewTractBarPosition;
         end;
       finally
         Sleep(50);
@@ -4568,7 +4575,7 @@ procedure TMainForm.ProgressTimerTimer(Sender: TObject);
 begin
   if FPlayer.PlayerStatus2 = psPlaying then
   begin
-    PositionLabel.Caption := FPlayer.PositionStr + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt - FPlayer.PositionAsSec) + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt);
+    PositionLabel.Text := FPlayer.PositionStr + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt - FPlayer.PositionAsSec) + '/' + FPlayer.IntToTime(FCurrentItemInfo.DurationAsSecInt);
     PositionBar.Hint := FPlayer.PositionStr;
   end;
 end;
@@ -5692,7 +5699,7 @@ begin
   FSelfCaption := Self.Caption;
   FArtistLabel := '';
   FAlbumLabel := '';
-  PositionLabel.Caption := '00:00:00/00:00:00/00:00:00';
+  PositionLabel.Text := '00:00:00/00:00:00/00:00:00';
   InfoLabel.Caption := 'Stopped';
   LyricList.Items.Clear;
   Taskbar2.ProgressMaxValue := High(Int64);

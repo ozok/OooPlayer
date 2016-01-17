@@ -129,7 +129,7 @@ end;
 procedure TLyricDownloader.DoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string);
 const
   START_STR = '<!-- Usage of azlyrics.com content';
-  END_STR = '<!-- MxM banner -->';
+  END_STR = '<form id="addsong" style="visible:hidden; margin:0;" action="../../add.php" method="post">';
   START_STR_BAT = '<pre id="from_pre">';
   END_STR_BAT = '<pre id="to_pre" style="display';
   BAT_SPAN = '<span style="font-size';
