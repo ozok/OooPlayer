@@ -183,12 +183,20 @@ begin
         begin
           if PlayList.Items.Count > 0 then
           begin
-            Randomize;
-            LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
-            PositionTimer.Enabled := False;
-            ProgressTimer.Enabled := PositionTimer.Enabled;
+            if FQueueLists[FSelectedPlaylistIndex].Count > 0 then
+            begin
+              // play first queue item
+              PlayItem(FQueueLists[FSelectedPlaylistIndex][0]);
+            end
+            else
+            begin
+              Randomize;
+              LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
+              PositionTimer.Enabled := False;
+              ProgressTimer.Enabled := PositionTimer.Enabled;
 
-            PlayItem(LRndIndex);
+              PlayItem(LRndIndex);
+            end;
           end
           else
           begin
@@ -200,18 +208,26 @@ begin
         begin
           if PlayList.Items.Count > 0 then
           begin
-            PositionTimer.Enabled := False;
-            ProgressTimer.Enabled := PositionTimer.Enabled;
-
-            try
-              if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
-              begin
-                PlayItem(FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex);
-              end;
-            finally
-              PositionTimer.Enabled := True;
+            if FQueueLists[FSelectedPlaylistIndex].Count > 0 then
+            begin
+              // play first queue item
+              PlayItem(FQueueLists[FSelectedPlaylistIndex][0]);
+            end
+            else
+            begin
+              PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
 
+              try
+                if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
+                begin
+                  PlayItem(FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex);
+                end;
+              finally
+                PositionTimer.Enabled := True;
+                ProgressTimer.Enabled := PositionTimer.Enabled;
+
+              end;
             end;
           end
           else
@@ -224,30 +240,38 @@ begin
         begin
           if PlayList.Items.Count > 0 then
           begin
-            PositionTimer.Enabled := False;
-            ProgressTimer.Enabled := PositionTimer.Enabled;
-
-            try
-              if FShuffleIndex + 1 < FShuffleIndexes.Count then
-              begin
-                FShuffleIndex := 1 + FShuffleIndex;
-                if FShuffleIndexes[FShuffleIndex] < FPlaylists[FSelectedPlaylistIndex].Count then
-                begin
-                  PlayItem(FShuffleIndexes[FShuffleIndex]);
-                end
-              end
-              else
-              begin
-                // if played all in shuffle list
-                // just re-generate shuffle list and start playing this new list
-                GenerateShuffleList;
-                FShuffleIndex := 0;
-                PlayItem(FShuffleIndexes[FShuffleIndex]);
-              end;
-            finally
-              PositionTimer.Enabled := True;
+            if FQueueLists[FSelectedPlaylistIndex].Count > 0 then
+            begin
+              // play first queue item
+              PlayItem(FQueueLists[FSelectedPlaylistIndex][0]);
+            end
+            else
+            begin
+              PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
 
+              try
+                if FShuffleIndex + 1 < FShuffleIndexes.Count then
+                begin
+                  FShuffleIndex := 1 + FShuffleIndex;
+                  if FShuffleIndexes[FShuffleIndex] < FPlaylists[FSelectedPlaylistIndex].Count then
+                  begin
+                    PlayItem(FShuffleIndexes[FShuffleIndex]);
+                  end
+                end
+                else
+                begin
+                // if played all in shuffle list
+                // just re-generate shuffle list and start playing this new list
+                  GenerateShuffleList;
+                  FShuffleIndex := 0;
+                  PlayItem(FShuffleIndexes[FShuffleIndex]);
+                end;
+              finally
+                PositionTimer.Enabled := True;
+                ProgressTimer.Enabled := PositionTimer.Enabled;
+
+              end;
             end;
           end
           else

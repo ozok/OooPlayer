@@ -1643,7 +1643,7 @@ begin
         end
         else
         begin
-          if (Extension = '.mp3') or (Extension = '.aac') or (Extension = '.ogg') or (Extension = '.opus') or (Extension = '.flac') or (Extension = '.alac') or (Extension = '.ape') or (Extension = '.mpc') or (Extension = '.tta') or (Extension = '.wv') or (Extension = '.wma') or (Extension = '.ac3') or (Extension = '.spx') or (Extension = '.tak') or (Extension = '.ofr') or (Extension = '.wav') or (Extension = '.cue') then
+          if (Extension = '.mp3') or (Extension = '.aac') or (Extension = '.ogg') or (Extension = '.opus') or (Extension = '.flac') or (Extension = '.alac') or (Extension = '.ape') or (Extension = '.mpc') or (Extension = '.tta') or (Extension = '.wv') or (Extension = '.wma') or (Extension = '.ac3') or (Extension = '.spx') or (Extension = '.tak') or (Extension = '.ofr') or (Extension = '.wav') or (Extension = '.cue') or (Extension = '.m4a') then
           begin
             AddFile(Value[i]);
             FLastDir := ExtractFileDir(Value[i]);
@@ -3167,50 +3167,95 @@ begin
         end;
       1: // random
         begin
-          Randomize;
-          LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
-          PositionTimer.Enabled := False;
-          ProgressTimer.Enabled := PositionTimer.Enabled;
+        // first try queue
+          if FQueueLists[FSelectedPlaylistIndex].Count > 0 then
+          begin
+            // play first item in the queue list
+            PlayItem(FQueueLists[FSelectedPlaylistIndex][0]);
+            PlayItemUIUpdate;
+            // remove item from queue
+            FQueueLists[FSelectedPlaylistIndex].Delete(0);
+            QueueList.Items.Count := FQueueLists[FSelectedPlaylistIndex].Count;
+            QueueList.Invalidate;
+            // PlayList.Invalidate;
+          end
+          else
+          begin
+            Randomize;
+            LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
+            PositionTimer.Enabled := False;
+            ProgressTimer.Enabled := PositionTimer.Enabled;
 
-          PlayItem(LRndIndex);
-          PlayItemUIUpdate;
+            PlayItem(LRndIndex);
+            PlayItemUIUpdate;
+          end;
         end;
       2: // repeat track
         begin
-          PositionTimer.Enabled := False;
-          ProgressTimer.Enabled := PositionTimer.Enabled;
-
-          try
-            if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
-            begin
-              PlayItem(FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex);
-              PlayItemUIUpdate;
-            end;
-          finally
-            PositionTimer.Enabled := True;
+        // first try queue
+          if FQueueLists[FSelectedPlaylistIndex].Count > 0 then
+          begin
+            // play first item in the queue list
+            PlayItem(FQueueLists[FSelectedPlaylistIndex][0]);
+            PlayItemUIUpdate;
+            // remove item from queue
+            FQueueLists[FSelectedPlaylistIndex].Delete(0);
+            QueueList.Items.Count := FQueueLists[FSelectedPlaylistIndex].Count;
+            QueueList.Invalidate;
+            // PlayList.Invalidate;
+          end
+          else
+          begin
+            PositionTimer.Enabled := False;
             ProgressTimer.Enabled := PositionTimer.Enabled;
 
+            try
+              if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
+              begin
+                PlayItem(FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex);
+                PlayItemUIUpdate;
+              end;
+            finally
+              PositionTimer.Enabled := True;
+              ProgressTimer.Enabled := PositionTimer.Enabled;
+
+            end;
           end;
         end;
       3: // shuffle
         begin
-          PositionTimer.Enabled := False;
-          ProgressTimer.Enabled := PositionTimer.Enabled;
-
-          try
-            if FShuffleIndex + 1 < FShuffleIndexes.Count then
-            begin
-              FShuffleIndex := 1 + FShuffleIndex;
-              if FShuffleIndexes[FShuffleIndex] < FPlaylists[FSelectedPlaylistIndex].Count then
-              begin
-                PlayItem(FShuffleIndexes[FShuffleIndex]);
-                PlayItemUIUpdate;
-              end;
-            end;
-          finally
-            PositionTimer.Enabled := True;
+        // first try queue
+          if FQueueLists[FSelectedPlaylistIndex].Count > 0 then
+          begin
+            // play first item in the queue list
+            PlayItem(FQueueLists[FSelectedPlaylistIndex][0]);
+            PlayItemUIUpdate;
+            // remove item from queue
+            FQueueLists[FSelectedPlaylistIndex].Delete(0);
+            QueueList.Items.Count := FQueueLists[FSelectedPlaylistIndex].Count;
+            QueueList.Invalidate;
+            // PlayList.Invalidate;
+          end
+          else
+          begin
+            PositionTimer.Enabled := False;
             ProgressTimer.Enabled := PositionTimer.Enabled;
 
+            try
+              if FShuffleIndex + 1 < FShuffleIndexes.Count then
+              begin
+                FShuffleIndex := 1 + FShuffleIndex;
+                if FShuffleIndexes[FShuffleIndex] < FPlaylists[FSelectedPlaylistIndex].Count then
+                begin
+                  PlayItem(FShuffleIndexes[FShuffleIndex]);
+                  PlayItemUIUpdate;
+                end;
+              end;
+            finally
+              PositionTimer.Enabled := True;
+              ProgressTimer.Enabled := PositionTimer.Enabled;
+
+            end;
           end;
         end;
     end;
