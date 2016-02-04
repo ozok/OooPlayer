@@ -534,7 +534,6 @@ end;
 procedure TMusicPlayer.Play;
 var
   LExt: string;
-  LPreAmp: BASS_BFX_VOLUME;
 begin
   // free the stream first
   if FBassHandle <> 0 then

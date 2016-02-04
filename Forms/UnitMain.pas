@@ -2331,106 +2331,135 @@ begin
       end;
     1: // random
       begin
-        if PlayList.Items.Count > 0 then
+        if FQueueLists[FSelectedPlaylistIndex].Count > 0 then
         begin
-          Randomize;
-          LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
-          PositionTimer.Enabled := False;
-          ProgressTimer.Enabled := PositionTimer.Enabled;
-
+            // delete it from lists
+          FQueueLists[FSelectedPlaylistIndex].Delete(0);
+          QueueList.Items.Delete(0);
+          QueueList.Invalidate;
         end
         else
         begin
+          if PlayList.Items.Count > 0 then
+          begin
+            Randomize;
+            LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
+            PositionTimer.Enabled := False;
+            ProgressTimer.Enabled := PositionTimer.Enabled;
+          end
+          else
+          begin
           // empty playlist
-          MainForm.FStoppedByUser := True;
-          PositionBar.Position := 0;
-          MainForm.Caption := 'OooPlayer';
-          CoverImage.Picture.LoadFromFile('logo.png');
-          TitleLabel.Caption := '';
-          FTitleLabel := TitleLabel.Caption;
-          FSelfCaption := Self.Caption;
-          FArtistLabel := '';
-          FAlbumLabel := '';
-          PositionLabel.Text := '00:00:00/00:00:00/00:00:00';
-          LyricList.Items.Clear;
-          if MainForm.Enabled and MainForm.Visible then
-            MainForm.FocusControl(VolumeBar);
+            MainForm.FStoppedByUser := True;
+            PositionBar.Position := 0;
+            MainForm.Caption := 'OooPlayer';
+            CoverImage.Picture.LoadFromFile('logo.png');
+            TitleLabel.Caption := '';
+            FTitleLabel := TitleLabel.Caption;
+            FSelfCaption := Self.Caption;
+            FArtistLabel := '';
+            FAlbumLabel := '';
+            PositionLabel.Text := '00:00:00/00:00:00/00:00:00';
+            LyricList.Items.Clear;
+            if MainForm.Enabled and MainForm.Visible then
+              MainForm.FocusControl(VolumeBar);
+          end;
         end;
       end;
     2: // repeat track
       begin
-        if PlayList.Items.Count > 0 then
+        if FQueueLists[FSelectedPlaylistIndex].Count > 0 then
         begin
-          PositionTimer.Enabled := False;
-          ProgressTimer.Enabled := PositionTimer.Enabled;
-
-          try
-            if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
-            begin
-
-            end;
-          finally
-            PositionTimer.Enabled := True;
-            ProgressTimer.Enabled := PositionTimer.Enabled;
-
-          end;
+            // delete it from lists
+          FQueueLists[FSelectedPlaylistIndex].Delete(0);
+          QueueList.Items.Delete(0);
+          QueueList.Invalidate;
         end
         else
         begin
+          if PlayList.Items.Count > 0 then
+          begin
+            PositionTimer.Enabled := False;
+            ProgressTimer.Enabled := PositionTimer.Enabled;
+
+            try
+              if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
+              begin
+
+              end;
+            finally
+              PositionTimer.Enabled := True;
+              ProgressTimer.Enabled := PositionTimer.Enabled;
+
+            end;
+          end
+          else
+          begin
           // empty playlist
-          MainForm.FStoppedByUser := True;
-          PositionBar.Position := 0;
-          MainForm.Caption := 'OooPlayer';
-          CoverImage.Picture.LoadFromFile('logo.png');
-          TitleLabel.Caption := '';
-          FTitleLabel := TitleLabel.Caption;
-          FSelfCaption := Self.Caption;
-          FArtistLabel := '';
-          FAlbumLabel := '';
-          PositionLabel.Text := '00:00:00/00:00:00/00:00:00';
-          LyricList.Items.Clear;
-          if MainForm.Enabled and MainForm.Visible then
-            MainForm.FocusControl(VolumeBar);
+            MainForm.FStoppedByUser := True;
+            PositionBar.Position := 0;
+            MainForm.Caption := 'OooPlayer';
+            CoverImage.Picture.LoadFromFile('logo.png');
+            TitleLabel.Caption := '';
+            FTitleLabel := TitleLabel.Caption;
+            FSelfCaption := Self.Caption;
+            FArtistLabel := '';
+            FAlbumLabel := '';
+            PositionLabel.Text := '00:00:00/00:00:00/00:00:00';
+            LyricList.Items.Clear;
+            if MainForm.Enabled and MainForm.Visible then
+              MainForm.FocusControl(VolumeBar);
+          end;
         end;
       end;
     3: // shuffle
       begin
-        if PlayList.Items.Count > 0 then
+        if FQueueLists[FSelectedPlaylistIndex].Count > 0 then
         begin
-          PositionTimer.Enabled := False;
-          ProgressTimer.Enabled := PositionTimer.Enabled;
-
-          try
-            if FShuffleIndex + 1 < FShuffleIndexes.Count then
-            begin
-              FShuffleIndex := 1 + FShuffleIndex;
-              if FShuffleIndexes[FShuffleIndex] < FPlaylists[FSelectedPlaylistIndex].Count then
-              begin
-
-              end;
-            end;
-          finally
-            PositionTimer.Enabled := True;
-            ProgressTimer.Enabled := PositionTimer.Enabled;
-
-          end;
+            // delete it from lists
+          FQueueLists[FSelectedPlaylistIndex].Delete(0);
+          QueueList.Items.Delete(0);
+          QueueList.Invalidate;
         end
         else
         begin
+          if PlayList.Items.Count > 0 then
+          begin
+            PositionTimer.Enabled := False;
+            ProgressTimer.Enabled := PositionTimer.Enabled;
+
+            try
+              if FShuffleIndex + 1 < FShuffleIndexes.Count then
+              begin
+                FShuffleIndex := 1 + FShuffleIndex;
+                if FShuffleIndexes[FShuffleIndex] < FPlaylists[FSelectedPlaylistIndex].Count then
+                begin
+
+                end;
+              end;
+            finally
+              PositionTimer.Enabled := True;
+              ProgressTimer.Enabled := PositionTimer.Enabled;
+
+            end;
+          end
+          else
+          begin
           // empty playlist
-          MainForm.FStoppedByUser := True;
-          PositionBar.Position := 0;
-          MainForm.Caption := 'OooPlayer';
-          CoverImage.Picture.LoadFromFile('logo.png');
-          TitleLabel.Caption := '';
-          FTitleLabel := TitleLabel.Caption;
-          FSelfCaption := Self.Caption;
-          FArtistLabel := '';
-          FAlbumLabel := '';
-          PositionLabel.Text := '00:00:00/00:00:00/00:00:00';
-          LyricList.Items.Clear;
-          if MainForm.Enabled and MainForm.Visible then
-            MainForm.FocusControl(VolumeBar);
+            MainForm.FStoppedByUser := True;
+            PositionBar.Position := 0;
+            MainForm.Caption := 'OooPlayer';
+            CoverImage.Picture.LoadFromFile('logo.png');
+            TitleLabel.Caption := '';
+            FTitleLabel := TitleLabel.Caption;
+            FSelfCaption := Self.Caption;
+            FArtistLabel := '';
+            FAlbumLabel := '';
+            PositionLabel.Text := '00:00:00/00:00:00/00:00:00';
+            LyricList.Items.Clear;
+            if MainForm.Enabled and MainForm.Visible then
+              MainForm.FocusControl(VolumeBar);
+          end;
         end;
       end;
   end;
