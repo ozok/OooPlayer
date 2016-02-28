@@ -1,5 +1,5 @@
 { *
-  * Copyright (C) 2014-2015 ozok <ozok26@gmail.com>
+  * Copyright (C) 2014-2016 ozok <ozok26@gmail.com>
   *
   * This file is part of OooPlayer.
   *
@@ -521,7 +521,7 @@ var
 
 const
 {$DEFINE WRITEDEBUGLOG}
-  BuildInt = 2975;
+  BuildInt = 3334;
   Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
@@ -2136,6 +2136,10 @@ begin
     for I := FShuffleIndexes.Count - 1 downto 0 do
     begin
       LIndex := Random(FShuffleIndexes.Count);
+      while LIndex = I do
+      begin
+        LIndex := Random(FShuffleIndexes.Count);
+      end;
       FShuffleIndexes.Exchange(i, LIndex);
     end;
   end;

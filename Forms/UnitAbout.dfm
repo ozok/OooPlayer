@@ -28,8 +28,8 @@ object AboutForm: TAboutForm
     Height = 13
     Align = alTop
     Alignment = taCenter
-    Caption = 'OooPlayer 2.2.0.3038 ALPHA3'
-    ExplicitWidth = 148
+    Caption = 'OooPlayer 2.2.0.3334 BETA1'
+    ExplicitWidth = 141
   end
   object Image1: TImage
     Left = 0
@@ -268,7 +268,6 @@ object AboutForm: TAboutForm
     Caption = 'Close'
     TabOrder = 0
     OnClick = Button1Click
-    ExplicitTop = 186
   end
   object Button2: TButton
     Left = 8
@@ -279,6 +278,5 @@ object AboutForm: TAboutForm
     Caption = 'Home page'
     TabOrder = 1
     OnClick = Button2Click
-    ExplicitTop = 186
   end
 end
