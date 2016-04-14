@@ -22,7 +22,7 @@ unit UnitMusicPlayer;
 interface
 
 uses
-  System.Classes, BASS, BASS_AAC, BASSFLAC, BassWMA, BASSWV, BASS_AC3, BASS_ALAC,
+  System.Classes, BASS, BASS_AAC, BASSFLAC, BassWMA, BASSWV, BASS_AC3, BASSALAC,
   BASS_APE, BASS_MPC, BASS_OFR, BASS_SPX, BASS_TTA, BassOPUS, Windows, SysUtils,
   StrUtils, Generics.Collections, MediaInfoDll, Bassmix, BASS_FX, CommonTypes;
 
@@ -41,7 +41,6 @@ type
     FFileName: string;
     FVolumeLevel: integer;
     FPositionAsSec: integer;
-    FTAKPluginHandle: Cardinal;
     FMixHandle: HSTREAM;
     FPosition: int64;
     FEQParams: array[0..17] of HFX;
@@ -303,12 +302,7 @@ constructor TMusicPlayer.Create(const WinHandle: Cardinal);
 begin
   FPlayerStatus := psStopped;
   FErrorMsg := MY_ERROR_OK;
-  if not BASS_Init(1, 44100, 0, WinHandle, nil) then
-  begin
-    FErrorMsg := MY_ERROR_BASS_NOT_LOADED;
-  end;
-  FTAKPluginHandle := BASS_PluginLoad('bass_tak2.4.dll', BASS_UNICODE);
-  if FTAKPluginHandle < 1 then
+  if not BASS_Init(-1, 44100, 0, WinHandle, nil) then
   begin
     FErrorMsg := MY_ERROR_BASS_NOT_LOADED;
   end;
@@ -325,10 +319,6 @@ end;
 
 destructor TMusicPlayer.Destroy;
 begin
-  if FTAKPluginHandle > 0 then
-  begin
-    BASS_PluginFree(FTAKPluginHandle)
-  end;
   BASS_StreamFree(FBassHandle);
   BASS_Free();
   inherited;
@@ -627,7 +617,7 @@ end;
 procedure TMusicPlayer.PlayUrl(const URL: string);
 begin
   begin
-    FBassHandle := BASS_StreamCreateURL(PAnsiChar(URL), 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX, nil, nil);
+    FBassHandle := BASS_StreamCreateURL(PWideChar(URL), 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX, nil, nil);
   end;
   if FBassHandle > 0 then
   begin

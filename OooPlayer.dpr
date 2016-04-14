@@ -2,6 +2,7 @@ program OooPlayer;
 
 uses
   madExcept,
+//  madExcept,
   Vcl.Forms,
   UnitMain in 'Forms\UnitMain.pas' {MainForm},
   MediaInfoDLL in 'Units\MediaInfoDLL.pas',
@@ -23,7 +24,6 @@ uses
   bass in 'BassUnits\bass.pas',
   bass_aac in 'BassUnits\bass_aac.pas',
   bass_ac3 in 'BassUnits\bass_ac3.pas',
-  bass_alac in 'BassUnits\bass_alac.pas',
   bass_ape in 'BassUnits\bass_ape.pas',
   bass_mpc in 'BassUnits\bass_mpc.pas',
   bass_ofr in 'BassUnits\bass_ofr.pas',
@@ -50,7 +50,8 @@ uses
   UnitTagReader in 'Units\UnitTagReader.pas',
   UnitSubProcessLauncher in 'Units\UnitSubProcessLauncher.pas',
   UnitCueParser in 'Units\UnitCueParser.pas',
-  bass_fx in 'BassUnits\bass_fx.pas';
+  bass_fx in 'BassUnits\bass_fx.pas',
+  bassalac in 'BassUnits\bassalac.pas';
 
 {$R *.res}
 

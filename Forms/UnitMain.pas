@@ -35,7 +35,7 @@ uses
   UnitLyricDownloader, UnitTagWriter, UnitImageResize, JvAnimatedImage,
   JvGIFCtrl, JvExExtCtrls, JvImage, JvAppInst, UnitArtworkReader, Vcl.Taskbar,
   System.Win.TaskbarCore, Vcl.AppEvnts, System.Types, UnitLastFMToolLauncher,
-  Pipes, UnitSubProcessLauncher, GraphUtil, Vcl.XPMan, UnitCueParser, System.ImageList;
+  UnitSubProcessLauncher, GraphUtil, Vcl.XPMan, UnitCueParser, System.ImageList;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -236,7 +236,6 @@ type
     RenamePlaylistBtn: TButton;
     sSplitter2: TSplitter;
     LastFMLaunchTimer: TTimer;
-    PipeServer: TPipeServer;
     TrayIcon: TJvTrayIcon;
     UpdateChecker: TJvHttpUrlGrabber;
     H3: TMenuItem;
@@ -376,8 +375,6 @@ type
     procedure sSkinManager1Deactivate(Sender: TObject);
     procedure InfoLabelMouseEnter(Sender: TObject);
     procedure InfoPanelMouseEnter(Sender: TObject);
-    procedure PipeServerPipeConnect(Sender: TObject; Pipe: HPIPE);
-    procedure FormActivate(Sender: TObject);
     procedure sSkinManager1Activate(Sender: TObject);
     procedure PlayListAdvancedCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
     procedure PlaylistViewClick(Sender: TObject);
@@ -1762,11 +1759,6 @@ begin
   end;
 end;
 
-procedure TMainForm.FormActivate(Sender: TObject);
-begin
-  PipeServer.Broadcast(PWideChar('Active')^, Length('Active') * SizeOf(WideChar));
-end;
-
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   // VisTimer.Enabled := False;
@@ -1895,7 +1887,7 @@ begin
   FuncPages.Pages[1].TabVisible := False;
   FLastFMToolLauncher := TLastFMToolLauncher.Create;
   FTagEditorLauncher := TSubProcessLauncher.Create;
-  PipeServer.Active := True;
+
   FTagFiles := TStringList.Create;
   FInfoFiles := TStringList.Create;
 
@@ -3464,50 +3456,6 @@ begin
   end;
 end;
 
-procedure TMainForm.PipeServerPipeConnect(Sender: TObject; Pipe: HPIPE);
-var
-  LSkinName: string;
-  LHue: string;
-  LBrightness: string;
-  LSaturation: string;
-  I: Integer;
-begin
-  if FTagFiles.Count > 0 then
-  begin
-    for I := 0 to FTagFiles.Count - 1 do
-    begin
-      if not PipeServer.Broadcast(PWideChar('File:' + FTagFiles[i])^, Length('File:' + FTagFiles[i]) * SizeOf(WideChar)) then
-      begin
-        LogForm.LogList.Lines.Add('Unable to broadcast tag editor message.');
-        if not LogForm.Visible then
-        begin
-          LogForm.Show;
-        end;
-      end;
-    end;
-  end
-  else if FInfoFiles.Count > 0 then
-  begin
-    for I := 0 to FInfoFiles.Count - 1 do
-    begin
-      if not PipeServer.Broadcast(PWideChar('FileInfo:' + FInfoFiles[i])^, Length('FileInfo:' + FInfoFiles[i]) * SizeOf(WideChar)) then
-      begin
-        LogForm.LogList.Lines.Add('Unable to broadcast info message.');
-        if not LogForm.Visible then
-        begin
-          LogForm.Show;
-        end;
-      end;
-    end;
-  end;
-  PipeServer.Broadcast(PWideChar(LSkinName)^, Length(LSkinName) * SizeOf(WideChar));
-  PipeServer.Broadcast(PWideChar(LHue)^, Length(LHue) * SizeOf(WideChar));
-  PipeServer.Broadcast(PWideChar(LBrightness)^, Length(LBrightness) * SizeOf(WideChar));
-  PipeServer.Broadcast(PWideChar(LSaturation)^, Length(LSaturation) * SizeOf(WideChar));
-  FTagFiles.Clear;
-  FInfoFiles.Clear;
-end;
-
 procedure TMainForm.PlaybackOrderListChange(Sender: TObject);
 begin
   if PlaybackOrderList.ItemIndex = 2 then
@@ -4999,7 +4947,7 @@ begin
   LCacheProgress := 0;
 
   // create radio stream
-  FRadioHandle := BASS_StreamCreateURL(PAnsiChar(FRadioURL), 0, BASS_STREAM_BLOCK or BASS_STREAM_STATUS or BASS_STREAM_AUTOFREE, @StatusProc, nil);
+  FRadioHandle := BASS_StreamCreateURL(PWideChar(FRadioURL), 0, BASS_STREAM_BLOCK or BASS_STREAM_STATUS or BASS_STREAM_AUTOFREE, @StatusProc, nil);
   if FRadioHandle = 0 then
   begin
     try

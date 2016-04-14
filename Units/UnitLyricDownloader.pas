@@ -105,7 +105,7 @@ begin
     OnDoneStream := DoneStream;
     OnError := Error;
     OutputMode := omStream;
-    Agent := 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0';
+    Agent := 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36 OPR/36.0.2130.46';
   end;
 
   FLyricFolder := LyricFolder;
@@ -129,18 +129,20 @@ end;
 procedure TLyricDownloader.DoneStream(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string);
 const
   START_STR = '<!-- Usage of azlyrics.com content';
-  END_STR = '<form id="addsong" style="visible:hidden; margin:0;" action="../../add.php" method="post">';
+  END_STR = '<!-- MxM banner -->';
   START_STR_BAT = '<pre id="from_pre">';
   END_STR_BAT = '<pre id="to_pre" style="display';
   BAT_SPAN = '<span style="font-size';
-  METRO_START = '<div id="lyrics-body-text">';
+  METRO_START = '<div id="lyrics-body-text" class="js-lyric-text">';
   // METRO_END = '<div id="selected-song-meaning-open" unselectable="on" style="display:none;">';
   METRO_END = '<p class="writers"><strong>Songwriters</strong>';
+  METRO_END2 = '</sd-lyricbody>';
   LRC123_START = '<font color="#008000">';
 var
   LSR: TStreamReader;
   LLine: string;
   LAddToLyricFile: Boolean;
+  I: integer;
 begin
   if Stream.Size = 0 then
   begin
@@ -235,7 +237,7 @@ begin
                 begin
                   LAddToLyricFile := True;
                 end
-                else if LLine.StartsWith(METRO_END) then
+                else if LLine.StartsWith(METRO_END) or LLine.StartsWith(METRO_END2) then
                 begin
                   Break;
                 end;
@@ -255,6 +257,33 @@ begin
       LSR.Close;
       LSR.Free;
     end;
+
+    // remove first line for metro
+    if FLyricSourceIndex = 2 then
+    begin
+      if FLyricFile.Count > 1 then
+      begin
+        FLyricFile.Delete(0);
+      end;
+    end;
+
+    // remove empty lines from bottom
+    for I := FLyricFile.Count - 1 downto 0 do
+    begin
+      if Trim(FLyricFile[i]) = '' then
+      begin
+        FLyricFile.Delete(i);
+      end;
+    end;
+    // remove empty lines from bottom
+    if FLyricFile.Count > 0 then
+    begin
+      while Length(Trim(FLyricFile[0])) < 1 do
+      begin
+        FLyricFile.Delete(0);
+      end;
+    end;
+    // show lyric on the interface
     try
       FThread.Synchronize(UpdateMainUI);
     except
@@ -265,6 +294,7 @@ begin
       with FItemInfo do
       begin
         try
+
           FLyricFile.SaveToFile(FLyricFolder + MainForm.CreateLyricFileName(Title, Artist, Album), TEncoding.UTF8);
         except
           on E: EFCreateError do
@@ -281,7 +311,7 @@ begin
     end
     else
     begin
-      FLyricStatusMsg := 'Could not found any lyrics';
+      FLyricStatusMsg := 'Could not find any lyrics';
       try
         FThread.Synchronize(UpdateLyricStatus);
       except
@@ -347,17 +377,17 @@ begin
   Result := Trim(StringReplace(Result, '<p class=''verse''>', sLineBreak, [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<p class=''''verse''''> ', sLineBreak, [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '</p>	</div>', '', [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, '<br />', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '<br />', sLineBreak, [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<i>', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '</div>', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '</i>', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<!-- start of lyrics -->', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '<pre id="from_pre">', '', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '</pre>', '', [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, '<br/>', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '<br/>', sLineBreak, [rfReplaceAll]));
   Result := Trim(StringReplace(Result, 'º', 'ş', [rfReplaceAll]));
   Result := Trim(StringReplace(Result, 'þ', 'ş', [rfReplaceAll]));
-  Result := Trim(StringReplace(Result, '<br>', '', [rfReplaceAll]));
+  Result := Trim(StringReplace(Result, '<br>', sLineBreak, [rfReplaceAll]));
   Result := Trim(StringReplace(Result, '&quot;', '"', [rfReplaceAll]));
 
   Result := Trim(Result)
@@ -485,6 +515,7 @@ begin
     2:
       FPageDownloader.Url := 'http://www.metrolyrics.com/' + URIEncode(FixStrings(FTitle) + '-lyrics-' + FixStrings(FArtist)) + '.html';
   end;
+
   FPageDownloader.Start;
   while FPageDownloader.Status <> gsStopped do
   begin
@@ -516,7 +547,6 @@ procedure TLyricDownloader.UpdateMainUI;
 var
   I: Integer;
 begin
-  MainForm.LyricList.Items.Clear;
   // if (MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][MainForm.FCurrentRadioIndex].Title = FTitle) and
   // (MainForm.FPlaylists[MainForm.FSelectedPlaylistIndex][MainForm.FCurrentRadioIndex].Artist = FArtist) then
   // begin
@@ -524,6 +554,7 @@ begin
   try
     if FLyricFile.Count > 0 then
     begin
+      MainForm.LyricList.Items.Clear;
       for I := 0 to FLyricFile.Count - 1 do
       begin
         MainForm.LyricList.Items.Add(Trim(FLyricFile[i]));
