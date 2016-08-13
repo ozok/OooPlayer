@@ -306,13 +306,6 @@ object MainForm: TMainForm
       TabOrder = 3
     end
   end
-  object PipeClient1: TPipeClient
-    MemoryThrottle = 10240000
-    PipeName = 'OooPlayerPipe'
-    OnPipeMessage = PipeClient1PipeMessage
-    Left = 332
-    Top = 272
-  end
   object JvDragDrop1: TJvDragDrop
     DropTarget = Owner
     OnDrop = JvDragDrop1Drop

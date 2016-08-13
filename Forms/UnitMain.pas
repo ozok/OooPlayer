@@ -665,6 +665,7 @@ begin
       Self.Width := Self.Width - 1;
       GenerateShuffleList;
       FShuffleIndex := -1;
+      PlayList.Items.Count := FPlaylists[FSelectedPlaylistIndex].Count;
       StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files/' + FPlayListFiles[FSelectedPlaylistIndex].Name;
       FStopAddFiles := True;
     end;
@@ -698,6 +699,7 @@ begin
       Self.Width := Self.Width - 1;
       GenerateShuffleList;
       FShuffleIndex := -1;
+      PlayList.Items.Count := FPlaylists[FSelectedPlaylistIndex].Count;
       StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files/' + FPlayListFiles[FSelectedPlaylistIndex].Name;
     end;
   end;
@@ -1016,8 +1018,6 @@ begin
           begin
             LSampleRate := 'N/A';
           end;
-          // increase playlist item count
-          PlayList.Items.Count := PlayList.Items.Count + 1;
 
           LPlayListItem := TPlayItem.Create;
           LPlayListItem.FullFileName := FileName;
@@ -1673,6 +1673,7 @@ begin
     Self.Width := Self.Width - 1;
     GenerateShuffleList;
     FShuffleIndex := -1;
+    PlayList.Items.Count := FPlaylists[FSelectedPlaylistIndex].Count;
     StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files / ' + FPlayListFiles[FSelectedPlaylistIndex].Name;
     FStopAddFiles := True;
   end;
@@ -1734,9 +1735,14 @@ begin
         FTagFiles.Add(FPlaylists[FSelectedPlaylistIndex][i].FullFileName);
       end;
     end;
+    if FileExists(FAppDataFolder + '\tag.txt') then
+    begin
+      DeleteFile(FAppDataFolder + '\tag.txt')
+    end;
+    FTagFiles.SaveToFile(FAppDataFolder + '\tag.txt', TEncoding.UTF8);
     if not FTagEditorLauncher.IsRunning then
     begin
-      FTagEditorLauncher.Start('', ExtractFileDir(Application.ExeName) + '\OooTagEditor.exe');
+      FTagEditorLauncher.Start(FAppDataFolder + '\tag.txt', ExtractFileDir(Application.ExeName) + '\OooTagEditor.exe');
     end;
   end;
 end;
@@ -3890,6 +3896,7 @@ begin
         FActivePlaylistIndex := FSelectedPlaylistIndex;
         FPlayer.FileName := FCurrentItemInfo.FullFileName;
         FPlayer.Play;
+        ;
         FCurrentItemInfo.DurationBass := FPlayer.TotalLength;
         PositionBar.Max := MaxInt;
         Taskbar2.ProgressMaxValue := MaxInt;

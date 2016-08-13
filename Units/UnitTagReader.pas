@@ -353,6 +353,7 @@ begin
           Title := FID3v2Tag.GetUnicodeText('TIT2');
           Artist := FID3v2Tag.GetUnicodeText('TPE1');
           Album := FID3v2Tag.GetUnicodeText('TALB');
+          Bitrate := FloatToStr(FID3v2Tag.MPEGInfo.BitRate);
         end;
       end;
     end

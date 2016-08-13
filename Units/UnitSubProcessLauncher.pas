@@ -100,8 +100,8 @@ begin
     begin
       if FileExists(ProcessPath) then
       begin
-        FProcess.ApplicationName := ProcessPath;
-        FProcess.CommandLine := SettingsFilePath;
+        FProcess.ApplicationName := '';
+        FProcess.CommandLine := ProcessPath + ' "' + SettingsFilePath + '"';
         FProcess.Run;
       end
       else

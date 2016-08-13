@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.StdCtrls,
   Vcl.ExtCtrls, UnitTagReader, Generics.Collections, UnitTagTypes, MediaInfoDll,
-  Pipes, Vcl.Mask, Vcl.ImgList, JvComponentBase, JvDragDrop, Vcl.Buttons, Vcl.Menus,
+  Vcl.Mask, Vcl.ImgList, JvComponentBase, JvDragDrop, Vcl.Buttons, Vcl.Menus,
   System.ImageList;
 
 type
@@ -23,7 +23,6 @@ type
     sPanel1: TPanel;
     ApplyBtn: TButton;
     ReloadBtn: TButton;
-    PipeClient1: TPipeClient;
     FileList: TListView;
     TitleEdit: TEdit;
     ArtistEdit: TEdit;
@@ -55,7 +54,6 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure ApplyBtnClick(Sender: TObject);
-    procedure PipeClient1PipeMessage(Sender: TObject; Pipe: HPIPE; Stream: TStream);
     procedure FileListData(Sender: TObject; Item: TListItem);
     procedure FileListClick(Sender: TObject);
     procedure JvDragDrop1Drop(Sender: TObject; Pos: TPoint; Value: TStrings);
@@ -144,11 +142,11 @@ begin
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
+var
+  I: Integer;
+  LTagFilePath: string;
+  LTagFile: TStringList;
 begin
-  if not PipeClient1.Connect(2000, True) then
-  begin
-    ShowMessage('not ocnn');
-  end;
   FTagReader := TTagReader.Create;
   FTags := TGeneralTagList.Create;
   FDisplayTags := TGeneralTagList.Create;
@@ -159,6 +157,23 @@ begin
     Application.Terminate;
   end;
   FFileItems := TFileItems.Create;
+  LTagFilePath := ParamStr(1);
+  if FileExists(LTagFilePath) then
+  begin
+    LTagFile := TStringList.Create;
+    try
+      LTagFile.LoadFromFile(LTagFilePath, TEncoding.UTF8);
+      for I := 0 to LTagFile.Count - 1 do
+      begin
+        GetFileInfoForDisplay(LTagFile[i]);
+        FileList.Items.Count := FFileItems.Count;
+        GetFileInfo(FFileItems.Count - 1);
+      end;
+    finally
+      LTagFile.Free;
+    end;
+    DeleteFile(LTagFilePath);
+  end;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -261,27 +276,6 @@ begin
   end;
   FileList.Items.Count := FFileItems.Count;
   GetFileInfo(0);
-end;
-
-procedure TMainForm.PipeClient1PipeMessage(Sender: TObject; Pipe: HPIPE; Stream: TStream);
-var
-  Msg: string;
-  LSkinName: string;
-  I: Integer;
-begin
-  SetLength(Msg, Stream.Size div SizeOf(WideChar));
-  Stream.Position := 0;
-  Stream.Read(Msg[1], Stream.Size);
-  if Msg.StartsWith('File') then
-  begin
-    GetFileInfoForDisplay(Msg.Replace('File:', '', []));
-    FileList.Items.Count := FFileItems.Count;
-    GetFileInfo(FFileItems.Count - 1);
-  end
-  else if Msg.StartsWith('Active') then
-  begin
-    Self.BringToFront;
-  end
 end;
 
 procedure TMainForm.TitleEditChange(Sender: TObject);
