@@ -518,7 +518,7 @@ var
 
 const
 {$DEFINE WRITEDEBUGLOG}
-  BuildInt = 3334;
+  BuildInt = 3382;
   Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;

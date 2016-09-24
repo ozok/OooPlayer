@@ -1,7 +1,6 @@
 object MainForm: TMainForm
   Left = 0
   Top = 0
-  BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'TFileInfo'
   ClientHeight = 628
   ClientWidth = 756
@@ -150,7 +149,6 @@ object MainForm: TMainForm
         RightClickSelect = True
         RowSelect = True
         TabOrder = 0
-        ExplicitTop = 4
       end
     end
   end
@@ -195,7 +193,6 @@ object MainForm: TMainForm
     OnClick = Button4Click
   end
   object JvDragDrop1: TJvDragDrop
-    AcceptDrag = False
     DropTarget = Owner
     OnDrop = JvDragDrop1Drop
     Left = 128

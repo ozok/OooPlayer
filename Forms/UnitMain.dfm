@@ -168,11 +168,10 @@ object MainForm: TMainForm
             Left = 6
             Top = 3
             Width = 618
-            Height = 32
+            Height = 35
             Hint = 'Title - Album - Artist'
             Margins.Left = 6
             Margins.Right = 6
-            Margins.Bottom = 0
             Align = alClient
             Alignment = taCenter
             AutoSize = False
@@ -190,12 +189,13 @@ object MainForm: TMainForm
           object InfoLabel: TLabel
             AlignWithMargins = True
             Left = 3
-            Top = 38
+            Top = 41
             Width = 624
             Height = 13
             Align = alBottom
             Alignment = taCenter
             OnMouseEnter = InfoLabelMouseEnter
+            ExplicitTop = 38
             ExplicitWidth = 3
           end
         end
@@ -453,7 +453,7 @@ object MainForm: TMainForm
       Left = 3
       Top = 3
       Width = 1137
-      Height = 35
+      Height = 38
       Align = alClient
       Caption = 'Progress info'
       Layout = tlCenter
@@ -834,7 +834,7 @@ object MainForm: TMainForm
     object LyricStatusLabel: TLabel
       AlignWithMargins = True
       Left = 3
-      Top = 365
+      Top = 368
       Width = 344
       Height = 13
       Align = alBottom
@@ -1001,7 +1001,7 @@ object MainForm: TMainForm
       Left = 0
       Top = 112
       Width = 350
-      Height = 250
+      Height = 253
       Align = alClient
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
