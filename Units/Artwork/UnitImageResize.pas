@@ -22,8 +22,7 @@ unit UnitImageResize;
 interface
 
 uses
-  Classes, Windows, SysUtils, Messages, StrUtils, Jpeg, Graphics, madGraphics,
-  PNGImage;
+  Classes, Windows, SysUtils, Messages, StrUtils, Jpeg, Graphics, madGraphics, PNGImage;
 
 type
   TImageResizer = class(TObject)
@@ -93,11 +92,11 @@ begin
       Exit;
     end;
     // output bitmap
-    LBMP.PixelFormat := pf24bit;
+    LBMP.PixelFormat := pf32bit;
     LBMP.Width := IMG_SIZE;
     LBMP.Height := Round(IMG_SIZE * (LJpeg.Height / LJpeg.Width));
     // bitmap to hold data from jpeg
-    LJpegBMP.PixelFormat := pf8bit;
+    LJpegBMP.PixelFormat := pf32bit;
     LJpegBMP.Width := LJpeg.Width;
     LJpegBMP.Height := LJpeg.Height;
     LJpegBMP.Assign(LJpeg);
@@ -162,7 +161,9 @@ begin
       try
         LJpeg.Free;
         LBMP.Free;
-      except on E: Exception do
+      except
+        on E: Exception do
+
       end;
       Exit;
     end;
@@ -294,4 +295,5 @@ begin
 end;
 
 end.
+
 

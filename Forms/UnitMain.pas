@@ -23,19 +23,8 @@ unit UnitMain;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
-  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
-  Vcl.ExtCtrls, Generics.Collections, Vcl.Menus, JvExControls, JvArrowButton,
-  JvComponentBase, JvSearchFiles, JvBaseDlg, JvBrowseFolder, MediaInfoDll,
-  JvExComCtrls, JvComCtrls, Vcl.ImgList, JvThreadTimer, JvExStdCtrls, JvListBox,
-  IniFiles, Vcl.Buttons, JvFormPlacement, JvAppStorage, JvAppIniStorage,
-  StrUtils, ShellAPI, JvComputerInfoEx, UnitTagTypes, UnitTagReader, PNGImage,
-  JvDragDrop, JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon, Jpeg,
-  UnitMusicPlayer, Bass, BASSenc, IdBaseComponent, IdThreadComponent,
-  UnitLyricDownloader, UnitTagWriter, UnitImageResize, JvAnimatedImage,
-  JvGIFCtrl, JvExExtCtrls, JvImage, JvAppInst, UnitArtworkReader, Vcl.Taskbar,
-  System.Win.TaskbarCore, Vcl.AppEvnts, System.Types, UnitLastFMToolLauncher,
-  UnitSubProcessLauncher, GraphUtil, Vcl.XPMan, UnitCueParser, System.ImageList;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls, Vcl.ExtCtrls, Generics.Collections, Vcl.Menus, JvExControls, JvArrowButton, JvComponentBase, JvSearchFiles, JvBaseDlg, JvBrowseFolder, MediaInfoDll, JvExComCtrls, JvComCtrls, Vcl.ImgList, JvThreadTimer, JvExStdCtrls, JvListBox, IniFiles, Vcl.Buttons, JvFormPlacement, JvAppStorage, JvAppIniStorage, StrUtils, ShellAPI, JvComputerInfoEx,
+  UnitTagTypes, UnitTagReader, PNGImage, JvDragDrop, JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon, Jpeg, UnitMusicPlayer, Bass, BASSenc, IdBaseComponent, IdThreadComponent, UnitLyricDownloader, UnitTagWriter, UnitImageResize, JvAnimatedImage, JvGIFCtrl, JvExExtCtrls, JvImage, JvAppInst, UnitArtworkReader, Vcl.Taskbar, System.Win.TaskbarCore, Vcl.AppEvnts, System.Types, UnitLastFMToolLauncher, UnitSubProcessLauncher, GraphUtil, Vcl.XPMan, UnitCueParser, System.ImageList;
 
 type
   TPlaybackType = (music = 0, radio = 1);
@@ -540,8 +529,7 @@ implementation
 {$R *.dfm}
 
 uses
-  UnitSearch, UnitSettings, UnitLog, UnitAbout, UnitRadioInfo, UnitNewRadio,
-  UnitRadioRecordOptions, UnitEQ;
+  UnitSearch, UnitSettings, UnitLog, UnitAbout, UnitRadioInfo, UnitNewRadio, UnitRadioRecordOptions, UnitEQ;
 
 // radio sync func
 procedure StatusProc(Buffer: Pointer; len: DWORD; user: Pointer); stdcall;
@@ -5994,179 +5982,189 @@ procedure TMainForm.WndProc(var Msg: TMessage);
 var
   LSplitList: TStringList;
 begin
-  inherited;
-  if Msg.Msg = WM_INFO_UPDATE then
-  begin
-    if (Msg.WParam = UPDATE_META) or (Msg.WParam = UPDATE_META_NAME) then
+  try
+    inherited;
+    if Msg.Msg = WM_INFO_UPDATE then
     begin
+      if (Msg.WParam = UPDATE_META) or (Msg.WParam = UPDATE_META_NAME) then
+      begin
       // radio recording
       // seperate file for each song
-      if FRecordingRadio then
-      begin
-        Log('Recording radio.');
-        if RadioRecordModeList.ItemIndex = 0 then
+        if FRecordingRadio then
         begin
-          StopRadioRecording;
-          StartRadioRecording;
-        end
-        else
-        begin
-          // single file so do nothing
-        end;
-      end;
-    end;
-    case Msg.WParam of
-      RESET_UI:
-        begin
-          Log('Reset ui');
-          TitleLabel.Caption := 'Connecting...';
-          TitleLabel.Caption := '';
-          FTitleLabel := TitleLabel.Caption;
-          FArtistLabel := '';
-          FAlbumLabel := '';
-          Self.Caption := 'Radio [OooPlayer]';
-          FSelfCaption := Self.Caption;
-        end;
-      SHOW_ERROR:
-        begin
-          Log('error');
-          TitleLabel.Caption := 'Error';
-          FTitleLabel := TitleLabel.Caption;
-          FRadioLogItem := 'Unable to play radio. Error code: ' + IntToStr(Msg.LParam);
-          AddToRadioLog;
-          RadioConnectionBar.Visible := False;
-          RadioConnectionBar.Style := pbstNormal;
-        end;
-      UPDATE_PROGRESS:
-        begin
-          Log('update progress');
-          TitleLabel.Caption := Format('Buffering... %d%%', [Msg.LParam]);
-          FTitleLabel := TitleLabel.Caption;
-        end;
-      UPDATE_META_NAME:
-        begin
-          Log('update meta anme');
-          FTitleLabel := string(PAnsiChar(Msg.LParam));
-          TitleLabel.Caption := FTitleLabel + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
-          if (not FTitleLabel.StartsWith('HTTP')) and (FTitleLabel.Length > 0) then
+          Log('Recording radio.');
+          if RadioRecordModeList.ItemIndex = 0 then
           begin
-            Self.Caption := string(PAnsiChar(Msg.LParam)) + ' [OooPlayer]';
+            StopRadioRecording;
+            StartRadioRecording;
           end
           else
           begin
+          // single file so do nothing
+          end;
+        end;
+      end;
+      case Msg.WParam of
+        RESET_UI:
+          begin
+            Log('Reset ui');
+            TitleLabel.Caption := 'Connecting...';
+            TitleLabel.Caption := '';
+            FTitleLabel := TitleLabel.Caption;
+            FArtistLabel := '';
+            FAlbumLabel := '';
             Self.Caption := 'Radio [OooPlayer]';
+            FSelfCaption := Self.Caption;
           end;
-          FTitleLabel := TitleLabel.Caption;
-          FSelfCaption := Self.Caption;
-          if TitleLabel.Width < TitleLabel.Canvas.TextWidth(TitleLabel.Caption) then
+        SHOW_ERROR:
           begin
-            TitleLabel.Caption := TitleLabel.Caption + ' - '
+            Log('error');
+            TitleLabel.Caption := 'Error';
+            FTitleLabel := TitleLabel.Caption;
+            FRadioLogItem := 'Unable to play radio. Error code: ' + IntToStr(Msg.LParam);
+            AddToRadioLog;
+            RadioConnectionBar.Visible := False;
+            RadioConnectionBar.Style := pbstNormal;
           end;
-        end;
-      UPDATE_META_BITRATE:
-        begin
-          Log('update bitrate');
-          FAlbumLabel := string(PAnsiChar(Msg.LParam)) + ' kbps';
-          TitleLabel.Caption := string(PAnsiChar(Msg.LParam)) + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
-          FTitleLabel := TitleLabel.Caption;
-          if TitleLabel.Width < TitleLabel.Canvas.TextWidth(TitleLabel.Caption) then
+        UPDATE_PROGRESS:
           begin
-            TitleLabel.Caption := TitleLabel.Caption + ' - '
+            Log('update progress');
+            TitleLabel.Caption := Format('Buffering... %d%%', [Msg.LParam]);
+            FTitleLabel := TitleLabel.Caption;
           end;
-        end;
+        UPDATE_META_NAME:
+          begin
+            Log('update meta anme');
+            FTitleLabel := string(PAnsiChar(Msg.LParam));
+            TitleLabel.Caption := FTitleLabel + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
+            if (not FTitleLabel.StartsWith('HTTP')) and (FTitleLabel.Length > 0) then
+            begin
+              Self.Caption := string(PAnsiChar(Msg.LParam)) + ' [OooPlayer]';
+            end
+            else
+            begin
+              Self.Caption := 'Radio [OooPlayer]';
+            end;
+            FTitleLabel := TitleLabel.Caption;
+            FSelfCaption := Self.Caption;
+            if TitleLabel.Width < TitleLabel.Canvas.TextWidth(TitleLabel.Caption) then
+            begin
+              TitleLabel.Caption := TitleLabel.Caption + ' - '
+            end;
+          end;
+        UPDATE_META_BITRATE:
+          begin
+            Log('update bitrate');
+            FAlbumLabel := string(PAnsiChar(Msg.LParam)) + ' kbps';
+            TitleLabel.Caption := string(PAnsiChar(Msg.LParam)) + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
+            FTitleLabel := TitleLabel.Caption;
+            if TitleLabel.Width < TitleLabel.Canvas.TextWidth(TitleLabel.Caption) then
+            begin
+              TitleLabel.Caption := TitleLabel.Caption + ' - '
+            end;
+          end;
       // 5:
       // Label5.Caption := String(PAnsiChar(msg.LParam));
       // 6:
       // Label3.Caption := String(PAnsiChar(msg.LParam));
-      UPDATE_META:
-        begin
-          Log('update meta');
-          FTitleLabel := string(PAnsiChar(Msg.LParam));
-          TitleLabel.Caption := FTitleLabel + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
-          if (not FTitleLabel.StartsWith('HTTP')) and (FTitleLabel.Length > 0) then
+        UPDATE_META:
           begin
-            Self.Caption := string(PAnsiChar(Msg.LParam)) + ' [OooPlayer]';
-          end
-          else
-          begin
-            Self.Caption := 'Radio [OooPlayer]';
-          end;
-          FTitleLabel := TitleLabel.Caption;
-          // radio recording
-          // seperate file for each song
-          if FRecordingRadio then
-          begin
-            Log('Recording radio.');
-            if RadioRecordModeList.ItemIndex = 0 then
+            Log('update meta');
+            FTitleLabel := string(PAnsiChar(Msg.LParam));
+            TitleLabel.Caption := FTitleLabel + ' - ' + FAlbumLabel + ' - ' + FArtistLabel;
+            if (not FTitleLabel.StartsWith('HTTP')) and (FTitleLabel.Length > 0) then
             begin
-              StopRadioRecording;
-              StartRadioRecording;
+              Self.Caption := string(PAnsiChar(Msg.LParam)) + ' [OooPlayer]';
             end
             else
             begin
+              Self.Caption := 'Radio [OooPlayer]';
+            end;
+            FTitleLabel := TitleLabel.Caption;
+          // radio recording
+          // seperate file for each song
+            if FRecordingRadio then
+            begin
+              Log('Recording radio.');
+              if RadioRecordModeList.ItemIndex = 0 then
+              begin
+                StopRadioRecording;
+                StartRadioRecording;
+              end
+              else
+              begin
               // single file so do nothing
+              end;
             end;
           end;
-        end;
-      STATUS_UPDATE:
-        begin
-          Log('status update');
-          if (string(PAnsiChar(Msg.LParam)) = 'ICY 200 OK') or (string(PAnsiChar(Msg.LParam)) = 'HTTP/1.0 200 OK') then
+        STATUS_UPDATE:
           begin
-            InfoLabel.Caption := 'Playing';
-          end
-          else
-          begin
-            InfoLabel.Caption := string(PAnsiChar(Msg.LParam));
+            Log('status update');
+            if (string(PAnsiChar(Msg.LParam)) = 'ICY 200 OK') or (string(PAnsiChar(Msg.LParam)) = 'HTTP/1.0 200 OK') then
+            begin
+              InfoLabel.Caption := 'Playing';
+            end
+            else
+            begin
+              InfoLabel.Caption := string(PAnsiChar(Msg.LParam));
+            end;
           end;
-        end;
-      REPAINT_RADIO_LIST:
-        RadioList.Invalidate;
-      STOP_IMG_ANIM:
-        begin
-          Log('stop anim');
-          RadioConnectionBar.Visible := False;
-          RadioConnectionBar.Style := pbstNormal;
-        end;
-      DOWNLOAD_LYRIC:
-        begin
-          Log('download lyric');
+        REPAINT_RADIO_LIST:
+          RadioList.Invalidate;
+        STOP_IMG_ANIM:
+          begin
+            Log('stop anim');
+            RadioConnectionBar.Visible := False;
+            RadioConnectionBar.Style := pbstNormal;
+          end;
+        DOWNLOAD_LYRIC:
+          begin
+            Log('download lyric');
           // lyric
-          LyricList.Items.Clear;
-          LyricStatusLabel.Caption := '';
-          LyricTitleEdit.Text := '';
-          LyricArtistEdit.Text := '';
-          LSplitList := TStringList.Create;
-          Log(FTitleLabel);
-          try
+            LyricList.Items.Clear;
+            LyricStatusLabel.Caption := '';
+            LyricTitleEdit.Text := '';
+            LyricArtistEdit.Text := '';
+            LSplitList := TStringList.Create;
+            Log(FTitleLabel);
+            try
             // try to get tags
             // artist - title is assumed
-            LSplitList.StrictDelimiter := True;
-            LSplitList.Delimiter := '-';
-            LSplitList.DelimitedText := FTitleLabel;
-            if LSplitList.Count >= 2 then
-            begin
-              // sometimes there are no tags so we must check for them
-              if (Length(Trim(LSplitList[1])) > 0) and (Length(Trim(LSplitList[0])) > 0) then
+              LSplitList.StrictDelimiter := True;
+              LSplitList.Delimiter := '-';
+              LSplitList.DelimitedText := FTitleLabel;
+              if LSplitList.Count >= 2 then
               begin
-                LyricTitleEdit.Text := Trim(LSplitList[1]);
-                LyricArtistEdit.Text := Trim(LSplitList[0]);
-                FLyricAlbumStr := 'Radio';
-                LyricSearchBtn.Enabled := False;
-                LyricArtistEdit.Enabled := False;
-                LyricTitleEdit.Enabled := False;
-                LyricSourceList.Enabled := False;
-                ReloadLyricTitleBtn.Enabled := False;
-                FLyricDownloader.Stop;
-                if FPlaylists[FSelectedPlaylistIndex].Count < 1 then
-                  Exit;
-                FLyricDownloader.SongTitle := Trim(LSplitList[1]);
-                FLyricDownloader.Artist := Trim(LSplitList[0]);
-                FLyricDownloader.Album := 'Radio';
-                FLyricDownloader.ItemInfo.Title := Trim(LSplitList[1]);
-                FLyricDownloader.ItemInfo.Artist := Trim(LSplitList[0]);
-                FLyricDownloader.ItemInfo.Album := 'Radio';
-                FLyricDownloader.Start;
+              // sometimes there are no tags so we must check for them
+                if (Length(Trim(LSplitList[1])) > 0) and (Length(Trim(LSplitList[0])) > 0) then
+                begin
+                  LyricTitleEdit.Text := Trim(LSplitList[1]);
+                  LyricArtistEdit.Text := Trim(LSplitList[0]);
+                  FLyricAlbumStr := 'Radio';
+                  LyricSearchBtn.Enabled := False;
+                  LyricArtistEdit.Enabled := False;
+                  LyricTitleEdit.Enabled := False;
+                  LyricSourceList.Enabled := False;
+                  ReloadLyricTitleBtn.Enabled := False;
+                  FLyricDownloader.Stop;
+                  if FPlaylists[FSelectedPlaylistIndex].Count < 1 then
+                    Exit;
+                  FLyricDownloader.SongTitle := Trim(LSplitList[1]);
+                  FLyricDownloader.Artist := Trim(LSplitList[0]);
+                  FLyricDownloader.Album := 'Radio';
+                  FLyricDownloader.ItemInfo.Title := Trim(LSplitList[1]);
+                  FLyricDownloader.ItemInfo.Artist := Trim(LSplitList[0]);
+                  FLyricDownloader.ItemInfo.Album := 'Radio';
+                  FLyricDownloader.Start;
+                end
+                else
+                begin
+                  LyricSearchBtn.Enabled := True;
+                  LyricArtistEdit.Enabled := True;
+                  LyricTitleEdit.Enabled := True;
+                  LyricSourceList.Enabled := True;
+                  ReloadLyricTitleBtn.Enabled := True;
+                end;
               end
               else
               begin
@@ -6176,30 +6174,27 @@ begin
                 LyricSourceList.Enabled := True;
                 ReloadLyricTitleBtn.Enabled := True;
               end;
-            end
-            else
-            begin
-              LyricSearchBtn.Enabled := True;
-              LyricArtistEdit.Enabled := True;
-              LyricTitleEdit.Enabled := True;
-              LyricSourceList.Enabled := True;
-              ReloadLyricTitleBtn.Enabled := True;
+            finally
+              LSplitList.Free;
             end;
-          finally
-            LSplitList.Free;
           end;
-        end;
-      PLAY_NEXT_SONG:
-        begin
-          Log('play next file');
-          HandlePlaybackFromBassThread;
-        end;
+        PLAY_NEXT_SONG:
+          begin
+            Log('play next file');
+            HandlePlaybackFromBassThread;
+          end;
       // UPDATE_LEVEL:
       // begin
       // Log('left: ' + FloatToStr(FLevels.Left));
       // end;
+      end;
+    end
+  except
+    on E: Exception do
+    begin
+
     end;
-  end
+  end;
 end;
 
 procedure TMainForm.WriteTagsToRecordFile;
@@ -6218,4 +6213,5 @@ begin
 end;
 
 end.
+
 

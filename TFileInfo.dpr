@@ -8,7 +8,7 @@ uses
   madListModules,
   Vcl.Forms,
   UnitMain in 'TFileInfo\UnitMain.pas' {MainForm},
-  MediaInfoDLL in 'Units\MediaInfoDLL.pas',
+  MediaInfoDLL in 'Units\Others\MediaInfoDLL.pas',
   UnitAbout in 'TFileInfo\UnitAbout.pas' {AboutForm};
 
 {$R *.res}
