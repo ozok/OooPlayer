@@ -50,7 +50,11 @@ uses
   UnitSubProcessLauncher in 'Units\Process\UnitSubProcessLauncher.pas',
   UnitCueParser in 'Units\Cue\UnitCueParser.pas',
   bass_fx in 'BassUnits\bass_fx.pas',
-  bassalac in 'BassUnits\bassalac.pas';
+  bassalac in 'BassUnits\bassalac.pas',
+  UnitShuffleList in 'Forms\UnitShuffleList.pas' {ShuffleListForm},
+  Playlist in 'Types\Playlist.pas',
+  Radiolist in 'Types\Radiolist.pas',
+  CommonTypes in 'Types\CommonTypes.pas';
 
 {$R *.res}
 
@@ -66,6 +70,7 @@ begin
   Application.CreateForm(TNewRadioForm, NewRadioForm);
   Application.CreateForm(TRadioRecordOptionsForm, RadioRecordOptionsForm);
   Application.CreateForm(TEQForm, EQForm);
+  Application.CreateForm(TShuffleListForm, ShuffleListForm);
   Application.Run;
 
 end.

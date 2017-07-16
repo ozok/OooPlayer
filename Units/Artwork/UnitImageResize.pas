@@ -22,7 +22,8 @@ unit UnitImageResize;
 interface
 
 uses
-  Classes, Windows, SysUtils, Messages, StrUtils, Jpeg, Graphics, madGraphics, PNGImage;
+  Classes, Windows, SysUtils, Messages, StrUtils, Jpeg, Graphics, madGraphics,
+  PNGImage;
 
 type
   TImageResizer = class(TObject)
@@ -146,11 +147,11 @@ begin
       Exit;
     end;
     // output bitmap
-    LBMP.PixelFormat := pf24bit;
+    LBMP.PixelFormat := pf32bit;
     LBMP.Width := IMG_SIZE;
     LBMP.Height := Round(IMG_SIZE * (LJpeg.Height / LJpeg.Width));
     // bitmap to hold data from jpeg
-    LJpegBMP.PixelFormat := pf8bit;
+    LJpegBMP.PixelFormat := pf32bit;
     LJpegBMP.Width := LJpeg.Width;
     LJpegBMP.Height := LJpeg.Height;
     LJpegBMP.Assign(LJpeg);
@@ -163,6 +164,7 @@ begin
         LBMP.Free;
       except
         on E: Exception do
+
 
       end;
       Exit;
@@ -208,11 +210,11 @@ begin
       Exit;
     end;
     // output bitmap
-    LBMP.PixelFormat := pf24bit;
+    LBMP.PixelFormat := pf32bit;
     LBMP.Width := IMG_SIZE;
     LBMP.Height := Round(IMG_SIZE * (LPng.Height / LPng.Width));
     // bitmap to hold data from png
-    LPngBMP.PixelFormat := pf8bit;
+    LPngBMP.PixelFormat := pf32bit;
     LPngBMP.Width := LPng.Width;
     LPngBMP.Height := LPng.Height;
     LPngBMP.Assign(LPng);
@@ -262,11 +264,11 @@ begin
       Exit;
     end;
     // output bitmap
-    LBMP.PixelFormat := pf24bit;
+    LBMP.PixelFormat := pf32bit;
     LBMP.Width := IMG_SIZE;
     LBMP.Height := Round(IMG_SIZE * (LPng.Height / LPng.Width));
     // bitmap to hold data from jpeg
-    LPngBMP.PixelFormat := pf8bit;
+    LPngBMP.PixelFormat := pf32bit;
     LPngBMP.Width := LPng.Width;
     LPngBMP.Height := LPng.Height;
     LPngBMP.Assign(LPng);
@@ -295,5 +297,4 @@ begin
 end;
 
 end.
-
 

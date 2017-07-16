@@ -1,0 +1,23 @@
+Flat
+Ballad
+Classical
+Club
+Dance
+Full Bass
+Full Bass & Treble
+Full Treble
+Headphone
+Heavy Metal
+Jazz
+Large Hall
+Live
+Party
+Pop
+Rap
+Reggae
+Rock
+Ska
+Soft
+Soft Rock
+Techno
+Vocal

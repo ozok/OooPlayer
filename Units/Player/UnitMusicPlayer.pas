@@ -292,9 +292,9 @@ var
 begin
   for I := Low(EQValues) to High(EQValues) do
   begin
-    BASS_FXGetParameters(FEQParams[i], @LEQ);
-    LEQ.fGain := EQValues[i];
-    BASS_FXSetParameters(FEQParams[i], @LEQ);
+    BASS_FXGetParameters(FEQParams[I], @LEQ);
+    LEQ.fGain := EQValues[I];
+    BASS_FXSetParameters(FEQParams[I], @LEQ);
   end;
 end;
 
@@ -404,13 +404,13 @@ var
   I: Integer;
 begin
   // RemoveEQ;
-  for i := Low(EQ_FRENQ) to High(EQ_FRENQ) do
+  for I := Low(EQ_FRENQ) to High(EQ_FRENQ) do
   begin
-    FEQParams[i] := 0;
+    FEQParams[I] := 0;
   end;
-  for i := Low(EQ_FRENQ) to High(EQ_FRENQ) do
+  for I := Low(EQ_FRENQ) to High(EQ_FRENQ) do
   begin
-    FEQParams[i] := BASS_ChannelSetFX(FBassHandle, BASS_FX_DX8_PARAMEQ, 13);
+    FEQParams[I] := BASS_ChannelSetFX(FBassHandle, BASS_FX_DX8_PARAMEQ, 13);
 
     case BASS_ErrorGetCode of
       BASS_ERROR_HANDLE:
@@ -427,8 +427,8 @@ begin
 
     LEQ.fGain := 0;
     LEQ.fBandwidth := 3;
-    LEQ.fCenter := EQ_FRENQ[i];
-    if not BASS_FXSetParameters(FEQParams[i], @LEQ) then
+    LEQ.fCenter := EQ_FRENQ[I];
+    if not BASS_FXSetParameters(FEQParams[I], @LEQ) then
     begin
       LogForm.LogList.Lines.Add('EQ error: Unable to set params for freq: ' + LEQ.fCenter.ToString());
     end;
