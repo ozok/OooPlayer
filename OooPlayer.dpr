@@ -54,7 +54,8 @@ uses
   UnitShuffleList in 'Forms\UnitShuffleList.pas' {ShuffleListForm},
   Playlist in 'Types\Playlist.pas',
   Radiolist in 'Types\Radiolist.pas',
-  CommonTypes in 'Types\CommonTypes.pas';
+  CommonTypes in 'Types\CommonTypes.pas',
+  UnitProgress in 'Forms\UnitProgress.pas' {ProgressForm};
 
 {$R *.res}
 
@@ -71,6 +72,7 @@ begin
   Application.CreateForm(TRadioRecordOptionsForm, RadioRecordOptionsForm);
   Application.CreateForm(TEQForm, EQForm);
   Application.CreateForm(TShuffleListForm, ShuffleListForm);
+  Application.CreateForm(TProgressForm, ProgressForm);
   Application.Run;
 
 end.

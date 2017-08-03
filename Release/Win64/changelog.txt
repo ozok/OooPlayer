@@ -1,3 +1,8 @@
+--2.3.0
+-Added: [Music Player] Option to select audio device
+-Added: [UI] A progress window for adding files
+-Fixed: [UI] Minor problems
+
 --2.2.0
 -Added: [General] New UI layout
 -Added: [Music Player] 18 band equalizer with several presets
@@ -5,6 +10,7 @@
 -Added: [Music Player] Playlist now has columns for title, album, artist and bitrate, channel, codec and samplerate
 -Added: [Music Player] Pressing previous button in shuffle mode will return to previous random song instead playing the next random song
 -Added: [Music Player] Added an option to enable/disable loading of already downloaded lyrics
+-Added: [UI] Shuffle list
 -Improved: [Music Player] Seperated options of loading and downloading lyric
 -Improved: [Radio Player] Usability by making radio playlist and playlist selection like music player
 -Fixed: [Music Player] Lyric list's width was not adjusted according to the content
@@ -13,9 +19,10 @@
 -Fixed: [General] Clicking on a taskbar button would make buttons disappear
 -Fixed: [Radio Player] Metatag related bugs
 -Updated: Bassmix to 2.4.8
--Updated: BassOpus to 2.4.1.4
--Updated: MediaInfo to 0.7.76
+-Updated: BassOpus to 2.4.1.10
+-Updated: MediaInfo to 0.7.79
 -Updated: Tag libraries
+-Updated: Last.fm scrobbler library
 -Removed: Skin component
 
 --2.1.2

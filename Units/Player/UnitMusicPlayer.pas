@@ -1,5 +1,5 @@
 { *
-  * Copyright (C) 2014-2016 ozok <ozok26@gmail.com>
+  * Copyright (C) 2014-2017 ozok <ozok26@gmail.com>
   *
   * This file is part of OooPlayer.
   *
@@ -45,6 +45,7 @@ type
     FPosition: int64;
     FEQParams: array[0..17] of HFX;
     FDSPHandle: Cardinal;
+    FDevices: TList<BASS_DEVICEINFO>;
     function GetBassStreamStatus: TPlayerStatus;
     function GetTotalLength(): int64;
     function GetPosition(): int64;
@@ -67,9 +68,10 @@ type
     property Channel: Cardinal read FBassHandle;
     property BassErrorCode: Integer read GetBassErrorCode;
     property MixHandle: HSTREAM read FMixHandle;
+    property Devices: TList<BASS_DEVICEINFO> read FDevices write FDevices;
     // property Levels: TLevels read FLevels;
 
-    constructor Create(const WinHandle: Cardinal);
+    constructor Create(const WinHandle: Cardinal; const DeviceId: integer = 1);
     destructor Destroy; override;
     procedure Play;
     procedure PlayUrl(const URL: string);
@@ -82,6 +84,7 @@ type
     procedure SetBuffer(const Buffer: DWORD);
     procedure ChangeEQ(const EQValues: TEQValues);
     procedure UpdatePreAmp(const PreAmpValue: single);
+    function SetDevice(const DeviceId: Integer = 1): integer;
     // procedure RemoveEQ;
     procedure InitQE;
   end;
@@ -298,11 +301,30 @@ begin
   end;
 end;
 
-constructor TMusicPlayer.Create(const WinHandle: Cardinal);
+constructor TMusicPlayer.Create(const WinHandle: Cardinal; const DeviceId: integer = 1);
+var
+  I: Integer;
+  LDeviceInfo: BASS_DEVICEINFO;
 begin
   FPlayerStatus := psStopped;
   FErrorMsg := MY_ERROR_OK;
-  if not BASS_Init(-1, 44100, 0, WinHandle, nil) then
+
+  FDevices := TList<BASS_DEVICEINFO>.Create;
+  I := 1;
+  while BASS_GetDeviceInfo(I, LDeviceInfo) do
+  begin
+    try
+      FDevices.Add(LDeviceInfo);
+      Inc(I);
+    except
+      on E: Exception do
+      begin
+
+      end;
+    end;
+  end;
+
+  if not BASS_Init(DeviceId, 44100, 0, WinHandle, nil) then
   begin
     FErrorMsg := MY_ERROR_BASS_NOT_LOADED;
   end;
@@ -319,6 +341,7 @@ end;
 
 destructor TMusicPlayer.Destroy;
 begin
+  FDevices.Free;
   BASS_StreamFree(FBassHandle);
   BASS_Free();
   inherited;
@@ -654,6 +677,14 @@ end;
 procedure TMusicPlayer.SetBuffer(const Buffer: DWORD);
 begin
   BASS_SetConfig(BASS_CONFIG_BUFFER, Buffer);
+end;
+
+function TMusicPlayer.SetDevice(const DeviceId: Integer): integer;
+begin
+  if not BASS_SetDevice(DeviceId) then
+  begin
+    Result := BASS_ErrorGetCode;
+  end;
 end;
 
 function TMusicPlayer.SetPosition(const Position: int64): Boolean;

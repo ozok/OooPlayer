@@ -14,7 +14,6 @@ object SettingsForm: TSettingsForm
   Font.Style = []
   OldCreateOrder = False
   Position = poMainFormCenter
-  OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
@@ -27,7 +26,7 @@ object SettingsForm: TSettingsForm
     Top = 8
     Width = 544
     Height = 278
-    ActivePage = TabSheet1
+    ActivePage = TabSheet2
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     object TabSheet1: TTabSheet
@@ -110,16 +109,19 @@ object SettingsForm: TSettingsForm
     object TabSheet2: TTabSheet
       Caption = 'Playback'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label1: TLabel
         Left = 17
         Top = 69
         Width = 106
         Height = 13
         Caption = 'Playback buffer in ms:'
+      end
+      object Label6: TLabel
+        Left = 17
+        Top = 97
+        Width = 36
+        Height = 13
+        Caption = 'Device:'
       end
       object PlayCursorBtn: TCheckBox
         Left = 16
@@ -153,14 +155,27 @@ object SettingsForm: TSettingsForm
         TabOrder = 2
         Value = 1000
       end
+      object DeviceList: TComboBox
+        Left = 59
+        Top = 94
+        Width = 384
+        Height = 21
+        Style = csDropDownList
+        TabOrder = 3
+      end
+      object ApplyDeviceBtn: TButton
+        Left = 449
+        Top = 92
+        Width = 75
+        Height = 25
+        Caption = 'Apply'
+        TabOrder = 4
+        OnClick = ApplyDeviceBtnClick
+      end
     end
     object TabSheet3: TTabSheet
       Caption = 'Cover'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LoadArtBtn: TCheckBox
         Left = 16
         Top = 16
@@ -199,10 +214,6 @@ object SettingsForm: TSettingsForm
       Font.Style = []
       ImageIndex = 4
       ParentFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LyricBtn: TCheckBox
         Left = 16
         Top = 16
@@ -238,10 +249,6 @@ object SettingsForm: TSettingsForm
     end
     object sTabSheet2: TTabSheet
       Caption = 'Last.fm'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object sLabel4: TLabel
         Left = 3
         Top = 95
@@ -317,9 +324,18 @@ object SettingsForm: TSettingsForm
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    Caption = 'OK'
+    Caption = 'Save'
     TabOrder = 1
     OnClick = Button1Click
+  end
+  object Button3: TButton
+    Left = 396
+    Top = 292
+    Width = 75
+    Height = 25
+    Caption = 'Cancel'
+    TabOrder = 2
+    OnClick = Button3Click
   end
   object UpdateChecker: TJvHttpUrlGrabber
     FileName = 'output.txt'
@@ -330,7 +346,7 @@ object SettingsForm: TSettingsForm
     ProxyIgnoreList = '<local>'
     OnDoneStream = UpdateCheckerDoneStream
     Left = 84
-    Top = 262
+    Top = 214
   end
   object UpdateThread: TJvThread
     Exclusive = True
@@ -338,7 +354,7 @@ object SettingsForm: TSettingsForm
     RunOnCreate = True
     FreeOnTerminate = True
     OnExecute = UpdateThreadExecute
-    Left = 220
-    Top = 262
+    Left = 204
+    Top = 206
   end
 end

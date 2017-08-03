@@ -1,5 +1,5 @@
 { *
-  * Copyright (C) 2014-2016 ozok <ozok26@gmail.com>
+  * Copyright (C) 2014-2017 ozok <ozok26@gmail.com>
   *
   * This file is part of OooPlayer.
   *
@@ -27,7 +27,7 @@ uses
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
   IniFiles, Vcl.Mask, JvExMask, JvSpin, JvThread, JvComponentBase,
   JvUrlListGrabber, JvUrlGrabbers, ShellAPI, IdGlobal, IdHash,
-  IdHashMessageDigest, Vcl.Samples.Spin;
+  IdHashMessageDigest, Vcl.Samples.Spin, Bass, Generics.Collections;
 
 type
   TSettingsForm = class(TForm)
@@ -62,8 +62,11 @@ type
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
+    DeviceList: TComboBox;
+    Label6: TLabel;
+    Button3: TButton;
+    ApplyDeviceBtn: TButton;
     procedure Button1Click(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LoadArtBtnClick(Sender: TObject);
     procedure BufferEditChange(Sender: TObject);
     procedure UpdateThreadExecute(Sender: TObject; Params: Pointer);
@@ -73,8 +76,11 @@ type
     procedure FormCreate(Sender: TObject);
     procedure PlaylistItemTextListChange(Sender: TObject);
     procedure LastFMSaveBtnClick(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure ApplyDeviceBtnClick(Sender: TObject);
   private
     { Private declarations }
+    FDeviceChanged: Boolean;
   public
     { Public declarations }
     LastFMUser: string;
@@ -93,6 +99,21 @@ implementation
 uses
   UnitMain, UnitAbout, UnitLog;
 
+procedure TSettingsForm.ApplyDeviceBtnClick(Sender: TObject);
+var
+  LResult: integer;
+begin
+  LResult := MainForm.ChangeDevice(DeviceList.ItemIndex + 1);
+  if LResult = BASS_OK then
+  begin
+    Application.MessageBox('Device has been changed. You can continue the playback.', 'Info', MB_ICONINFORMATION);
+  end
+  else
+  begin
+    Application.MessageBox(PWideChar('Unable to change the device. Error code: ' + FloatToStr(LResult)), 'Error', MB_ICONERROR);
+  end;
+end;
+
 procedure TSettingsForm.BufferEditChange(Sender: TObject);
 begin
   MainForm.SetPlayerBuffer(BufferEdit.Value);
@@ -100,6 +121,7 @@ end;
 
 procedure TSettingsForm.Button1Click(Sender: TObject);
 begin
+  SaveSettings;
   Self.Close;
 end;
 
@@ -108,9 +130,9 @@ begin
   UpdateThread.Execute(nil);
 end;
 
-procedure TSettingsForm.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TSettingsForm.Button3Click(Sender: TObject);
 begin
-  SaveSettings;
+  Self.Close;
 end;
 
 procedure TSettingsForm.FormCreate(Sender: TObject);
@@ -119,7 +141,18 @@ begin
 end;
 
 procedure TSettingsForm.FormShow(Sender: TObject);
+var
+  LDevices: TList<BASS_DEVICEINFO>;
+  i: integer;
 begin
+  DeviceList.Items.Clear;
+  LDevices := MainForm.GetDevices;
+
+  for i := 0 to LDevices.Count - 1 do
+  begin
+    DeviceList.Items.Add(LDevices[i].name);
+  end;
+
   LoadSettings;
 end;
 
@@ -163,6 +196,7 @@ end;
 procedure TSettingsForm.LoadSettings;
 var
   SettingsFile: TIniFile;
+  LDeviceIndex: integer;
 begin
   SettingsFile := TIniFile.Create(MainForm.FAppDataFolder + '\settings.ini');
   try
@@ -180,6 +214,14 @@ begin
       WindowTitleList.ItemIndex := SettingsFile.ReadInteger('settings', 'windowtitle', 0);
       PlaylistItemTextList.ItemIndex := SettingsFile.ReadInteger('settings', 'playlistitemtext', 2);
       LastFMEnableBtn.Checked := SettingsFile.ReadBool('settings', 'lastfm', True);
+      if DeviceList.Items.Count > 0 then
+      begin
+        LDeviceIndex := SettingsFile.ReadInteger('General', 'DeviceId', 1) - 1;
+        if LDeviceIndex < DeviceList.Items.Count then
+        begin
+          DeviceList.ItemIndex := LDeviceIndex;
+        end;
+      end;
     end;
   finally
     SettingsFile.Free;
@@ -223,6 +265,7 @@ begin
       SettingsFile.WriteInteger('settings', 'windowtitle', WindowTitleList.ItemIndex);
       SettingsFile.WriteInteger('settings', 'playlistitemtext', PlaylistItemTextList.ItemIndex);
       SettingsFile.WriteBool('settings', 'lastfm', LastFMEnableBtn.Checked);
+      SettingsFile.WriteInteger('General', 'DeviceId', DeviceList.ItemIndex + 1);
     end;
   finally
     SettingsFile.Free;
