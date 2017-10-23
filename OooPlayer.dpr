@@ -55,7 +55,9 @@ uses
   Playlist in 'Types\Playlist.pas',
   Radiolist in 'Types\Radiolist.pas',
   CommonTypes in 'Types\CommonTypes.pas',
-  UnitProgress in 'Forms\UnitProgress.pas' {ProgressForm};
+  UnitProgress in 'Forms\UnitProgress.pas' {ProgressForm},
+  CUESheetDefs in 'Units\Cue\CUESheetDefs.pas',
+  CUESheetFunctions in 'Units\Cue\CUESheetFunctions.pas';
 
 {$R *.res}
 

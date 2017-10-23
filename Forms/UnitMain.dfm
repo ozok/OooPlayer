@@ -473,10 +473,8 @@ object MainForm: TMainForm
     TabOrder = 2
     OnChange = FuncPagesChange
     OnMouseLeave = FuncPagesMouseLeave
-    ExplicitHeight = 582
     object TabSheet1: TTabSheet
       Caption = 'Music'
-      ExplicitHeight = 554
       object Splitter1: TSplitter
         Left = 0
         Top = 435
@@ -557,7 +555,6 @@ object MainForm: TMainForm
         OnDragOver = PlayListDragOver
         OnMouseEnter = PlayListMouseEnter
         OnStartDrag = PlayListStartDrag
-        ExplicitHeight = 394
       end
       object QueueList: TListView
         Left = 0
@@ -590,7 +587,6 @@ object MainForm: TMainForm
         OnDblClick = QueueListDblClick
         OnMouseEnter = QueueListMouseEnter
         OnMouseLeave = QueueListMouseLeave
-        ExplicitTop = 398
       end
       object ShortcutPanel: TPanel
         Left = 0
@@ -599,7 +595,6 @@ object MainForm: TMainForm
         Height = 35
         Align = alBottom
         TabOrder = 2
-        ExplicitTop = 519
         object AddMenuBtn: TButton
           Left = 1
           Top = 1
@@ -631,7 +626,6 @@ object MainForm: TMainForm
     object TabSheet2: TTabSheet
       Caption = 'Radio'
       ImageIndex = 1
-      ExplicitHeight = 554
       object RadioList: TListView
         Left = 0
         Top = 52
@@ -668,7 +662,6 @@ object MainForm: TMainForm
         OnDblClick = RadioListDblClick
         OnMouseEnter = RadioListMouseEnter
         OnMouseLeave = RadioListMouseLeave
-        ExplicitHeight = 482
       end
       object RadioRecordPanel: TPanel
         Left = 0
@@ -793,7 +786,6 @@ object MainForm: TMainForm
         ParentDoubleBuffered = False
         TabOrder = 2
         Visible = False
-        ExplicitTop = 534
       end
     end
   end
@@ -812,7 +804,6 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 3
     OnResize = LyricPanelResize
-    ExplicitHeight = 582
     object sSplitter1: TSplitter
       Left = 0
       Top = 402
@@ -831,7 +822,6 @@ object MainForm: TMainForm
       Width = 344
       Height = 13
       Align = alBottom
-      ExplicitTop = 345
       ExplicitWidth = 3
     end
     object CoverPanel: TPanel
@@ -841,7 +831,6 @@ object MainForm: TMainForm
       Height = 217
       Align = alBottom
       TabOrder = 0
-      ExplicitTop = 365
       object CoverImage: TJvImage
         AlignWithMargins = True
         Left = 3
@@ -1007,7 +996,6 @@ object MainForm: TMainForm
       TabOrder = 2
       OnMouseEnter = LyricListMouseEnter
       OnMouseLeave = LyricListMouseLeave
-      ExplicitHeight = 230
     end
   end
   object CategoryPages: TPageControl
@@ -1020,10 +1008,8 @@ object MainForm: TMainForm
     Images = CategoryList
     TabOrder = 4
     OnResize = CategoryPagesResize
-    ExplicitHeight = 582
     object sTabSheet2: TTabSheet
       Caption = 'Music'
-      ExplicitHeight = 547
       object PlaylistListPanel: TPanel
         Left = 0
         Top = 0
@@ -1098,13 +1084,11 @@ object MainForm: TMainForm
         OnClick = PlaylistViewClick
         OnCustomDrawItem = PlaylistViewCustomDrawItem
         OnResize = PlaylistViewResize
-        ExplicitHeight = 517
       end
     end
     object sTabSheet4: TTabSheet
       Caption = 'Radio'
       ImageIndex = 1
-      ExplicitHeight = 547
       object RadiosView: TListView
         Left = 0
         Top = 0
@@ -1131,7 +1115,6 @@ object MainForm: TMainForm
         OnClick = RadiosViewClick
         OnCustomDrawItem = RadiosViewCustomDrawItem
         OnResize = RadiosViewResize
-        ExplicitHeight = 547
       end
     end
   end

@@ -36,7 +36,8 @@ uses
   JvGIFCtrl, JvExExtCtrls, JvImage, JvAppInst, UnitArtworkReader, Vcl.Taskbar,
   System.Win.TaskbarCore, Vcl.AppEvnts, System.Types, UnitLastFMToolLauncher,
   UnitSubProcessLauncher, GraphUtil, Vcl.XPMan, UnitCueParser, System.ImageList,
-  Playlist, Radiolist, CommonTypes, UnitProgress;
+  Playlist, Radiolist, CommonTypes, UnitProgress, CUESheetDefs,
+  CUESheetFunctions;
 
 type
   TMyDragObject = class(TDragObject)
@@ -485,11 +486,12 @@ var
   FPlayer: TMusicPlayer;
   FRecordingRadio: Boolean;
   FRadioRecordingInfo: TRadioRecordInfo;
+  CUEData: HCUESheetLibrary = nil;
 
 const
 {$DEFINE WRITEDEBUGLOG}
   BuildInt = 3422;
-  Portable = True;
+  Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
   SHOW_ERROR = 1;
@@ -770,88 +772,81 @@ end;
 
 procedure TMainForm.AddCueSheet(const CUEPath: string);
 var
-  LCueParser: TCueSplitter;
   LMediaInfoHandle: Cardinal;
   FileDuration: integer;
   I: integer;
-  LTitle, LArtist, LAlbum, LDuration, LBitrate, LChannels, LCodec, LSampleRate: string;
+  LBitrate, LChannels, LCodec, LSampleRate: string;
+  LDuration: integer;
   LPlayListItem: TPlayItem;
+  AlbumInfo: TCUEAlbumInfo;
+  IndexData: TCUETrackIndexData;
+  FCUESheet: TCUESheet;
+  LSectionFileName: string;
+  P, Q, R: NativeInt;
+  M: Integer;
+  ALen, APos: integer;
+  AData: TCUETrackIndexData;
+  LPlaylist: TPlaylist;
 begin
-  LCueParser := TCueSplitter.Create(CUEPath);
-  LCueParser.FileDuration := GetDurationEx(LCueParser.SongFileName);
-  try
-    LCueParser.ParseCueSheet;
-    if LCueParser.ErrorMsg <> 0 then
-    begin
-      Log('Error with cue ' + CUEPath + '. Error code: ' + FloatToStr(LCueParser.ErrorMsg));
-    end
-    else
-    begin
-      if FileExists(LCueParser.SongFileName) then
-      begin
-        // New handle for mediainfo
-        LMediaInfoHandle := MediaInfo_New();
-        if LMediaInfoHandle <> 0 then
+  if FileExists(CUEPath) then
+  begin
+    LPlaylist := TPlaylist.Create;
+    try
+      FCUESheet := TCUESheet.Create;
+      try
+        with FCUESheet do
         begin
-          try
-            // Open a file in complete mode
-            MediaInfo_Open(LMediaInfoHandle, PWideChar(LCueParser.SongFileName));
-            MediaInfo_Option(0, 'Complete', '1');
+          Load(CUEPath);
 
+          ALen := 0;
+          for I := 0 to GetSectionCount - 1 do
+          begin
+            Inc(ALen, GetTrackCount(I));
+          end;
+
+          APos := 0;
+
+          for I := 0 to GetSectionCount - 1 do
+          begin
+            LSectionFileName := IncludeTrailingBackslash(ExtractFileDir(CUEPath)) + Sections[I].FileName;
+            if not FileExists(LSectionFileName) then
+            begin
+              Log('Unable to add section ' + FloatToStr(I) + ' because file does not exist: ' + LSectionFileName);
+              Continue;
+            end;
+
+            // New handle for mediainfo
+            LMediaInfoHandle := MediaInfo_New();
             if LMediaInfoHandle <> 0 then
             begin
-              FileDuration := GetDurationEx(LCueParser.SongFileName);
+              try
+                // Open a file in complete mode
+                MediaInfo_Open(LMediaInfoHandle, PWideChar(LSectionFileName));
+                MediaInfo_Option(0, 'Complete', '1');
 
-              // get tags from cue file
-              if LCueParser.TrackCount > 0 then
-              begin
-                // each track is treated as a file
-                for I := 0 to LCueParser.TrackCount - 1 do
+                if LMediaInfoHandle <> 0 then
                 begin
-                  Application.ProcessMessages;
+                  FileDuration := GetDurationEx(LSectionFileName);
 
                   // info
                   LBitrate := MediaInfo_Get(LMediaInfoHandle, Stream_Audio, 0, 'BitRate/String', Info_Text, Info_Name);
                   LChannels := MediaInfo_Get(LMediaInfoHandle, Stream_Audio, 0, 'Channel(s)/String', Info_Text, Info_Name);
                   LCodec := MediaInfo_Get(LMediaInfoHandle, Stream_Audio, 0, 'Codec/String', Info_Text, Info_Name);
                   // a workaround for ALAC being reported as "Lossless"
+
                   if LCodec = 'Lossless' then
                   begin
                     LCodec := MediaInfo_Get(LMediaInfoHandle, Stream_Audio, 0, 'Format', Info_Text, Info_Name);
                   end;
                   LSampleRate := MediaInfo_Get(LMediaInfoHandle, Stream_Audio, 0, 'SamplingRate', Info_Text, Info_Name);
-                  // tags
-                  LTitle := LCueParser.CueTracksInfos[I].CueTrackTagInfo.Title;
-                  LArtist := LCueParser.CueTracksInfos[I].CueTrackTagInfo.Artist;
-                  LAlbum := LCueParser.CueTracksInfos[I].CueTrackTagInfo.Album;
 
-                  LTitle := Trim(LTitle);
-                  LArtist := Trim(LArtist);
-                  LAlbum := Trim(LAlbum);
-                  LDuration := '00:00:00.000';
+                  LDuration := 0;
                   LCodec := Trim(LCodec);
                   LSampleRate := Trim(LSampleRate);
 
-                  if (Length(LTitle) < 1) then
+                  if (LDuration < 1) then
                   begin
-                    // if cannot get title
-                    // set to file name
-                    LTitle := ChangeFileExt(ExtractFileName(LCueParser.SongFileName), '');
-                  end;
-
-                  if (Length(LArtist) < 1) then
-                  begin
-                    LArtist := 'unkown';
-                  end;
-
-                  if (Length(LAlbum) < 1) then
-                  begin
-                    LAlbum := 'unkown';
-                  end;
-
-                  if (Length(LDuration) < 1) then
-                  begin
-                    LDuration := '00:00:00.000';
+                    LDuration := 0;
                   end;
 
                   if (Length(LBitrate) < 1) then
@@ -873,47 +868,92 @@ begin
                   begin
                     LSampleRate := 'N/A';
                   end;
-                  // increase playlist item count
-                  PlayList.Items.Count := PlayList.Items.Count + 1;
-
-                  LPlayListItem := TPlayItem.Create;
-                  LPlayListItem.FullFileName := LCueParser.SongFileName;
-                  LPlayListItem.DurationStr := LDuration;
-                  LPlayListItem.Title := LTitle;
-                  LPlayListItem.Artist := LArtist;
-                  LPlayListItem.Album := LAlbum;
-                  LPlayListItem.Bitrate := LBitrate;
-                  LPlayListItem.Channels := LChannels;
-                  LPlayListItem.Codec := LCodec;
-                  LPlayListItem.SampleRate := LSampleRate;
-                  // these two values are used for cue sheets
-                  LPlayListItem.Duration := LCueParser.CueTracksInfos[I].CueTrackDurationInfo.Duration;
-                  LPlayListItem.StartPos := LCueParser.CueTracksInfos[I].CueTrackDurationInfo.StartPos;
-                  LPlayListItem.EndPos := LCueParser.CueTracksInfos[I].CueTrackDurationInfo.StartPos;
-                  FPlaylists[FSelectedPlaylistIndex].Add(LPlayListItem);
+                end
+                else
+                begin
+                  Log('Couldn''t add ' + CUEPath + ' because mediainfo can''t open it.');
                 end;
+              finally
+                MediaInfo_Close(LMediaInfoHandle);
               end;
             end
             else
             begin
-              Log('Couldn''t add ' + LCueParser.SongFileName + ' because mediainfo can''t open it.');
+              Log('Couldn''t add ' + CUEPath + ' because mediainfo can''t be loaded.');
             end;
-          finally
-            MediaInfo_Close(LMediaInfoHandle);
+
+            for P := 0 to GetTrackCount(I) - 1 do
+            begin
+              for Q := 0 to GetIndexCount(I, P) - 1 do
+              begin
+                R := Sections[I].Tracks[P].Indexes[Q].Indexes.IndexOf('01');
+                if R > -1 then
+                begin
+                  GetIndex(I, P, Q, R, M)
+                end
+                else
+                begin
+                  GetIndex(I, P, Q, 0, M);
+                end;
+
+                if P < GetTrackCount(I) - 1 then
+                begin
+                  R := Sections[I].Tracks[Succ(P)].Indexes[Q].Indexes.IndexOf('01');
+                  if R > -1 then
+                  begin
+                    GetIndex(I, Succ(P), Q, R, LDuration)
+                  end
+                  else
+                  begin
+                    GetIndex(I, Succ(P), Q, 0, LDuration);
+                  end;
+                end;
+
+                GetIndexData(I, P, Q, AData);
+
+                LPlayListItem := TPlayItem.Create;
+                LPlayListItem.FullFileName := LSectionFileName;
+                LPlayListItem.DurationStr := FloatToStr(LDuration);
+                LPlayListItem.Title := AData.Title;
+                LPlayListItem.Artist := AData.Perfomer + ' ' + FloatToStr(AData.PreGap);
+                LPlayListItem.Album := FCUESheet.AlbumTitle + ' ' + FloatToStr(AData.PostGap);
+                LPlayListItem.Bitrate := LBitrate;
+                LPlayListItem.Channels := LChannels;
+                LPlayListItem.Codec := LCodec;
+                LPlayListItem.SampleRate := LSampleRate;
+
+                // these two values are used for cue sheets
+                LPlayListItem.Duration := LDuration;
+                if Q = 0 then
+                begin
+                  LPlayListItem.StartPos := AData.PreGap;
+                end
+                else
+                begin
+                  LPlayListItem.StartPos := 0;
+
+                  LPlayListItem.StartPos := AData.PreGap;
+                end;
+                LPlayListItem.EndPos := AData.PostGap;
+
+                LPlaylist.Add(LPlayListItem);
+                Inc(APos);
+              end;
+            end;
           end;
-        end
-        else
-        begin
-          Log('Couldn''t add ' + LCueParser.SongFileName + ' because mediainfo can''t be loaded.');
         end;
-      end
-      else
-      begin
-        Log('Couldn''t add ' + LCueParser.SongFileName + ' because file indicated in cue sheet doesn''t exist: ' + LCueParser.SongFileName);
+
+        FPlaylists[FSelectedPlaylistIndex].AddRange(LPlaylist);
+      finally
+        FCUESheet.Free;
       end;
+    finally
+      LPlaylist.Free;
     end;
-  finally
-    LCueParser.Free;
+  end
+  else
+  begin
+    Log('Couldn''t add ' + CUEPath + ' because file indicated in cue sheet doesn''t exist: ');
   end;
 end;
 
@@ -1574,7 +1614,7 @@ begin
   if MusicSearch.Searching then
     Exit;
 
-  for i := 0 to FPlaylists[FSelectedPlaylistIndex].Count - 1 do
+  for i := FPlaylists[FSelectedPlaylistIndex].Count - 1 downto 0 do
   begin
     if PlayList.Items[i].Selected then
     begin
@@ -1870,6 +1910,13 @@ begin
     Application.MessageBox('Couldn''t load mediainfo.dll library.', 'Fatal Error', MB_ICONERROR);
     Application.Terminate;
   end;
+  if not CUEDLLLoaded then
+  begin
+    Application.MessageBox('Couldn''t load cue library.', 'Fatal Error', MB_ICONERROR);
+    Application.Terminate;
+  end;
+  CUEData := CUE_Create;
+
 
   // encoder paths
   FLamePath := ExtractFileDir(Application.ExeName) + '\Encoders\lame.exe';
@@ -1957,6 +2004,7 @@ var
   I: Integer;
   j: Integer;
 begin
+  CUE_Free(CUEData);
   FPlayer.Free;
   for I := 0 to FPlaylists.Count - 1 do
   begin
