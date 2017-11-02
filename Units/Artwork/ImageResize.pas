@@ -17,7 +17,7 @@
   * along with OooPlayer.  If not, see <http://www.gnu.org/licenses/>.
   *
   * }
-unit UnitImageResize;
+unit ImageResize;
 
 interface
 

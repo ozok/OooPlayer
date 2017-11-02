@@ -18,12 +18,12 @@
   *
   * }
 
-unit UnitTagReader;
+unit TagReader;
 
 interface
 
 uses
-  Classes, Windows, SysUtils, Messages, StrUtils, UnitTagTypes, WMATagLibrary,
+  Classes, Windows, SysUtils, Messages, StrUtils, TagTypes, WMATagLibrary,
   APEv2Library, MP4TagLibrary, FlacTagLibrary, ID3v2Library, ID3v1Library,
   OggVorbisAndOpusTagLibrary, WAVTagLibrary;
 

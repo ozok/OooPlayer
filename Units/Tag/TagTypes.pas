@@ -18,7 +18,7 @@
   *
   * }
 
-unit UnitTagTypes;
+unit TagTypes;
 
 interface
 

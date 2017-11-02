@@ -24,7 +24,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.ComCtrls, UnitMusicPlayer, Generics.Collections, IniFiles;
+  Vcl.ComCtrls, MusicPlayer, Generics.Collections, IniFiles;
 
 type
   TEQValuesArray = array[0..17] of integer;

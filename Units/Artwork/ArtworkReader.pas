@@ -17,14 +17,13 @@
   * along with OooPlayer.  If not, see <http://www.gnu.org/licenses/>.
   *
   * }
-unit UnitArtworkReader;
+unit ArtworkReader;
 
 interface
 
 uses
-  Classes, SysUtils, IdBaseComponent, IdThreadComponent, IdThread, UnitTagTypes,
-  Vcl.Imaging.jpeg, Vcl.Imaging.pngimage, UnitImageResize, UnitTagReader,
-  UnitArtworkInfo;
+  Classes, SysUtils, IdBaseComponent, IdThreadComponent, IdThread, TagTypes, Vcl.Imaging.jpeg,
+  Vcl.Imaging.pngimage, ImageResize, TagReader, ArtworkInfo;
 
 type
   TArtworkReader = class

@@ -163,6 +163,16 @@ object MainForm: TMainForm
           BevelOuter = bvNone
           TabOrder = 0
           OnMouseEnter = InfoPanelMouseEnter
+          DesignSize = (
+            542
+            54)
+          object VisBox: TImage
+            Left = 0
+            Top = 0
+            Width = 542
+            Height = 54
+            Anchors = [akLeft, akTop, akRight, akBottom]
+          end
           object TitleLabel: TLabel
             AlignWithMargins = True
             Left = 6
@@ -626,6 +636,10 @@ object MainForm: TMainForm
     object TabSheet2: TTabSheet
       Caption = 'Radio'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object RadioList: TListView
         Left = 0
         Top = 52
@@ -1089,6 +1103,10 @@ object MainForm: TMainForm
     object sTabSheet4: TTabSheet
       Caption = 'Radio'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object RadiosView: TListView
         Left = 0
         Top = 0
@@ -4932,5 +4950,12 @@ object MainForm: TMainForm
       FFFFFF00FFC1FFFC1FFFE01FFFFFFF00FFF1FFFC7FFFE01FFFFFFF00FFF9FFFC
       FFFFE03FFFFFFF00FFFFFFFFFFFFE03FFFFFFF00FFFFFFFFFFFFF03FFFFFFF00
       00000000000000000000000000000000000000000000}
+  end
+  object VisTimer: TJvThreadTimer
+    Enabled = True
+    Interval = 50
+    OnTimer = VisTimerTimer
+    Left = 464
+    Top = 184
   end
 end

@@ -17,14 +17,15 @@
   * along with OooPlayer.  If not, see <http://www.gnu.org/licenses/>.
   *
   * }
-unit UnitMusicPlayer;
+unit MusicPlayer;
 
 interface
 
 uses
   System.Classes, BASS, BASS_AAC, BASSFLAC, BassWMA, BASSWV, BASS_AC3, BASSALAC,
   BASS_APE, BASS_MPC, BASS_OFR, BASS_SPX, BASS_TTA, BassOPUS, Windows, SysUtils,
-  StrUtils, Generics.Collections, MediaInfoDll, Bassmix, BASS_FX, CommonTypes;
+  StrUtils, Generics.Collections, MediaInfoDll, Bassmix, BASS_FX, CommonTypes,
+  ThreadMsgConstants;
 
 type
   TPlayerStatus = (psPlaying = 0, psPaused = 1, psStopped = 2, psStalled = 3, psUnkown = 4);
@@ -120,6 +121,7 @@ begin
         begin
           PositionTimer.Enabled := False;
           ProgressTimer.Enabled := PositionTimer.Enabled;
+          VisTimer.Enabled := PositionTimer.Enabled;
 
           // if playlist is not empty
           if PlayList.Items.Count > 0 then
@@ -196,6 +198,7 @@ begin
               LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
               PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+              VisTimer.Enabled := PositionTimer.Enabled;
 
               PlayItem(LRndIndex);
             end;
@@ -219,6 +222,7 @@ begin
             begin
               PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+              VisTimer.Enabled := PositionTimer.Enabled;
 
               try
                 if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
@@ -228,6 +232,7 @@ begin
               finally
                 PositionTimer.Enabled := True;
                 ProgressTimer.Enabled := PositionTimer.Enabled;
+                VisTimer.Enabled := PositionTimer.Enabled;
 
               end;
             end;
@@ -251,6 +256,7 @@ begin
             begin
               PositionTimer.Enabled := False;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+              VisTimer.Enabled := PositionTimer.Enabled;
 
               try
                 if FShuffleIndex + 1 < FShuffleIndexes.Count then
@@ -272,6 +278,7 @@ begin
               finally
                 PositionTimer.Enabled := True;
                 ProgressTimer.Enabled := PositionTimer.Enabled;
+                VisTimer.Enabled := PositionTimer.Enabled;
 
               end;
             end;
@@ -284,7 +291,7 @@ begin
         end;
     end;
   end;
-  SendMessage(WinHandle, WM_INFO_UPDATE, PLAY_NEXT_SONG, 0);
+  SendMessage(WinHandle, WM_INFO_UPDATE, THREAD_MSG_PLAY_NEXT_SONG, 0);
   BASS_ChannelSetPosition(FPlayer.MixHandle, 0, BASS_POS_BYTE);
 end;
 

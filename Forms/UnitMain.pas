@@ -29,15 +29,15 @@ uses
   JvComponentBase, JvSearchFiles, JvBaseDlg, JvBrowseFolder, MediaInfoDll,
   JvExComCtrls, JvComCtrls, Vcl.ImgList, JvThreadTimer, JvExStdCtrls, JvListBox,
   IniFiles, Vcl.Buttons, JvFormPlacement, JvAppStorage, JvAppIniStorage,
-  StrUtils, ShellAPI, JvComputerInfoEx, UnitTagTypes, UnitTagReader, PNGImage,
+  StrUtils, ShellAPI, JvComputerInfoEx, TagTypes, TagReader, PNGImage,
   JvDragDrop, JvThread, JvUrlListGrabber, JvUrlGrabbers, JvTrayIcon, Jpeg,
-  UnitMusicPlayer, Bass, BASSenc, IdBaseComponent, IdThreadComponent,
-  UnitLyricDownloader, UnitTagWriter, UnitImageResize, JvAnimatedImage,
-  JvGIFCtrl, JvExExtCtrls, JvImage, JvAppInst, UnitArtworkReader, Vcl.Taskbar,
-  System.Win.TaskbarCore, Vcl.AppEvnts, System.Types, UnitLastFMToolLauncher,
-  UnitSubProcessLauncher, GraphUtil, Vcl.XPMan, UnitCueParser, System.ImageList,
+  MusicPlayer, Bass, BASSenc, IdBaseComponent, IdThreadComponent,
+  LyricDownloader, TagWriter, ImageResize, JvAnimatedImage,
+  JvGIFCtrl, JvExExtCtrls, JvImage, JvAppInst, ArtworkReader, Vcl.Taskbar,
+  System.Win.TaskbarCore, Vcl.AppEvnts, System.Types, LastFMToolLauncher,
+  SubProcessLauncher, GraphUtil, Vcl.XPMan, CueParser, System.ImageList,
   Playlist, Radiolist, CommonTypes, UnitProgress, CUESheetDefs,
-  CUESheetFunctions;
+  CUESheetFunctions, spectrum_vis, VisTypes, BASSmix, ThreadMsgConstants;
 
 type
   TMyDragObject = class(TDragObject)
@@ -218,6 +218,8 @@ type
     BottomBtnImages: TImageList;
     PositionLabel: TEdit;
     ShuffleBtn: TButton;
+    VisTimer: TJvThreadTimer;
+    VisBox: TImage;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MusicSearchProgress(Sender: TObject);
@@ -358,6 +360,7 @@ type
     procedure FormMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure DirectoryListClick(Sender: TObject);
     procedure ShuffleBtnClick(Sender: TObject);
+    procedure VisTimerTimer(Sender: TObject);
   private
     { Private declarations }
     FLastDir: string;
@@ -381,6 +384,12 @@ type
     FTagFiles: TStringList;
     FInfoFiles: TStringList;
     FCategoryIndex: integer;
+    // array to hold data draw vis.
+    VisData: TFFTData;
+    // visualization data lenght
+    VisDataLenght: Integer;
+    procedure ResetVisData;
+    procedure DrawVisData;
     procedure AddFile(const FileName: string);
     procedure AddCueSheet(const CUEPath: string);
     function GetDurationEx(const FileName: string): integer;
@@ -493,19 +502,6 @@ const
   BuildInt = 3422;
   Portable = False;
   WM_INFO_UPDATE = WM_USER + 101;
-  RESET_UI = 0;
-  SHOW_ERROR = 1;
-  UPDATE_PROGRESS = 2;
-  UPDATE_META_NAME = 3;
-  UPDATE_META_BITRATE = 4;
-  UPDATE_META = 7;
-  STATUS_UPDATE = 8;
-  REPAINT_RADIO_LIST = 9;
-  STOP_IMG_ANIM = 10;
-  DOWNLOAD_LYRIC = 11;
-  START_RECORDING = 12;
-  PLAY_NEXT_SONG = 13;
-  UPDATE_LEVELS = 14;
 
 implementation
 
@@ -522,7 +518,7 @@ var
 begin
   if (Buffer <> nil) and (len = 0) then
   begin
-    SendMessage(WinHandle, WM_INFO_UPDATE, STATUS_UPDATE, DWORD(PAnsiChar(Buffer)));
+    SendMessage(WinHandle, WM_INFO_UPDATE, THREAD_MSG_STATUS_UPDATE, DWORD(PAnsiChar(Buffer)));
   end
   else if (Buffer <> nil) and (len > 0) and FRecordingRadio then
   begin
@@ -559,7 +555,7 @@ begin
     if (p = 0) then
       Exit;
     p := p + 13;
-    SendMessage(WinHandle, WM_INFO_UPDATE, UPDATE_META, DWORD(PAnsiChar(Ansistring(Copy(meta, p, Pos(';', string(meta)) - p - 1)))));
+    SendMessage(WinHandle, WM_INFO_UPDATE, THREAD_MSG_UPDATE_META, DWORD(PAnsiChar(Ansistring(Copy(meta, p, Pos(';', string(meta)) - p - 1)))));
   end;
 end;
 
@@ -1756,6 +1752,24 @@ begin
   end;
 end;
 
+procedure TMainForm.DrawVisData;
+var
+  I: Integer;
+  s: string;
+begin
+
+  Spectrum.Draw(VisBox.Canvas.Handle, VisData, 0, 0);
+  VisBox.Refresh;
+
+//        Spectrum.Draw(VisBox.Canvas.Handle, VisData, 0, 0);
+    // vis. look
+//  Spectrum.BackColor := Self.Color;
+//  VisBox.Color := Self.Color;
+//    // Spectrum.Pen := Form5.VisBarColor;
+//    // Spectrum.Peak := Form5.VisBarColor;
+//  VisBox.Repaint;
+end;
+
 procedure TMainForm.E2Click(Sender: TObject);
 begin
   Self.Close;
@@ -1844,7 +1858,7 @@ end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  // VisTimer.Enabled := False;
+  VisTimer.Enabled := False;
   StopBtnClick(Self);
   AbortBtnClick(Self);
   SavePlayList;
@@ -1997,6 +2011,23 @@ begin
   finally
     LRadios.Free;
   end;
+
+  // dat length
+  VisDataLenght := 256;
+
+  // vis.
+  Spectrum := TSpectrum.Create(VisBox.Width, InfoPanel.Height);
+  with Spectrum do
+  begin
+    DrawPeak := True;
+    Mode := 1;
+    PeakFallOff := 1;
+    Width := VisBox.Width div (VisDataLenght div 4);
+    Pen := clGray;
+    Peak := clBtnFace;
+    Color := Self.Color;
+  end;
+ // VisBox.Color := Self.Color;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -2077,6 +2108,14 @@ begin
     RadioList.Columns[2].Width := (RadioList.ClientWidth - 20) div RadioList.Columns.Count;
     QueueList.Columns[0].Width := QueueList.ClientWidth - QueueList.Columns[1].Width;
     StatusBar.Panels[1].Width := StatusBar.ClientWidth - StatusBar.Panels[2].Width - StatusBar.Panels[0].Width;
+
+    Spectrum.BackgroundImage.Width := VisBox.Width;
+    Spectrum.BackgroundImage.Height := VisBox.Height;
+
+    Spectrum.VisilBitmap.Width := VisBox.Width;
+    Spectrum.VisilBitmap.Height := VisBox.Height;
+
+    Spectrum.Width := VisBox.Width div (VisDataLenght div 4);
   except
     on E: Exception do
       Log(E.Message);
@@ -2204,6 +2243,13 @@ begin
   // Self.BringToFront;
   // playlist columns
   ChangePlaylistColumnNames;
+
+  Spectrum.BackColor := Self.Color;
+//  VisBox.Color := Self.Color;
+  Spectrum.Pen := cl3DLight;
+  Spectrum.Peak := cl3DLight;
+  Spectrum.BackColor := Self.Color;
+
   TrayIcon.ShowApplication;
   // IdThreadComponent1.Start;
 end;
@@ -2444,6 +2490,7 @@ begin
             LRndIndex := Random(FPlaylists[FSelectedPlaylistIndex].Count);
             PositionTimer.Enabled := False;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
           end
           else
           begin
@@ -2479,6 +2526,7 @@ begin
           begin
             PositionTimer.Enabled := False;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
 
             try
               if (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex > -1) and (FPlayListFiles[FSelectedPlaylistIndex].CurrentItemIndex < PlayList.Items.Count) then
@@ -2488,6 +2536,7 @@ begin
             finally
               PositionTimer.Enabled := True;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+              VisTimer.Enabled := PositionTimer.Enabled;
 
             end;
           end
@@ -2525,6 +2574,7 @@ begin
           begin
             PositionTimer.Enabled := False;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
 
             try
               if FShuffleIndex + 1 < FShuffleIndexes.Count then
@@ -2546,6 +2596,7 @@ begin
             finally
               PositionTimer.Enabled := True;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+              VisTimer.Enabled := PositionTimer.Enabled;
 
             end;
           end
@@ -3377,6 +3428,7 @@ begin
             finally
               PositionTimer.Enabled := True;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+              VisTimer.Enabled := PositionTimer.Enabled;
 
             end;
           end;
@@ -3421,6 +3473,7 @@ begin
             finally
               PositionTimer.Enabled := True;
               ProgressTimer.Enabled := PositionTimer.Enabled;
+              VisTimer.Enabled := PositionTimer.Enabled;
               if ShuffleListForm.Visible then
               begin
                 ShuffleListForm.ShuffleList.Update;
@@ -3564,6 +3617,7 @@ begin
       FPlayer.SetVolume(100 - VolumeBar.Position);
       PositionTimer.Enabled := True;
       ProgressTimer.Enabled := PositionTimer.Enabled;
+      VisTimer.Enabled := PositionTimer.Enabled;
 
       InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
@@ -3640,6 +3694,7 @@ begin
       FPlayer.SetVolume(100 - VolumeBar.Position);
       PositionTimer.Enabled := True;
       ProgressTimer.Enabled := PositionTimer.Enabled;
+      VisTimer.Enabled := PositionTimer.Enabled;
 
       InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
@@ -3738,6 +3793,7 @@ begin
               finally
                 PositionTimer.Enabled := True;
                 ProgressTimer.Enabled := PositionTimer.Enabled;
+                VisTimer.Enabled := PositionTimer.Enabled;
 
               end;
             end;
@@ -3767,6 +3823,7 @@ begin
               finally
                 PositionTimer.Enabled := True;
                 ProgressTimer.Enabled := PositionTimer.Enabled;
+                VisTimer.Enabled := PositionTimer.Enabled;
 
               end;
             end;
@@ -3850,6 +3907,7 @@ begin
             FPlayer.SetVolume(100 - VolumeBar.Position);
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
 
             InfoLabel.Caption := 'Playing | ' + FCurrentItemInfo.InfoStr;
 
@@ -3944,6 +4002,7 @@ begin
                     finally
                       PositionTimer.Enabled := True;
                       ProgressTimer.Enabled := PositionTimer.Enabled;
+                      VisTimer.Enabled := PositionTimer.Enabled;
 
                     end;
                   end;
@@ -3973,6 +4032,7 @@ begin
                     finally
                       PositionTimer.Enabled := True;
                       ProgressTimer.Enabled := PositionTimer.Enabled;
+                      VisTimer.Enabled := PositionTimer.Enabled;
 
                     end;
                   end;
@@ -4066,7 +4126,7 @@ begin
         FActivePlaylistIndex := FSelectedPlaylistIndex;
         FPlayer.FileName := FCurrentItemInfo.FullFileName;
         FPlayer.Play;
-        ;
+
         FCurrentItemInfo.DurationBass := FPlayer.TotalLength;
         PositionBar.Max := MaxInt;
         Taskbar2.ProgressMaxValue := MaxInt;
@@ -4153,6 +4213,7 @@ begin
         PositionBar.Position := 0;
         PositionTimer.Enabled := True;
         ProgressTimer.Enabled := PositionTimer.Enabled;
+        VisTimer.Enabled := PositionTimer.Enabled;
 
         // reset playlist
         PlayList.ItemIndex := -1;
@@ -4641,6 +4702,7 @@ begin
         FPlayer.Resume;
         PositionTimer.Enabled := True;
         ProgressTimer.Enabled := True;
+        VisTimer.Enabled := PositionTimer.Enabled;
 
       end;
     end;
@@ -4728,6 +4790,7 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
 
           end;
         end;
@@ -4757,6 +4820,7 @@ begin
           finally
             PositionTimer.Enabled := True;
             ProgressTimer.Enabled := PositionTimer.Enabled;
+            VisTimer.Enabled := PositionTimer.Enabled;
 
           end;
         end;
@@ -5150,7 +5214,7 @@ begin
   // previous stream
   BASS_StreamFree(FRadioHandle);
   // reset UI
-  SendMessage(WinHandle, WM_INFO_UPDATE, RESET_UI, 0);
+  SendMessage(WinHandle, WM_INFO_UPDATE, THREAD_MSG_RESET_UI, 0);
   LCacheProgress := 0;
 
   // create radio stream
@@ -5168,7 +5232,7 @@ begin
 
 
     end;
-    SendMessage(WinHandle, WM_INFO_UPDATE, STOP_IMG_ANIM, LCacheProgress);
+    SendMessage(WinHandle, WM_INFO_UPDATE, THREAD_MSG_STOP_IMG_ANIM, LCacheProgress);
   end
   else
   begin
@@ -5181,7 +5245,7 @@ begin
       end;
       LCacheProgress := (BASS_StreamGetFilePosition(FRadioHandle, BASS_FILEPOS_BUFFER) * 100) div LLen;
       // update ui
-      SendMessage(WinHandle, WM_INFO_UPDATE, UPDATE_PROGRESS, LCacheProgress);
+      SendMessage(WinHandle, WM_INFO_UPDATE, THREAD_MSG_UPDATE_PROGRESS, LCacheProgress);
     until (LCacheProgress > 75) or (BASS_StreamGetFilePosition(FRadioHandle, BASS_FILEPOS_CONNECTED) = 0);
 
     // get meta data
@@ -5190,16 +5254,16 @@ begin
     begin
       // try http if icy fails
       LMeta := BASS_ChannelGetTags(FRadioHandle, BASS_TAG_HTTP);
-      SendMessage(WinHandle, WM_INFO_UPDATE, UPDATE_META_NAME, DWORD(PAnsiChar(LMeta)));
+      SendMessage(WinHandle, WM_INFO_UPDATE, THREAD_MSG_UPDATE_META_NAME, DWORD(PAnsiChar(LMeta)));
     end;
     if (LMeta <> nil) then
     begin
       while (LMeta^ <> #0) do
       begin
         if (Copy(LMeta, 1, 9) = 'icy-name:') then
-          SendMessage(WinHandle, WM_INFO_UPDATE, UPDATE_META_NAME, DWORD(PAnsiChar(Copy(LMeta, 10, MaxInt))))
+          SendMessage(WinHandle, WM_INFO_UPDATE, THREAD_MSG_UPDATE_META_NAME, DWORD(PAnsiChar(Copy(LMeta, 10, MaxInt))))
         else if (Copy(LMeta, 1, 7) = 'icy-br:') then
-          SendMessage(WinHandle, WM_INFO_UPDATE, UPDATE_META_BITRATE, DWORD(PAnsiChar('Bitrate: ' + Copy(LMeta, 8, MaxInt))));
+          SendMessage(WinHandle, WM_INFO_UPDATE, THREAD_MSG_UPDATE_META_BITRATE, DWORD(PAnsiChar('Bitrate: ' + Copy(LMeta, 8, MaxInt))));
         LMeta := LMeta + Length(LMeta) + 1;
       end;
     end;
@@ -5210,11 +5274,11 @@ begin
     BASS_ChannelPlay(FRadioHandle, False);
     SetRadioVolume(100 - VolumeBar.Position);
     // re-paint radio list
-    SendMessage(WinHandle, WM_INFO_UPDATE, REPAINT_RADIO_LIST, 0);
+    SendMessage(WinHandle, WM_INFO_UPDATE, THREAD_MSG_REPAINT_RADIO_LIST, 0);
     // stop-loading animation
-    SendMessage(WinHandle, WM_INFO_UPDATE, STOP_IMG_ANIM, 0);
+    SendMessage(WinHandle, WM_INFO_UPDATE, THREAD_MSG_STOP_IMG_ANIM, 0);
     // download lyric
-    SendMessage(WinHandle, WM_INFO_UPDATE, DOWNLOAD_LYRIC, 0);
+    SendMessage(WinHandle, WM_INFO_UPDATE, THREAD_MSG_DOWNLOAD_LYRIC, 0);
   end;
   try
     RadioThread.Terminate;
@@ -5557,6 +5621,17 @@ begin
         MediaInfo_Close(MediaInfoHandle);
       end;
     end;
+  end;
+end;
+
+procedure TMainForm.ResetVisData;
+var
+  i: integer;
+begin
+
+  for i := 0 to VisDataLenght do
+  begin
+    VisData[i] := 0;
   end;
 end;
 
@@ -5925,6 +6000,9 @@ begin
     // music
     FStoppedByUser := True;
     FPlayer.Stop;
+  // reset visualization
+    ResetVisData;
+    DrawVisData;
   end
   else if FPlaybackType = radio then
   begin
@@ -6147,6 +6225,16 @@ begin
   end;
 end;
 
+procedure TMainForm.VisTimerTimer(Sender: TObject);
+begin
+//  if FPlayer.PlayerStatus2 = psPlaying then
+//  begin
+//   // BASS_Mixer_ChannelGetData(FPlayer.MixHandle, @Vis)
+//    BASS_Mixer_ChannelGetData(FPlayer.Channel, @VisData, BASS_DATA_FFT256);
+//    DrawVisData;
+//  end;
+end;
+
 procedure TMainForm.VolumeBarChange(Sender: TObject);
 begin
   if FPlaybackType = music then
@@ -6220,7 +6308,7 @@ begin
     inherited;
     if Msg.Msg = WM_INFO_UPDATE then
     begin
-      if (Msg.WParam = UPDATE_META) or (Msg.WParam = UPDATE_META_NAME) then
+      if (Msg.WParam = THREAD_MSG_UPDATE_META) or (Msg.WParam = THREAD_MSG_UPDATE_META_NAME) then
       begin
       // radio recording
       // seperate file for each song
@@ -6239,7 +6327,7 @@ begin
         end;
       end;
       case Msg.WParam of
-        RESET_UI:
+        THREAD_MSG_RESET_UI:
           begin
             Log('Reset ui');
             TitleLabel.Caption := 'Connecting...';
@@ -6250,7 +6338,7 @@ begin
             Self.Caption := 'Radio [OooPlayer]';
             FSelfCaption := Self.Caption;
           end;
-        SHOW_ERROR:
+        THREAD_MSG_SHOW_ERROR:
           begin
             Log('error');
             TitleLabel.Caption := 'Error';
@@ -6260,13 +6348,13 @@ begin
             RadioConnectionBar.Visible := False;
             RadioConnectionBar.Style := pbstNormal;
           end;
-        UPDATE_PROGRESS:
+        THREAD_MSG_UPDATE_PROGRESS:
           begin
             Log('update progress');
             TitleLabel.Caption := Format('Buffering... %d%%', [Msg.LParam]);
             FTitleLabel := TitleLabel.Caption;
           end;
-        UPDATE_META_NAME:
+        THREAD_MSG_UPDATE_META_NAME:
           begin
             Log('update meta anme');
             FTitleLabel := string(PAnsiChar(Msg.LParam));
@@ -6286,7 +6374,7 @@ begin
               TitleLabel.Caption := TitleLabel.Caption + ' - '
             end;
           end;
-        UPDATE_META_BITRATE:
+        THREAD_MSG_UPDATE_META_BITRATE:
           begin
             Log('update bitrate');
             FAlbumLabel := string(PAnsiChar(Msg.LParam)) + ' kbps';
@@ -6301,7 +6389,7 @@ begin
       // Label5.Caption := String(PAnsiChar(msg.LParam));
       // 6:
       // Label3.Caption := String(PAnsiChar(msg.LParam));
-        UPDATE_META:
+        THREAD_MSG_UPDATE_META:
           begin
             Log('update meta');
             FTitleLabel := string(PAnsiChar(Msg.LParam));
@@ -6331,7 +6419,7 @@ begin
               end;
             end;
           end;
-        STATUS_UPDATE:
+        THREAD_MSG_STATUS_UPDATE:
           begin
             Log('status update');
             if (string(PAnsiChar(Msg.LParam)) = 'ICY 200 OK') or (string(PAnsiChar(Msg.LParam)) = 'HTTP/1.0 200 OK') then
@@ -6343,15 +6431,15 @@ begin
               InfoLabel.Caption := string(PAnsiChar(Msg.LParam));
             end;
           end;
-        REPAINT_RADIO_LIST:
+        THREAD_MSG_REPAINT_RADIO_LIST:
           RadioList.Invalidate;
-        STOP_IMG_ANIM:
+        THREAD_MSG_STOP_IMG_ANIM:
           begin
             Log('stop anim');
             RadioConnectionBar.Visible := False;
             RadioConnectionBar.Style := pbstNormal;
           end;
-        DOWNLOAD_LYRIC:
+        THREAD_MSG_DOWNLOAD_LYRIC:
           begin
             Log('download lyric');
           // lyric
@@ -6412,7 +6500,7 @@ begin
               LSplitList.Free;
             end;
           end;
-        PLAY_NEXT_SONG:
+        THREAD_MSG_PLAY_NEXT_SONG:
           begin
             Log('play next file');
             HandlePlaybackFromBassThread;

@@ -18,7 +18,7 @@
   *
   * }
 // handles extracting information from cue sheets
-unit UnitCueParser;
+unit CueParser;
 
 interface
 

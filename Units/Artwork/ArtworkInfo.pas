@@ -17,12 +17,12 @@
   * along with OooPlayer.  If not, see <http://www.gnu.org/licenses/>.
   *
   * }
-unit UnitArtworkInfo;
+unit ArtworkInfo;
 
 interface
 
 uses
-  Classes, Windows, SysUtils, Messages, StrUtils, UnitTagTypes, MediaInfoDll;
+  Classes, Windows, SysUtils, Messages, StrUtils, TagTypes, MediaInfoDll;
 
 type
   TArtworkInfo = class
