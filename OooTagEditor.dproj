@@ -124,20 +124,22 @@
         <DCC_LocalDebugSymbols>true</DCC_LocalDebugSymbols>
         <VerInfo_Build>201</VerInfo_Build>
         <VerInfo_Keys>CompanyName=;FileDescription=OooPlayer TagEditor Module;FileVersion=1.0.0.201;InternalName=TagEditor;LegalCopyright=2015 (c) ozok;LegalTrademarks=;OriginalFilename=TagEditor.exe;ProductName=TagEditor;ProductVersion=1.0.0.0;Comments=OooPlayer TagEditor Module;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <BT_BuildType>Debug</BT_BuildType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <DCC_DebugInformation>2</DCC_DebugInformation>
         <DCC_ExeOutput>.\$(Config)\$(Platform)</DCC_ExeOutput>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Build>218</VerInfo_Build>
+        <VerInfo_Build>219</VerInfo_Build>
         <DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
         <DCC_LocalDebugSymbols>true</DCC_LocalDebugSymbols>
-        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.218;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.219;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <AppEnableHighDPI>true</AppEnableHighDPI>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_MapFile>3</DCC_MapFile>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
+        <BT_BuildType>Debug</BT_BuildType>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

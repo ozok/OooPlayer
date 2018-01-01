@@ -1,5 +1,5 @@
 { *
-  * Copyright (C) 2014-2016 ozok <ozok26@gmail.com>
+  * Copyright (C) 2014-2017 ozok <ozok26@gmail.com>
   *
   * This file is part of OooPlayer.
   *
@@ -72,7 +72,7 @@ end;
 
 procedure TAboutForm.Button2Click(Sender: TObject);
 begin
-  ShellExecute(Handle, 'open', 'http://www.oooplayer.sourceforge.net/', nil, nil, SW_NORMAL);
+  ShellExecute(Handle, 'open', 'http://www.ozok26.com/categories/5/oooplayer', nil, nil, SW_NORMAL);
 end;
 
 procedure TAboutForm.FormClose(Sender: TObject; var Action: TCloseAction);

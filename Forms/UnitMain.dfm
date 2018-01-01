@@ -29,7 +29,7 @@ object MainForm: TMainForm
     Left = 870
     Top = 78
     Width = 4
-    Height = 582
+    Height = 623
     Align = alRight
     OnMoved = Splitter2Moved
     ExplicitLeft = 872
@@ -40,7 +40,7 @@ object MainForm: TMainForm
     Left = 250
     Top = 78
     Width = 4
-    Height = 582
+    Height = 623
     ExplicitLeft = 217
     ExplicitTop = 83
     ExplicitHeight = 599
@@ -457,46 +457,11 @@ object MainForm: TMainForm
         Width = 100
       end>
   end
-  object ProgressPanel: TPanel
-    Left = 0
-    Top = 660
-    Width = 1224
-    Height = 41
-    Align = alBottom
-    BevelOuter = bvNone
-    TabOrder = 2
-    Visible = False
-    OnMouseEnter = ProgressPanelMouseEnter
-    object ProgressLabel: TLabel
-      AlignWithMargins = True
-      Left = 3
-      Top = 3
-      Width = 1137
-      Height = 35
-      Align = alClient
-      Caption = 'Progress info'
-      Layout = tlCenter
-      OnMouseEnter = ProgressLabelMouseEnter
-      ExplicitWidth = 63
-      ExplicitHeight = 13
-    end
-    object AbortBtn: TButton
-      AlignWithMargins = True
-      Left = 1146
-      Top = 3
-      Width = 75
-      Height = 35
-      Align = alRight
-      Caption = 'Abort'
-      TabOrder = 0
-      OnClick = AbortBtnClick
-    end
-  end
   object FuncPages: TPageControl
     Left = 254
     Top = 78
     Width = 616
-    Height = 582
+    Height = 623
     ActivePage = TabSheet1
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
@@ -505,14 +470,14 @@ object MainForm: TMainForm
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 3
+    TabOrder = 2
     OnChange = FuncPagesChange
     OnMouseLeave = FuncPagesMouseLeave
     object TabSheet1: TTabSheet
       Caption = 'Music'
       object Splitter1: TSplitter
         Left = 0
-        Top = 394
+        Top = 435
         Width = 608
         Height = 4
         Cursor = crVSplit
@@ -525,7 +490,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 608
-        Height = 394
+        Height = 435
         Hint = 'Playlist'
         Margins.Left = 0
         Margins.Top = 0
@@ -593,7 +558,7 @@ object MainForm: TMainForm
       end
       object QueueList: TListView
         Left = 0
-        Top = 398
+        Top = 439
         Width = 608
         Height = 121
         Align = alBottom
@@ -625,7 +590,7 @@ object MainForm: TMainForm
       end
       object ShortcutPanel: TPanel
         Left = 0
-        Top = 519
+        Top = 560
         Width = 608
         Height = 35
         Align = alBottom
@@ -661,15 +626,11 @@ object MainForm: TMainForm
     object TabSheet2: TTabSheet
       Caption = 'Radio'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object RadioList: TListView
         Left = 0
         Top = 52
         Width = 608
-        Height = 482
+        Height = 523
         Align = alClient
         BorderStyle = bsNone
         Columns = <
@@ -701,7 +662,6 @@ object MainForm: TMainForm
         OnDblClick = RadioListDblClick
         OnMouseEnter = RadioListMouseEnter
         OnMouseLeave = RadioListMouseLeave
-        ExplicitHeight = 502
       end
       object RadioRecordPanel: TPanel
         Left = 0
@@ -818,7 +778,7 @@ object MainForm: TMainForm
       end
       object RadioConnectionBar: TProgressBar
         Left = 0
-        Top = 534
+        Top = 575
         Width = 608
         Height = 20
         Align = alBottom
@@ -826,7 +786,6 @@ object MainForm: TMainForm
         ParentDoubleBuffered = False
         TabOrder = 2
         Visible = False
-        ExplicitTop = 554
       end
     end
   end
@@ -834,7 +793,7 @@ object MainForm: TMainForm
     Left = 874
     Top = 78
     Width = 350
-    Height = 582
+    Height = 623
     Align = alRight
     BevelOuter = bvNone
     Font.Charset = DEFAULT_CHARSET
@@ -843,11 +802,11 @@ object MainForm: TMainForm
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 4
+    TabOrder = 3
     OnResize = LyricPanelResize
     object sSplitter1: TSplitter
       Left = 0
-      Top = 361
+      Top = 402
       Width = 350
       Height = 4
       Cursor = crVSplit
@@ -859,7 +818,7 @@ object MainForm: TMainForm
     object LyricStatusLabel: TLabel
       AlignWithMargins = True
       Left = 3
-      Top = 345
+      Top = 386
       Width = 344
       Height = 13
       Align = alBottom
@@ -867,7 +826,7 @@ object MainForm: TMainForm
     end
     object CoverPanel: TPanel
       Left = 0
-      Top = 365
+      Top = 406
       Width = 350
       Height = 217
       Align = alBottom
@@ -1026,7 +985,7 @@ object MainForm: TMainForm
       Left = 0
       Top = 112
       Width = 350
-      Height = 230
+      Height = 271
       Align = alClient
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
@@ -1043,11 +1002,11 @@ object MainForm: TMainForm
     Left = 0
     Top = 78
     Width = 250
-    Height = 582
+    Height = 623
     ActivePage = sTabSheet2
     Align = alLeft
     Images = CategoryList
-    TabOrder = 5
+    TabOrder = 4
     OnResize = CategoryPagesResize
     object sTabSheet2: TTabSheet
       Caption = 'Music'
@@ -1103,7 +1062,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 30
         Width = 242
-        Height = 517
+        Height = 558
         Align = alClient
         Columns = <
           item
@@ -1130,15 +1089,11 @@ object MainForm: TMainForm
     object sTabSheet4: TTabSheet
       Caption = 'Radio'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object RadiosView: TListView
         Left = 0
         Top = 0
         Width = 242
-        Height = 567
+        Height = 588
         Align = alClient
         Columns = <
           item
@@ -1391,6 +1346,7 @@ object MainForm: TMainForm
     end
     object F2: TMenuItem
       Caption = 'Tag Editor'
+      Visible = False
       OnClick = F2Click
     end
     object F3: TMenuItem

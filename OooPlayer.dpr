@@ -54,13 +54,18 @@ uses
   UnitShuffleList in 'Forms\UnitShuffleList.pas' {ShuffleListForm},
   Playlist in 'Types\Playlist.pas',
   Radiolist in 'Types\Radiolist.pas',
-  CommonTypes in 'Types\CommonTypes.pas';
+  CommonTypes in 'Types\CommonTypes.pas',
+  UnitProgress in 'Forms\UnitProgress.pas' {ProgressForm},
+  Utils in 'Units\Others\Utils.pas',
+  JsonSerializer in 'Units\Others\JsonSerializer.pas',
+  Constants in 'Units\Constants\Constants.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
+  TStyleManager.TrySetStyle('Glow');
   Application.Title := 'OooPlayer';
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TSearchForm, SearchForm);
@@ -71,6 +76,7 @@ begin
   Application.CreateForm(TRadioRecordOptionsForm, RadioRecordOptionsForm);
   Application.CreateForm(TEQForm, EQForm);
   Application.CreateForm(TShuffleListForm, ShuffleListForm);
+  Application.CreateForm(TProgressForm, ProgressForm);
   Application.Run;
 
 end.

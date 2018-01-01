@@ -1,6 +1,6 @@
 {
   BASSmix 2.4 Delphi unit
-  Copyright (c) 2005-2015 Un4seen Developments Ltd.
+  Copyright (c) 2005-2017 Un4seen Developments Ltd.
 
   See the BASSMIX.CHM file for more detailed documentation
 }
@@ -40,16 +40,24 @@ const
 
   // splitter flags
   BASS_SPLIT_SLAVE   = $1000;   // only read buffered data
+  BASS_SPLIT_POS     = $2000;
+
+  // splitter attributes
+  BASS_ATTRIB_SPLIT_ASYNCBUFFER = $15010;
+  BASS_ATTRIB_SPLIT_ASYNCPERIOD = $15011;
 
   // envelope types
   BASS_MIXER_ENV_FREQ = 1;
   BASS_MIXER_ENV_VOL  = 2;
   BASS_MIXER_ENV_PAN  = 3;
-  BASS_MIXER_ENV_LOOP = $10000; // FLAG: loop
+  BASS_MIXER_ENV_LOOP = $10000; // flag: loop
 
   // additional sync type
   BASS_SYNC_MIXER_ENVELOPE = $10200;
   BASS_SYNC_MIXER_ENVELOPE_NODE = $10201;
+
+  // additional BASS_Mixer_ChannelSetPosition flag
+  BASS_POS_MIXER_RESET = $10000; // flag: clear mixer's playback buffer
 
   // BASS_CHANNELINFO type
   BASS_CTYPE_STREAM_MIXER = $10800;
@@ -79,6 +87,7 @@ function BASS_Mixer_GetVersion: DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$EN
 function BASS_Mixer_StreamCreate(freq, chans, flags: DWORD): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external bassmixdll;
 function BASS_Mixer_StreamAddChannel(handle: HSTREAM; channel, flags: DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external bassmixdll;
 function BASS_Mixer_StreamAddChannelEx(handle: HSTREAM; channel, flags: DWORD; start, length: QWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external bassmixdll;
+function BASS_Mixer_StreamGetChannels(handle: DWORD; channels: Pointer; count: DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external bassmixdll;
 
 function BASS_Mixer_ChannelGetMixer(handle: DWORD): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external bassmixdll;
 function BASS_Mixer_ChannelFlags(handle, flags, mask: DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external bassmixdll;
@@ -108,3 +117,4 @@ function BASS_Split_StreamGetAvailable(handle: DWORD): DWORD; {$IFDEF MSWINDOWS}
 implementation
 
 end.
+

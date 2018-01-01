@@ -1,5 +1,5 @@
 { *
-  * Copyright (C) 2014-2016 ozok <ozok26@gmail.com>
+  * Copyright (C) 2014-2017 ozok <ozok26@gmail.com>
   *
   * This file is part of OooPlayer.
   *
@@ -24,7 +24,8 @@ interface
 uses
   System.Classes, BASS, BASS_AAC, BASSFLAC, BassWMA, BASSWV, BASS_AC3, BASSALAC,
   BASS_APE, BASS_MPC, BASS_OFR, BASS_SPX, BASS_TTA, BassOPUS, Windows, SysUtils,
-  StrUtils, Generics.Collections, MediaInfoDll, Bassmix, BASS_FX, CommonTypes;
+  StrUtils, Generics.Collections, MediaInfoDll, Bassmix, BASS_FX, CommonTypes,
+  Utils, nxLogging, Constants;
 
 type
   TPlayerStatus = (psPlaying = 0, psPaused = 1, psStopped = 2, psStalled = 3, psUnkown = 4);
@@ -45,6 +46,7 @@ type
     FPosition: int64;
     FEQParams: array[0..17] of HFX;
     FDSPHandle: Cardinal;
+    FDevices: TList<BASS_DEVICEINFO>;
     function GetBassStreamStatus: TPlayerStatus;
     function GetTotalLength(): int64;
     function GetPosition(): int64;
@@ -67,9 +69,10 @@ type
     property Channel: Cardinal read FBassHandle;
     property BassErrorCode: Integer read GetBassErrorCode;
     property MixHandle: HSTREAM read FMixHandle;
+    property Devices: TList<BASS_DEVICEINFO> read FDevices write FDevices;
     // property Levels: TLevels read FLevels;
 
-    constructor Create(const WinHandle: Cardinal);
+    constructor Create(const WinHandle: Cardinal; const DeviceId: integer = 1);
     destructor Destroy; override;
     procedure Play;
     procedure PlayUrl(const URL: string);
@@ -82,8 +85,10 @@ type
     procedure SetBuffer(const Buffer: DWORD);
     procedure ChangeEQ(const EQValues: TEQValues);
     procedure UpdatePreAmp(const PreAmpValue: single);
+    function SetDevice(const DeviceId: Integer = 1): integer;
     // procedure RemoveEQ;
     procedure InitQE;
+    procedure SetPlaybackOrder(const PlaybackOrder: integer);
   end;
 
 const
@@ -98,18 +103,23 @@ const
   UI_LEVEL_MAX = 20;
   EQ_FRENQ: array[0..17] of integer = (31, 63, 87, 125, 175, 250, 350, 500, 700, 1000, 1400, 2000, 2800, 4000, 5600, 8000, 11000, 16000);
 
+var
+  FWinHandle: Cardinal;
+  FPlaybackOrder: Integer;
+
 implementation
 
 { TMusicPlayer }
 
 uses
-  UnitMain, UnitSettings, UnitLog, UnitEQ;
+  UnitSettings, UnitLog, UnitEQ, UnitMain;
 
 // procedure SyncProc(hSync: Thandle; hChan: THandle; NotUsed: DWord; MyObject: DWord); stdcall;
 procedure SyncProc(hSync: Thandle; hChan: HSTREAM; NotUsed: DWORD; MyObject: DWORD); stdcall;
 var
   LRndIndex: integer;
 begin
+  LogSend('SyncProc');
   with MainForm do
   begin
     case PlaybackOrderList.ItemIndex of
@@ -282,7 +292,8 @@ begin
     end;
   end;
   SendMessage(WinHandle, WM_INFO_UPDATE, PLAY_NEXT_SONG, 0);
-  BASS_ChannelSetPosition(FPlayer.MixHandle, 0, BASS_POS_BYTE);
+//  BASS_ChannelSetPosition(FPlayer.MixHandle, 0, BASS_POS_BYTE);
+
 end;
 
 procedure TMusicPlayer.ChangeEQ(const EQValues: TEQValues);
@@ -298,11 +309,30 @@ begin
   end;
 end;
 
-constructor TMusicPlayer.Create(const WinHandle: Cardinal);
+constructor TMusicPlayer.Create(const WinHandle: Cardinal; const DeviceId: integer = 1);
+var
+  I: Integer;
+  LDeviceInfo: BASS_DEVICEINFO;
 begin
   FPlayerStatus := psStopped;
   FErrorMsg := MY_ERROR_OK;
-  if not BASS_Init(-1, 44100, 0, WinHandle, nil) then
+
+  FDevices := TList<BASS_DEVICEINFO>.Create;
+  I := 1;
+  while BASS_GetDeviceInfo(I, LDeviceInfo) do
+  begin
+    try
+      FDevices.Add(LDeviceInfo);
+      Inc(I);
+    except
+      on E: Exception do
+      begin
+
+      end;
+    end;
+  end;
+  FWinHandle := WinHandle;
+  if not BASS_Init(DeviceId, 44100, 0, WinHandle, nil) then
   begin
     FErrorMsg := MY_ERROR_BASS_NOT_LOADED;
   end;
@@ -312,13 +342,14 @@ begin
   // BASS_SetConfig(BASS_CONFIG_ASYNCFILE_BUFFER, 131072);
   // BASS_SetConfig(BASS_CONFIG_BUFFER, 2000);
 
-  FMixHandle := BASS_Mixer_StreamCreate(44100, 2, BASS_MIXER_END or BASS_MIXER_BUFFER);
-  BASS_ChannelSetSync(FMixHandle, BASS_SYNC_END or BASS_SYNC_MIXTIME, 0, @SyncProc, nil);
+  FMixHandle := BASS_Mixer_StreamCreate(44100, 2, BASS_MIXER_END);
+  BASS_ChannelSetSync(FMixHandle, BASS_SYNC_END or BASS_SYNC_MIXTIME, 0, @SyncProc, 0);
   // BASS_Mixer_ChannelFlags(FMixHandle, BASS_CONFIG_MIXER_BUFFER, 4);
 end;
 
 destructor TMusicPlayer.Destroy;
 begin
+  FDevices.Free;
   BASS_StreamFree(FBassHandle);
   BASS_Free();
   inherited;
@@ -414,15 +445,15 @@ begin
 
     case BASS_ErrorGetCode of
       BASS_ERROR_HANDLE:
-        LogForm.LogList.Lines.Add('Cant''t create equalizer because of invalid handle.');
+        LogSend('Cant''t create equalizer because of invalid handle.');
       BASS_ERROR_ILLTYPE:
-        LogForm.LogList.Lines.Add('Cant''t create equalizer because of illegal type.');
+        LogSend('Cant''t create equalizer because of illegal type.');
       BASS_ERROR_NOFX:
-        LogForm.LogList.Lines.Add('Cant''t create equalizer because of DirectX error.');
+        LogSend('Cant''t create equalizer because of DirectX error.');
       BASS_ERROR_FORMAT:
-        LogForm.LogList.Lines.Add('Cant''t create equalizer because of format error.');
+        LogSend('Cant''t create equalizer because of format error.');
       BASS_ERROR_UNKNOWN:
-        LogForm.LogList.Lines.Add('Cant''t create equalizer because of an unkown error.');
+        LogSend('Cant''t create equalizer because of an unkown error.');
     end;
 
     LEQ.fGain := 0;
@@ -430,11 +461,12 @@ begin
     LEQ.fCenter := EQ_FRENQ[I];
     if not BASS_FXSetParameters(FEQParams[I], @LEQ) then
     begin
-      LogForm.LogList.Lines.Add('EQ error: Unable to set params for freq: ' + LEQ.fCenter.ToString());
+      LogSend('EQ error: Unable to set params for freq: ' + LEQ.fCenter.ToString());
     end;
   end;
 end;
 
+// todo: utils unit
 function TMusicPlayer.IntToTime(IntTime: Integer): string;
 var
   hour: Integer;
@@ -525,17 +557,21 @@ procedure TMusicPlayer.Play;
 var
   LExt: string;
 begin
+  LogSend('TMusicPlayer.Play FBassHandle: ' + FloatToStr(FBassHandle));
   // free the stream first
-  if FBassHandle <> 0 then
-  begin
-    if not BASS_StreamFree(FBassHandle) then
-    begin
-      FErrorMsg := MY_ERROR_COULDNT_FREE_STREAM;
-      exit;
-    end;
-  end;
+//  if FBassHandle <> 0 then
+//  begin
+//    if not BASS_StreamFree(FBassHandle) then
+//    begin
+//      LogSend('TMusicPlayer.Play BASS_ErrorGetCode: ' + FloatToStr(BASS_ErrorGetCode));
+//      FErrorMsg := MY_ERROR_COULDNT_FREE_STREAM;
+//      exit;
+//    end;
+//  end;
+
   // create stream according to file extension
   LExt := LowerCase(ExtractFileExt(FFileName));
+  LogSend('TMusicPlayer.Play File ext: ' + LExt);
   if (LExt = '.aac') or (LExt = '.m4b') then
   begin
     FBassHandle := BASS_MP4_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX);
@@ -587,13 +623,17 @@ begin
   begin
     FBassHandle := Bass_StreamCreateFile(False, PwideChar(FFileName), 0, 0, BASS_UNICODE or BASS_SAMPLE_FLOAT or BASS_STREAM_DECODE or BASS_STREAM_PRESCAN or BASS_SAMPLE_FX);
   end;
+
+  LogSend('TMusicPlayer.Play FBassHandle2: ' + FloatToStr(FBassHandle));
   if FBassHandle > 0 then
   begin
     UpdatePreAmp(2.0);
 
+    BASS_ChannelLock(FBassHandle, True);
     BASS_ChannelSetAttribute(FBassHandle, BASS_ATTRIB_VOL, (100 - MainForm.VolumeBar.Position) / 100.0);
     BASS_Mixer_StreamAddChannel(FMixHandle, FBassHandle, BASS_STREAM_AUTOFREE or BASS_MIXER_NORAMPIN or BASS_MIXER_BUFFER);
     BASS_ChannelSetPosition(FMixHandle, 0, BASS_POS_BYTE);
+    BASS_ChannelLock(FBassHandle, False);
 
     if BASS_ChannelPlay(FMixHandle, False) then
     begin
@@ -604,12 +644,15 @@ begin
     end
     else
     begin
+      LogSend('MY_ERROR_STREAM_ZERO 1');
+      LogSend('MY_ERROR_STREAM_ZERO ' + FloatToStr(BASS_ErrorGetCode));
       FErrorMsg := MY_ERROR_STREAM_ZERO;
       FPlayerStatus := psStopped;
     end;
   end
   else
   begin
+    LogSend('MY_ERROR_STREAM_ZERO 2');
     FErrorMsg := MY_ERROR_STREAM_ZERO;
   end;
 end;
@@ -656,6 +699,19 @@ begin
   BASS_SetConfig(BASS_CONFIG_BUFFER, Buffer);
 end;
 
+function TMusicPlayer.SetDevice(const DeviceId: Integer): integer;
+begin
+  if not BASS_SetDevice(DeviceId) then
+  begin
+    Result := BASS_ErrorGetCode;
+  end;
+end;
+
+procedure TMusicPlayer.SetPlaybackOrder(const PlaybackOrder: integer);
+begin
+  FPlaybackOrder := PlaybackOrder;
+end;
+
 function TMusicPlayer.SetPosition(const Position: int64): Boolean;
 begin
   Result := BASS_ChannelSetPosition(FBassHandle, Position, BASS_POS_BYTE);
@@ -671,10 +727,13 @@ end;
 
 procedure TMusicPlayer.Stop;
 begin
+  LogSend('TMusicPlayer.Stop1');
   if GetBassStreamStatus <> psStopped then
   begin
+    LogSend('TMusicPlayer.Stop2');
     if BASS_ChannelStop(FBassHandle) and BASS_ChannelStop(FMixHandle) then
     begin
+      LogSend('TMusicPlayer.Stop3');
       FPlayerStatus := psStopped;
     end;
   end;

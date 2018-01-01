@@ -1,5 +1,5 @@
 { *
-  * Copyright (C) 2014-2016 ozok <ozok26@gmail.com>
+  * Copyright (C) 2014-2017 ozok <ozok26@gmail.com>
   *
   * This file is part of OooPlayer.
   *
@@ -36,7 +36,7 @@ uses
   JvGIFCtrl, JvExExtCtrls, JvImage, JvAppInst, UnitArtworkReader, Vcl.Taskbar,
   System.Win.TaskbarCore, Vcl.AppEvnts, System.Types, UnitLastFMToolLauncher,
   UnitSubProcessLauncher, GraphUtil, Vcl.XPMan, UnitCueParser, System.ImageList,
-  Playlist, Radiolist, CommonTypes;
+  Playlist, Radiolist, CommonTypes, UnitProgress, Utils, nxLogging;
 
 type
   TMyDragObject = class(TDragObject)
@@ -82,9 +82,6 @@ type
     N4: TMenuItem;
     E2: TMenuItem;
     L2: TMenuItem;
-    ProgressPanel: TPanel;
-    AbortBtn: TButton;
-    ProgressLabel: TLabel;
     R2: TMenuItem;
     DragDrop: TJvDragDrop;
     H1: TMenuItem;
@@ -363,7 +360,6 @@ type
   private
     { Private declarations }
     FLastDir: string;
-    FStopAddFiles: Boolean;
     FDraggingCurrentFile: Boolean;
     FDraggedQueueItemIndex: integer;
     FJpeg: TJPEGImage;
@@ -393,6 +389,7 @@ type
     function GeneratePlaylistFileName: string;
     procedure LoadSettings;
     procedure SaveSettings;
+    function LoadDevice: integer;
     procedure ScrollToCurrentSong;
     procedure LoadM3UPlaylist(const PlaylistPath: string);
     procedure LoadPPFPlaylist(const PlaylistPath: string);
@@ -403,6 +400,10 @@ type
     procedure WriteTagsToRecordFile;
     procedure UpdateOverlayIcon(const Index: integer);
     procedure LastFMScrobble;
+    procedure ProgressState(const Visible: Boolean; const State: string; const Msg: string; const Abortable: Boolean);
+    procedure UpdateProgressMsg(const Msg: string);
+    procedure UpdateProgressProgress(const Max: integer; const Progress: integer);
+    function LightenColor(Col: TColor; Percent: Byte): TColor;
   public
     { Public declarations }
     // encoder paths
@@ -431,6 +432,7 @@ type
     FSelfCaption: string;
     FWinHandle: HWND;
     FActivelyPlayedPlaylistIndex: integer;
+    FStopAddFiles: Boolean;
     procedure Log(s: string);
     procedure ScrollToItem(const ItemIndex: integer);
     procedure PlayItem(const ItemIndex: integer);
@@ -472,6 +474,10 @@ type
     procedure EnableEQ;
     procedure ChangePlaylistColumnNames;
     procedure GenerateShuffleList;
+    function GetDevices: TList<BASS_DEVICEINFO>;
+    function ChangeDevice(const DeviceId: integer): integer;
+    procedure LogHardwareInfo;
+    function DriveSpace(DriveLetter: string; var FreeSpace, UsedSpace, TotalSpace: int64): Boolean;
   end;
 
 var
@@ -485,8 +491,8 @@ var
 
 const
 {$DEFINE WRITEDEBUGLOG}
-  BuildInt = 3382;
-  Portable = False;
+  BuildInt = 3422;
+  Portable = True;
   WM_INFO_UPDATE = WM_USER + 101;
   RESET_UI = 0;
   SHOW_ERROR = 1;
@@ -606,12 +612,14 @@ begin
     PlayList.Items.BeginUpdate;
     PlaylistListPanel.Enabled := False;
     ShortcutPanel.Enabled := False;
-    ProgressPanel.Visible := True;
+    ProgressState(True, 'Adding files', '', True);
     try
       for I := 0 to OpenDialog.Files.Count - 1 do
       begin
         Application.ProcessMessages;
-        ProgressLabel.Caption := ExtractFileDir(OpenDialog.Files[I]);
+        UpdateProgressMsg(ExtractFileDir(OpenDialog.Files[I]));
+        UpdateProgressProgress(OpenDialog.Files.Count, I + 1);
+
         if FStopAddFiles then
         begin
           Break;
@@ -622,7 +630,7 @@ begin
         end;
       end;
     finally
-      ProgressPanel.Visible := False;
+      ProgressState(False, 'Adding files', '', True);
       PlayList.Items.EndUpdate;
       PlaylistListPanel.Enabled := True;
       ShortcutPanel.Enabled := True;
@@ -658,13 +666,13 @@ begin
     PlayList.Items.BeginUpdate;
     PlaylistListPanel.Enabled := False;
     ShortcutPanel.Enabled := False;
-    ProgressPanel.Visible := True;
+    ProgressState(True, 'Searching files', '', True);
     try
       MusicSearch.RecurseDepth := MaxInt;
       MusicSearch.RootDirectory := OpenFolder.Directory;
       MusicSearch.Search;
     finally
-      ProgressPanel.Visible := False;
+      ProgressState(False, 'Adding files', '', True);
       PlayList.Items.EndUpdate;
       PlaylistListPanel.Enabled := True;
       ShortcutPanel.Enabled := True;
@@ -737,30 +745,30 @@ end;
 
 procedure TMainForm.AbortBtnClick(Sender: TObject);
 begin
-  if MusicSearch.Searching then
-  begin
-    MusicSearch.Abort;
-    ProgressPanel.Visible := False;
-    PlayList.Items.EndUpdate;
-    PlaylistListPanel.Enabled := True;
-    ShortcutPanel.Enabled := True;
-    SavePlayList;
-    FLastDir := OpenFolder.Directory;
-    Self.Width := Self.Width + 1;
-    Self.Width := Self.Width - 1;
-    GenerateShuffleList;
-    FShuffleIndex := -1;
-    try
-      ShuffleListForm.ShuffleList.Refresh;
-    except
-      on E: Exception do
-      begin
-
-      end;
-    end;
-    StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files / ' + FPlayListFiles[FSelectedPlaylistIndex].Name;
-  end;
-  FStopAddFiles := True;
+//  if MusicSearch.Searching then
+//  begin
+//    MusicSearch.Abort;
+//    ProgressPanel.Visible := False;
+//    PlayList.Items.EndUpdate;
+//    PlaylistListPanel.Enabled := True;
+//    ShortcutPanel.Enabled := True;
+//    SavePlayList;
+//    FLastDir := OpenFolder.Directory;
+//    Self.Width := Self.Width + 1;
+//    Self.Width := Self.Width - 1;
+//    GenerateShuffleList;
+//    FShuffleIndex := -1;
+//    try
+//      ShuffleListForm.ShuffleList.Refresh;
+//    except
+//      on E: Exception do
+//      begin
+//
+//      end;
+//    end;
+//    StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files / ' + FPlayListFiles[FSelectedPlaylistIndex].Name;
+//  end;
+//  FStopAddFiles := True;
 end;
 
 procedure TMainForm.AddCueSheet(const CUEPath: string);
@@ -1049,9 +1057,11 @@ var
   LQueueList: TQueueList;
   LSW: TStreamWriter;
   LListItem: TListItem;
+  LIsOK: Boolean;
 begin
-  LName := InputBox('New playlist name', 'Name', 'Playlist' + FPlayListFiles.Count.ToString());
-  if LName.Length > 0 then
+//  LName := InputBox('New playlist name', 'Name', 'Playlist' + FPlayListFiles.Count.ToString());
+  LIsOK := InputQuery('New playlist name', 'Name:', LName);
+  if (LName.Length > 0) and LIsOK then
   begin
     LPlaylistFile := TPlaylistFile.Create;
     LQueueList := TQueueList.Create;
@@ -1101,12 +1111,13 @@ begin
   begin
     FStopAddFiles := False;
     PlayList.Items.BeginUpdate;
-    ProgressPanel.Visible := True;
+    ProgressState(True, 'Adding files', '', True);
     try
       for i := 0 to CmdLine.Count - 1 do
       begin
         Application.ProcessMessages;
-        ProgressLabel.Caption := ExtractFileDir(CmdLine[i]);
+        UpdateProgressMsg(ExtractFileDir(CmdLine[i]));
+        UpdateProgressProgress(CmdLine.Count, i + 1);
         if FStopAddFiles then
         begin
           Break;
@@ -1117,7 +1128,7 @@ begin
         end;
       end;
     finally
-      ProgressPanel.Visible := False;
+      ProgressState(True, 'Adding files', '', True);
       PlayList.Items.EndUpdate;
       SavePlayList;
       // FLastDir := OpenFolder.Directory;
@@ -1434,7 +1445,18 @@ function TMainForm.CreateRadioRecordFileName: TRadioRecordInfo;
 var
   LOutputFile: string;
   LSplitLst: TStringList;
+  LRadioStationName: string;
 begin
+
+  if (FCurrentRadioIndex > -1) and (FCurrentRadioIndex < FRadioStations.Count) then
+  begin
+    LRadioStationName := FRadioStations[FCurrentRadioIndex].Name;
+  end
+  else
+  begin
+    LRadioStationName := 'Radio';
+  end;
+
   case RadioRecordModeList.ItemIndex of
     0: // seperate file for each file
       begin
@@ -1448,22 +1470,25 @@ begin
             LSplitLst.DelimitedText := FArtistLabel;
             if LSplitLst.Count >= 2 then
             begin
-              LOutputFile := FRadioStations[FCurrentRadioIndex].Name + ' - ' + Trim(LSplitLst[1]) + ' - ' + Trim(LSplitLst[0]);
-              if RadioRecordFormatList.ItemIndex = 4 then
+              if (FCurrentRadioIndex > -1) and (FCurrentRadioIndex < FRadioStations.Count) then
               begin
-                Result.Title := Trim(LSplitLst[1]);
-                Result.Artist := Trim(LSplitLst[0]);
-              end
-              else
-              begin
-                Result.Title := '"' + Trim(LSplitLst[1]) + '" ';
-                Result.Artist := '"' + Trim(LSplitLst[0]) + '" ';
+                LOutputFile := LRadioStationName + ' - ' + Trim(LSplitLst[1]) + ' - ' + Trim(LSplitLst[0]);
+                if RadioRecordFormatList.ItemIndex = 4 then
+                begin
+                  Result.Title := Trim(LSplitLst[1]);
+                  Result.Artist := Trim(LSplitLst[0]);
+                end
+                else
+                begin
+                  Result.Title := '"' + Trim(LSplitLst[1]) + '" ';
+                  Result.Artist := '"' + Trim(LSplitLst[0]) + '" ';
+                end;
               end;
             end
             else
             begin
               // use date time
-              LOutputFile := FRadioStations[FCurrentRadioIndex].Name + ' - ' + DateTimeToStr(Now);
+              LOutputFile := LRadioStationName + ' - ' + DateTimeToStr(Now);
             end;
           finally
             LSplitLst.Free;
@@ -1472,12 +1497,12 @@ begin
         else
         begin
           // if tags aren't present use date and date
-          LOutputFile := FRadioStations[FCurrentRadioIndex].Name + ' - ' + DateTimeToStr(Now);
+          LOutputFile := LRadioStationName + ' - ' + DateTimeToStr(Now);
         end;
       end;
     1: // single long file
       begin
-        LOutputFile := FRadioStations[FCurrentRadioIndex].Name + ' - ' + DateTimeToStr(Now)
+        LOutputFile := LRadioStationName + ' - ' + DateTimeToStr(Now)
       end;
   end;
   if Length(Result.FileName) >= 251 then
@@ -1627,7 +1652,7 @@ begin
   PlayList.Items.BeginUpdate;
   PlaylistListPanel.Enabled := False;
   ShortcutPanel.Enabled := False;
-  ProgressPanel.Visible := True;
+  ProgressState(True, 'Adding files', '', True);
   DirectoriesToSearch := TStringList.Create;
   try
     for i := 0 to Value.Count - 1 do
@@ -1670,7 +1695,7 @@ begin
       end;
     end;
   finally
-    ProgressPanel.Visible := False;
+    ProgressState(False, 'Adding files', '', True);
     PlayList.Items.EndUpdate;
     PlaylistListPanel.Enabled := True;
     ShortcutPanel.Enabled := True;
@@ -1691,6 +1716,21 @@ begin
     PlayList.Items.Count := FPlaylists[FSelectedPlaylistIndex].Count;
     StatusBar.Panels[0].Text := FloatToStr(PlayList.Items.Count) + ' files / ' + FPlayListFiles[FSelectedPlaylistIndex].Name;
     FStopAddFiles := True;
+  end;
+end;
+
+function TMainForm.DriveSpace(DriveLetter: string; var FreeSpace, UsedSpace, TotalSpace: int64): Boolean;
+begin
+  Result := GetDiskFreeSpaceEx(Pchar(DriveLetter), UsedSpace, TotalSpace, @FreeSpace);
+
+  if UsedSpace > 0 then
+    UsedSpace := TotalSpace - FreeSpace;
+
+  if not Result then
+  begin
+    UsedSpace := 0;
+    TotalSpace := 0;
+    FreeSpace := 0;
   end;
 end;
 
@@ -1804,8 +1844,45 @@ var
   LRadios: TStringList;
   I: Integer;
   LItem: TListItem;
+  LDeviceInfo: BASS_DEVICEINFO;
 begin
-  FPlayer := TMusicPlayer.Create(handle);
+  if Portable then
+  begin
+    FAppDataFolder := ExtractFileDir(Application.ExeName) + '\'
+  end
+  else
+  begin
+    FAppDataFolder := SysInfo.Folders.AppData + '\OooPlayer\'
+  end;
+
+  if not DirectoryExists(FAppDataFolder + '\logs\') then
+  begin
+    ForceDirectories(FAppDataFolder + '\logs\')
+  end;
+
+  nxLogging.Logger.initializeFileLogging('OooPlayer', FAppDataFolder + '\logs\', FormatDateTime('yyyy_mm_dd_hh_nn_ss', Now), 10, TNxLogAppenderFileStrategy.NXLFS_SINGLEFILE);
+
+  {$IFDEF DEBUG}
+  LogSend('Debug');
+{$ELSE}
+  LogSend('Release');
+{$ENDIF}
+  LogSend(nxLogging.Logger.DesignInfo.ToString);
+  LogSend(GetExeBuild(Application.ExeName));
+  LogSend('Program started');
+  LogHardwareInfo;
+
+  if not DirectoryExists(FAppDataFolder) then
+  begin
+    if not ForceDirectories(FAppDataFolder) then
+    begin
+      Application.MessageBox('Unable to create profile folder.', 'FATAL ERROR', MB_ICONERROR);
+      Application.Terminate;
+    end;
+  end;
+  ForceDirectories(FAppDataFolder + '\lyric\');
+
+  FPlayer := TMusicPlayer.Create(handle, LoadDevice);
   case FPlayer.ErrorMsg of
     MY_ERROR_BASS_NOT_LOADED:
       begin
@@ -1861,24 +1938,6 @@ begin
   BASS_SetConfig(BASS_CONFIG_NET_PREBUF, 0);
   WinHandle := handle;
   FWinHandle := handle;
-
-  if Portable then
-  begin
-    FAppDataFolder := ExtractFileDir(Application.ExeName) + '\'
-  end
-  else
-  begin
-    FAppDataFolder := SysInfo.Folders.AppData + '\OooPlayer\'
-  end;
-  if not DirectoryExists(FAppDataFolder) then
-  begin
-    if not ForceDirectories(FAppDataFolder) then
-    begin
-      Application.MessageBox('Unable to create profile folder.', 'FATAL ERROR', MB_ICONERROR);
-      Application.Terminate;
-    end;
-  end;
-  ForceDirectories(FAppDataFolder + '\lyric\');
 
   FPlaylists := TList<TPlaylist>.Create;
   FQueueLists := TList<TQueueList>.Create;
@@ -2086,12 +2145,13 @@ begin
   begin
     FStopAddFiles := False;
     PlayList.Items.BeginUpdate;
-    ProgressPanel.Visible := True;
+    ProgressState(True, 'Adding files', '', True);
     try
       for I := 1 to ParamCount do
       begin
         Application.ProcessMessages;
-        ProgressLabel.Caption := ExtractFileDir(ParamStr(I));
+        UpdateProgressMsg(ExtractFileDir(ParamStr(I)));
+        UpdateProgressProgress(ParamCount, I + 1);
         if FStopAddFiles then
         begin
           Break;
@@ -2102,7 +2162,7 @@ begin
         end;
       end;
     finally
-      ProgressPanel.Visible := False;
+      ProgressState(False, 'Adding files', '', True);
       PlayList.Items.EndUpdate;
       SavePlayList;
       // FLastDir := OpenFolder.Directory;
@@ -2168,6 +2228,11 @@ var
 begin
   CreateGUID(LGUID);
   Result := GUIDToString(LGUID);
+end;
+
+function TMainForm.GetDevices: TList<BASS_DEVICEINFO>;
+begin
+  Result := FPlayer.Devices;
 end;
 
 function TMainForm.GetDurationEx(const FileName: string): integer;
@@ -2506,6 +2571,14 @@ begin
     Self.FocusControl(VolumeBar);
 end;
 
+function TMainForm.ChangeDevice(const DeviceId: integer): integer;
+begin
+  StopBtnClick(Self);
+  FPlayer.Free;
+  FPlayer := TMusicPlayer.Create(handle, DeviceId);
+  Result := FPlayer.BassErrorCode;
+end;
+
 function TMainForm.IsRadioPlayerPaused: Boolean;
 begin
   Result := BASS_ChannelIsActive(FRadioHandle) = BASS_ACTIVE_PAUSED
@@ -2628,6 +2701,35 @@ begin
         FLastFMToolLauncher.Start('" " "' + SettingsForm.LastFMUser.Trim + '" "' + SettingsForm.LastFMHashedPass + '" "' + FLastFMArtist + '" "' + FLastFMSong + '"', ExtractFileDir(Application.ExeName) + '\lastfm\lastfmscrobble.exe');
       end;
     end;
+  end;
+end;
+
+function TMainForm.LightenColor(Col: TColor; Percent: Byte): TColor;
+var
+  R, G, B: Byte;
+begin
+  R := GetRValue(Col);
+  G := GetGValue(Col);
+  B := GetBValue(Col);
+  R := Round(R * Percent / 100) + Round(255 - Percent / 100 * 255);
+  G := Round(G * Percent / 100) + Round(255 - Percent / 100 * 255);
+  B := Round(B * Percent / 100) + Round(255 - Percent / 100 * 255);
+  Result := RGB(R, G, B);
+end;
+
+function TMainForm.LoadDevice: integer;
+var
+  SettingsFile: TIniFile;
+  LSkinIndex: integer;
+begin
+  SettingsFile := TIniFile.Create(FAppDataFolder + '\settings.ini');
+  try
+    with SettingsFile do
+    begin
+      Result := ReadInteger('General', 'DeviceId', 1);
+    end;
+  finally
+    SettingsFile.Free;
   end;
 end;
 
@@ -3009,6 +3111,74 @@ begin
 {$ENDIF}
 end;
 
+procedure TMainForm.LogHardwareInfo;
+var
+  LDrives: TStringList;
+  DriveMap, dMask: DWORD;
+  dRoot: string;
+  I: Integer;
+  FreeSpace, UsedSpace, TotalSpace: int64;
+begin
+  try
+    with SysInfo do
+    begin
+      LogSend('CPU.Name: ' + CPU.Name);
+      LogSend('CPU.ProcessorCount: ' + CPU.ProcessorCount.ToString);
+      LogSend('Memory.TotalPhysicalMemory: ' + FileSizetoString(Memory.TotalPhysicalMemory));
+      LogSend('Memory.FreePhysicalMemory: ' + FileSizetoString(Memory.FreePhysicalMemory));
+      LogSend('BIOS.Name: ' + BIOS.Name);
+      LogSend('BIOS.ExtendedInfo: ' + BIOS.ExtendedInfo);
+      LogSend('Screen.ScreenResolution.X: ' + Screen.ScreenResolution.X.ToString);
+      LogSend('Screen.ScreenResolution.Y: ' + Screen.ScreenResolution.Y.ToString);
+      LogSend('Screen.Hz: ' + Screen.Hz.ToString);
+      LogSend('Folders.CommonFiles: ' + Folders.CommonFiles);
+      LogSend('Folders.ProgramFiles: ' + Folders.ProgramFiles);
+      LogSend('Folders.Windows: ' + Folders.Windows);
+      LogSend('Folders.System: ' + Folders.System);
+      LogSend('Folders.Temp: ' + Folders.Temp);
+      LogSend('Folders.Desktop: ' + Folders.Desktop);
+      LogSend('Folders.Programs: ' + Folders.Programs);
+      LogSend('Folders.Personal: ' + Folders.Personal);
+
+      LDrives := TStringList.Create;
+      try
+        dRoot := 'A:\';
+        DriveMap := GetLogicalDrives;
+        dMask := 1;
+
+        for I := 0 to 32 do
+        begin
+          if (dMask and DriveMap) <> 0 then
+          begin
+            if GetDriveType(PChar(dRoot)) = DRIVE_FIXED then
+            begin
+              LDrives.Add(dRoot[1] + ':');
+            end;
+          end;
+
+          dMask := dMask shl 1;
+          Inc(dRoot[1]);
+        end;
+
+        for I := 0 to LDrives.Count - 1 do
+        begin
+          if DriveSpace(LDrives[I], FreeSpace, UsedSpace, TotalSpace) then
+          begin
+            LogSend('Drive: ' + LDrives[I] + ' = Free Space :' + FileSizetoString(FreeSpace) + ' Used Space: ' + FileSizetoString(UsedSpace) + ' Total Space: ' + FileSizetoString(TotalSpace));
+          end;
+        end;
+      finally
+        LDrives.Free;
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      LogSendException('TMainForm.LogHardwareInfo', E);
+    end;
+  end;
+end;
+
 procedure TMainForm.LyricListMouseEnter(Sender: TObject);
 begin
   if Self.Enabled and Self.Visible then
@@ -3138,7 +3308,7 @@ end;
 
 procedure TMainForm.MusicSearchFindFile(Sender: TObject; const AName: string);
 begin
-  ProgressLabel.Caption := ExtractFileDir(AName);
+  UpdateProgressMsg(ExtractFileDir(AName));
   AddFile(AName);
 end;
 
@@ -4213,7 +4383,8 @@ begin
   end
   else
   begin
-    Sender.Canvas.Brush.Color := clGradientInactiveCaption;
+    Sender.Canvas.Brush.Color := LightenColor((Sender as TListView).Color, 95);
+    Sender.Canvas.Font.Color := clWhite;
   end;
   if FPlayer.PlayerStatus2 <> psStopped then
   begin
@@ -4681,6 +4852,28 @@ begin
     Self.FocusControl(VolumeBar);
 end;
 
+procedure TMainForm.ProgressState(const Visible: Boolean; const State, Msg: string; const Abortable: Boolean);
+begin
+  if Visible then
+  begin
+    Self.Enabled := False;
+    ProgressForm.Width := Self.Width - 80;
+    ProgressForm.Show;
+    ProgressForm.StateLabel.Caption := State;
+    ProgressForm.MsgLabel.Caption := Msg;
+    ProgressForm.AbortBtn.Enabled := Abortable;
+  end
+  else
+  begin
+    if ProgressForm.Visible then
+    begin
+      ProgressForm.Close;
+    end;
+    Self.Enabled := True;
+    Self.BringToFront;
+  end;
+end;
+
 procedure TMainForm.ProgressTimerTimer(Sender: TObject);
 begin
   if FPlayer.PlayerStatus2 = psPlaying then
@@ -4850,7 +5043,7 @@ var
   I: Integer;
   LCounter: integer;
 begin
-  if ProgressPanel.Visible then
+  if ProgressForm.Visible then
     Exit;
 
   if ID_YES = Application.MessageBox('This will remove items that no longer exist on your disk from active playlist. Do you wish to continue?', 'Question', MB_ICONQUESTION or MB_YESNO) then
@@ -5278,6 +5471,11 @@ begin
       FPlaylists.Delete(LSelectedIndex);
       PlaylistView.Items.Delete(LSelectedIndex);
       FSelectedPlaylistIndex := FPlayListFiles.Count - 1;
+      if PlaylistView.Items.Count > 0 then
+      begin
+        PlaylistView.Items[0].Selected := True;
+        PlaylistView.ItemIndex := 0;
+      end;
       PlaylistViewClick(Self);
       SavePlayList;
     end;
@@ -5979,6 +6177,17 @@ begin
   // change play status icon
   Taskbar2.OverlayIcon.LoadFromFile(ExtractFileDir(Application.ExeName) + '\ico\' + FloatToStr(Index) + '.ico');
   Taskbar2.ApplyOverlayChanges;
+end;
+
+procedure TMainForm.UpdateProgressMsg(const Msg: string);
+begin
+  ProgressForm.MsgLabel.Caption := Msg;
+end;
+
+procedure TMainForm.UpdateProgressProgress(const Max, Progress: integer);
+begin
+  ProgressForm.ProgressBar1.Max := Max;
+  ProgressForm.ProgressBar1.Position := Progress;
 end;
 
 procedure TMainForm.UpdateThreadExecute(Sender: TObject; Params: Pointer);
