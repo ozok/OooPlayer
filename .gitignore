@@ -112,3 +112,4 @@ Release/Win64/skins.txt
 /Release/Win64/lastfm/email/architecture.rst
 /LastFMTool/build/exe.win32-3.6/python36.zip
 /Release/Win64/lastfm/python36.zip
+*.nxlog
