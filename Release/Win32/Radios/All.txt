@@ -185,6 +185,12 @@ All4Fun Radio - Clubstream;http://www.all4funradio.eu;http://46.163.108.110:3074
 All4Fun Radio - Deutschstream;http://www.all4funradio.eu;http://46.163.108.110:30730
 All4Fun Radio - Mainstream;http://www.all4funradio.eu;http://46.163.108.110:30716
 All 80s Dublin;http://www.all80s.ie/listen/;http://5.63.151.52:8101
+Alles Radio;http://stream.laut.fm/alles-radio
+Alles Chill;http://stream.laut.fm/alles-chill
+Alles Dance;http://stream.laut.fm/alles-dance
+Alles Techno;http://stream.laut.fm/alles-techno
+Alles Hardstyle;http://stream.laut.fm/alles-hardstyle
+Alles Klub;http://stream.laut.fm/alles-klub
 Alpenmelodie;http://www.alpenmelodie.de;http://radio.alpenmelodie.de:8100
 Alpenradio - Volksmusik;http://www.radionomy.com/en/radio/air-lounge#!/en/radio/alpenradio-volksmusik/index;http://listen.radionomy.com/alpenradio-volksmusik
 Alpha Radio Minsk;http://www.alpha.by;http://86.57.151.4:8009/
